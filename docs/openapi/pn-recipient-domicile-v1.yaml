@@ -1,0 +1,160 @@
+openapi: 3.0.1
+info:
+  title: Get recipients digital addresses from national public registries
+  version: v1
+  description: |
+      # Fare una descrizione
+  license:
+    name: PagoPA PN license
+    url: http://pippo.pappo.it
+servers:
+  - url: https://servizio-anonimizzazione
+    description: finto
+tags:
+  - name: InfoDomicile
+    description: Domicile addresses
+paths:
+  '/ext-registry-private/domiciles/v1/{recipientType}/{taxId}/digital':
+    get:
+      operationId: getOneDigitalDomicile
+      summary: Read the digital domicile of a notification recipient
+      description: |
+          Read the digital domicile of a notification recipient. Il destinatario 
+          può essere una persona fisica o una persona giuridica.
+      tags:
+        - InfoDomicile
+      parameters:
+        - name: recipientType
+          description: il tipo del destinatario
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/RecipientType'
+        - name: taxId
+          description: il codice fiscale del destinatario
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/TaxId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigitalDomicile'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+  '/ext-registry-private/domiciles/v1/{recipientType}/{taxId}/analog':
+    get:
+      operationId: getOneAnalogDomicile
+      summary: Read the analog domicile of a notification recipient
+      description: |
+          Read the analog domicile of a notification recipient. Il destinatario 
+          può essere una persona fisica o una persona giuridica.
+      tags:
+        - InfoDomicile
+      parameters:
+        - name: recipientType
+          description: il tipo del destinatario
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/RecipientType'
+        - name: taxId
+          description: il codice fiscale del destinatario
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/TaxId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalogDomicile'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'  
+components:
+  schemas:
+    RecipientType:
+      title: 'Tipo del destinatario: PF / PG'
+      type: string
+      enum:
+        - PF
+        - PG
+    TaxId:
+      title: Codice Fiscale
+      type: string
+      pattern: '[A-Z0-9]{5,20}'
+      minLength: 5
+      maxLength: 20
+    DigitalDomicile:
+      title: dettagli di un domicilio digitale
+      type: object
+      required:
+        - domicileType
+        - address
+      properties:
+        domicileType:
+          type: string
+          enum:
+            - PEC
+            - IO
+        address:
+          type: string
+    AnalogDomicile:
+      title: dettagli di un domicilio analogico; ovvero un indirizzo fisico
+      type: object
+      required:
+        - address
+        - cap
+        - municipality
+        - province
+      properties:
+        at:
+          type: string
+          example: 'presso famiglia Rossi'
+        address: 
+          type: string
+          example: 'Via senza Nome 15'
+        addressDetails:
+          type: string
+          example: 'scala A'
+        cap:
+          type: string
+          example: '40129'
+        municipality:
+          type: string
+          example: 'Bologna'
+        province:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: 'BO'
+        state:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: 'it'
