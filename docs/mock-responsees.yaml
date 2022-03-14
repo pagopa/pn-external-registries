@@ -10,7 +10,6 @@ pa-list:
 domiciles:
   - id: 'id_opaco_destinatario'
     recipientType: PF
-    taxId: NMOCGN30T01A944Y
     digital:
       domicileType: PEC
       address: 'nome.cognome.1@works.pec.it'

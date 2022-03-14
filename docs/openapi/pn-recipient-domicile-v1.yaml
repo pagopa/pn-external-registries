@@ -14,7 +14,7 @@ tags:
   - name: InfoDomicile
     description: Domicile addresses
 paths:
-  '/ext-registry-private/domiciles/v1/{recipientType}/{taxId}/digital':
+  '/ext-registry-private/domiciles/v1/{recipientType}/{opaqueId}/digital':
     get:
       operationId: getOneDigitalDomicile
       summary: Read the digital domicile of a notification recipient
@@ -30,12 +30,12 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/RecipientType'
-        - name: taxId
-          description: il codice fiscale del destinatario
+        - name: opaqueId
+          description: Identificativo universale univoco del destinatario
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/TaxId'
+            $ref: '#/components/schemas/OpaqueId'
       responses:
         '200':
           description: OK
@@ -55,7 +55,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'pn-errors.yaml#/components/schemas/Problem'
-  '/ext-registry-private/domiciles/v1/{recipientType}/{taxId}/analog':
+  '/ext-registry-private/domiciles/v1/{recipientType}/{opaqueId}/analog':
     get:
       operationId: getOneAnalogDomicile
       summary: Read the analog domicile of a notification recipient
@@ -71,12 +71,12 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/RecipientType'
-        - name: taxId
-          description: il codice fiscale del destinatario
+        - name: opaqueId
+          description: Identificativo universale univoco del destinatario
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/TaxId'
+            $ref: '#/components/schemas/OpaqueId'
       responses:
         '200':
           description: OK
@@ -104,12 +104,12 @@ components:
       enum:
         - PF
         - PG
-    TaxId:
-      title: Codice Fiscale
+    OpaqueId:
+      title: |
+          Identificati Univoco Universale del destinatario della notifica di cui si 
+          sta richiedendo il domicilio analogico o digitale.
       type: string
-      pattern: '[A-Z0-9]{5,20}'
-      minLength: 5
-      maxLength: 20
+      format: uuid
     DigitalDomicile:
       title: dettagli di un domicilio digitale
       type: object
