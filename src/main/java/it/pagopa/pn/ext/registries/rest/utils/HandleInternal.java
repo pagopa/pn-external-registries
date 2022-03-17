@@ -4,8 +4,6 @@ import it.pagopa.pn.ext.registries.common.exceptions.PnInternalException;
 import it.pagopa.pn.ext.registries.common.model.ProblemDto;
 import org.springframework.http.ResponseEntity;
 
-import javax.validation.ConstraintViolationException;
-
 public class HandleInternal {
     private HandleInternal(){}
     

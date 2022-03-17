@@ -1,6 +1,5 @@
 package it.pagopa.pn.ext.registries.rest;
 
-//import it.pagopa.pn.commons.exceptions.PnValidationException;
 import it.pagopa.pn.ext.registries.common.exceptions.PnInternalException;
 import it.pagopa.pn.ext.registries.common.model.ProblemDto;
 import it.pagopa.pn.ext.registries.pa.api.InfoPaApi;
