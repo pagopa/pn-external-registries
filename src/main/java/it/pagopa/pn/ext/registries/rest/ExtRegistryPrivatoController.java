@@ -6,6 +6,7 @@ import it.pagopa.pn.ext.registries.privati.api.InfoDomicileApi;
 import it.pagopa.pn.ext.registries.privati.model.AnalogDomicileDto;
 import it.pagopa.pn.ext.registries.privati.model.DigitalDomicileDto;
 import it.pagopa.pn.ext.registries.privati.model.RecipientTypeDto;
+import it.pagopa.pn.ext.registries.rest.utils.HandleIllegalArgument;
 import it.pagopa.pn.ext.registries.rest.utils.HandleInternal;
 import it.pagopa.pn.ext.registries.rest.utils.HandleValidation;
 import lombok.extern.slf4j.Slf4j;
@@ -84,5 +85,9 @@ public class ExtRegistryPrivatoController implements InfoDomicileApi {
         return HandleValidation.handleValidationException(ex, HttpStatus.BAD_REQUEST.value() );
     }
 
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ProblemDto> handleIllegalArgumentException(IllegalArgumentException ex){
+        return HandleIllegalArgument.handleIllegalArgumentException(ex, HttpStatus.BAD_REQUEST.value() );
+    }
 
 }

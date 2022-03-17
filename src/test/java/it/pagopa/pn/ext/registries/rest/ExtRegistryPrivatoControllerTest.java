@@ -82,4 +82,36 @@ class ExtRegistryPrivatoControllerTest {
                 .andExpect(content().json(content));
 
     }
+
+    @Test
+    void getOneDigitalDomicile_KO_Bad_recipientType()  throws Exception {
+        String content = TestUtils.toJson(digitalDomicileDto);
+
+        String recipientType = "PFXX";
+        String opaqueId = "c0a235b2-a454-11ec-b909-0242ac120002";
+        String url = String.format("/ext-registry-private/domiciles/v1/%s/%s/digital", recipientType, opaqueId);
+
+        this.mockMvc
+                .perform(
+                        get(url)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getOneDigitalDomicile_KO_Bad_opaqueId()  throws Exception {
+        String content = TestUtils.toJson(digitalDomicileDto);
+
+        String recipientType = "PF";
+        String opaqueId = "c0a235b2-a454-11ec-b909-0242ac120002_XXXX";
+        String url = String.format("/ext-registry-private/domiciles/v1/%s/%s/digital", recipientType, opaqueId);
+
+        this.mockMvc
+                .perform(
+                        get(url)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }
