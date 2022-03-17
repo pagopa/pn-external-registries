@@ -1,6 +1,8 @@
 package it.pagopa.pn.ext.registries.common.model;
 
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import javax.annotation.Generated;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProblemDto   {
 
   @JsonProperty("status")

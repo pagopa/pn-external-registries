@@ -3,11 +3,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package it.pagopa.pn.ext.registries.privato.api;
+package it.pagopa.pn.ext.registries.privati.api;
 
-import it.pagopa.pn.ext.registries.privato.model.AnalogDomicileDto;
-import it.pagopa.pn.ext.registries.privato.model.DigitalDomicileDto;
-import it.pagopa.pn.ext.registries.privato.model.RecipientTypeDto;
+import it.pagopa.pn.ext.registries.privati.model.AnalogDomicileDto;
+import it.pagopa.pn.ext.registries.privati.model.DigitalDomicileDto;
+import it.pagopa.pn.ext.registries.privati.model.RecipientTypeDto;
 
 import java.util.UUID;
 

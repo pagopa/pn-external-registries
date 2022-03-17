@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package it.pagopa.pn.ext.registries.api;
+package it.pagopa.pn.ext.registries.pa.api;
 
-import it.pagopa.pn.ext.registries.model.PaInfoDto;
+import it.pagopa.pn.ext.registries.pa.model.PaInfoDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

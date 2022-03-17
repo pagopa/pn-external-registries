@@ -1,15 +1,20 @@
 package it.pagopa.pn.ext.registries.rest;
 
-import it.pagopa.pn.ext.registries.privato.api.InfoDomicileApi;
-import it.pagopa.pn.ext.registries.privato.model.AnalogDomicileDto;
-import it.pagopa.pn.ext.registries.privato.model.DigitalDomicileDto;
-import it.pagopa.pn.ext.registries.privato.model.RecipientTypeDto;
+import it.pagopa.pn.ext.registries.common.exceptions.PnInternalException;
+import it.pagopa.pn.ext.registries.common.model.ProblemDto;
+import it.pagopa.pn.ext.registries.privati.api.InfoDomicileApi;
+import it.pagopa.pn.ext.registries.privati.model.AnalogDomicileDto;
+import it.pagopa.pn.ext.registries.privati.model.DigitalDomicileDto;
+import it.pagopa.pn.ext.registries.privati.model.RecipientTypeDto;
+import it.pagopa.pn.ext.registries.rest.utils.HandleInternal;
+import it.pagopa.pn.ext.registries.rest.utils.HandleValidation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.UUID;
 
 @RestController
@@ -38,9 +43,9 @@ public class ExtRegistryPrivatoController implements InfoDomicileApi {
             dto.setProvince("BO");
             return ResponseEntity.ok(dto);
         } else {
-            String msg = String.format("recipientType: %s not found", recipientType);
+            String msg = String.format("recipientType '%s' not found", recipientType);
             log.info("getOneAnalogDomicile - {}", msg);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, msg);
+            throw new PnInternalException(msg);
         }
     }
 
@@ -64,9 +69,20 @@ public class ExtRegistryPrivatoController implements InfoDomicileApi {
             dto.setDomicileType(DigitalDomicileDto.DomicileTypeEnum.PEC);
             return ResponseEntity.ok(dto);
         } else {
-            String msg = String.format("recipientType: %s not found", recipientType);
-            log.info("getOneDigitalDomicile - {}", msg);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, msg);
+            String msg = String.format("recipientType '%s' not found", recipientType);
+            throw new PnInternalException(msg);
         }
     }
+
+    @ExceptionHandler({PnInternalException.class})
+    public ResponseEntity<ProblemDto> handleInternalException(PnInternalException ex){
+        return HandleInternal.handleInternalException(ex, HttpStatus.BAD_REQUEST.value() );
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<ProblemDto> handleValidationException(ConstraintViolationException ex){
+        return HandleValidation.handleValidationException(ex, HttpStatus.BAD_REQUEST.value() );
+    }
+
+
 }

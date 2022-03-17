@@ -1,4 +1,4 @@
-package it.pagopa.pn.ext.registries.model;
+package it.pagopa.pn.ext.registries.pa.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,16 +1,20 @@
 package it.pagopa.pn.ext.registries.rest;
 
 //import it.pagopa.pn.commons.exceptions.PnValidationException;
-import it.pagopa.pn.ext.registries.api.InfoPaApi;
+import it.pagopa.pn.ext.registries.common.exceptions.PnInternalException;
 import it.pagopa.pn.ext.registries.common.model.ProblemDto;
-import it.pagopa.pn.ext.registries.model.PaContactsDto;
-import it.pagopa.pn.ext.registries.model.PaInfoDto;
+import it.pagopa.pn.ext.registries.pa.api.InfoPaApi;
+import it.pagopa.pn.ext.registries.pa.model.PaContactsDto;
+import it.pagopa.pn.ext.registries.pa.model.PaInfoDto;
+import it.pagopa.pn.ext.registries.rest.utils.HandleInternal;
+import it.pagopa.pn.ext.registries.rest.utils.HandleValidation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +22,7 @@ import java.util.List;
 @RestController
 @Slf4j
 public class ExtRegistryController implements InfoPaApi {
-    public static final Integer EXT_REGISTRY_VALIDATION_ERROR_STATUS = HttpStatus.BAD_REQUEST.value();
+    public static final Integer EXT_REGISTRY_VALIDATION_ERROR_STATUS = 1;
 
     /**
      * GET /ext-registry/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
@@ -44,16 +48,9 @@ public class ExtRegistryController implements InfoPaApi {
 
             return ResponseEntity.ok(dto);
         } else {
-//            ProblemDto dto = new ProblemDto(HttpStatus.NOT_FOUND.,
-//                                "",
-//                                 String.format("id: % not found", id),
-//                            null);
-
-
-
-            String msg = String.format("id: %s not found", id);
+            String msg = String.format("id '%s' not found", id);
             log.info("getOnePa - {}", msg);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, msg);
+            throw new PnInternalException(msg);
         }
     }
 
@@ -64,7 +61,9 @@ public class ExtRegistryController implements InfoPaApi {
      * @param paNameFilter Se valorizzato indica (optional)
      * @return OK (status code 200)
      *         or Invalid input (status code 400)
-     *         or Internal Server Error (status code 500)
+     *         or Internal Server Error (status code 500
+     *
+     *         se "c_f205" inizia per paNameFilter allora ritorno
      */
     @Override
     public ResponseEntity<List<Object>> listOnboardedPa(String paNameFilter) {
@@ -86,9 +85,14 @@ public class ExtRegistryController implements InfoPaApi {
 
     }
 
-//    @ExceptionHandler({PnValidationException.class})
-//    public ResponseEntity<ProblemDto> handleValidationException(PnValidationException ex){
-//        return HandleValidation.handleValidationException(ex, EXT_REGISTRY_VALIDATION_ERROR_STATUS);
-//    }
+    @ExceptionHandler({PnInternalException.class})
+    public ResponseEntity<ProblemDto> handleInternalException(PnInternalException ex){
+        return HandleInternal.handleInternalException(ex, HttpStatus.BAD_REQUEST.value() );
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<ProblemDto> handleValidationException(ConstraintViolationException ex){
+        return HandleValidation.handleValidationException(ex, HttpStatus.BAD_REQUEST.value() );
+    }
 
 }
