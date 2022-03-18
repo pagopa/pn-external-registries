@@ -97,10 +97,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
               <generateApiTests>false</generateApiTests>
               <generateModelTests>false</generateModelTests>
               <configOptions>
-                <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.recipeints.domicile.v1</basePackage>
-                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.server.recipeints.domicile.v1.dto</modelPackage>
-                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.server.recipeints.domicile.v1.api</apiPackage>
-                <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.recipeints.domicile.v1.config</configPackage>
+                <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1</basePackage>
+                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto</modelPackage>
+                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.api</apiPackage>
+                <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.config</configPackage>
                 <dateLibrary>java11</dateLibrary>
                 <delegatePattern>true</delegatePattern>
                 <interfaceOnly>true</interfaceOnly>
