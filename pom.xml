@@ -64,7 +64,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
               <inputSpec>${project.basedir}/docs/openapi/pn-ipa-v1.yaml</inputSpec>
               <generatorName>spring</generatorName>
               <library>spring-boot</library>
-              <modelNameSuffix></modelNameSuffix>
+              <modelNameSuffix>Dto</modelNameSuffix>
               <generateApiTests>false</generateApiTests>
               <generateModelTests>false</generateModelTests>
               <configOptions>
@@ -93,7 +93,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
               <inputSpec>${project.basedir}/docs/openapi/pn-recipient-domicile-v1.yaml</inputSpec>
               <generatorName>spring</generatorName>
               <library>spring-boot</library>
-              <modelNameSuffix></modelNameSuffix>
+              <modelNameSuffix>Dto</modelNameSuffix>
               <generateApiTests>false</generateApiTests>
               <generateModelTests>false</generateModelTests>
               <configOptions>
