@@ -16,13 +16,15 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
   <description>TODO</description>
 
   <dependencies>
-    <!--
+    <!-- commentato perchè non si riesce ad evitare la connessione a Cassandra all'avvio
     <dependency>
       <groupId>it.pagopa.pn</groupId>
       <artifactId>pn-commons</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
     -->
+
+    <!-- inizio sezione di dipendenze in alternativa a pn-commons -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
@@ -36,6 +38,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
       <artifactId>springdoc-openapi-webflux-ui</artifactId>
       <version>1.5.8</version>
     </dependency>
+    <!-- fine sezione di dipendenze in alternativa a pn-commons -->
 
     <dependency>
       <groupId>net.logstash.logback</groupId>
