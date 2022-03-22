@@ -1,6 +1,6 @@
-package it.pagopa.pn.external.registries.rest;
+package it.pagopa.pn.external.registries.rest.v1;
 
-import it.pagopa.pn.external.registries.api.mock.InfoDomicilieImpl;
+import it.pagopa.pn.external.registries.api.v1.mock.InfoDomicilieImpl;
 import it.pagopa.pn.external.registries.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.api.InfoDomicileApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
@@ -22,13 +22,38 @@ import java.util.UUID;
 @RestController
 @Slf4j
 public class InfoDomicileController implements InfoDomicileApi {
+
+    /**
+     * GET /ext-registry-private/domiciles/v1/{recipientType}/{opaqueId}/analog : Read the analog domicile of a notification recipient
+     * Read the analog domicile of a notification recipient. Il destinatario  può essere una persona fisica o una persona giuridica.
+     *
+     * @param recipientType il tipo del destinatario (required)
+     * @param opaqueId Identificativo universale univoco del destinatario (required)
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
     @Override
     public Mono<ResponseEntity<AnalogDomicileDto>> getOneAnalogDomicile(RecipientTypeDto recipientType, UUID opaqueId, ServerWebExchange exchange) {
+        log.debug("getOneAnalogDomicile - recipientType = {} - opaqueId = {}", recipientType, opaqueId);
+
         return InfoDomicilieImpl.getOneAnalogDomicile(recipientType, opaqueId, exchange);
     }
 
+    /**
+     * GET /ext-registry-private/domiciles/v1/{recipientType}/{opaqueId}/digital : Read the digital domicile of a notification recipient
+     * Read the digital domicile of a notification recipient. Il destinatario  può essere una persona fisica o una persona giuridica.
+     *
+     * @param recipientType il tipo del destinatario (required)
+     * @param opaqueId Identificativo universale univoco del destinatario (required)
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
     @Override
     public Mono<ResponseEntity<DigitalDomicileDto>> getOneDigitalDomicile(RecipientTypeDto recipientType, UUID opaqueId, ServerWebExchange exchange) {
+        log.debug("getOneDigitalDomicile - recipientType = {} - opaqueId = {}", recipientType, opaqueId);
+
         return InfoDomicilieImpl.getOneDigitalDomicile(recipientType, opaqueId, exchange);
     }
 
@@ -37,7 +62,7 @@ public class InfoDomicileController implements InfoDomicileApi {
     public ResponseEntity<ProblemDto> handleInternalException(PnInternalException ex) {
         ProblemDto p = new ProblemDto();
         p.setStatus(HttpStatus.BAD_REQUEST.value());
-        p.setTitle(null);
+        p.setTitle("Bad Request");
         p.setDetail(ex.getMessage());
         p.setErrors(null);
 
