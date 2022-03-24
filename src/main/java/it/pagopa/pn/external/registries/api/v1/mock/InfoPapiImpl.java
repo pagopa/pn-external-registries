@@ -1,25 +1,39 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import it.pagopa.pn.external.registries.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaContactsDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class InfoPapiImpl {
-    public static final String PA_ID = "c_f205";
-
     public static Mono<ResponseEntity<PaInfoDto>> getOnePa(String id,  final ServerWebExchange exchange) throws PnInternalException {
-        PaInfoDto paInfo =  getPaInfo();
+        PaInfoDto paInfo = null;
 
-        if (PA_ID.equals(id)) {
+        try {
+            paInfo = MockResponsees.getMockResp().getOnePa(id);
+        } catch (Exception e) {
+            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
+        }
+
+        if (paInfo != null) {
             return Mono.just(ResponseEntity.ok().body(paInfo));
         } else {
             throw new PnInternalException("Not Found");
@@ -27,33 +41,16 @@ public class InfoPapiImpl {
     }
 
     public static Mono<ResponseEntity<Flux<Object>>> listOnboardedPa(String paNameFilter, final ServerWebExchange exchange) {
-        PaInfoDto paInfo =  getPaInfo();
-
-        if (paNameFilter == null || PA_ID.startsWith(paNameFilter)) {
-            List<PaInfoDto> list = Arrays.asList(paInfo);
-            return Mono.just(ResponseEntity.ok().body(Mono.just(list)
-                    .flatMapMany(Flux::fromIterable)));
-
-        } else {
-            List<PaInfoDto> list = new ArrayList<>();
-            return Mono.just(ResponseEntity.ok().body(Mono.just(list)
-                    .flatMapMany(Flux::fromIterable)));
+        List<PaInfoDto> list = null;
+        try {
+            list = MockResponsees.getMockResp().listOnboardedPa(paNameFilter);
+        } catch (Exception e) {
+            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
         }
+
+        return Mono.just(ResponseEntity.ok().body(Mono.just(list)
+                    .flatMapMany(Flux::fromIterable)));
+
     }
 
-    private static PaInfoDto getPaInfo() {
-            PaContactsDto pac = new PaContactsDto();
-            pac.setEmail("protocollo@comune.milano.it");
-            pac.setPec("protocollo@postacert.comune.milano.it");
-            pac.setWeb(URI.create("www.comune.milano.it"));
-            pac.setTel("0212345678");
-
-            PaInfoDto paInfo = new PaInfoDto();
-            paInfo.setId(PA_ID);
-            paInfo.setName("Comune di Milano");
-            paInfo.setTaxId("01199250158");
-            paInfo.setGeneralContacts(pac);
-
-            return paInfo;
-    }
 }
