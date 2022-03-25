@@ -76,7 +76,7 @@ public class MockResponsees {
 
         if (palist != null) {
             for (MockPa p: palist) {
-                if (paNameFilter == null || p.getName().contains(paNameFilter)) {
+                if (paNameFilter == null || p.getName().toLowerCase().contains(paNameFilter.toLowerCase())) {
                     PaInfoDto pa = new PaInfoDto();
                     pa.setId(p.getId());
                     pa.setName(p.getName());
