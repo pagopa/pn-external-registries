@@ -9,6 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import it.pagopa.pn.external.registries.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaContactsDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ServerWebExchange;
@@ -40,8 +41,8 @@ public class InfoPapiImpl {
         }
     }
 
-    public static Mono<ResponseEntity<Flux<Object>>> listOnboardedPa(String paNameFilter, final ServerWebExchange exchange) {
-        List<PaInfoDto> list = null;
+    public static Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, final ServerWebExchange exchange) {
+        List<PaSummaryDto> list = null;
         try {
             list = MockResponsees.getMockResp().listOnboardedPa(paNameFilter);
         } catch (Exception e) {

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaContactsDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import lombok.extern.slf4j.Slf4j;
@@ -71,22 +72,15 @@ public class MockResponsees {
         return ret;
     }
 
-    public List<PaInfoDto> listOnboardedPa(String paNameFilter) {
-        List<PaInfoDto> list = new ArrayList<>();
+    public List<PaSummaryDto> listOnboardedPa(String paNameFilter) {
+        List<PaSummaryDto> list = new ArrayList<>();
 
         if (palist != null) {
             for (MockPa p: palist) {
                 if (paNameFilter == null || p.getName().toLowerCase().contains(paNameFilter.toLowerCase())) {
-                    PaInfoDto pa = new PaInfoDto();
+                    PaSummaryDto pa = new PaSummaryDto();
                     pa.setId(p.getId());
                     pa.setName(p.getName());
-                    pa.setTaxId(p.getTaxId());
-                    PaContactsDto pac = new PaContactsDto();
-                    pac.setEmail(p.getGeneralContacts().getEmail());
-                    pac.setTel(p.getGeneralContacts().getTel());
-                    pac.setWeb(p.getGeneralContacts().getWeb());
-                    pac.setPec(p.getGeneralContacts().getPec());
-                    pa.setGeneralContacts(pac);
                     list.add(pa);
                 }
             }

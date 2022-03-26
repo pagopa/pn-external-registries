@@ -4,6 +4,7 @@ import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InfoPaApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProblemDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class InfoPaController implements InfoPaApi {
      *         or Internal Server Error (status code 500)
      */
     @Override
-    public Mono<ResponseEntity<Flux<Object>>> listOnboardedPa(String paNameFilter, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, ServerWebExchange exchange) {
         log.debug("listOnboardedPa - paNameFilter = {}", paNameFilter);
         return InfoPapiImpl.listOnboardedPa(paNameFilter, exchange);
     }
