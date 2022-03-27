@@ -36,7 +36,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-webflux-ui</artifactId>
-      <version>1.5.8</version>
+      <version>1.6.6</version>
     </dependency>
     <!-- fine sezione di dipendenze in alternativa a pn-commons -->
 
