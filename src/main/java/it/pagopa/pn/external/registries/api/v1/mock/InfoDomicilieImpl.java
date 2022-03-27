@@ -1,8 +1,5 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import it.pagopa.pn.external.registries.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
@@ -11,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 public class InfoDomicilieImpl {

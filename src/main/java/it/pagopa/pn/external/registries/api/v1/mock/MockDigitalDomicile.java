@@ -1,13 +1,5 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-import javax.annotation.Generated;
-import javax.validation.constraints.NotNull;
-import java.util.Objects;
-
 /**
  * DigitalDomicileDto
  */
