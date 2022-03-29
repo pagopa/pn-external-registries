@@ -87,20 +87,25 @@ components:
       type: string
       minLength: 3
       pattern: "[A-Za-z0-9 _]*"
+    PaSummary:
+      title: PA in short
+      description: PA with minimal information
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
     PaSummariesList:
       title: Brief list of PAs
       description: Contains a list of PA with minimal information
       type: array
       items:
-        type: object
-        required:
-          - id
-          - name
-        properties:
-          id:
-            $ref: '#/components/schemas/SelfCarePaId'
-          name:
-            type: string
+        type: PaSummary
+        $ref: '#/components/schemas/PaSummary'
     PaInfo:
       title: PA Info by IPA
       description: Denomination, fiscal code, pec, email, tel, www site, ...
