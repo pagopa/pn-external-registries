@@ -57,11 +57,11 @@ Parameters:
 
   ExternalRegistryDynamoTableName:
     Type: String
-    Description: 'Name of dynamodb table containing Extenarl Registry informations'
+    Description: 'Name of dynamodb table containing External Registry informations'
 
   ExternalRegistryDynamoTableArn:
     Type: String
-    Description: 'ARN of dynamodb table containing Extenarl Registry informations'
+    Description: 'ARN of dynamodb table containing External Registry informations'
 
 Resources:
 
