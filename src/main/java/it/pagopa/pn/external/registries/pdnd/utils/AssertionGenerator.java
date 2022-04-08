@@ -17,6 +17,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 @Slf4j
+
 public class AssertionGenerator {
     private PnExternalRegistriesConfig config;
 
