@@ -32,6 +32,13 @@ public class PnExternalRegistryApplicationTest {
     {
 
         ClientCredentialsResponseDto c = pdndClient.createToken().block();
+        log.info("Generated token -> "+ c.getAccessToken());
         assertNotNull(c.getAccessToken());
+        try{
+            Thread.sleep(20000);
+        }catch(Exception e)
+        {
+
+        }
     }
 }
