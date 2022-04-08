@@ -7,10 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Base64;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
@@ -24,19 +20,18 @@ public class PnExternalRegistryApplicationTest {
 
     @Test
     void contextLoads() {
-
     }
+
     @Test
     public void main() {
         PnExternalRegistriesApplication.main(new String[] {});
     }
 
     @Test
-    public void tokenTest() throws Exception
+    public void tokenTest()
     {
 
         ClientCredentialsResponseDto c = pdndClient.createToken().block();
-        log.info(" Access token -> " +c.getAccessToken());
         assertNotNull(c.getAccessToken());
     }
 }
