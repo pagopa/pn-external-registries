@@ -100,7 +100,7 @@ Resources:
   SessionTokenSigningKeyAlias:
     Type: 'AWS::KMS::Alias'
     Properties:
-      AliasName: !Sub 'alias/${ProjectName}-session-token-key'
+      AliasName: !Sub 'alias/${ProjectName}-pdnd-authentication-token-key'
       TargetKeyId: !Ref SessionTokenSigningKey
 
 
