@@ -27,6 +27,6 @@ public class JWTBuilder {
         this.config=config;
     }
 
-    public String sign
+
 
 }

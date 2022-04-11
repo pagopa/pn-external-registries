@@ -27,17 +27,22 @@ public class AssertionGenerator {
     }
 
     public String generateClientAssertion() {
-        JSONObject header = new JSONObject();
-        header.put("alg","RS256");
-        header.put("kid",config.getPdnpM2MKid());
-        header.put("typ","JWT");
+        try {
+            JSONObject header = new JSONObject();
+            header.put("alg", "RS256");
+            header.put("kid", config.getPdnpM2MKid());
+            header.put("typ", "JWT");
 
-        JSONObject payload = new JSONObject();
+            JSONObject payload = new JSONObject();
+        }catch(Exception e)
+        {
 
-
+        }
+        return null;
     }
     public String generateClientAssertionLocalKey()
     {
+
         Map header = new HashMap<String,String>();
         header.put("alg","RS256");
         header.put("kid",config.getPdnpM2MKid());
@@ -50,10 +55,8 @@ public class AssertionGenerator {
         long expMillis = nowMillis + ttlMillis;
         Date exp = new Date(expMillis);
 
-
-
         // la funzione seguente genera un jwt token utilizzando la chiave private
-        /*
+
         try {
             PrivateKey privateKey = getPrivateKey();
             String jwtToken = Jwts.builder().setHeader(header)
@@ -66,10 +69,6 @@ public class AssertionGenerator {
                     .setExpiration(exp).compact();
             log.info("token -> "+ jwtToken);
             Jws<Claims> token = parseJwt(jwtToken);
-    */
-
-        String jwtToken= null;
-        // TODO Costruzione del token jwt interrogando AWS
 
             return jwtToken;
         }catch(Exception e)
