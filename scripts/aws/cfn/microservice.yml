@@ -76,8 +76,8 @@ Resources:
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
 
-  ###      SESSION TOKEN SIGNING/VALIDATION KEY PAIR      ###
-  ###########################################################
+  ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND   ###
+  #####################################################################################
   SessionTokenSigningKey:
     Type: 'AWS::KMS::Key'
     DeletionPolicy: Retain
