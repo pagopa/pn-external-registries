@@ -88,6 +88,22 @@ public class MockResponsees {
         return list;
     }
 
+    public List<PaSummaryDto> listOnboardedPa( List<String> ids ) {
+        List<PaSummaryDto> list = new ArrayList<>();
+
+        if (palist != null) {
+            for (MockPa p: palist) {
+                if ( ids.contains(p.getId()) ) {
+                    PaSummaryDto pa = new PaSummaryDto();
+                    pa.setId(p.getId());
+                    pa.setName(p.getName());
+                    list.add(pa);
+                }
+            }
+        }
+        return list;
+    }
+
     public AnalogDomicileDto getOneAnalogDomicile(String recipientType, String opaqueId) {
         AnalogDomicileDto ret = null;
         if (domiciles != null) {

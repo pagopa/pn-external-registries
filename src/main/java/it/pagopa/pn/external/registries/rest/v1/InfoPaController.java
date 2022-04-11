@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.ConstraintViolationException;
+import java.util.List;
 
 
 @RestController
@@ -47,9 +48,14 @@ public class InfoPaController implements InfoPaApi {
      *         or Internal Server Error (status code 500)
      */
     @Override
-    public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, List<String> ids, ServerWebExchange exchange) {
         log.debug("listOnboardedPa - paNameFilter = {}", paNameFilter);
-        return InfoPapiImpl.listOnboardedPa(paNameFilter, exchange);
+        if( ids == null || ids.isEmpty() ) {
+            return InfoPapiImpl.listOnboardedPa(paNameFilter, exchange);
+        }
+        else {
+            return InfoPapiImpl.listOnboardedPa( ids, exchange);
+        }
     }
 
     // catch id not found (c_f205 only allowed)

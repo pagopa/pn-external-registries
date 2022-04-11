@@ -37,8 +37,23 @@ public class InfoPapiImpl {
             throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
         }
 
-        return Mono.just(ResponseEntity.ok().body(Mono.just(list)
-                    .flatMapMany(Flux::fromIterable)));
+        return Mono.just(
+                ResponseEntity.ok().body( Flux.fromIterable( list ))
+            );
+
+    }
+
+    public static Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa( List<String> ids, final ServerWebExchange exchange) {
+        List<PaSummaryDto> list = null;
+        try {
+            list = MockResponsees.getMockResp().listOnboardedPa( ids );
+        } catch (Exception e) {
+            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
+        }
+
+        return Mono.just(
+                ResponseEntity.ok().body( Flux.fromIterable( list ))
+        );
 
     }
 
