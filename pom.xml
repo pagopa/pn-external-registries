@@ -26,7 +26,21 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
     <reactor-version>3.4.3</reactor-version>
     <reactor-netty-version>0.7.15.RELEASE</reactor-netty-version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-bom</artifactId>
+        <version>1.11.1000</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
+
+
     <!-- commentato perchè non si riesce ad evitare la connessione a Cassandra all'avvio
     <dependency>
       <groupId>it.pagopa.pn</groupId>
@@ -98,12 +112,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
       <version>${reactor-version}</version>
     </dependency>
 
-    <!-- HTTP client: Springboot starter WebFlux -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webflux</artifactId>
-      <version>${spring-web-version}</version>
-    </dependency>
 
     <dependency>
       <groupId>io.projectreactor.ipc</groupId>

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 
 import java.security.KeyFactory;
@@ -24,7 +25,18 @@ public class AssertionGenerator {
     public AssertionGenerator(PnExternalRegistriesConfig config){
         this.config=config;
     }
-    public String generateClientAssertion()
+
+    public String generateClientAssertion() {
+        JSONObject header = new JSONObject();
+        header.put("alg","RS256");
+        header.put("kid",config.getPdnpM2MKid());
+        header.put("typ","JWT");
+
+        JSONObject payload = new JSONObject();
+
+
+    }
+    public String generateClientAssertionLocalKey()
     {
         Map header = new HashMap<String,String>();
         header.put("alg","RS256");
@@ -37,6 +49,11 @@ public class AssertionGenerator {
         long ttlMillis = 86400000; // 24 ore
         long expMillis = nowMillis + ttlMillis;
         Date exp = new Date(expMillis);
+
+
+
+        // la funzione seguente genera un jwt token utilizzando la chiave private
+        /*
         try {
             PrivateKey privateKey = getPrivateKey();
             String jwtToken = Jwts.builder().setHeader(header)
@@ -49,6 +66,10 @@ public class AssertionGenerator {
                     .setExpiration(exp).compact();
             log.info("token -> "+ jwtToken);
             Jws<Claims> token = parseJwt(jwtToken);
+    */
+
+        String jwtToken= null;
+        // TODO Costruzione del token jwt interrogando AWS
 
             return jwtToken;
         }catch(Exception e)

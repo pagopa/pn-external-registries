@@ -5,6 +5,7 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.ClientCredentialsResponseDto;
 import it.pagopa.pn.external.registries.pdnd.client.PDNDClient;
 
+import it.pagopa.pn.external.registries.pdnd.service.TokenService;
 import it.pagopa.pn.external.registries.pdnd.utils.AssertionGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Subscriber;
@@ -33,6 +34,8 @@ public class PDNDController {
 
     @Autowired
     PnExternalRegistriesConfig config;
+    @Autowired
+    TokenService tokenService;
 
     @RequestMapping(value = "/getToken", method = RequestMethod.GET)
     public Mono<ResponseEntity<String>> getToken() {
@@ -53,5 +56,15 @@ public class PDNDController {
         });
         return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
     }
-
+    @RequestMapping(value = "/getToken1", method = RequestMethod.GET)
+    public Mono<ResponseEntity<String>> getToken1() {
+        log.info(tokenService.getToken("ANPR"));
+        return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
+    }
+    @RequestMapping(value = "/getToken2", method = RequestMethod.GET)
+    public Mono<ResponseEntity<String>> getToken2() {
+        log.info("*** getToken2 2 ***");
+        log.info(tokenService.getToken("PIPPO"));
+        return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
+    }
 }
