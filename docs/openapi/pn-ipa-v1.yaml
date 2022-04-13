@@ -23,11 +23,19 @@ paths:
         - InfoPA
       parameters:
         - name: paNameFilter
-          description: Se valorizzato indica
+          description: Se valorizzato indica il prefisso della denominazione della PA
           in: query
           required: false
           schema:
             $ref: '#/components/schemas/PaNameFilter'
+        - name: id
+          description: Se valorizzato indica gli id delle PA di cui si vuole la denominazione
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
       responses:
         '200':
           description: OK
