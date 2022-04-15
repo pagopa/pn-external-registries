@@ -34,15 +34,4 @@ public class PDNDController {
         return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
     }
 
-    @RequestMapping(value = "/getToken1", method = RequestMethod.GET)
-    public Mono<ResponseEntity<String>> getToken1() {
-       // log.info(tokenService.getToken("ANPR"));
-        return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
-    }
-    @RequestMapping(value = "/getToken2", method = RequestMethod.GET)
-    public Mono<ResponseEntity<String>> getToken2() {
-        log.info("*** getToken2 2 ***");
-        //log.info(tokenService.getToken("PIPPO"));
-        return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
-    }
 }
