@@ -8,17 +8,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Base64;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @Slf4j
-public class PnExternalRegistryApplicationTest {
+public class PDNDClientTest {
 
     @Autowired
     PDNDClient pdndClient;
     @Autowired
     PnExternalRegistriesConfig config;
-
 
     @Test
     public void tokenTest() {
@@ -26,6 +27,13 @@ public class PnExternalRegistryApplicationTest {
         ClientCredentialsResponseDto c = pdndClient.createToken().block();
         log.info("Generated token -> " + c.getAccessToken());
         assertNotNull(c.getAccessToken());
+        String[] chunks = c.getAccessToken().split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+
+        String header = new String(decoder.decode(chunks[0]));
+        String payload = new String(decoder.decode(chunks[1]));
+        log.info("Header: " + header);
+        log.info("payload:" + payload);
 
     }
 }

@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.pdnd.utils;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
+import it.pagopa.pn.external.registries.config.aws.AwsServicesClientsConfig;
 import it.pagopa.pn.external.registries.pdnd.utils.AssertionGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -12,18 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 class AssertionGeneratorTest {
 
     @Autowired
-    PnExternalRegistriesConfig config;
-
-    @Test
-    void contextLoads() {
-    }
+    AssertionGenerator assertionGenerator;
 
     @Test
     void generateClientAssertion() {
         System.out.println("AssertionGeneratorTest -> generateClientAssertion ... init ...");
-        AssertionGenerator assertionGenerator = new AssertionGenerator(config);
-        String jtwToken= assertionGenerator.generateClientAssertion();
-        System.out.printf("token: "+ jtwToken);
+       String jtwToken= assertionGenerator.generateClientAssertion();
 
     }
 }

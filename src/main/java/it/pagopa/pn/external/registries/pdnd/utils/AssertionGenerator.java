@@ -1,114 +1,100 @@
 package it.pagopa.pn.external.registries.pdnd.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
+import com.amazonaws.services.kms.*;
+import com.amazonaws.services.kms.model.*;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
-
-
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.Future;
+
 
 @Slf4j
-
+@Component
 public class AssertionGenerator {
-    private PnExternalRegistriesConfig config;
 
-    public AssertionGenerator(PnExternalRegistriesConfig config){
-        this.config=config;
+    private PnExternalRegistriesConfig config;
+    private AwsConfigs awsConfig;
+
+    public AssertionGenerator(PnExternalRegistriesConfig config,AwsConfigs awsConfig) {
+        this.config = config;
+        this.awsConfig=awsConfig;
     }
 
     public String generateClientAssertion() {
         try {
+
+            AWSKMSAsync kmsClient = AWSKMSAsyncClientBuilder.standard()
+                    .withRegion(awsConfig.getRegionCode())
+                    .build();
+
+            if (kmsClient == null) {
+                log.error("kmsClient null");
+                return null;
+            } else
+                log.info(kmsClient.toString());
+
             JSONObject header = new JSONObject();
+            JSONObject payload = new JSONObject();
+            if (!generateTokenFields(header, payload))
+                return null;
+
+            log.debug("jwtToken header: " + header.toString());
+            log.debug("jwtToken payload: " + payload.toString());
+
+            Base64.Encoder encoder = Base64.getUrlEncoder();
+            byte[] header64 = encoder.encode(header.toString().getBytes(StandardCharsets.UTF_8));
+            byte[] payload64 = encoder.encode(payload.toString().getBytes(StandardCharsets.UTF_8));
+
+            StringBuffer jwtContent =  new StringBuffer().append(new String(header64, "UTF8")).append(".").append(new String(payload64, "UTF8"));
+            log.info("jwtContent= " + jwtContent);
+
+            ByteBuffer jwtContentPlaintext = ByteBuffer.wrap(jwtContent.toString().getBytes(StandardCharsets.UTF_8));
+
+            SignRequest signRequest = new SignRequest();
+            signRequest.setMessage(jwtContentPlaintext);
+            signRequest.setKeyId(awsConfig.getKeyARN());
+            signRequest.setSigningAlgorithm("RSASSA_PKCS1_V1_5_SHA_256");
+            signRequest.setMessageType("RAW");
+
+            Future<SignResult> signingResult = kmsClient.signAsync(signRequest);
+            SignResult signResult=signingResult.get();
+
+            byte[] sign = Base64Utils.encodeUrlSafe(signResult.getSignature().array());
+            String jwtSignature = new String(sign, StandardCharsets.UTF_8);
+
+            log.info("Sign -> " + jwtSignature);
+            log.info("Sign result OK- token -> \n" + jwtContent + "." + jwtSignature);
+            return jwtContent + "." + jwtSignature;
+        } catch (Exception e) {
+            log.error(e.getMessage() + " - " + e);
+        }
+        return "OK";
+    }
+    private boolean generateTokenFields(JSONObject header, JSONObject payload) {
+        try {
             header.put("alg", "RS256");
             header.put("kid", config.getPdnpM2MKid());
             header.put("typ", "JWT");
 
-            JSONObject payload = new JSONObject();
-        }catch(Exception e)
-        {
-
+            long nowMillis = System.currentTimeMillis();
+            long ttlMillis = 86400000; // 24 ore
+            long expMillis = nowMillis + ttlMillis;
+            payload.put("iss", config.getPdndM2MIssuer());
+            payload.put("sub", config.getPdndM2MSubjec());
+            payload.put("aud", config.getPdndM2MAudience());
+            payload.put("jti", UUID.randomUUID().toString());
+            payload.put("iat", nowMillis);
+            payload.put("exp", expMillis);
+        } catch (Exception e) {
+            log.error("Error creating header/payload jwt Token: " + e.getMessage());
+            return false;
         }
-        return null;
-    }
-    public String generateClientAssertionLocalKey()
-    {
-
-        Map header = new HashMap<String,String>();
-        header.put("alg","RS256");
-        header.put("kid",config.getPdnpM2MKid());
-        header.put("typ","JWT");
-
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-       // long ttlMillis = 1200000; // 20 min
-        long ttlMillis = 86400000; // 24 ore
-        long expMillis = nowMillis + ttlMillis;
-        Date exp = new Date(expMillis);
-
-        // la funzione seguente genera un jwt token utilizzando la chiave private
-
-        try {
-            PrivateKey privateKey = getPrivateKey();
-            String jwtToken = Jwts.builder().setHeader(header)
-                    .setIssuer(config.getPdndM2MIssuer())
-                    .setSubject(config.getPdndM2MSubjec())
-                    .setAudience(config.getPdndM2MAudience())
-                    .setId(UUID.randomUUID().toString())
-                    .setIssuedAt(now)
-                    .signWith(privateKey)
-                    .setExpiration(exp).compact();
-            log.info("token -> "+ jwtToken);
-            Jws<Claims> token = parseJwt(jwtToken);
-
-            return jwtToken;
-        }catch(Exception e)
-        {
-            log.error("Exception e"+ e.getMessage());
-        }
-        return null;
-    }
-
-    public  Jws<Claims> parseJwt(String jwtString) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        log.info("parseJWT init");
-        PublicKey publicKey = getPublicKey();
-        log.info("getPublic key OK");
-        Jws<Claims> jwt = Jwts.parserBuilder()
-                .setSigningKey(publicKey)
-                .build()
-                .parseClaimsJws(jwtString);
-        log.info("parseJWT end");
-        return jwt;
-    }
-
-    private  PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String rsaPublicKey= config.getPdndM2MPublicKey();
-        rsaPublicKey = rsaPublicKey.replace("-----BEGIN PUBLIC KEY-----", "");
-        rsaPublicKey = rsaPublicKey.replace("-----END PUBLIC KEY-----", "");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = kf.generatePublic(keySpec);
-        return publicKey;
-    }
-
-    public  PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-        String rsaPrivateKey = config.getPdndM2MPrivateKey();
-        rsaPrivateKey = rsaPrivateKey.replace("-----BEGIN PRIVATE KEY-----", "");
-        rsaPrivateKey = rsaPrivateKey.replace("-----END PRIVATE KEY-----", "");
-
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(rsaPrivateKey));
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        PrivateKey privKey = kf.generatePrivate(keySpec);
-        return privKey;
+        return true;
     }
 }
