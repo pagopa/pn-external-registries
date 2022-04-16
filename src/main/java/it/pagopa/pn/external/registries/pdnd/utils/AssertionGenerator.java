@@ -26,7 +26,9 @@ public class AssertionGenerator {
         this.awsConfig=awsConfig;
     }
 
-    public String generateClientAssertion() {
+    public String generateClientAssertion() throws AssertionGeneratorException{
+        log.info("AWS config "+ awsConfig);
+        log.info("PN-ER config "+ config);
         try {
 
             AWSKMSAsync kmsClient = AWSKMSAsyncClientBuilder.standard()
@@ -72,10 +74,11 @@ public class AssertionGenerator {
             log.info("Sign result OK- token -> \n" + jwtContent + "." + jwtSignature);
             return jwtContent + "." + jwtSignature;
         } catch (Exception e) {
-            log.error(e.getMessage() + " - " + e);
+            log.error("Error creating client_assertion: -> "+ e.getMessage() + " - " + e);
+            throw new AssertionGeneratorException("Error creating client_assertion: "+ e.getMessage(),e);
         }
-        return "OK";
     }
+
     private boolean generateTokenFields(JSONObject header, JSONObject payload) {
         try {
             header.put("alg", "RS256");

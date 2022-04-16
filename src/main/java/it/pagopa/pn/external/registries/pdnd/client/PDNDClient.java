@@ -13,12 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class PDNDClient {
-    //private ApiClient newApiClient;
+
     private AssertionGenerator assertionGenerator;
     private AuthApi authApi;
     private PnExternalRegistriesConfig config;
@@ -38,9 +39,14 @@ public class PDNDClient {
         authApi = new AuthApi(newApiClient);
     }
 
-    public Mono<ClientCredentialsResponseDto> createToken() {
+    public Mono<ClientCredentialsResponseDto> createToken() throws Exception {
+        String client_assertion = null;
+        try {
+            client_assertion = assertionGenerator.generateClientAssertion();
+        } catch (Exception e) {
+            throw new Exception("Error creating assertion: " + e.getMessage());
+        }
 
-        String client_assertion = assertionGenerator.generateClientAssertion();
         log.debug("Client assertion -> " + client_assertion);
         log.debug("createToken ... init");
 

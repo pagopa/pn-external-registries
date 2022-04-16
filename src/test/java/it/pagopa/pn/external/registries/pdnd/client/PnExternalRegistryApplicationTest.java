@@ -21,7 +21,7 @@ public class PnExternalRegistryApplicationTest {
 
 
     @Test
-    public void tokenTest() {
+    public void tokenTest() throws Exception{
 
         ClientCredentialsResponseDto c = pdndClient.createToken().block();
         log.info("Generated token -> " + c.getAccessToken());

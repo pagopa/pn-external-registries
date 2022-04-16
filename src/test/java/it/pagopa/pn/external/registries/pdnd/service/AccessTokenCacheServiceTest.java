@@ -34,14 +34,14 @@ public class AccessTokenCacheServiceTest {
 
     @DisplayName("Simulazione richiesta TOKEN")
     @Test
-    public void tokenServiceTest() {
+    public void tokenServiceTest() throws Exception {
         ClientCredentialsResponseDto resp = new ClientCredentialsResponseDto();
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
         resp.expiresIn(600);
 
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M2").block();
+        String a = tokenService.getToken("M1").block();
         assertNotNull(a);
         if (a != null) {
             log.info("TEST -> received access token " + a);
@@ -51,7 +51,7 @@ public class AccessTokenCacheServiceTest {
 
     @DisplayName("Simulazione richiesta 2 TOKEN prima della scadenza del timeut")
     @Test
-    public void tokenServiceTestWithoutRefresh() {
+    public void tokenServiceTestWithoutRefresh() throws Exception {
         ClientCredentialsResponseDto resp = new ClientCredentialsResponseDto();
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
         resp.expiresIn(600);
@@ -68,7 +68,7 @@ public class AccessTokenCacheServiceTest {
             e.printStackTrace();
         }
         String b = tokenService.getToken("M2").block();
-        if (a != null) {
+        if (b != null) {
             log.info("TEST -> received access token " + a);
         }
         assertEquals(a,b);
@@ -76,14 +76,14 @@ public class AccessTokenCacheServiceTest {
 
     @DisplayName("Simulazione richiesta 2 TOKEN dopo la scadenza del timeut")
     @Test
-    public void tokenServiceTestWithRefresh() {
+    public void tokenServiceTestWithRefresh() throws Exception {
         ClientCredentialsResponseDto resp = new ClientCredentialsResponseDto();
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
         resp.expiresIn(5);
 
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M2M").block();
+        String a = tokenService.getToken("M3").block();
         if (a != null) {
             log.info("TEST -> received access token " + a);
         }
@@ -95,7 +95,7 @@ public class AccessTokenCacheServiceTest {
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String b = tokenService.getToken("M2M").block();
+        String b = tokenService.getToken("M3").block();
         if (b != null) {
             log.info("TEST -> received access token " + b);
         }
