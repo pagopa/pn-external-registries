@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
 @Slf4j
-class AssertionGeneratorTest {
+class AssertionGeneratorTestIT {
 
     @Autowired
     AssertionGenerator assertionGenerator;

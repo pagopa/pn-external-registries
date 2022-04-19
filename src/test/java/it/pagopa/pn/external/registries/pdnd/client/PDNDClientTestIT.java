@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.pdnd.client;
 
-import it.pagopa.pn.external.registries.PnExternalRegistriesApplication;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
 import it.pagopa.pn.external.registries.config.aws.AwsServicesClientsConfig;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @Slf4j
-public class PDNDClientTest {
+public class PDNDClientTestIT {
 
     @Autowired
     PDNDClient pdndClient;
