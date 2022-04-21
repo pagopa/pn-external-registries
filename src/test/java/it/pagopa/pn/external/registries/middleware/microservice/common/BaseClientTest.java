@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.middleware.microservice.common;
 
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.pdnd.service.AccessTokenCacheService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
