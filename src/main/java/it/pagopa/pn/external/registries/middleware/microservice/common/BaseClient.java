@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 
@@ -33,7 +32,7 @@ public abstract class BaseClient {
         WebClient webClient = ApiClient.buildWebClientBuilder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .filters(filterList -> {
-                    filterList.add(bearerAuthFilter());
+                    filterList.add(ExchangeFilterFunction.ofRequestProcessor(this::bearerAuthFilter));
                     filterList.add(renewTokenFilter());
                 })
                 .build();
@@ -45,13 +44,11 @@ public abstract class BaseClient {
         return this.apiClient;
     }
 
-    private ExchangeFilterFunction bearerAuthFilter() {
-        return (request, next) -> {
-            ClientRequest filtered = ClientRequest.from(request)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenCacheService.getToken(this.purposeId).block(Duration.ofMillis(3000)))
-                    .build();
-            return next.exchange(filtered);
-        };
+    private Mono<ClientRequest> bearerAuthFilter(ClientRequest request) {
+        return accessTokenCacheService.getToken(this.purposeId)
+                .map(token -> ClientRequest.from(request)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .build());
     }
 
     private ExchangeFilterFunction renewTokenFilter() {
