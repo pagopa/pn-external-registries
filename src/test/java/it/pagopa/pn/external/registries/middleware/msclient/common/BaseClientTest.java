@@ -1,19 +1,22 @@
-package it.pagopa.pn.external.registries.middleware.microservice.common;
+package it.pagopa.pn.external.registries.middleware.msclient.common;
 
 import it.pagopa.pn.external.registries.pdnd.service.AccessTokenCacheService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -46,6 +49,7 @@ class BaseClientTest {
         mockServer = startClientAndServer(9999);
     }
 
+
     @AfterAll
     public static void stopMockServer() {
         mockServer.stop();
@@ -69,8 +73,10 @@ class BaseClientTest {
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
 
-        //WHEN
         FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
+        fakeApiClient.init();
+
+        //WHEN
         String resp = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class).block(Duration.ofMillis(3000));
 
         //THEN
@@ -107,9 +113,10 @@ class BaseClientTest {
                         .withBody("hello " + hello)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
+        FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
+        fakeApiClient.init();
 
         //WHEN
-        FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
         String resp = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class).block(Duration.ofMillis(3000));
 
         //THEN
@@ -147,9 +154,11 @@ class BaseClientTest {
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
 
-        //WHEN
         FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-        Mono<String> httpcall = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class);
+        fakeApiClient.init();
+
+        //WHEN
+         Mono<String> httpcall = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class);
         Duration duration = Duration.ofMillis(3000);
         try {
             httpcall.block(duration);
@@ -162,7 +171,6 @@ class BaseClientTest {
 
         //THEN
     }
-
 
     private static class FakeApiClient extends BaseClient
     {

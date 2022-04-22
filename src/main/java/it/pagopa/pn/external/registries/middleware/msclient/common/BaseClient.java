@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.middleware.microservice.common;
+package it.pagopa.pn.external.registries.middleware.msclient.common;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -13,18 +13,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
-
 
 public abstract class BaseClient {
 
     private final AccessTokenCacheService accessTokenCacheService;
     private final String purposeId;
-    private final ApiClient apiClient;
+    private ApiClient apiClient;
+    private final String basepath;
 
     protected  BaseClient(AccessTokenCacheService accessTokenCacheService, String purposeId, String basepath){
         this.accessTokenCacheService = accessTokenCacheService;
         this.purposeId = purposeId;
+        this.basepath = basepath;
+    }
+
+    @PostConstruct
+    public void init(){
 
         HttpClient httpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(1000, TimeUnit.MILLISECONDS)));
@@ -39,6 +45,7 @@ public abstract class BaseClient {
         apiClient = new ApiClient(webClient);
         apiClient.setBasePath(basepath);
     }
+
 
     protected ApiClient getApiClient(){
         return this.apiClient;
