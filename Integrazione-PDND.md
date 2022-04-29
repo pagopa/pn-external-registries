@@ -1,6 +1,5 @@
 # PN-EXTERNAL-REGISTRIES - Integrazione PDND
 
-
 PDND è la piattaforma che gestisce i servizi di directory, di autorizzazione e di autenticazione 
 per l’accesso ai servizi offerti dalla dalle piattaforme digitali della pubblica amministrazione.
 
@@ -107,7 +106,7 @@ Il payload prevede sei campi: "iss", "sub", "aud", "jti", "iat" e "exp":
 - jti: il JWT ID, un id unico (uuid) random assegnato da chi vuole creare il token, serve per tracciare il token 
   stesso. Deve essere cura del chiamante assicurarsi che l'id di questo token sia unico
 - iat: l'issued at, il timestamp riportante data e ora in cui viene creato il token, espresso in UNIX epoch (valore numerico, non stringa)
-- exp: l'expiration, il timestamp riportante data e ora di scadenza del token, espresso in UNIX epoch  (valore numerico, non stringa)
+- exp: l'expiration, il timestamp riportante data e ora di scadenza del token, espresso in UNIX epoch (valore numerico, non stringa)
 
 ## Fruizione di un E-Service
 
