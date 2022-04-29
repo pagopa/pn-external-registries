@@ -25,6 +25,7 @@ paths:
           description: Payment identifier composed by fiscal code and notice number (numero avviso)
           in: path
           required: true
+          example: '77777777777302000100000019421 '
           schema:
             type: string
             maxLength: 29
@@ -62,9 +63,11 @@ components:
           $ref: '#/components/schemas/PaymentStatus'
         amount:
           description: Amount for required payment in eurocents
+          example: 1200
           type: integer
     PaymentStatus:
       title: Payment status
+      example: 'required'
       description: >
         Payment status:
           * `required` - payment required
