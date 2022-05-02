@@ -1,14 +1,11 @@
 package it.pagopa.pn.external.registries.pdnd.service;
 
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.ClientCredentialsResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
 
 import it.pagopa.pn.external.registries.pdnd.client.PDNDClient;
-import it.pagopa.pn.external.registries.pdnd.utils.AssertionGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +38,7 @@ public class AccessTokenCacheServiceTest {
 
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M1").block();
+        String a = tokenService.getToken("M1",false).block();
         assertNotNull(a);
         if (a != null) {
             log.info("TEST -> received access token " + a);
@@ -58,7 +55,7 @@ public class AccessTokenCacheServiceTest {
 
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M2").block();
+        String a = tokenService.getToken("M2",false).block();
         if (a != null) {
             log.info("TEST -> received access token " + a);
         }
@@ -67,7 +64,7 @@ public class AccessTokenCacheServiceTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        String b = tokenService.getToken("M2").block();
+        String b = tokenService.getToken("M2",false).block();
         if (b != null) {
             log.info("TEST -> received access token " + a);
         }
@@ -83,7 +80,7 @@ public class AccessTokenCacheServiceTest {
 
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M3").block();
+        String a = tokenService.getToken("M3",false).block();
         if (a != null) {
             log.info("TEST -> received access token " + a);
         }
@@ -95,7 +92,7 @@ public class AccessTokenCacheServiceTest {
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
         Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
 
-        String b = tokenService.getToken("M3").block();
+        String b = tokenService.getToken("M3",false).block();
         if (b != null) {
             log.info("TEST -> received access token " + b);
         }

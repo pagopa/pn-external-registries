@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.common;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.ApiClient;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.pdnd.service.AccessTokenCacheService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,7 +52,7 @@ public abstract class BaseClient {
     }
 
     private Mono<ClientRequest> bearerAuthFilter(ClientRequest request) {
-        return accessTokenCacheService.getToken(this.purposeId)
+        return accessTokenCacheService.getToken(this.purposeId,false)
                 .map(token -> ClientRequest.from(request)
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                             .build());
@@ -62,7 +62,7 @@ public abstract class BaseClient {
         return (request, next) -> next.exchange(request).flatMap(response -> {
             if (response.statusCode().value() == HttpStatus.UNAUTHORIZED.value()) {
                 return response.releaseBody()
-                        .then(accessTokenCacheService.getToken(this.purposeId))
+                        .then(accessTokenCacheService.getToken(this.purposeId, true))
                         .flatMap(token -> {
                             ClientRequest newRequest = ClientRequest.from(request)
                                     .headers(headers -> headers.remove(HttpHeaders.AUTHORIZATION))

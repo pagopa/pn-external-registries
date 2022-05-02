@@ -29,7 +29,7 @@ public class PDNDController {
     @RequestMapping(value = "/getToken", method = RequestMethod.GET)
     public Mono<ResponseEntity<String>> getToken() {
         log.debug("*** getToken 2 ***");
-        tokenService.getToken("M2M");
+        tokenService.getToken("M2M",false);
 
         return Mono.just(new ResponseEntity<String>("Hello World!", HttpStatus.OK));
     }

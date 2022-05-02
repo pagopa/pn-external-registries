@@ -76,8 +76,10 @@ Resources:
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
 
-  ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND   ###
-  #####################################################################################
+  ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND    ###
+  ###   La chiave viene impiegata per firmare il client assertion che serve          ###
+  ###   per richedere a PDND il JWT da utilizzare per invocare i servizi M2M di PDND ###
+  ######################################################################################
   SessionTokenSigningKey:
     Type: 'AWS::KMS::Key'
     DeletionPolicy: Retain

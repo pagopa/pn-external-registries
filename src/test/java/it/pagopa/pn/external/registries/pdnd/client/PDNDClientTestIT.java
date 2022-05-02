@@ -3,7 +3,7 @@ package it.pagopa.pn.external.registries.pdnd.client;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
 import it.pagopa.pn.external.registries.config.aws.AwsServicesClientsConfig;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.ClientCredentialsResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class PDNDClientTestIT {
             log.info("payload:" + payload);
         }catch(Exception e)
         {
-
+            log.error("Exception creating token: "+ e.getMessage());
         }
     }
 }

@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.pdnd.dto;
 
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.ClientCredentialsResponseDto;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.TokenTypeDto;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.TokenTypeDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

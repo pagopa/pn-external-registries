@@ -60,7 +60,7 @@ class BaseClientTest {
         //GIVEN
         String token = "newtoken123456";
         String hello = "world";
-        when(accessTokenCacheService.getToken(Mockito.anyString())).thenReturn(Mono.just(token));
+        when(accessTokenCacheService.getToken(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(Mono.just(token));
 
 
         new MockServerClient("localhost", 9999)
@@ -90,7 +90,7 @@ class BaseClientTest {
         String tokenExpired = "token123456_EXPIRED";
         String tokenValid = "token123456_VALID";
         String hello = "world";
-        when(accessTokenCacheService.getToken(Mockito.anyString()))
+        when(accessTokenCacheService.getToken(Mockito.anyString(), Mockito.anyBoolean()))
                 .thenReturn(Mono.just(tokenExpired))
                 .thenReturn(Mono.just(tokenValid));
 
@@ -131,7 +131,7 @@ class BaseClientTest {
         String tokenExpired = "token123456_EXPIRED";
         String tokenValid = "token123456_VALID";
         String hello = "world";
-        when(accessTokenCacheService.getToken(Mockito.anyString()))
+        when(accessTokenCacheService.getToken(Mockito.anyString(), Mockito.anyBoolean()))
                 .thenReturn(Mono.just(tokenExpired));
 
 

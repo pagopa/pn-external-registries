@@ -24,7 +24,7 @@ public class AccessTokenCacheServiceIntegrationTestIT {
     @Test
     public void tokenServiceTest(){
 
-        String a = tokenService.getToken("M2").block();
+        String a = tokenService.getToken("M2",false).block();
 
         if (a != null) {
             log.info("TEST -> received access token " +a);

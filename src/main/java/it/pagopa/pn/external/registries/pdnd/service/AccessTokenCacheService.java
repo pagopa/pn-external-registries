@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.pdnd.service;
 
 
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.ClientCredentialsResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
 import it.pagopa.pn.external.registries.pdnd.client.PDNDClient;
 import it.pagopa.pn.external.registries.pdnd.dto.TokenCacheEntry;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class AccessTokenCacheService {
         this.pdndClient = pdndClient;
     }
 
-    public Mono<String> getToken(String purposeId) {
+    public Mono<String> getToken(String purposeId, boolean force) {
         TokenCacheEntry accessToken;
         log.info("richiesta token per porpouseid -> " + purposeId);
         boolean initializeToken = false;
@@ -31,11 +31,12 @@ public class AccessTokenCacheService {
         accessToken = accessTokenHolder.get(purposeId);
         if (accessToken == null) {
             log.info("richiesta token per purposeId -> " + purposeId + " token null");
-            accessToken = new TokenCacheEntry(purposeId);
-            accessTokenHolder.put(purposeId, accessToken);
             initializeToken = true;
         } else {
             if (accessToken.isExpired()) {
+                initializeToken = true;
+                accessTokenHolder.remove(purposeId);
+            }else if (force){
                 initializeToken = true;
                 accessTokenHolder.remove(purposeId);
             }

@@ -69,6 +69,7 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -79,6 +80,12 @@
             <artifactId>jjwt-impl</artifactId>
             <version>0.11.1</version>
             <scope>runtime</scope>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.22</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -281,12 +288,41 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.config
+                                </configPackage>
+                                <dateLibrary>java11</dateLibrary>
+                            </configOptions>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pn-external-registires-anpr-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/ANPRAPIC001.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>webclient</library>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <configOptions>
+                                <swaggerAnnotations>false</swaggerAnnotations>
+                                <openApiNullable>false</openApiNullable>
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.dto
+                                </modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.api
+                                </apiPackage>
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>

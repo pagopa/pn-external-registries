@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.config;
 
+import it.pagopa.pn.external.registries.anpr.util.X509CertificateChain;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -22,5 +23,13 @@ public class PnExternalRegistriesConfig {
     private String pdndM2MClientAssertionType;
     private String pdndM2MGrantType;
     private String pdndM2MClientId;
+    private Integer clientAssertionTTL;
+    private String anprJWTHeaderDigestCertChains;
+    private String anprJWTHeaderDigestPassword;
+    private String anprServerURL;
+
+    private String anprX509CertificateChain;
+    private String anprJWTHeaderDigestKeystoreAlias;
+
 
 }
