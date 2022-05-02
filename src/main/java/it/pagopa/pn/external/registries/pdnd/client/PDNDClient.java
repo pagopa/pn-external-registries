@@ -3,9 +3,9 @@ package it.pagopa.pn.external.registries.pdnd.client;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.api.AuthApi;
-import it.pagopa.pn.external.registries.generated.openapi.client.v1.dto.ClientCredentialsResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.ApiClient;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.api.AuthApi;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
 import it.pagopa.pn.external.registries.pdnd.utils.AssertionGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -41,14 +41,13 @@ public class PDNDClient {
 
     public Mono<ClientCredentialsResponseDto> createToken() throws Exception {
         String client_assertion = null;
-        try {
-            client_assertion = assertionGenerator.generateClientAssertion();
-        } catch (Exception e) {
-            throw new Exception("Error creating assertion: " + e.getMessage());
-        }
+
+        client_assertion = assertionGenerator.generateClientAssertion();
 
         log.debug("Client assertion -> " + client_assertion);
-        log.debug("createToken ... init");
+        log.debug("createToken ... assertionType {} - grantType {} - ClientID {} ", config.getPdndM2MClientAssertionType(),
+                config.getPdndM2MGrantType(),
+                config.getPdndM2MClientId());
 
         return authApi.createToken(client_assertion,
                 config.getPdndM2MClientAssertionType(),

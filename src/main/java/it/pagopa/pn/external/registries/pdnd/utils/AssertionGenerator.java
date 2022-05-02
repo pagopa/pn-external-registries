@@ -27,8 +27,8 @@ public class AssertionGenerator {
     }
 
     public String generateClientAssertion() throws AssertionGeneratorException{
-        log.info("AWS config "+ awsConfig);
-        log.info("PN-ER config "+ config);
+        log.info("generateClientAssertion init: AWS KeyARN: "+ awsConfig.getKeyARN());
+
         try {
 
             AWSKMSAsync kmsClient = AWSKMSAsyncClientBuilder.standard()
@@ -39,7 +39,7 @@ public class AssertionGenerator {
                 log.error("kmsClient null");
                 return null;
             } else
-                log.info(kmsClient.toString());
+                log.info("kmsClient: generation done");
 
             JSONObject header = new JSONObject();
             JSONObject payload = new JSONObject();
@@ -70,11 +70,10 @@ public class AssertionGenerator {
             byte[] sign = Base64Utils.encodeUrlSafe(signResult.getSignature().array());
             String jwtSignature = new String(sign, StandardCharsets.UTF_8);
 
-            log.info("Sign -> " + jwtSignature);
             log.info("Sign result OK- token -> \n" + jwtContent + "." + jwtSignature);
             return jwtContent + "." + jwtSignature;
         } catch (Exception e) {
-            log.error("Error creating client_assertion: -> "+ e.getMessage() + " - " + e);
+            log.error("Error creating client_assertion: -> " + e);
             throw new AssertionGeneratorException("Error creating client_assertion: "+ e.getMessage(),e);
         }
     }
