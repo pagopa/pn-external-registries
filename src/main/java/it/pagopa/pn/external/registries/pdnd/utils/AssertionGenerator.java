@@ -85,7 +85,7 @@ public class AssertionGenerator {
             header.put("typ", "JWT");
 
             long nowMillis = System.currentTimeMillis();
-            long ttlMillis = 86400000; // 24 ore
+            long ttlMillis = config.getClientAssertionTTL(); // 24 ore
             long expMillis = nowMillis + ttlMillis;
             payload.put("iss", config.getPdndM2MIssuer());
             payload.put("sub", config.getPdndM2MSubjec());
