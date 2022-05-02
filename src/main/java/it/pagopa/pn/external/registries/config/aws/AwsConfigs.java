@@ -15,10 +15,10 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("aws")
 public class AwsConfigs {
 
+    private String accessKeyId;
+    private String secretAccessKey;
     private String regionCode;
     private String endpointUrl;
     private String keyARN;
 
-    private String accessKeyId;
-    private String secretAccessKey;
 }
