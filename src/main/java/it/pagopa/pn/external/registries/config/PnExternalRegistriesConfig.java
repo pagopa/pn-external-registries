@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.config;
 
-import it.pagopa.pn.external.registries.anpr.util.X509CertificateChain;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
