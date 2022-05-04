@@ -25,6 +25,7 @@
         <junit-version>4.13.1</junit-version>
         <reactor-version>3.4.3</reactor-version>
         <reactor-netty-version>0.7.15.RELEASE</reactor-netty-version>
+        <jacoco.min.line.cover.ratio>0.01</jacoco.min.line.cover.ratio>
     </properties>
 
     <dependencyManagement>
