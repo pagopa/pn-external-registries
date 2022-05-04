@@ -61,6 +61,12 @@ components:
       properties:
         status:
           $ref: '#/components/schemas/PaymentStatus'
+        errorType:
+          $ref: '#/components/schemas/PaymentErrorType'
+        errorCode:
+          description: error code to show at the user
+          type: string
+          example: PPT_AUTORIZZAZIONE
         amount:
           description: Amount for required payment in eurocents
           example: 1200
@@ -70,14 +76,34 @@ components:
       example: 'required'
       description: >
         Payment status:
-          * `required` - payment required
-          * `succeeded` - payment done
-          * `in progress` - waiting confirm 
-          * `failed` - error
+          * `REQUIRED` - payment required
+          * `SUCCEEDED` - payment done
+          * `IN_PROGRESS` - waiting confirm 
+          * `FAILURE` - error see errorType
       type: string
       enum:
-        - required
-        - succeeded
-        - in progress
-        - failed
-
+        - REQUIRED
+        - SUCCEEDED
+        - IN_PROGRESS
+        - FAILURE
+    PaymentErrorType:
+      title: Error classification
+      description: > 
+        Classification to help user address the issue
+          * `PPA_TECH_ERR`: Technical Error.
+          * `PPA_BAD_REQ_ERR`: Payment data error.
+          * `PPA_PA_RESP_ERR`: creditor institution error.
+          * `PPA_EXPIRED_ERR`: payment expired.
+          * `PPA_CANCELED_ERR`: payment cancelled.
+          * `PPA_DUPLICATED_ERR`: payment duplicated.
+          * `PPA_GENERIC_ERR`: generic error.
+      example: PPA_TECH_ERR
+      type: string
+      enum:
+        - PPA_TECH_ERR
+        - PPA_BAD_REQ_ERR
+        - PPA_PA_RESP_ERR
+        - PPA_EXPIRED_ERR
+        - PPA_CANCELED_ERR
+        - PPA_DUPLICATED_ERR
+        - PPA_GENERIC_ERR
