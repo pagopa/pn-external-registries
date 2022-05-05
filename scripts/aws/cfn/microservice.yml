@@ -102,7 +102,7 @@ Resources:
   PDNDSessionTokenSigningKeyAlias:
     Type: 'AWS::KMS::Alias'
     Properties:
-      AliasName: !Sub 'alias/${ProjectName}-pdnd-authentication-token-key'
+      AliasName: !Sub 'alias/${ProjectName}-pdnd-authentication-token-key2'
       TargetKeyId: !Ref PDNDSessionTokenSigningKey
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI ANPR DI PDND    ###
