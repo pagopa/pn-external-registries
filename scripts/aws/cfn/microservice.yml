@@ -103,7 +103,7 @@ Resources:
     Type: 'AWS::KMS::Alias'
     Properties:
       AliasName: !Sub 'alias/${ProjectName}-pdnd-authentication-token-key'
-      TargetKeyId: !Ref SessionTokenSigningKey
+      TargetKeyId: !Ref PDNDSessionTokenSigningKey
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI ANPR DI PDND    ###
   ###   La chiave viene impiegata per firmare il client assertion che serve           ###
@@ -132,5 +132,5 @@ Resources:
     Type: 'AWS::KMS::Alias'
     Properties:
       AliasName: !Sub 'alias/${ProjectName}-PdndAnpr-authentication-token-key'
-      TargetKeyId: !Ref SessionTokenSigningKey
+      TargetKeyId: !Ref PdndAnprSessionTokenSigningKey
 
