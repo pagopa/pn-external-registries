@@ -17,7 +17,7 @@ paths:
     get:
       operationId: getPaymentInfo
       summary: Retrieve payment information
-      description: Use to enable payment button in notification detail page and amount
+      description: Use to enable payment button in notification detail page and display amount
       tags:
         - PaymentInfo
       parameters:
