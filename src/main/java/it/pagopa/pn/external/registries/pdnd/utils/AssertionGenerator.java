@@ -1,102 +1,100 @@
 package it.pagopa.pn.external.registries.pdnd.utils;
 
-import com.amazonaws.services.kms.*;
-import com.amazonaws.services.kms.model.*;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
+import it.pagopa.pn.external.registries.config.JwtConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
-import java.nio.ByteBuffer;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.kms.KmsAsyncClient;
+import software.amazon.awssdk.services.kms.model.MessageType;
+import software.amazon.awssdk.services.kms.model.SignRequest;
+import software.amazon.awssdk.services.kms.model.SigningAlgorithmSpec;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 
 @Slf4j
 @Component
 public class AssertionGenerator {
 
-    private PnExternalRegistriesConfig config;
-    private AwsConfigs awsConfig;
+    public static final String JWT_HEADER_FILED_NAME = "header";
+    public static final String JWT_PAYLOAD_FIELD_NAME = "payload";
+    private KmsAsyncClient kmsClient;
 
-    public AssertionGenerator(PnExternalRegistriesConfig config,AwsConfigs awsConfig) {
-        this.config = config;
-        this.awsConfig=awsConfig;
+    public AssertionGenerator( KmsAsyncClient kmsAsyncClient) {
+        this.kmsClient = kmsAsyncClient;
     }
 
-    public String generateClientAssertion() throws AssertionGeneratorException{
-        log.info("generateClientAssertion init: AWS KeyARN: "+ awsConfig.getKeyARN());
-
+    public CompletableFuture<String> generateClientAssertion( JwtConfig jwtCfg ) throws AssertionGeneratorException {
         try {
 
-            AWSKMSAsync kmsClient = AWSKMSAsyncClientBuilder.standard()
-                    .withRegion(awsConfig.getRegionCode())
+            JSONObject jwtObj = generateJwtObject( jwtCfg );
+            log.debug("jwtTokenObject={} ", jwtObj );
+
+
+            String headerBase64String = jsonObjectToUrlSafeBase64String( jwtObj.getJSONObject(JWT_HEADER_FILED_NAME) );
+            String payloadBase64String = jsonObjectToUrlSafeBase64String( jwtObj.getJSONObject(JWT_PAYLOAD_FIELD_NAME) );
+            String jwtContent = headerBase64String + "." + payloadBase64String;
+            log.info("jwtContent={}", jwtContent);
+
+
+            SdkBytes awsBytesJwtContent = SdkBytes.fromByteArray( jwtContent.getBytes(StandardCharsets.UTF_8) );
+            SignRequest signRequest = SignRequest.builder()
+                    .message( awsBytesJwtContent )
+                    .messageType( MessageType.RAW )
+                    .signingAlgorithm( SigningAlgorithmSpec.RSASSA_PKCS1_V1_5_SHA_256 )
+                    .keyId( jwtCfg.getKeypairAlias() )
                     .build();
 
-            if (kmsClient == null) {
-                log.error("kmsClient null");
-                return null;
-            } else
-                log.info("kmsClient: generation done");
 
-            JSONObject header = new JSONObject();
-            JSONObject payload = new JSONObject();
-            if (!generateTokenFields(header, payload))
-                return null;
+            return kmsClient.sign( signRequest ).thenApply( signResult -> {
 
-            log.debug("jwtToken header: " + header.toString());
-            log.debug("jwtToken payload: " + payload.toString());
+                byte[] signature = signResult.signature().asByteArray();
+                byte[] urlSafeBase64Signature = Base64Utils.encodeUrlSafe(signature);
+                String signatureString = new String( urlSafeBase64Signature, StandardCharsets.UTF_8 );
 
-            Base64.Encoder encoder = Base64.getUrlEncoder();
-            byte[] header64 = encoder.encode(header.toString().getBytes(StandardCharsets.UTF_8));
-            byte[] payload64 = encoder.encode(payload.toString().getBytes(StandardCharsets.UTF_8));
+                log.info("Sign result OK - jwt={}", jwtContent + "." + signatureString);
+                return jwtContent + "." + signatureString;
 
-            StringBuffer jwtContent =  new StringBuffer().append(new String(header64, "UTF8")).append(".").append(new String(payload64, "UTF8"));
-            log.info("jwtContent= " + jwtContent);
-
-            ByteBuffer jwtContentPlaintext = ByteBuffer.wrap(jwtContent.toString().getBytes(StandardCharsets.UTF_8));
-
-            SignRequest signRequest = new SignRequest();
-            signRequest.setMessage(jwtContentPlaintext);
-            signRequest.setKeyId(awsConfig.getKeyARN());
-            signRequest.setSigningAlgorithm("RSASSA_PKCS1_V1_5_SHA_256");
-            signRequest.setMessageType("RAW");
-
-            Future<SignResult> signingResult = kmsClient.signAsync(signRequest);
-            SignResult signResult=signingResult.get();
-
-            byte[] sign = Base64Utils.encodeUrlSafe(signResult.getSignature().array());
-            String jwtSignature = new String(sign, StandardCharsets.UTF_8);
-
-            log.info("Sign result OK- token -> \n" + jwtContent + "." + jwtSignature);
-            return jwtContent + "." + jwtSignature;
-        } catch (Exception e) {
-            log.error("Error creating client_assertion: -> " + e);
-            throw new AssertionGeneratorException("Error creating client_assertion: "+ e.getMessage(),e);
+            });
+        }
+        catch (JSONException exc) {
+            log.error("Error creating client_assertion: -> ", exc);
+            throw new AssertionGeneratorException("Error creating client_assertion: ", exc );
         }
     }
 
-    private boolean generateTokenFields(JSONObject header, JSONObject payload) {
-        try {
-            header.put("alg", "RS256");
-            header.put("kid", config.getPdnpM2MKid());
-            header.put("typ", "JWT");
+    private static String jsonObjectToUrlSafeBase64String(JSONObject jsonObj ) {
+        byte[] jsonBytes = jsonObj.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] base64JsonBytes = Base64Utils.encodeUrlSafe( jsonBytes );
+        return new String( base64JsonBytes, StandardCharsets.UTF_8 );
+    }
 
-            long nowMillis = System.currentTimeMillis();
-            long ttlMillis = config.getClientAssertionTTL(); // 24 ore
-            long expMillis = nowMillis + ttlMillis;
-            payload.put("iss", config.getPdndM2MIssuer());
-            payload.put("sub", config.getPdndM2MSubjec());
-            payload.put("aud", config.getPdndM2MAudience());
-            payload.put("jti", UUID.randomUUID().toString());
-            payload.put("iat", nowMillis);
-            payload.put("exp", expMillis);
-        } catch (Exception e) {
-            log.error("Error creating header/payload jwt Token: " + e.getMessage());
-            return false;
-        }
-        return true;
+    private static JSONObject generateJwtObject( JwtConfig jwtCfg ) throws JSONException {
+        JSONObject header = new JSONObject();
+        JSONObject payload = new JSONObject();
+
+        header.put("alg", "RS256");
+        header.put("kid", jwtCfg.getKid());
+        header.put("typ", "JWT");
+
+        long nowMillis = System.currentTimeMillis();
+        long ttlMillis = jwtCfg.getClientAssertionTTL(); // 24 ore
+        long expMillis = nowMillis + ttlMillis;
+        payload.put("iss", jwtCfg.getIssuer());
+        payload.put("sub", jwtCfg.getSubject());
+        payload.put("aud", jwtCfg.getAudience());
+        payload.put("jti", UUID.randomUUID().toString());
+        payload.put("iat", nowMillis);
+        payload.put("exp", expMillis);
+
+        JSONObject jwt = new JSONObject();
+        jwt.put("header", header);
+        jwt.put("payload", payload);
+        return jwt;
     }
 }

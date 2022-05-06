@@ -1,39 +1,53 @@
 package it.pagopa.pn.external.registries.config.aws;
 
-import it.pagopa.pn.external.registries.config.RuntimeMode;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.kms.KmsAsyncClient;
+
+import java.net.URI;
 
 @Configuration
-@ConditionalOnProperty(name = "pn.external.registries.init.aws", havingValue = "true")
 @Slf4j
 public class AwsServicesClientsConfig {
 
     private AwsConfigs props;
 
-    public AwsServicesClientsConfig(AwsConfigs props, RuntimeMode runtimeMode) {
+    public AwsServicesClientsConfig(AwsConfigs props) {
         this.props=props;
-        if (RuntimeMode.DEVELOPMENT.equals(runtimeMode)) {
-            setAwsCredentialPropertiesInSystem(props);
-        }
     }
 
-    private void setAwsCredentialPropertiesInSystem(AwsConfigs props) {
-        if (StringUtils.isNotBlank(props.getAccessKeyId())) {
-            System.setProperty("aws.accessKeyId", props.getAccessKeyId());
+    @Bean
+    public KmsAsyncClient kmsAsyncClient() {
+        return configureBuilder(KmsAsyncClient.builder() );
+    }
+
+    private <C> C configureBuilder(AwsClientBuilder<?, C> builder) {
+        if( props != null ) {
+
+            String profileName = props.getProfileName();
+            if( StringUtils.isNotBlank( profileName ) ) {
+                builder.credentialsProvider( ProfileCredentialsProvider.create( profileName ));
+            }
+
+            String regionCode = props.getRegionCode();
+            if( StringUtils.isNotBlank( regionCode )) {
+                builder.region( Region.of( regionCode ));
+            }
+
+            String endpointUrl = props.getEndpointUrl();
+            if( StringUtils.isNotBlank( endpointUrl )) {
+                builder.endpointOverride( URI.create( endpointUrl ));
+            }
+
         }
-        if (StringUtils.isNotBlank(props.getSecretAccessKey())) {
-            System.setProperty("aws.secretAccessKey", props.getSecretAccessKey());
-        }
-        if (StringUtils.isNotBlank(props.getRegionCode())) {
-            System.setProperty("aws.region-code", props.getRegionCode());
-        }
-        if (StringUtils.isNotBlank(props.getKeyARN())) {
-            System.setProperty("aws.keyARN", props.getKeyARN());
-        }
+
+        return builder.build();
     }
 
 }

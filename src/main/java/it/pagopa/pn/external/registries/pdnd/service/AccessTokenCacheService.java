@@ -1,21 +1,19 @@
 package it.pagopa.pn.external.registries.pdnd.service;
 
 
-import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
+import it.pagopa.pn.external.registries.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.pdnd.client.PDNDClient;
-import it.pagopa.pn.external.registries.pdnd.dto.TokenCacheEntry;
+import it.pagopa.pn.external.registries.pdnd.utils.AssertionGeneratorException;
 import lombok.extern.slf4j.Slf4j;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 
 @Service
 @Slf4j
 public class AccessTokenCacheService {
-    private final ConcurrentMap<String, TokenCacheEntry> accessTokenHolder = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, AccessTokenCacheEntry> accessTokenHolder = new ConcurrentHashMap<>();
 
     private final PDNDClient pdndClient;
 
@@ -24,39 +22,37 @@ public class AccessTokenCacheService {
     }
 
     public Mono<String> getToken(String purposeId, boolean force) {
-        TokenCacheEntry accessToken;
+        AccessTokenCacheEntry accessToken;
         log.info("richiesta token per porpouseid -> " + purposeId);
         boolean initializeToken = false;
 
         accessToken = accessTokenHolder.get(purposeId);
-        if (accessToken == null) {
+
+        if ( accessToken == null || force || accessToken.isExpired() ) {
             log.info("richiesta token per purposeId -> " + purposeId + " token null");
-            initializeToken = true;
-        } else {
-            if (accessToken.isExpired()) {
-                initializeToken = true;
-                accessTokenHolder.remove(purposeId);
-            }else if (force){
-                initializeToken = true;
-                accessTokenHolder.remove(purposeId);
-            }
-        }
-        if (initializeToken) {
-            log.info("simulo chiamata a PDND per purposeId {} ... wait", purposeId);
 
-            try {
-                return pdndClient.createToken().flatMap(clientCredentials -> {
-                    TokenCacheEntry tok = new TokenCacheEntry("purposeId");
-                    tok.setClientCredentials(clientCredentials);
-                    accessTokenHolder.put(purposeId, tok);
-                    return Mono.just(tok.getAccessToken());
-                });
-            }catch(Exception e){
-                log.error("Exceptiopn in getToken");
-            }
-
+            return requireNewAccessToken( purposeId );
         }
-        return Mono.just(accessToken.getAccessToken());
+        else {
+
+            return Mono.just(accessToken.getAccessToken());
+        }
+
+
     }
 
-  }
+    private Mono<String> requireNewAccessToken(String purposeId) {
+        try {
+            return pdndClient.createToken().flatMap(clientCredentials -> {
+                AccessTokenCacheEntry tok = new AccessTokenCacheEntry("purposeId");
+                tok.setClientCredentials(clientCredentials);
+                accessTokenHolder.put(purposeId, tok);
+                return Mono.just(tok.getAccessToken());
+            });
+        }
+        catch ( AssertionGeneratorException exc ) {
+            throw new PnInternalException( "Asking token for purposeId=" + purposeId, exc );
+        }
+    }
+
+}
