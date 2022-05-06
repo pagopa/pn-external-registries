@@ -13,7 +13,7 @@ tags:
   - name: PaymentInfo
     description: Informazioni sullo stato del pagamento
 paths:
-  /ext-registry/pa/v1/paymentinfo/{paymentId}:
+  /ext-registry/pagopa/v1/paymentinfo/{paymentId}:
     get:
       operationId: getPaymentInfo
       summary: Retrieve payment information
@@ -73,7 +73,7 @@ components:
           type: integer
     PaymentStatus:
       title: Payment status
-      example: 'required'
+      example: 'REQUIRED'
       description: >
         Payment status:
           * `REQUIRED` - payment required
