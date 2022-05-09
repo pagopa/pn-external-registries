@@ -39,12 +39,12 @@ public class PDNDClient {
                 .build();
 
         ApiClient  newApiClient = new ApiClient(webClient);
-        newApiClient.setBasePath(config.getPdndServerURL());
+        newApiClient.setBasePath(config.getPdndServerUrl());
         authApi = new AuthApi(newApiClient);
     }
 
-    public Mono<ClientCredentialsResponseDto> createToken() throws AssertionGeneratorException {
-        AccessTokenConfig accessTokenCfg = config.getPdndM2m();
+    public Mono<ClientCredentialsResponseDto> createToken(String tokenName) throws AssertionGeneratorException {
+        AccessTokenConfig accessTokenCfg = config.getAccessTokens().get( tokenName );
         return createToken( accessTokenCfg );
     }
 

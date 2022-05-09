@@ -10,7 +10,7 @@ public class JwtConfig {
     private String audience;
     private String kid;
 
-    private Integer clientAssertionTTL;
+    private Integer clientAssertionTtl;
     private String keypairAlias;
 
 }

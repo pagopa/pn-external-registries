@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.kms.model.SignRequest;
 import software.amazon.awssdk.services.kms.model.SigningAlgorithmSpec;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,12 +22,15 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class AssertionGenerator {
 
-    public static final String JWT_HEADER_FILED_NAME = "header";
-    public static final String JWT_PAYLOAD_FIELD_NAME = "payload";
-    private KmsAsyncClient kmsClient;
+    private static final String JWT_HEADER_FILED_NAME = "header";
+    private static final String JWT_PAYLOAD_FIELD_NAME = "payload";
 
-    public AssertionGenerator( KmsAsyncClient kmsAsyncClient) {
+    private final KmsAsyncClient kmsClient;
+    private final Clock clock;
+
+    public AssertionGenerator(KmsAsyncClient kmsAsyncClient, Clock clock) {
         this.kmsClient = kmsAsyncClient;
+        this.clock = clock;
     }
 
     public CompletableFuture<String> generateClientAssertion( JwtConfig jwtCfg ) throws AssertionGeneratorException {
@@ -54,8 +58,7 @@ public class AssertionGenerator {
             return kmsClient.sign( signRequest ).thenApply( signResult -> {
 
                 byte[] signature = signResult.signature().asByteArray();
-                byte[] urlSafeBase64Signature = Base64Utils.encodeUrlSafe(signature);
-                String signatureString = new String( urlSafeBase64Signature, StandardCharsets.UTF_8 );
+                String signatureString = bytesToUrlSafeBase64String( signature );
 
                 log.info("Sign result OK - jwt={}", jwtContent + "." + signatureString);
                 return jwtContent + "." + signatureString;
@@ -69,12 +72,22 @@ public class AssertionGenerator {
     }
 
     private static String jsonObjectToUrlSafeBase64String(JSONObject jsonObj ) {
-        byte[] jsonBytes = jsonObj.toString().getBytes(StandardCharsets.UTF_8);
-        byte[] base64JsonBytes = Base64Utils.encodeUrlSafe( jsonBytes );
-        return new String( base64JsonBytes, StandardCharsets.UTF_8 );
+        String jsonString = jsonObj.toString();
+        return stringToUrlSafeBase64String( jsonString );
     }
 
-    private static JSONObject generateJwtObject( JwtConfig jwtCfg ) throws JSONException {
+    private static String stringToUrlSafeBase64String( String inString ) {
+        byte[] jsonBytes = inString.getBytes(StandardCharsets.UTF_8);
+        return bytesToUrlSafeBase64String( jsonBytes );
+    }
+
+    private static String bytesToUrlSafeBase64String( byte[] bytes ) {
+        byte[] base64JsonBytes = Base64Utils.encodeUrlSafe( bytes );
+        return new String( base64JsonBytes, StandardCharsets.UTF_8 )
+                .replaceFirst("=+$", "");
+    }
+
+    private JSONObject generateJwtObject( JwtConfig jwtCfg ) throws JSONException {
         JSONObject header = new JSONObject();
         JSONObject payload = new JSONObject();
 
@@ -82,15 +95,15 @@ public class AssertionGenerator {
         header.put("kid", jwtCfg.getKid());
         header.put("typ", "JWT");
 
-        long nowMillis = System.currentTimeMillis();
-        long ttlMillis = jwtCfg.getClientAssertionTTL(); // 24 ore
-        long expMillis = nowMillis + ttlMillis;
+        long nowSeconds = clock.millis() / 1000l;
+        long ttlSeconds = jwtCfg.getClientAssertionTtl();
+        long expireSeconds = nowSeconds + ttlSeconds;
         payload.put("iss", jwtCfg.getIssuer());
         payload.put("sub", jwtCfg.getSubject());
         payload.put("aud", jwtCfg.getAudience());
         payload.put("jti", UUID.randomUUID().toString());
-        payload.put("iat", nowMillis);
-        payload.put("exp", expMillis);
+        payload.put("iat", nowSeconds);
+        payload.put("exp", expireSeconds);
 
         JSONObject jwt = new JSONObject();
         jwt.put("header", header);

@@ -43,9 +43,9 @@ public class AccessTokenCacheService {
 
     private Mono<String> requireNewAccessToken(String purposeId) {
         try {
-            return pdndClient.createToken().flatMap(clientCredentials -> {
-                AccessTokenCacheEntry tok = new AccessTokenCacheEntry("purposeId");
-                tok.setClientCredentials(clientCredentials);
+            return pdndClient.createToken( purposeId ).flatMap(clientCredentials -> {
+                AccessTokenCacheEntry tok = new AccessTokenCacheEntry( purposeId );
+                tok.setClientCredentials( clientCredentials );
                 accessTokenHolder.put(purposeId, tok);
                 return Mono.just(tok.getAccessToken());
             });

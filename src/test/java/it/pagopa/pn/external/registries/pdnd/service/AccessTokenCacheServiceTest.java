@@ -24,78 +24,83 @@ public class AccessTokenCacheServiceTest {
 
 
     @Autowired
-    AccessTokenCacheService tokenService;
+    private AccessTokenCacheService tokenService;
 
     @MockBean
-    PDNDClient pdndClient;
+    private PDNDClient pdndClient;
 
-    @DisplayName("Simulazione richiesta TOKEN")
+    @DisplayName("Simulazione richiesta token, devono essere uguali")
     @Test
-    public void tokenServiceTest() throws Exception {
+    public void tokenServiceTestKeepCache() throws Exception {
+
+        // - GIVEN
+        String purposeId = "test1";
+
         ClientCredentialsResponseDto resp = new ClientCredentialsResponseDto();
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
         resp.expiresIn(600);
 
-        Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
+        Mockito.when(pdndClient.createToken( purposeId )).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M1",false).block();
-        assertNotNull(a);
-        if (a != null) {
-            log.info("TEST -> received access token " + a);
-        }
-        assertNotNull(a);
+        // - WHEN
+        String accessToken1 = tokenService.getToken( purposeId,false).block();
+        String accessToken2 = tokenService.getToken( purposeId,false).block();
+
+        // - THEN
+        assertNotNull( accessToken1 );
+        assertNotNull( accessToken2 );
+
+        assertEquals( resp.getAccessToken(), accessToken1 );
+        assertEquals( resp.getAccessToken(), accessToken2 );
+
+        Mockito.verify( pdndClient, Mockito.times(1) ).createToken( purposeId );
     }
 
-    @DisplayName("Simulazione richiesta 2 TOKEN prima della scadenza del timeut")
+    @DisplayName("Simulazione scadenza token")
     @Test
     public void tokenServiceTestWithoutRefresh() throws Exception {
+        // - GIVEN
+        String purposeId = "test2";
+
         ClientCredentialsResponseDto resp = new ClientCredentialsResponseDto();
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
-        resp.expiresIn(600);
+        resp.expiresIn(1);
 
-        Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
+        Mockito.when(pdndClient.createToken( purposeId )).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M2",false).block();
-        if (a != null) {
-            log.info("TEST -> received access token " + a);
-        }
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        String b = tokenService.getToken("M2",false).block();
-        if (b != null) {
-            log.info("TEST -> received access token " + a);
-        }
-        assertEquals(a,b);
+        // - WHEN
+        String accessToken1 = tokenService.getToken( purposeId,false).block();
+        Thread.sleep( 2000 );
+        String accessToken2 = tokenService.getToken( purposeId,false).block();
+
+        // - THEN
+        assertNotNull( accessToken1 );
+        assertNotNull( accessToken2 );
+
+        Mockito.verify( pdndClient, Mockito.times(2) ).createToken( purposeId );
     }
 
-    @DisplayName("Simulazione richiesta 2 TOKEN dopo la scadenza del timeut")
+    @DisplayName("Simulazione refresh token")
     @Test
-    public void tokenServiceTestWithRefresh() throws Exception {
+    public void tokenServiceTestForceRefresh() throws Exception {
+        // - GIVEN
+        String purposeId = "test3";
+
         ClientCredentialsResponseDto resp = new ClientCredentialsResponseDto();
         resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
-        resp.expiresIn(5);
+        resp.expiresIn(1);
 
-        Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
+        Mockito.when(pdndClient.createToken( purposeId )).thenReturn(Mono.just(resp));
 
-        String a = tokenService.getToken("M3",false).block();
-        if (a != null) {
-            log.info("TEST -> received access token " + a);
-        }
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        resp.accessToken("MY_ACCESS_TOKEN "+ new Date());
-        Mockito.when(pdndClient.createToken()).thenReturn(Mono.just(resp));
+        // - WHEN
+        String accessToken1 = tokenService.getToken( purposeId,false).block();
+        String accessToken2 = tokenService.getToken( purposeId,true).block();
 
-        String b = tokenService.getToken("M3",false).block();
-        if (b != null) {
-            log.info("TEST -> received access token " + b);
-        }
-        assertNotEquals(a,b);
+        // - THEN
+        assertNotNull( accessToken1 );
+        assertNotNull( accessToken2 );
+
+        Mockito.verify( pdndClient, Mockito.times(2) ).createToken( purposeId );
     }
+
 }
