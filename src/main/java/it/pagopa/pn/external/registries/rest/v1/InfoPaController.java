@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
-import it.pagopa.pn.external.registries.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InfoPaApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
@@ -59,8 +59,8 @@ public class InfoPaController implements InfoPaApi {
     }
 
     // catch id not found (c_f205 only allowed)
-    @ExceptionHandler({PnInternalException.class})
-    public ResponseEntity<ProblemDto> handleInternalException(PnInternalException ex){
+    @ExceptionHandler({PnException.class})
+    public ResponseEntity<ProblemDto> handleInternalException(PnException ex){
         ProblemDto p = new ProblemDto();
         p.setStatus(HttpStatus.BAD_REQUEST.value());
         p.setTitle("Bad Request");

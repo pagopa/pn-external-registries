@@ -1,27 +1,21 @@
 package it.pagopa.pn.external.registries.pdnd.client;
 
-import it.pagopa.pn.external.registries.config.AccessTokenConfig;
 import it.pagopa.pn.external.registries.config.ClockBeanConfig;
-import it.pagopa.pn.external.registries.config.JwtConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
 import it.pagopa.pn.external.registries.config.aws.AwsServicesClientsConfig;
 import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
-import it.pagopa.pn.external.registries.pdnd.utils.AssertionGenerator;
-import it.pagopa.pn.external.registries.pdnd.utils.AssertionGeneratorException;
+import it.pagopa.pn.external.registries.middleware.msclient.PDNDClient;
+import it.pagopa.pn.external.registries.utils.AssertionGenerator;
+import it.pagopa.pn.external.registries.exceptions.AssertionGeneratorException;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Base64Utils;
-import software.amazon.awssdk.services.kms.KmsAsyncClient;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         "aws.endpoint-url",
 })
 @Slf4j
-public class PDNDClientTestIT {
+class PDNDClientTestIT {
 
     @Autowired
     private PDNDClient pdndClient;

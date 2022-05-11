@@ -2,8 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.common;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.pdnd.service.AccessTokenCacheService;
+import it.pagopa.pn.external.registries.services.AccessTokenCacheService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -13,43 +12,32 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BaseClient {
 
     private final AccessTokenCacheService accessTokenCacheService;
     private final String purposeId;
-    private ApiClient apiClient;
-    private final String basepath;
 
-    protected  BaseClient(AccessTokenCacheService accessTokenCacheService, String purposeId, String basepath){
+    protected  BaseClient(AccessTokenCacheService accessTokenCacheService, String purposeId){
         this.accessTokenCacheService = accessTokenCacheService;
         this.purposeId = purposeId;
-        this.basepath = basepath;
     }
 
-    @PostConstruct
-    public void init(){
+    protected WebClient initWebClient(WebClient.Builder builder){
 
-        HttpClient httpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(1000, TimeUnit.MILLISECONDS)));
+        HttpClient httpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
 
-        WebClient webClient = ApiClient.buildWebClientBuilder()
+        return builder
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .filters(filterList -> {
                     filterList.add(ExchangeFilterFunction.ofRequestProcessor(this::bearerAuthFilter));
                     filterList.add(renewTokenFilter());
                 })
                 .build();
-        apiClient = new ApiClient(webClient);
-        apiClient.setBasePath(basepath);
     }
 
-
-    protected ApiClient getApiClient(){
-        return this.apiClient;
-    }
 
     private Mono<ClientRequest> bearerAuthFilter(ClientRequest request) {
         return accessTokenCacheService.getToken(this.purposeId,false)

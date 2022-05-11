@@ -1,9 +1,10 @@
-package it.pagopa.pn.external.registries.pdnd.utils;
+package it.pagopa.pn.external.registries.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.JwtConfig;
+import it.pagopa.pn.external.registries.exceptions.AssertionGeneratorException;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
@@ -15,7 +16,7 @@ import software.amazon.awssdk.services.kms.model.SigningAlgorithmSpec;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
-import java.util.*;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -23,8 +24,6 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class AssertionGenerator {
 
-    private static final String JWT_HEADER_FILED_NAME = "header";
-    private static final String JWT_PAYLOAD_FIELD_NAME = "payload";
 
     private final KmsAsyncClient kmsClient;
     private final Clock clock;
@@ -37,12 +36,14 @@ public class AssertionGenerator {
     public CompletableFuture<String> generateClientAssertion( JwtConfig jwtCfg ) throws AssertionGeneratorException {
         try {
 
-            JSONObject jwtObj = generateJwtObject( jwtCfg );
-            log.debug("jwtTokenObject={} ", jwtObj );
+            TokenHeader th = new TokenHeader(jwtCfg);
+            TokenPayload tp = new TokenPayload(jwtCfg);
+            log.debug("jwtTokenObject header={} payload={}", th, tp);
+            ObjectMapper mapper = new ObjectMapper();
 
 
-            String headerBase64String = jsonObjectToUrlSafeBase64String( jwtObj.getJSONObject(JWT_HEADER_FILED_NAME) );
-            String payloadBase64String = jsonObjectToUrlSafeBase64String( jwtObj.getJSONObject(JWT_PAYLOAD_FIELD_NAME) );
+            String headerBase64String = jsonObjectToUrlSafeBase64String( mapper.writeValueAsString(th));
+            String payloadBase64String = jsonObjectToUrlSafeBase64String( mapper.writeValueAsString(tp));
             String jwtContent = headerBase64String + "." + payloadBase64String;
             log.info("jwtContent={}", jwtContent);
 
@@ -66,14 +67,13 @@ public class AssertionGenerator {
 
             });
         }
-        catch (JSONException exc) {
+        catch (Exception exc) {
             log.error("Error creating client_assertion: -> ", exc);
-            throw new AssertionGeneratorException("Error creating client_assertion: ", exc );
+            throw new AssertionGeneratorException( exc );
         }
     }
 
-    private static String jsonObjectToUrlSafeBase64String(JSONObject jsonObj ) {
-        String jsonString = jsonObj.toString();
+    private static String jsonObjectToUrlSafeBase64String(String jsonString ) {
         return stringToUrlSafeBase64String( jsonString );
     }
 
@@ -88,31 +88,46 @@ public class AssertionGenerator {
                 .replaceFirst("=+$", "");
     }
 
-    private JSONObject generateJwtObject( JwtConfig jwtCfg ) throws JSONException {
-        JSONObject header = new JSONObject();
-        JSONObject payload = new JSONObject();
+    @Data
+    private class  TokenHeader {
+        String alg;
+        String kid;
+        String typ;
 
-        header.put("alg", "RS256");
-        header.put("kid", jwtCfg.getKid());
-        header.put("typ", "JWT");
-
-        long nowSeconds = clock.millis() / 1000l;
-        long ttlSeconds = jwtCfg.getClientAssertionTtl();
-        long expireSeconds = nowSeconds + ttlSeconds;
-        payload.put("iss", jwtCfg.getIssuer());
-        payload.put("sub", jwtCfg.getSubject());
-        payload.put("aud", jwtCfg.getAudience());
-        payload.put("jti", UUID.randomUUID().toString());
-        payload.put("iat", nowSeconds);
-        payload.put("exp", expireSeconds);
-        String purposeId = jwtCfg.getPurposeId();
-        if(StringUtils.hasText( purposeId )) {
-            payload.put("purposeId", purposeId);
+        public TokenHeader(JwtConfig jwtCfg )
+        {
+            alg = "RS256";
+            kid = jwtCfg.getKid();
+            typ = "JWT";
         }
-
-        JSONObject jwt = new JSONObject();
-        jwt.put("header", header);
-        jwt.put("payload", payload);
-        return jwt;
     }
+
+    @Data
+    private class  TokenPayload {
+        String iss;
+        String sub;
+        String aud;
+        String jti;
+        long iat;
+        long exp;
+        String purposeId;
+
+        public TokenPayload(JwtConfig jwtCfg){
+            long nowSeconds = clock.millis() / 1000l;
+            long ttlSeconds = jwtCfg.getClientAssertionTtl();
+            long expireSeconds = nowSeconds + ttlSeconds;
+
+            iss = jwtCfg.getIssuer();
+            sub = jwtCfg.getSubject();
+            aud = jwtCfg.getAudience();
+            jti = UUID.randomUUID().toString();
+            iat = nowSeconds;
+            exp = expireSeconds;
+            String confpurposeId = jwtCfg.getPurposeId();
+            if(StringUtils.hasText( confpurposeId )) {
+                purposeId = confpurposeId;
+            }
+        }
+    }
+
 }

@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoDomicilieImpl;
-import it.pagopa.pn.external.registries.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.api.InfoDomicileApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
@@ -58,8 +58,8 @@ public class InfoDomicileController implements InfoDomicileApi {
     }
 
     // catch exception when recipientType = PG (only PF is allowed)
-    @ExceptionHandler({PnInternalException.class})
-    public ResponseEntity<ProblemDto> handleInternalException(PnInternalException ex) {
+    @ExceptionHandler({PnException.class})
+    public ResponseEntity<ProblemDto> handleInternalException(PnException ex) {
         ProblemDto p = new ProblemDto();
         p.setStatus(HttpStatus.BAD_REQUEST.value());
         p.setTitle("Bad Request");
@@ -87,7 +87,7 @@ public class InfoDomicileController implements InfoDomicileApi {
         ProblemDto p = new ProblemDto();
         p.setStatus(HttpStatus.BAD_REQUEST.value());
         p.setTitle("Validation Error");
-        p.setDetail(ex.getRootCause().getMessage());
+        p.setDetail(ex.getRootCause() != null?ex.getRootCause().getMessage():ex.getMessage());
         p.setErrors(null);
 
         return ResponseEntity.badRequest().body(p);

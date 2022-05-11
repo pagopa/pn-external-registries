@@ -1,12 +1,11 @@
-package it.pagopa.pn.external.registries.pdnd.service;
+package it.pagopa.pn.external.registries.services;
 
 
-import it.pagopa.pn.external.registries.exceptions.PnInternalException;
-import it.pagopa.pn.external.registries.pdnd.client.PDNDClient;
-import it.pagopa.pn.external.registries.pdnd.utils.AssertionGeneratorException;
+import it.pagopa.pn.external.registries.middleware.msclient.PDNDClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -23,13 +22,13 @@ public class AccessTokenCacheService {
 
     public Mono<String> getToken(String purposeId, boolean force) {
         AccessTokenCacheEntry accessToken;
-        log.info("richiesta token per porpouseid -> " + purposeId);
-        boolean initializeToken = false;
+        log.info("richiesta token per purposeId:{} ", purposeId);
+
 
         accessToken = accessTokenHolder.get(purposeId);
 
         if ( accessToken == null || force || accessToken.isExpired() ) {
-            log.info("richiesta token per purposeId -> " + purposeId + " token null");
+            log.info("richiesta token per purposeId: {} token null", purposeId);
 
             return requireNewAccessToken( purposeId );
         }
@@ -42,17 +41,13 @@ public class AccessTokenCacheService {
     }
 
     private Mono<String> requireNewAccessToken(String purposeId) {
-        try {
-            return pdndClient.createToken( purposeId ).flatMap(clientCredentials -> {
+        return pdndClient.createToken( purposeId )
+            .map(clientCredentials -> {
                 AccessTokenCacheEntry tok = new AccessTokenCacheEntry( purposeId );
                 tok.setClientCredentials( clientCredentials );
                 accessTokenHolder.put(purposeId, tok);
-                return Mono.just(tok.getAccessToken());
+                return tok.getAccessToken();
             });
-        }
-        catch ( AssertionGeneratorException exc ) {
-            throw new PnInternalException( "Asking token for purposeId=" + purposeId, exc );
-        }
     }
 
 }

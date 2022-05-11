@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.pdnd.service;
+package it.pagopa.pn.external.registries.services;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,11 +24,10 @@ class AccessTokenCacheEntry {
     public void setClientCredentials(ClientCredentialsResponseDto clientCredential) {
         accessToken = clientCredential.getAccessToken();
         tokenType = clientCredential.getTokenType();
-        expiresAtEpochMillis = clientCredential.getExpiresIn() * 1000 + System.currentTimeMillis();
+        expiresAtEpochMillis = System.currentTimeMillis() + (clientCredential.getExpiresIn().longValue() * 1000L);
     }
 
     public boolean isExpired() {
-        long currentTimeMillis = System.currentTimeMillis();
-        return currentTimeMillis > expiresAtEpochMillis;
+        return System.currentTimeMillis() > expiresAtEpochMillis;
     }
 }

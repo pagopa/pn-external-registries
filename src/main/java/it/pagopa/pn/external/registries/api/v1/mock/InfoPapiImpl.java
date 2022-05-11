@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
+import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import lombok.extern.slf4j.Slf4j;
@@ -13,19 +15,20 @@ import java.util.List;
 
 @Slf4j
 public class InfoPapiImpl {
-    public static Mono<ResponseEntity<PaInfoDto>> getOnePa(String id,  final ServerWebExchange exchange) throws PnInternalException {
+    public static Mono<ResponseEntity<PaInfoDto>> getOnePa(String id,  final ServerWebExchange exchange) throws PnException {
         PaInfoDto paInfo = null;
 
         try {
             paInfo = MockResponsees.getMockResp().getOnePa(id);
         } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
+            log.error("error", e);
+            throw new InternalErrorException();
         }
 
         if (paInfo != null) {
             return Mono.just(ResponseEntity.ok().body(paInfo));
         } else {
-            throw new PnInternalException("Not Found");
+            throw new NotFoundException();
         }
     }
 
@@ -34,7 +37,8 @@ public class InfoPapiImpl {
         try {
             list = MockResponsees.getMockResp().listOnboardedPa(paNameFilter);
         } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
+            log.error("error", e);
+            throw new InternalErrorException();
         }
 
         return Mono.just(
@@ -48,7 +52,8 @@ public class InfoPapiImpl {
         try {
             list = MockResponsees.getMockResp().listOnboardedPa( ids );
         } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
+            log.error("error", e);
+            throw new InternalErrorException();
         }
 
         return Mono.just(

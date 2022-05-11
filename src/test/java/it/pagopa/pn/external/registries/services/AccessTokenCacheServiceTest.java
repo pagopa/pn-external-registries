@@ -1,8 +1,8 @@
-package it.pagopa.pn.external.registries.pdnd.service;
+package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
 
-import it.pagopa.pn.external.registries.pdnd.client.PDNDClient;
+import it.pagopa.pn.external.registries.middleware.msclient.PDNDClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

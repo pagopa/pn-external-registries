@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.pdnd.utils;
+package it.pagopa.pn.external.registries.utils;
 
 import it.pagopa.pn.external.registries.config.AccessTokenConfig;
 import it.pagopa.pn.external.registries.config.ClockBeanConfig;
@@ -6,12 +6,12 @@ import it.pagopa.pn.external.registries.config.JwtConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.config.aws.AwsConfigs;
 import it.pagopa.pn.external.registries.config.aws.AwsServicesClientsConfig;
+import it.pagopa.pn.external.registries.exceptions.AssertionGeneratorException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.concurrent.ExecutionException;
 

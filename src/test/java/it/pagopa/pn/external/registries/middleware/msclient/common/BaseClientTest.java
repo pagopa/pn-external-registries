@@ -1,22 +1,20 @@
 package it.pagopa.pn.external.registries.middleware.msclient.common;
 
-import it.pagopa.pn.external.registries.pdnd.service.AccessTokenCacheService;
+import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.ApiClient;
+import it.pagopa.pn.external.registries.services.AccessTokenCacheService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -74,7 +72,6 @@ class BaseClientTest {
                         .withStatusCode(200));
 
         FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-        fakeApiClient.init();
 
         //WHEN
         String resp = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class).block(Duration.ofMillis(3000));
@@ -114,7 +111,6 @@ class BaseClientTest {
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
         FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-        fakeApiClient.init();
 
         //WHEN
         String resp = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class).block(Duration.ofMillis(3000));
@@ -155,7 +151,6 @@ class BaseClientTest {
                         .withStatusCode(200));
 
         FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-        fakeApiClient.init();
 
         //WHEN
          Mono<String> httpcall = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class);
@@ -174,8 +169,11 @@ class BaseClientTest {
 
     private static class FakeApiClient extends BaseClient
     {
+        ApiClient apiClient;
         public FakeApiClient(AccessTokenCacheService accessTokenCacheService){
-            super(accessTokenCacheService, "M2M", "http://localhost:9999");
+            super(accessTokenCacheService, "M2M");
+            apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder()));
+            apiClient.setBasePath("http://localhost:9999");
         }
 
         public WebClient.ResponseSpec fakeHelloWorld(String hello)
@@ -194,17 +192,17 @@ class BaseClientTest {
             final String[] localVarAccepts = {
                     "application/json"
             };
-            final List<MediaType> localVarAccept = getApiClient().selectHeaderAccept(localVarAccepts);
+            final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
             final String[] localVarContentTypes = {
                     "application/x-www-form-urlencoded"
             };
-            final MediaType localVarContentType = getApiClient().selectHeaderContentType(localVarContentTypes);
+            final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
             String[] localVarAuthNames = new String[] { "bearerAuth" };
 
             ParameterizedTypeReference<String> localVarReturnType = new ParameterizedTypeReference<>() {
             };
-            return getApiClient().invokeAPI("/fake/helloworld/{hello}", HttpMethod.GET, pathParams, queryParams, postBody, headerParams, cookieParams, formParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+            return apiClient.invokeAPI("/fake/helloworld/{hello}", HttpMethod.GET, pathParams, queryParams, postBody, headerParams, cookieParams, formParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
         }
     }
 }
