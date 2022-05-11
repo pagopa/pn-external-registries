@@ -6,6 +6,7 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.kms.KmsAsyncClient;
 import software.amazon.awssdk.services.kms.model.MessageType;
@@ -104,6 +105,10 @@ public class AssertionGenerator {
         payload.put("jti", UUID.randomUUID().toString());
         payload.put("iat", nowSeconds);
         payload.put("exp", expireSeconds);
+        String purposeId = jwtCfg.getPurposeId();
+        if(StringUtils.hasText( purposeId )) {
+            payload.put("purposeId", purposeId);
+        }
 
         JSONObject jwt = new JSONObject();
         jwt.put("header", header);

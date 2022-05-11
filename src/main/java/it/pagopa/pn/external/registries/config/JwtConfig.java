@@ -9,6 +9,7 @@ public class JwtConfig {
     private String subject;
     private String audience;
     private String kid;
+    private String purposeId;
 
     private Integer clientAssertionTtl;
     private String keypairAlias;

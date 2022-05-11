@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.pdnd.client;
 
 import io.netty.channel.ChannelOption;
+import io.netty.handler.logging.LogLevel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import it.pagopa.pn.external.registries.config.AccessTokenConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +33,12 @@ public class PDNDClient {
         this.config = config;
         this.assertionGenerator = assertionGenerator;
 
-        HttpClient httpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
-                .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(1000, TimeUnit.MILLISECONDS)));
+        HttpClient httpClient = HttpClient.create()
+                .wiretap( "reactor.netty.http.client.HttpClient",
+                        LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL )
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
+                .doOnConnected( connection ->
+                        connection.addHandlerLast(new ReadTimeoutHandler(1000, TimeUnit.MILLISECONDS)));
 
         WebClient webClient = ApiClient.buildWebClientBuilder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))

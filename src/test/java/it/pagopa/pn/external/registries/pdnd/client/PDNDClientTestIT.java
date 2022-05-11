@@ -33,11 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         AssertionGenerator.class, AwsConfigs.class, AwsServicesClientsConfig.class,
         PnExternalRegistriesConfig.class, ClockBeanConfig.class, PDNDClient.class
 }, properties = {
-        "pn.external-registry.access-tokens.anpr.jwt-cfg.issuer=fa2aa359-ab78-45b2-aa55-977d8ddb7d2b",
+        "pn.external-registry.access-tokens.anpr.jwt-cfg.issuer=10ecec03-7c15-4c4e-a482-a16a99d9b63b",
         "pn.external-registry.access-tokens.anpr.jwt-cfg.subject=10ecec03-7c15-4c4e-a482-a16a99d9b63b",
-        "pn.external-registry.access-tokens.anpr.jwt-cfg.audience=https://modipa-val.anpr.interno.it/govway/rest/in/MinInternoPortaANPR/C001–servizioNotifica/v1",
+        "pn.external-registry.access-tokens.anpr.jwt-cfg.audience=test.interop.pagopa.it",
         "pn.external-registry.access-tokens.anpr.jwt-cfg.kid=H9M2FiPLrBew5-L7pZjwPTVbBcpP8Iuqe0feaBfrnCc",
         "pn.external-registry.access-tokens.anpr.jwt-cfg.client-assertion-ttl=600",
+        "pn.external-registry.access-tokens.anpr.jwt-cfg.purpose-id=fa2aa359-ab78-45b2-aa55-977d8ddb7d2b",
         "pn.external-registry.access-tokens.anpr.jwt-cfg.keypair-alias=alias/pn-PdndAnpr-authentication-token-key",
         "pn.external-registry.access-tokens.anpr.client-assertion-type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         "pn.external-registry.access-tokens.anpr.grant-type=client_credentials",
