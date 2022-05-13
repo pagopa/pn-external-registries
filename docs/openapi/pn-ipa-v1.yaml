@@ -55,7 +55,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'pn-errors.yaml#/components/schemas/Problem'
-  '/ext-registry/pa/v1/activated-on-pn/{id}':
+  '/ext-registry-private/pa/v1/activated-on-pn/{id}':
     get:
       operationId: getOnePa
       summary: Retrieve detailed information about one PA

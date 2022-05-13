@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.pdnd.client;
+package it.pagopa.pn.external.registries.middleware.wsclient;
 
 import it.pagopa.pn.external.registries.config.ClockBeanConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;

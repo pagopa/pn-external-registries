@@ -69,7 +69,7 @@ Resources:
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
         ContainerEnvEntry2: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
-        MappedPaths: '/ext-registry-private/*'
+        MappedPaths: '/ext-registry/*,/ext-registry-private/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
         VpcId: !Ref VpcId
@@ -106,25 +106,16 @@ Resources:
       TargetKeyId: !Ref SessionTokenSigningKey
 
 
-#  ExternalRegistryMicroserviceTaskPolicy:
-#    Type: AWS::IAM::Policy
-#    Properties:
-#      PolicyName: !Sub '${ProjectName}-ExternalRegistry-CustomTaskPolicy'
-#      Roles:
-#        - !GetAtt ExternalRegistryMicroservice.Outputs.TaskRoleName
-#      PolicyDocument:
-#        Version: 2012-10-17
-#        Statement:
-#          - Effect: Allow
-#            Action:
-#              - dynamodb:BatchGetItem
-#              - dynamodb:BatchWriteItem
-#              - dynamodb:ExecuteTransaction
-#              - dynamodb:GetItem
-#              - dynamodb:PutItem
-#              - dynamodb:Query
-#              - dynamodb:TransactGetItems
-#              - dynamodb:TransactWriteItems
-#              - dynamodb:UpdateItem
-#            Resource:
-#              - !Ref ExternalRegistryDynamoTableArn
+  # Expose PN-ExternalRegistry microservice public API with API-GW for WEB usage
+  MandateMicroservicePublicWebAPI:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service.yaml"
+      Parameters:
+        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        IntendedUsage: WEB
+        DnsName: !Ref WebApiDnsName
+        ProjectName: !Ref ProjectName
+        ServiceApiPath: 'ext-registry'
+        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
+        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain

@@ -15,7 +15,6 @@ import software.amazon.awssdk.services.kms.model.SignRequest;
 import software.amazon.awssdk.services.kms.model.SigningAlgorithmSpec;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Clock;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,11 +25,9 @@ public class AssertionGenerator {
 
 
     private final KmsAsyncClient kmsClient;
-    private final Clock clock;
 
-    public AssertionGenerator(KmsAsyncClient kmsAsyncClient, Clock clock) {
+    public AssertionGenerator(KmsAsyncClient kmsAsyncClient) {
         this.kmsClient = kmsAsyncClient;
-        this.clock = clock;
     }
 
     public CompletableFuture<String> generateClientAssertion( JwtConfig jwtCfg ) throws AssertionGeneratorException {
@@ -61,9 +58,9 @@ public class AssertionGenerator {
 
                 byte[] signature = signResult.signature().asByteArray();
                 String signatureString = bytesToUrlSafeBase64String( signature );
-
-                log.info("Sign result OK - jwt={}", jwtContent + "." + signatureString);
-                return jwtContent + "." + signatureString;
+                String result = jwtContent + "." + signatureString;
+                log.info("Sign result OK - jwt={}", result);
+                return result;
 
             });
         }
@@ -89,7 +86,7 @@ public class AssertionGenerator {
     }
 
     @Data
-    private class  TokenHeader {
+    private static class  TokenHeader {
         String alg;
         String kid;
         String typ;
@@ -103,7 +100,7 @@ public class AssertionGenerator {
     }
 
     @Data
-    private class  TokenPayload {
+    private static class  TokenPayload {
         String iss;
         String sub;
         String aud;
@@ -113,7 +110,7 @@ public class AssertionGenerator {
         String purposeId;
 
         public TokenPayload(JwtConfig jwtCfg){
-            long nowSeconds = clock.millis() / 1000l;
+            long nowSeconds = System.currentTimeMillis() / 1000L;
             long ttlSeconds = jwtCfg.getClientAssertionTtl();
             long expireSeconds = nowSeconds + ttlSeconds;
 

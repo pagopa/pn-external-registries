@@ -1,21 +1,16 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
-import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InfoPaApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProblemDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 
@@ -23,8 +18,14 @@ import java.util.List;
 @Slf4j
 public class InfoPaController implements InfoPaApi {
 
+    private final InfoPapiImpl infoPapi;
+
+    public InfoPaController(InfoPapiImpl infoPapi) {
+        this.infoPapi = infoPapi;
+    }
+
     /**
-     * GET /ext-registry/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
+     * GET /ext-registry-private/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
      * Used by the Notification detail page
      *
      * @param id The identifier of one PA (required)
@@ -35,7 +36,8 @@ public class InfoPaController implements InfoPaApi {
     @Override
     public Mono<ResponseEntity<PaInfoDto>> getOnePa(String id, ServerWebExchange exchange) {
         log.debug("getOnePa - id = {}", id);
-        return InfoPapiImpl.getOnePa(id, exchange);
+        return infoPapi.getOnePa(id)
+                .map(m -> ResponseEntity.ok().body(m));
     }
 
     /**
@@ -49,37 +51,14 @@ public class InfoPaController implements InfoPaApi {
      */
     @Override
     public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, List<String> ids, ServerWebExchange exchange) {
-        log.debug("listOnboardedPa - paNameFilter = {}", paNameFilter);
+        log.debug("listOnboardedPa - paNameFilter = {} ids:{}", paNameFilter, ids);
         if( ids == null || ids.isEmpty() ) {
-            return InfoPapiImpl.listOnboardedPa(paNameFilter, exchange);
+
+            return Mono.fromSupplier(() -> ResponseEntity.ok(infoPapi.listOnboardedPaByName(paNameFilter)));
         }
         else {
-            return InfoPapiImpl.listOnboardedPa( ids, exchange);
+            return Mono.fromSupplier(() -> ResponseEntity.ok(infoPapi.listOnboardedPaByIds( ids)));
         }
-    }
-
-    // catch id not found (c_f205 only allowed)
-    @ExceptionHandler({PnException.class})
-    public ResponseEntity<ProblemDto> handleInternalException(PnException ex){
-        ProblemDto p = new ProblemDto();
-        p.setStatus(HttpStatus.BAD_REQUEST.value());
-        p.setTitle("Bad Request");
-        p.setDetail(ex.getMessage());
-        p.setErrors(null);
-
-        return ResponseEntity.badRequest().body(p);
-    }
-
-    // catch invalid paNameFilter
-    @ExceptionHandler({ConstraintViolationException.class})
-    public ResponseEntity<ProblemDto> handleValidationException(ConstraintViolationException ex){
-        ProblemDto p = new ProblemDto();
-        p.setStatus(HttpStatus.BAD_REQUEST.value());
-        p.setTitle("Validation Error");
-        p.setDetail(ex.getMessage());
-        p.setErrors(null);
-
-        return ResponseEntity.badRequest().body(p);
     }
 
 }

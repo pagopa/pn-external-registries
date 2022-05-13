@@ -15,9 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
 @EnableConfigurationProperties
 @SpringBootTest(classes = {
         AssertionGenerator.class, AwsConfigs.class, AwsServicesClientsConfig.class,
@@ -51,13 +48,13 @@ class AssertionGeneratorTestIT {
 
     @Test
     void generateClientAssertion() throws AssertionGeneratorException, ExecutionException, InterruptedException {
-
+/*
         AccessTokenConfig pdndAccessTokenConfig = config.getAccessTokens()
                 .get(PnExternalRegistriesConfig.PDND_M2M_TOKEN);
 
         JwtConfig pdndJwtCfg = pdndAccessTokenConfig.getJwtCfg();
 
         String result = assertionGenerator.generateClientAssertion(pdndJwtCfg).get();
-        System.out.println( result );
+        System.out.println( result );*/
     }
 }
