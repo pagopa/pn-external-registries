@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.utils;
 import it.pagopa.pn.external.registries.config.AccessTokenConfig;
 import it.pagopa.pn.external.registries.config.JwtConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.exceptions.AssertionGeneratorException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,5 +77,27 @@ class AssertionGeneratorTest {
         //THEN
         assertNotNull(result);
         assertTrue(result.endsWith(base64signature));
+    }
+
+    @Test
+    void generateClientAssertionFail() {
+        //GIVEN
+        AccessTokenConfig pdndAccessTokenConfig = config.getAccessTokens()
+                .get(PnExternalRegistriesConfig.PDND_M2M_TOKEN);
+
+        JwtConfig pdndJwtCfg = pdndAccessTokenConfig.getJwtCfg();
+
+        byte[] signature = "abcd".getBytes(StandardCharsets.UTF_8);
+        String base64signature = "YWJjZA";
+
+        SignResponse signResponse = SignResponse.builder()
+                .signature(SdkBytes.fromByteArray(signature)).build();
+
+        Mockito.when(kmsAsyncClient.sign(Mockito.any(SignRequest.class))).thenThrow(new NullPointerException());
+
+        //WHEN
+        assertThrows(AssertionGeneratorException.class, () -> {
+            assertionGenerator.generateClientAssertion(pdndJwtCfg).get();
+        });
     }
 }

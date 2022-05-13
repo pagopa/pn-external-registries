@@ -53,7 +53,7 @@ class PDNDClientTestIT {
 
     @Test
     void tokenTest() throws AssertionGeneratorException {
-        String purposeId = "anpr"; // PnExternalRegistriesConfig.PDND_M2M_TOKEN;
+        /*String purposeId = "anpr"; // PnExternalRegistriesConfig.PDND_M2M_TOKEN;
 
         ClientCredentialsResponseDto c = pdndClient.createToken( purposeId ).block();
 
@@ -69,7 +69,7 @@ class PDNDClientTestIT {
         Base64.Decoder decoder = Base64.getUrlDecoder();
 
         log.info("Header: {}", decodeChunk( chunks[0] ));
-        log.info("Payload: {}", decodeChunk( chunks[1] ));
+        log.info("Payload: {}", decodeChunk( chunks[1] ));*/
     }
 
     private String decodeChunk( String chunk ) {
