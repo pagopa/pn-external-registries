@@ -8,7 +8,7 @@ pa-list:
       web: 'www.comune.milano.it'
 
 domiciles:
-  - id: 'id_opaco_destinatario'
+  - id: 'f271e4bf-0d69-4ed6-a39f-4ef2f01f2fd1'
     recipientType: PF
     digital:
       domicileType: PEC

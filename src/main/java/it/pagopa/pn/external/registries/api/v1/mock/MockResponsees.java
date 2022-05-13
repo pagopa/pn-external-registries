@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaContactsDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
@@ -18,15 +19,12 @@ import java.util.List;
 
 @Slf4j
 public class MockResponsees {
-    public static String mockFile = "config/mock-responsees.yaml";
+    private static final String mockFile = "config/mock-responsees.yaml";
 
     @JsonProperty("pa-list")
     private List<MockPa> palist;
 
     private List<MockDomicilie> domiciles;
-
-    public MockResponsees() {
-    }
 
     public List<MockPa> getPalist() {
         return palist;
@@ -46,7 +44,7 @@ public class MockResponsees {
 
     public PaInfoDto getOnePa(String id) {
         MockPa pa = null;
-        PaInfoDto ret = null;
+        PaInfoDto ret;
         if (palist != null) {
             for (MockPa p: palist) {
                 if (id.equals(p.getId())) {
@@ -153,15 +151,19 @@ public class MockResponsees {
         return ret;
     }
 
-    public static MockResponsees getMockResp() throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.findAndRegisterModules();
-        File file = new File(mockFile);
-        if (!file.exists())
-            log.error("Mock file: {} not found", mockFile);
-        MockResponsees mockResp = mapper.readValue(file, MockResponsees.class);
-        return mockResp;
+    public static MockResponsees getMockResp()  {
+        try {
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            mapper.findAndRegisterModules();
+            File file = new File(mockFile);
+            if (!file.exists())
+                log.error("Mock file: {} not found", mockFile);
+            return mapper.readValue(file, MockResponsees.class);
+        } catch (IOException e) {
+            log.error("Cannot load mock responses!!", e);
+            throw new InternalErrorException();
+        }
     }
 
 }
