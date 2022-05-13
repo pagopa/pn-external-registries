@@ -22,13 +22,13 @@ public class AccessTokenCacheService {
 
     public Mono<String> getToken(String purposeId, boolean force) {
         AccessTokenCacheEntry accessToken;
-        log.info("richiesta token per purposeId:{} ", purposeId);
+        log.info("richiesta token per purposeId:{}  force:{}", purposeId, force);
 
 
         accessToken = accessTokenHolder.get(purposeId);
 
         if ( accessToken == null || force || accessToken.isExpired() ) {
-            log.info("richiesta token per purposeId: {} token null", purposeId);
+            log.info("richiesta token per purposeId: {} forced, null or expired", purposeId);
 
             return requireNewAccessToken( purposeId );
         }

@@ -23,6 +23,7 @@
 
         <spring.boot-version>2.5.2</spring.boot-version>
         <awssdk.version>2.16.97</awssdk.version>
+        <sonar.coverage.exclusions>it.pagopa.pn.external.registries.generated/**/*.java</sonar.coverage.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -217,7 +218,7 @@
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>${project.basedir}/docs/openapi/pdnd-v1.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/docs/wsclient/pdnd/pdnd-v1.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <generateApiDocumentation>false</generateApiDocumentation>
@@ -246,7 +247,7 @@
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>${project.basedir}/docs/openapi/ANPRAPIC001.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/docs/wsclient/anpr/ANPRAPIC001.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <generateApiDocumentation>false</generateApiDocumentation>

@@ -23,11 +23,6 @@ public class PnExternalRegistriesConfig {
 
     private String pdndServerUrl;
 
-
-//    private String anprJWTHeaderDigestCertChains;
-//    private String anprJWTHeaderDigestPassword;
-//    private String anprServerURL;
-
     private String anprX509CertificateChain;
     private String anprJWTHeaderDigestKeystoreAlias;
 
