@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.kms.model.SignRequest;
 import software.amazon.awssdk.services.kms.model.SigningAlgorithmSpec;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,16 +26,18 @@ public class AssertionGenerator {
 
 
     private final KmsAsyncClient kmsClient;
+    private final Clock clock;
 
-    public AssertionGenerator(KmsAsyncClient kmsAsyncClient) {
+    public AssertionGenerator(KmsAsyncClient kmsAsyncClient, Clock clock) {
         this.kmsClient = kmsAsyncClient;
+        this.clock = clock;
     }
 
     public CompletableFuture<String> generateClientAssertion( JwtConfig jwtCfg ) throws AssertionGeneratorException {
         try {
 
             TokenHeader th = new TokenHeader(jwtCfg);
-            TokenPayload tp = new TokenPayload(jwtCfg);
+            TokenPayload tp = new TokenPayload( clock, jwtCfg);
             log.debug("jwtTokenObject header={} payload={}", th, tp);
             ObjectMapper mapper = new ObjectMapper();
 
@@ -109,8 +112,8 @@ public class AssertionGenerator {
         long exp;
         String purposeId;
 
-        public TokenPayload(JwtConfig jwtCfg){
-            long nowSeconds = System.currentTimeMillis() / 1000L;
+        public TokenPayload(Clock clock, JwtConfig jwtCfg){
+            long nowSeconds = clock.millis() / 1000L;
             long ttlSeconds = jwtCfg.getClientAssertionTtl();
             long expireSeconds = nowSeconds + ttlSeconds;
 
