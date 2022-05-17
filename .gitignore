@@ -31,4 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
-/src/test/resources/nt-gateway.jks
+
+### Ignore all jks
+**/*.jks
