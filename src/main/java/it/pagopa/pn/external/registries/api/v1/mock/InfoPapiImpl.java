@@ -14,8 +14,15 @@ import java.util.List;
 @Slf4j
 @Service
 public class InfoPapiImpl {
+
+    private final MockResponsesHolder mrh;
+
+    public InfoPapiImpl(MockResponsesHolder mrh) {
+        this.mrh = mrh;
+    }
+
     public Mono<PaInfoDto> getOnePa(String id) throws PnException {
-        PaInfoDto paInfo = MockResponsees.getMockResp().getOnePa(id);
+        PaInfoDto paInfo = mrh.getMockData().getOnePa(id);
 
         if (paInfo != null) {
             return Mono.just(paInfo);
@@ -25,14 +32,14 @@ public class InfoPapiImpl {
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
-        List<PaSummaryDto> list = MockResponsees.getMockResp().listOnboardedPa(paNameFilter);
+        List<PaSummaryDto> list = mrh.getMockData().listOnboardedPa(paNameFilter);
 
         return  Flux.fromIterable( list );
 
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
-        List<PaSummaryDto> list = MockResponsees.getMockResp().listOnboardedPa( ids );
+        List<PaSummaryDto> list = mrh.getMockData().listOnboardedPa( ids );
 
         return Flux.fromIterable( list );
 

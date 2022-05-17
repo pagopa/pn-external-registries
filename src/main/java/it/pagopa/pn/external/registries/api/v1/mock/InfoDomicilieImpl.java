@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
@@ -15,8 +14,14 @@ import java.util.UUID;
 @Service
 public class InfoDomicilieImpl {
 
+    private final MockResponsesHolder mrh;
+
+    public InfoDomicilieImpl(MockResponsesHolder mrh) {
+        this.mrh = mrh;
+    }
+
     public  Mono<AnalogDomicileDto> getOneAnalogDomicile(RecipientTypeDto recipientType, UUID opaqueId) {
-        AnalogDomicileDto dto = MockResponsees.getMockResp().getOneAnalogDomicile(recipientType.getValue(), opaqueId.toString());
+        AnalogDomicileDto dto = mrh.getMockData().getOneAnalogDomicile(recipientType.getValue(), opaqueId.toString());
 
         if (dto != null) {
             return Mono.just(dto);
@@ -27,7 +32,7 @@ public class InfoDomicilieImpl {
     }
 
     public  Mono<DigitalDomicileDto> getOneDigitalDomicile(RecipientTypeDto recipientType, UUID opaqueId) {
-        DigitalDomicileDto dto = MockResponsees.getMockResp().getOneDigitalDomicile(recipientType.getValue(), opaqueId.toString());
+        DigitalDomicileDto dto = mrh.getMockData().getOneDigitalDomicile(recipientType.getValue(), opaqueId.toString());
 
         if (dto != null) {
             return Mono.just(dto);

@@ -7,6 +7,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domic
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.RecipientTypeDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Mono;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class InfoDomicilieImplTest {
     private final Duration d = Duration.ofMillis(3000);
 
-    @InjectMocks
+    @Autowired
     private InfoDomicilieImpl service;
 
     @Test

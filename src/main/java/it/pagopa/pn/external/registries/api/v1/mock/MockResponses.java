@@ -11,6 +11,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSu
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class MockResponsees {
-    private static final String mockFile = "config/mock-responsees.yaml";
+public class MockResponses {
 
     @JsonProperty("pa-list")
     private List<MockPa> palist;
@@ -150,20 +150,4 @@ public class MockResponsees {
 
         return ret;
     }
-
-    public static MockResponsees getMockResp()  {
-        try {
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            mapper.findAndRegisterModules();
-            File file = new File(mockFile);
-            if (!file.exists())
-                log.error("Mock file: {} not found", mockFile);
-            return mapper.readValue(file, MockResponsees.class);
-        } catch (IOException e) {
-            log.error("Cannot load mock responses!!", e);
-            throw new InternalErrorException();
-        }
-    }
-
 }
