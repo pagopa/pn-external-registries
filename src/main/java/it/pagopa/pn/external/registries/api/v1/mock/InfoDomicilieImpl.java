@@ -1,48 +1,44 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.RecipientTypeDto;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ServerWebExchange;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+@Slf4j
+@Service
 public class InfoDomicilieImpl {
 
-    public static Mono<ResponseEntity<AnalogDomicileDto>> getOneAnalogDomicile(RecipientTypeDto recipientType, UUID opaqueId, ServerWebExchange exchange) {
-        AnalogDomicileDto dto = null;
+    private final MockResponsesHolder mrh;
 
-        try {
-            dto = MockResponsees.getMockResp().getOneAnalogDomicile(recipientType.getValue(), opaqueId.toString());
-        } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
-        }
+    public InfoDomicilieImpl(MockResponsesHolder mrh) {
+        this.mrh = mrh;
+    }
+
+    public  Mono<AnalogDomicileDto> getOneAnalogDomicile(RecipientTypeDto recipientType, UUID opaqueId) {
+        AnalogDomicileDto dto = mrh.getMockData().getOneAnalogDomicile(recipientType.getValue(), opaqueId.toString());
 
         if (dto != null) {
-            return Mono.just(ResponseEntity.ok().body(dto));
+            return Mono.just(dto);
         } else {
-            String msg = String.format("recipientType '%s' - opaqueId '%s' not found", recipientType, opaqueId);
-            throw new PnInternalException(msg);
+            log.warn("recipientType {} - opaqueId {} not found", recipientType, opaqueId);
+            throw new NotFoundException();
         }
     }
 
-    public static Mono<ResponseEntity<DigitalDomicileDto>> getOneDigitalDomicile(RecipientTypeDto recipientType, UUID opaqueId, ServerWebExchange exchange) {
-        DigitalDomicileDto dto = null;
-
-        try {
-            dto = MockResponsees.getMockResp().getOneDigitalDomicile(recipientType.getValue(), opaqueId.toString());
-        } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
-        }
+    public  Mono<DigitalDomicileDto> getOneDigitalDomicile(RecipientTypeDto recipientType, UUID opaqueId) {
+        DigitalDomicileDto dto = mrh.getMockData().getOneDigitalDomicile(recipientType.getValue(), opaqueId.toString());
 
         if (dto != null) {
-            return Mono.just(ResponseEntity.ok().body(dto));
+            return Mono.just(dto);
         } else {
-            String msg = String.format("recipientType '%s' - opaqueId '%s' not found", recipientType, opaqueId);
-            throw new PnInternalException(msg);
+            log.warn("recipientType {} - opaqueId {} not found", recipientType, opaqueId);
+            throw new NotFoundException();
         }
     }
 

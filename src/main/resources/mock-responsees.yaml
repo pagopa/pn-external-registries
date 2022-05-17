@@ -7,14 +7,6 @@ pa-list:
       email: 'protocollo@comune.milano.it'
       tel: '023456789'
       web: 'www.comune.milano.it'
-  - id: 'c_f204'
-    name: 'Comune di Pavia'
-    taxId: '0342424'
-    generalContacts:
-      pec: 'protocollo@postacert.comune.pavia.it'
-      email: 'protocollo@comune.pavia.it'
-      tel: '023456789'
-      web: 'www.comune.pavia.it'
 
 domiciles:
   - id: 'c0a235b2-a454-11ec-b909-0242ac120002'

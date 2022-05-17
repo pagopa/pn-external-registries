@@ -1,59 +1,47 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ServerWebExchange;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @Slf4j
+@Service
 public class InfoPapiImpl {
-    public static Mono<ResponseEntity<PaInfoDto>> getOnePa(String id,  final ServerWebExchange exchange) throws PnInternalException {
-        PaInfoDto paInfo = null;
 
-        try {
-            paInfo = MockResponsees.getMockResp().getOnePa(id);
-        } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
-        }
+    private final MockResponsesHolder mrh;
+
+    public InfoPapiImpl(MockResponsesHolder mrh) {
+        this.mrh = mrh;
+    }
+
+    public Mono<PaInfoDto> getOnePa(String id) throws PnException {
+        PaInfoDto paInfo = mrh.getMockData().getOnePa(id);
 
         if (paInfo != null) {
-            return Mono.just(ResponseEntity.ok().body(paInfo));
+            return Mono.just(paInfo);
         } else {
-            throw new PnInternalException("Not Found");
+            throw new NotFoundException();
         }
     }
 
-    public static Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, final ServerWebExchange exchange) {
-        List<PaSummaryDto> list = null;
-        try {
-            list = MockResponsees.getMockResp().listOnboardedPa(paNameFilter);
-        } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
-        }
+    public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
+        List<PaSummaryDto> list = mrh.getMockData().listOnboardedPa(paNameFilter);
 
-        return Mono.just(
-                ResponseEntity.ok().body( Flux.fromIterable( list ))
-            );
+        return  Flux.fromIterable( list );
 
     }
 
-    public static Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa( List<String> ids, final ServerWebExchange exchange) {
-        List<PaSummaryDto> list = null;
-        try {
-            list = MockResponsees.getMockResp().listOnboardedPa( ids );
-        } catch (Exception e) {
-            throw new PnInternalException("invalid mock file: " + MockResponsees.mockFile);
-        }
+    public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
+        List<PaSummaryDto> list = mrh.getMockData().listOnboardedPa( ids );
 
-        return Mono.just(
-                ResponseEntity.ok().body( Flux.fromIterable( list ))
-        );
+        return Flux.fromIterable( list );
 
     }
 
