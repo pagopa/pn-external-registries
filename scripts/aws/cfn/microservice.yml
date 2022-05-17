@@ -80,7 +80,7 @@ Resources:
   ###   La chiave viene impiegata per firmare il client assertion che serve          ###
   ###   per richedere a PDND il JWT da utilizzare per invocare i servizi M2M di PDND ###
   ######################################################################################
-  SessionTokenSigningKey:
+  PDNDSessionTokenSigningKey:
     Type: 'AWS::KMS::Key'
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -99,23 +99,38 @@ Resources:
             Resource: '*'
 
   # Application use this alias to access the public/private key pair
-  SessionTokenSigningKeyAlias:
+  PDNDSessionTokenSigningKeyAlias:
     Type: 'AWS::KMS::Alias'
     Properties:
       AliasName: !Sub 'alias/${ProjectName}-pdnd-authentication-token-key'
-      TargetKeyId: !Ref SessionTokenSigningKey
+      TargetKeyId: !Ref PDNDSessionTokenSigningKey
 
-
-  # Expose PN-ExternalRegistry microservice public API with API-GW for WEB usage
-  MandateMicroservicePublicWebAPI:
-    Type: AWS::CloudFormation::Stack
+  ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI ANPR DI PDND    ###
+  ###   La chiave viene impiegata per firmare il client assertion che serve           ###
+  ###   per richedere a PDND il JWT da utilizzare per invocare i servizi di ANPR      ###
+  #######################################################################################
+  PdndAnprSessionTokenSigningKey:
+    Type: 'AWS::KMS::Key'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
-      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service.yaml"
-      Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
-        IntendedUsage: WEB
-        DnsName: !Ref WebApiDnsName
-        ProjectName: !Ref ProjectName
-        ServiceApiPath: 'ext-registry'
-        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
-        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
+      Description: RSA-2048 key to generate session token
+      KeySpec: RSA_2048
+      KeyUsage: SIGN_VERIFY
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+
+  # Application use this alias to access the public/private key pair
+  PdndAnprSessionTokenSigningKeyAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-PdndAnpr-authentication-token-key'
+      TargetKeyId: !Ref PdndAnprSessionTokenSigningKey
+

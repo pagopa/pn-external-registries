@@ -1,0 +1,119 @@
+openapi: 3.0.1
+info:
+  title: API di integrazione con pagoPA
+  version: v1
+  description: Api di integrazione al sistema di pagamento pagoPA
+  license:
+    name: PagoPA PN license
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: PaymentInfo
+    description: Informazioni sullo stato del pagamento
+paths:
+  /ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
+    get:
+      operationId: getPaymentInfo
+      summary: Retrieve payment information
+      description: Use to enable payment button in notification detail page and display amount
+      tags:
+        - PaymentInfo
+      parameters:
+        - name: paTaxId
+          description: Payment PA fiscal code
+          in: path
+          required: true
+          example: '77777777777'
+          schema:
+            type: string
+            maxLength: 11
+            minLength: 11
+            pattern: '^\d+$'
+        - name: noticeNumber
+          description: Payment notice number  numero avviso
+          in: path
+          required: true
+          example: '302000100000019421'
+          schema:
+            type: string
+            maxLength: 18
+            minLength: 18
+            pattern: '^\d+$'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInfo'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+components:
+  schemas:
+    PaymentInfo:
+      title: Payment brief information
+      description: Payment minimal information
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        errorType:
+          $ref: '#/components/schemas/PaymentErrorType'
+        errorCode:
+          description: error code to show at the user
+          type: string
+          example: PPT_AUTORIZZAZIONE
+        amount:
+          description: Amount for required payment in eurocents
+          example: 1200
+          type: integer
+    PaymentStatus:
+      title: Payment status
+      example: 'REQUIRED'
+      description: >
+        Payment status:
+          * `REQUIRED` - payment required
+          * `SUCCEEDED` - payment done
+          * `IN_PROGRESS` - waiting confirm 
+          * `FAILURE` - error see errorType
+      type: string
+      enum:
+        - REQUIRED
+        - SUCCEEDED
+        - IN_PROGRESS
+        - FAILURE
+    PaymentErrorType:
+      title: Error classification
+      description: > 
+        Classification to help user address the issue
+          * `PPA_TECH_ERR`: Technical Error.
+          * `PPA_BAD_REQ_ERR`: Payment data error.
+          * `PPA_PA_RESP_ERR`: creditor institution error.
+          * `PPA_EXPIRED_ERR`: payment expired.
+          * `PPA_CANCELED_ERR`: payment cancelled.
+          * `PPA_DUPLICATED_ERR`: payment duplicated.
+          * `PPA_GENERIC_ERR`: generic error.
+      example: PPA_TECH_ERR
+      type: string
+      enum:
+        - PPA_TECH_ERR
+        - PPA_BAD_REQ_ERR
+        - PPA_PA_RESP_ERR
+        - PPA_EXPIRED_ERR
+        - PPA_CANCELED_ERR
+        - PPA_DUPLICATED_ERR
+        - PPA_GENERIC_ERR
