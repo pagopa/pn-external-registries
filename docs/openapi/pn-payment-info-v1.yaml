@@ -13,33 +13,23 @@ tags:
   - name: PaymentInfo
     description: Informazioni sullo stato del pagamento
 paths:
-  /ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
+  /ext-registry/pa/v1/paymentinfo/{paymentId}:
     get:
       operationId: getPaymentInfo
       summary: Retrieve payment information
-      description: Use to enable payment button in notification detail page and display amount
+      description: Use to enable payment button in notification detail page and amount
       tags:
         - PaymentInfo
       parameters:
-        - name: paTaxId
-          description: Payment PA fiscal code
+        - name: paymentId
+          description: Payment identifier composed by fiscal code and notice number (numero avviso)
           in: path
           required: true
-          example: '77777777777'
+          example: '77777777777302000100000019421 '
           schema:
             type: string
-            maxLength: 11
-            minLength: 11
-            pattern: '^\d+$'
-        - name: noticeNumber
-          description: Payment notice number  numero avviso
-          in: path
-          required: true
-          example: '302000100000019421'
-          schema:
-            type: string
-            maxLength: 18
-            minLength: 18
+            maxLength: 29
+            minLength: 29
             pattern: '^\d+$'
       responses:
         '200':
@@ -83,12 +73,12 @@ components:
           type: integer
     PaymentStatus:
       title: Payment status
-      example: 'REQUIRED'
+      example: 'required'
       description: >
         Payment status:
           * `REQUIRED` - payment required
           * `SUCCEEDED` - payment done
-          * `IN_PROGRESS` - waiting confirm 
+          * `IN_PROGRESS` - waiting confirm
           * `FAILURE` - error see errorType
       type: string
       enum:
@@ -98,7 +88,7 @@ components:
         - FAILURE
     PaymentErrorType:
       title: Error classification
-      description: > 
+      description: >
         Classification to help user address the issue
           * `PPA_TECH_ERR`: Technical Error.
           * `PPA_BAD_REQ_ERR`: Payment data error.
