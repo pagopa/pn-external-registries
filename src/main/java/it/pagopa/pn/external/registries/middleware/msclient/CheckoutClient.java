@@ -6,9 +6,11 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
@@ -39,7 +41,7 @@ public class CheckoutClient {
         this.defaultApiClient = new DefaultApi( apiClient );
     }
 
-    public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptIdFromString) {
+    public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptIdFromString) throws WebClientResponseException {
         return defaultApiClient.getPaymentInfo( rptIdFromString );
     }
 }
