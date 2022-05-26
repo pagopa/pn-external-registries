@@ -27,8 +27,9 @@ class InfoPaymentControllerTest {
         dto.setStatus( PaymentStatusDto.SUCCEEDED );
         dto.setAmount( 20 );
 
-        String url = "/ext-registry/pa/v1/paymentinfo/{paymentId}"
-                .replace( "{paymentId}", "77777777777302000100000019421" );
+        String url = "/ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}"
+                .replace( "{paTaxId}", "77777777777" )
+                .replace( "{noticeNumber}", "302000100000019421" );
 
         //When
         Mockito.when( service.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.just( dto ) );

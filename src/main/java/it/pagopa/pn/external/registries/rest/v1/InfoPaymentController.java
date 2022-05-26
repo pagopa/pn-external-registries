@@ -19,9 +19,9 @@ public class InfoPaymentController implements PaymentInfoApi {
     public InfoPaymentController(InfoPaymentService infoPaymentService) { this.infoPaymentService = infoPaymentService; }
 
     @Override
-    public Mono<ResponseEntity<PaymentInfoDto>> getPaymentInfo(String paymentId, ServerWebExchange exchange) {
-        log.info("[enter] paymentId:{}", paymentId);
-        return this.infoPaymentService.getPaymentInfo( paymentId )
+    public Mono<ResponseEntity<PaymentInfoDto>> getPaymentInfo(String paTaxId, String noticeNumber, ServerWebExchange exchange) {
+        log.info("[enter] paTaxId:{} ,noticeNumber:{}", paTaxId, noticeNumber);
+        return this.infoPaymentService.getPaymentInfo( paTaxId + noticeNumber )
                 .map(body -> {
                     log.debug("[exit]");
                     return ResponseEntity.ok(body);

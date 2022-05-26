@@ -13,23 +13,33 @@ tags:
   - name: PaymentInfo
     description: Informazioni sullo stato del pagamento
 paths:
-  /ext-registry/pa/v1/paymentinfo/{paymentId}:
+  /ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
     get:
       operationId: getPaymentInfo
       summary: Retrieve payment information
-      description: Use to enable payment button in notification detail page and amount
+      description: Use to enable payment button in notification detail page and display amount
       tags:
         - PaymentInfo
       parameters:
-        - name: paymentId
-          description: Payment identifier composed by fiscal code and notice number (numero avviso)
+        - name: paTaxId
+          description: Payment PA fiscal code
           in: path
           required: true
-          example: '77777777777302000100000019421 '
+          example: '77777777777'
           schema:
             type: string
-            maxLength: 29
-            minLength: 29
+            maxLength: 11
+            minLength: 11
+            pattern: '^\d+$'
+        - name: noticeNumber
+          description: Payment notice number  numero avviso
+          in: path
+          required: true
+          example: '302000100000019421'
+          schema:
+            type: string
+            maxLength: 18
+            minLength: 18
             pattern: '^\d+$'
       responses:
         '200':
@@ -75,7 +85,7 @@ components:
           type: integer
     PaymentStatus:
       title: Payment status
-      example: 'required'
+      example: 'REQUIRED'
       description: >
         Payment status:
           * `REQUIRED` - payment required
