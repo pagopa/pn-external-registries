@@ -6,7 +6,6 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,6 +37,7 @@ public class CheckoutClient {
                 .build();
 
         ApiClient apiClient = new ApiClient( webClient );
+        apiClient.setBasePath( config.getCheckoutBaseUrl() );
         this.defaultApiClient = new DefaultApi( apiClient );
     }
 

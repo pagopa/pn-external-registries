@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +51,10 @@ class InfoPaymentServiceTest {
         WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenThrow( ex );
-        service.getPaymentInfo( "asdasda" );
+        PaymentInfoDto result = service.getPaymentInfo( "asdasda" ).block();
+
+        Assertions.assertNotNull( result );
+        Assertions.assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
     }
 
 }
