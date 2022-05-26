@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,6 +57,22 @@ class InfoPaymentServiceTest {
 
         Assertions.assertNotNull( result );
         Assertions.assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
+    }
+
+    @Test
+    void getInfoPaymentOk() {
+        //Given
+        PaymentRequestsGetResponseDto paymentResponse = new PaymentRequestsGetResponseDto();
+        paymentResponse.setImportoSingoloVersamento( 120 );
+        Mono<PaymentRequestsGetResponseDto> checkoutResponse = Mono.just( paymentResponse );
+
+        //When
+        Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
+        PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id" ).block();
+
+        //Then
+        Assertions.assertNotNull( result );
+        Assertions.assertEquals( PaymentStatusDto.REQUIRED , result.getStatus() );
     }
 
 }
