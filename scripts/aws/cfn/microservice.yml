@@ -19,6 +19,10 @@ Parameters:
     Type: String
     Description: 'Comma separated list of domains allowed to make cross origin request'
 
+  CheckoutBaseUrl:
+    Type: String
+    Description: 'Checkout endpoint base url'
+
   ContainerImageUri:
     Type: String
     Description: 'Exact container image URI with full repository and image digest'
@@ -69,6 +73,8 @@ Resources:
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
         ContainerEnvEntry2: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
+        ContainerEnvEntry3: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_BASE_URL=${CheckoutBaseUrl}'
+        ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:CheckoutApiKey}}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds

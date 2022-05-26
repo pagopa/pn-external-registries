@@ -26,4 +26,7 @@ public class PnExternalRegistriesConfig {
     private String anprX509CertificateChain;
     private String anprJWTHeaderDigestKeystoreAlias;
 
+    private String checkoutApiKey;
+    private String checkoutBaseUrl;
+
 }
