@@ -140,3 +140,16 @@ Resources:
       AliasName: !Sub 'alias/${ProjectName}-PdndAnpr-authentication-token-key'
       TargetKeyId: !Ref PdndAnprSessionTokenSigningKey
 
+  # Expose PN-ExternalRegistry microservice public API with API-GW for WEB usage
+  MandateMicroservicePublicWebAPI:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service.yaml"
+      Parameters:
+        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        IntendedUsage: WEB
+        DnsName: !Ref WebApiDnsName
+        ProjectName: !Ref ProjectName
+        ServiceApiPath: 'ext-registry'
+        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
+        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
