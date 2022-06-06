@@ -2,7 +2,6 @@ package it.pagopa.pn.external.registries.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
@@ -10,27 +9,23 @@ import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.Duration;
 
 @SpringBootTest
 class InfoPaymentServiceTest {
 
-    @Autowired
+    @InjectMocks
     private InfoPaymentService service;
 
-    @MockBean
+    @Mock
     private CheckoutClient checkoutClient;
 
     @Test
@@ -52,8 +47,9 @@ class InfoPaymentServiceTest {
 
         WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
 
-        Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenThrow( ex );
-        PaymentInfoDto result = service.getPaymentInfo( "asdasda" ).block();
+        Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
+
+        PaymentInfoDto result = service.getPaymentInfo( "asdasda" ).block(Duration.ofMillis( 3000 ));
 
         Assertions.assertNotNull( result );
         Assertions.assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );

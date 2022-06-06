@@ -24,25 +24,22 @@ public class InfoPaymentService {
     }
 
     public Mono<PaymentInfoDto> getPaymentInfo(String paymentId) {
-        try {
-            PaymentRequestsGetResponseDto result = checkoutClient.getPaymentInfo( paymentId ).block();
-            PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-            if (result != null) {
-                paymentInfoDto.setStatus( PaymentStatusDto.REQUIRED );
-                paymentInfoDto.setAmount( result.getImportoSingoloVersamento() );
-            }
-            return Mono.just( paymentInfoDto );
-        } catch ( WebClientResponseException ex) {
-            HttpStatus httpStatus = ex.getStatusCode();
-            switch (httpStatus) {
-                case NOT_FOUND: { return fromCheckoutNotFoundToPn( ex.getResponseBodyAsString() ); }
-                case CONFLICT: { return fromCheckoutConflictToPn( ex.getResponseBodyAsString() ); }
-                case BAD_GATEWAY: { return fromCheckoutBadGatewayToPn( ex.getResponseBodyAsString() ); }
-                case SERVICE_UNAVAILABLE: { return fromCheckoutServiceUnavToPn( ex.getResponseBodyAsString() ); }
-                case GATEWAY_TIMEOUT: { return fromCheckoutGWTimeoutToPn( ex.getResponseBodyAsString() ); }
-                default: throw new UnsupportedOperationException( String.format("Unable to manage status response from checkout for paymentId=%s", paymentId) );
-            }
-        }
+        log.info( "get payment info paymentId={}", paymentId );
+        return checkoutClient.getPaymentInfo(paymentId)
+                .map(r -> new PaymentInfoDto()
+                    .status( PaymentStatusDto.REQUIRED )
+                    .amount( r.getImportoSingoloVersamento() ))
+                .onErrorResume( WebClientResponseException.class, ex -> {
+                    HttpStatus httpStatus = ex.getStatusCode();
+                    switch (httpStatus) {
+                        case NOT_FOUND: { return fromCheckoutNotFoundToPn( ex.getResponseBodyAsString() ); }
+                        case CONFLICT: { return fromCheckoutConflictToPn( ex.getResponseBodyAsString() ); }
+                        case BAD_GATEWAY: { return fromCheckoutBadGatewayToPn( ex.getResponseBodyAsString() ); }
+                        case SERVICE_UNAVAILABLE: { return fromCheckoutServiceUnavToPn( ex.getResponseBodyAsString() ); }
+                        case GATEWAY_TIMEOUT: { return fromCheckoutGWTimeoutToPn( ex.getResponseBodyAsString() ); }
+                        default: throw new UnsupportedOperationException( String.format("Unable to manage status response from checkout for paymentId=%s", paymentId) );
+                    }
+        });
     }
 
     private Mono<PaymentInfoDto> fromCheckoutGWTimeoutToPn(String checkoutResult) {
