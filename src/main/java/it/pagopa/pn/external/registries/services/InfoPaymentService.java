@@ -24,6 +24,7 @@ public class InfoPaymentService {
     }
 
     public Mono<PaymentInfoDto> getPaymentInfo(String paymentId) {
+        log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
                 .map(r -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
