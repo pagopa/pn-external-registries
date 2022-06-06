@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class CheckoutClient {
-    private static final String HEADER_API_KEY = "x-api-key";
+    private static final String HEADER_API_KEY = "Ocp-Apim-Subscription-Key";
 
     private DefaultApi defaultApiClient;
     private final PnExternalRegistriesConfig config;
