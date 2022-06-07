@@ -335,6 +335,40 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>pn-external-registries-io-functions-service</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/io-functions-services.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services
+                                </basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services.dto
+                                </modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services.api
+                                </apiPackage>
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services.config
+                                </configPackage>
+                                <dateLibrary>java11</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <reactive>true</reactive>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                                <apisToGenerate>submitMessageforUserWithFiscalCodeInBody,getProfileByPOST</apisToGenerate>
+                            </configOptions>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
