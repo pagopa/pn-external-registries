@@ -336,37 +336,32 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pn-external-registries-io-functions-service</id>
+                        <id>pn-external-registries-io-client</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
+                        <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>${project.basedir}/docs/openapi/io-functions-services.yaml</inputSpec>
-                            <generatorName>spring</generatorName>
-                            <library>spring-boot</library>
-                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <inputSpec>${project.basedir}/docs/wsclient/io/io-functions-services.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>webclient</library>
+                            <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>true</generateSupportingFiles>
                             <configOptions>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services
-                                </basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services.dto
+                                <swaggerAnnotations>false</swaggerAnnotations>
+                                <openApiNullable>false</openApiNullable>
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.io.functions.services.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
-                                <delegatePattern>true</delegatePattern>
-                                <interfaceOnly>true</interfaceOnly>
-                                <annotationLibrary>none</annotationLibrary>
-                                <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <reactive>true</reactive>
-                                <skipDefaultInterface>false</skipDefaultInterface>
-                                <useTags>true</useTags>
-                                <apisToGenerate>submitMessageforUserWithFiscalCodeInBody,getProfileByPOST</apisToGenerate>
                             </configOptions>
+                            <modelNameSuffix>Dto</modelNameSuffix>
                         </configuration>
                     </execution>
                 </executions>
