@@ -31,6 +31,7 @@ public class InfoPaymentService {
                     .amount( r.getImportoSingoloVersamento() ))
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
+                    log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
                     switch (httpStatus) {
                         case NOT_FOUND: { return fromCheckoutNotFoundToPn( ex.getResponseBodyAsString() ); }
                         case CONFLICT: { return fromCheckoutConflictToPn( ex.getResponseBodyAsString() ); }
