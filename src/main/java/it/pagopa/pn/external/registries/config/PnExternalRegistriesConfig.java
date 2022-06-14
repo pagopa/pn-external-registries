@@ -29,4 +29,7 @@ public class PnExternalRegistriesConfig {
     private String checkoutApiKey;
     private String checkoutBaseUrl;
 
+    private String IOApiKey;
+    private String IOBaseUrl;
+
 }
