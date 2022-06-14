@@ -4,7 +4,7 @@ info:
   description: Authenticated API to support payment activations
   version: v2
 servers:
-  - url: https://api.dev.platform.pagopa.it/checkout/auth/payments/v2
+  - url: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
 paths:
   '/payment-requests/{rpt_id_from_string}':
     get:
@@ -52,6 +52,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -65,6 +66,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -78,6 +80,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -91,6 +94,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -104,6 +108,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -152,6 +157,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -165,6 +171,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -178,6 +185,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -191,6 +199,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -204,6 +213,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -252,6 +262,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -265,6 +276,7 @@ paths:
                 type: about:blank
                 title: string
                 status: 0
+                category: string
                 detail: string
                 detail_v2: string
                 instance: string
@@ -302,6 +314,7 @@ components:
           format: uri
     PaymentProblemJson:
       required:
+        - category
         - detail
         - detail_v2
       type: object
@@ -321,6 +334,8 @@ components:
           minimum: 100
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/FaultCategory'
         detail:
           $ref: '#/components/schemas/PaymentFault'
         detail_v2:
@@ -332,6 +347,7 @@ components:
       description: A ProblemJson-like type specific for the GetPayment and ActivatePayment operations
     ValidationFaultPaymentProblemJson:
       required:
+        - category
         - detail
         - detail_v2
       type: object
@@ -351,6 +367,8 @@ components:
           minimum: 100
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/FaultCategory'
         detail:
           $ref: '#/components/schemas/PaymentFault'
         detail_v2:
@@ -362,6 +380,7 @@ components:
       description: "A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.\nPossible values of `detail_v2` are limited to faults pertaining to validation errors."
     PaymentStatusFaultPaymentProblemJson:
       required:
+        - category
         - detail
         - detail_v2
       type: object
@@ -381,6 +400,8 @@ components:
           minimum: 100
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/FaultCategory'
         detail:
           $ref: '#/components/schemas/PaymentFault'
         detail_v2:
@@ -392,6 +413,7 @@ components:
       description: "A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.\nPossible values of `detail_v2` are limited to faults pertaining to Nodo errors related to payment status conflicts."
     GatewayFaultPaymentProblemJson:
       required:
+        - category
         - detail
         - detail_v2
       type: object
@@ -411,6 +433,8 @@ components:
           minimum: 100
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/FaultCategory'
         detail:
           $ref: '#/components/schemas/PaymentFault'
         detail_v2:
@@ -422,6 +446,7 @@ components:
       description: "A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.\nPossible values of `detail_v2` are limited to faults pertaining to Nodo errors."
     PartyConfigurationFaultPaymentProblemJson:
       required:
+        - category
         - detail
         - detail_v2
       type: object
@@ -441,6 +466,8 @@ components:
           minimum: 100
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/FaultCategory'
         detail:
           $ref: '#/components/schemas/PaymentFault'
         detail_v2:
@@ -452,6 +479,7 @@ components:
       description: "A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.\nPossible values of `detail_v2` are limited to faults pertaining to EC fatal errors."
     PartyTimeoutFaultPaymentProblemJson:
       required:
+        - category
         - detail
         - detail_v2
       type: object
@@ -471,6 +499,8 @@ components:
           minimum: 100
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/FaultCategory'
         detail:
           $ref: '#/components/schemas/PaymentFault'
         detail_v2:
@@ -632,7 +662,7 @@ components:
       description: Amount related to a single element of a payment installments
     PaymentFault:
       type: string
-      description: "DEPRECATED. Fault codes for the PagoPA Verifica and Attiva operations.\nPossible fault codes are:\n- `PAYMENT_DUPLICATED`\n- `INVALID_AMOUNT`\n- `PAYMENT_ONGOING`\n- `PAYMENT_EXPIRED`\n- `PAYMENT_UNAVAILABLE`\n- `PAYMENT_UNKNOWN`\n- `DOMAIN_UNKNOWN`\n- `PPT_MULTI_BENEFICIARIO`\n- `GENERIC_ERROR`"
+      description: "DEPRECATED: Use `FaultCategory` instead.\nFault codes for the PagoPA Verifica and Attiva operations.\nPossible fault codes are:\n- `PAYMENT_DUPLICATED`\n- `INVALID_AMOUNT`\n- `PAYMENT_ONGOING`\n- `PAYMENT_EXPIRED`\n- `PAYMENT_UNAVAILABLE`\n- `PAYMENT_UNKNOWN`\n- `DOMAIN_UNKNOWN`\n- `PPT_MULTI_BENEFICIARIO`\n- `GENERIC_ERROR`"
       x-extensible-enum:
         - PAYMENT_DUPLICATED
         - INVALID_AMOUNT
@@ -642,6 +672,18 @@ components:
         - PAYMENT_UNKNOWN
         - DOMAIN_UNKNOWN
         - PPT_MULTI_BENEFICIARIO
+        - GENERIC_ERROR
+    FaultCategory:
+      type: string
+      description: "Fault code categorization for the PagoPA Verifica and Attiva operations.\nPossible categories are:\n- `PAYMENT_DUPLICATED`\n- `PAYMENT_ONGOING`\n- `PAYMENT_EXPIRED`\n- `PAYMENT_UNAVAILABLE`\n- `PAYMENT_UNKNOWN`\n- `DOMAIN_UNKNOWN`\n- `PAYMENT_CANCELED`\n- `GENERIC_ERROR`"
+      x-extensible-enum:
+        - PAYMENT_DUPLICATED
+        - PAYMENT_ONGOING
+        - PAYMENT_EXPIRED
+        - PAYMENT_UNAVAILABLE
+        - PAYMENT_UNKNOWN
+        - DOMAIN_UNKNOWN
+        - PAYMENT_CANCELED
         - GENERIC_ERROR
     PaymentStatusFault:
       type: string
@@ -653,7 +695,7 @@ components:
         - PAA_PAGAMENTO_DUPLICATO
     ValidationFault:
       type: string
-      description: "Fault codes for errors related to well-formed requests to ECs not present inside Nodo, should be mapped to 404 HTTP status code.\nMost of the time these are generated when users input a wrong fiscal code or notice number.\nFor further information visit https://docs.pagopa.it/gestionedeglierrori/struttura-degli-errori/fault-code\nPossible fault codes are:\n- `PPT_DOMINIO_SCONOSCIUTO`\n- `PPT_INTERMEDIARIO_PA_SCONOSCIUTO`\n- `PPT_STAZIONE_INT_PA_SCONOSCIUTA`"
+      description: "Fault codes for errors related to well-formed requests to ECs not present inside Nodo, should be mapped to 404 HTTP status code.\nMost of the time these are generated when users input a wrong fiscal code or notice number.\nFor further information visit https://docs.pagopa.it/gestionedeglierrori/struttura-degli-errori/fault-code.\nPossible fault codes are:\n- `PPT_DOMINIO_SCONOSCIUTO`\n- `PPT_INTERMEDIARIO_PA_SCONOSCIUTO`\n- `PPT_STAZIONE_INT_PA_SCONOSCIUTA`"
       x-extensible-enum:
         - PPT_DOMINIO_SCONOSCIUTO
         - PPT_INTERMEDIARIO_PA_SCONOSCIUTO

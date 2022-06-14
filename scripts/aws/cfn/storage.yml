@@ -25,5 +25,7 @@ Resources:
     Type: Custom::Null
     Condition: Never
 
-
-
+Outputs:
+  Dummy:
+    Description: 'The deploy scripts need at least one Output'
+    Value: 'FooBar'
