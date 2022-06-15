@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
@@ -31,6 +32,9 @@ class SendIOMessageServiceTest {
     @Mock
     IOClient ioClient;
 
+    @Mock
+    PnExternalRegistriesConfig cfg;
+
     @Test
     void sendIOMessageSuccess() {
         //Given
@@ -51,6 +55,7 @@ class SendIOMessageServiceTest {
                 .subject( "subject" );
 
         //When
+        Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
 

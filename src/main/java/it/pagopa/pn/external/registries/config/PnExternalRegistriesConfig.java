@@ -32,4 +32,6 @@ public class PnExternalRegistriesConfig {
     private String IOApiKey;
     private String IOBaseUrl;
 
+    private boolean enableIoMessage;
+
 }
