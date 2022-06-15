@@ -24,7 +24,7 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/SendMessageRequest"
+              $ref: "#/components/schemas/SendMessageRequest"
         required: true
       responses:
         '200':
@@ -76,6 +76,7 @@ components:
           description: data di scadenza del pagamento
           type: string
           format: date-time
+          example: '2022-06-16T00:00:00.000Z'
         senderDenomination:
           description: Denominazione dell'ente mittente
           type: string

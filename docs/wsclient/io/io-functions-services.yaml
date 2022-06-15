@@ -1008,7 +1008,7 @@ definitions:
       time_to_live:
         $ref: '#/definitions/TimeToLiveSeconds'
       created_at:
-        $ref: '#/definitions/Timestamp2'
+        $ref: '#/definitions/Timestamp'
       content:
         $ref: '#/definitions/NewMessageContent'
       sender_service_id:
@@ -1044,7 +1044,7 @@ definitions:
         description: Either a ServiceId or a simple string representing the sender name
         minLength: 1
       original_receipt_date:
-        $ref: '#/definitions/Timestamp2'
+        $ref: '#/definitions/Timestamp'
       has_attachments:
         type: boolean
         default: false
@@ -1102,9 +1102,9 @@ definitions:
           English and country US.
     required:
       - sender_allowed
-  Timestamp2:
+  Timestamp:
     type: string
-    format: date-time
+    format: UTCISODateFromString
     description: A date-time field in ISO-8601 format and UTC timezone.
     x-import: '@pagopa/ts-commons/lib/dates'
     example: '2018-10-13T00:00:00.000Z'
@@ -1201,7 +1201,7 @@ definitions:
           third_party_data:
             $ref: '#/definitions/ThirdPartyData'
           due_date:
-            $ref: '#/definitions/Timestamp2'
+            $ref: '#/definitions/Timestamp'
   NewMessageContent:
     allOf:
       - $ref: '#/definitions/MessageContentBase'
@@ -1210,7 +1210,7 @@ definitions:
           payment_data:
             $ref: '#/definitions/PaymentDataWithRequiredPayee'
           due_date:
-            $ref: '#/definitions/Timestamp2'
+            $ref: '#/definitions/Timestamp'
           prescription_data:
             $ref: '#/definitions/PrescriptionData'
           eu_covid_cert:
