@@ -18,6 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -26,7 +27,7 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.external-registry.IO-base-url=https://api.io.pagopa.it/api/v1",
+        "pn.external-registry.IO-base-url=http://localhost:9999",
         "pn.external-registry.IO-api-key=fake_api_key"
 })
 class IOClientTest {
@@ -83,11 +84,11 @@ class IOClientTest {
         Assertions.assertNotNull( limitedProfile );
     }
 
-    //@Test
+    @Test
     void submitMessageforUserWithFiscalCodeInBody() {
         //Given
         MessageContent messageContent = new MessageContent()
-                .dueDate( Timestamp.from( Instant.parse( "2022-06-14T00:00:00.000Z" ) ) )
+                .dueDate( Date.from( Instant.parse("2018-10-13T00:00:00.000Z") ) )
                 .markdown( "Per visualizzare il contenuto del certificato,  **aggiorna IO all'ultima versione disponibile**:\\n\\n- [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\\n\\n- [Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)\\n\\n***\\n\\nIn order to visualize your EU Digital Covid Certificate, **you have to update IO to the last available version**:\\n\\n- [Update for Android devices](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\\n\\n- [Update for iOS devices](https://apps.apple.com/it/app/io/id1501681835)" )
                 .paymentData( new PaymentData()
                         .amount( 9999999L )
@@ -105,11 +106,33 @@ class IOClientTest {
         NewMessage message = new NewMessage()
                 .content( messageContent );
 
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( CreatedMessage.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( createdMessage );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+        new MockServerClient( "localhost", 9999 )
+                .when( request()
+                        .withMethod( "POST" )
+                        .withPath( "/messages" ))
+                .respond( response()
+                        .withBody( responseBodyBites )
+                        .withContentType( MediaType.APPLICATION_JSON )
+                        .withStatusCode( 200 ));
+
         //When
-        CreatedMessage createdMessage = client.submitMessageforUserWithFiscalCodeInBody( message ).block();
+        CreatedMessage createdMessageResult = client.submitMessageforUserWithFiscalCodeInBody( message ).block();
 
         //Then
-        Assertions.assertNotNull( createdMessage );
+        Assertions.assertNotNull( createdMessageResult );
     }
 
 }

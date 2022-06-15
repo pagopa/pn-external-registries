@@ -54,6 +54,7 @@ components:
       required:
         - iun
         - recipientTaxID
+        - senderDenomination
       properties:
         subject:
           type: string
@@ -68,9 +69,13 @@ components:
           type: string
           description: L'Identificativo Univoco Notifica assegnato da PN
         amount:
-          description: Amount for required payment in eurocents
+          description: costo di pagamento richiesto in eurocents
           example: 1200
           type: integer
+        due_date:
+          description: data di scadenza del pagamento
+          type: string
+          format: date-time
         senderDenomination:
           description: Denominazione dell'ente mittente
           type: string
