@@ -3,8 +3,6 @@ package it.pagopa.pn.external.registries.services;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
@@ -20,8 +18,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class SendIOMessageServiceTest {
