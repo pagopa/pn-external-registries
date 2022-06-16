@@ -1,0 +1,93 @@
+openapi: 3.0.1
+info:
+  title: API di integrazione con IO
+  version: v1
+  description: Api di integrazione IO
+  license:
+    name: PagoPA PN license
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: IO
+    description: Informazioni sullo stato del pagamento
+paths:
+  /ext-registry/io/v1/sendmessage:
+    post:
+      operationId: sendIOMessage
+      summary: Send message to APPIO
+      description: Use to send courtesy message to APPIO
+      tags:
+        - SendIOMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+components:
+  schemas:
+    SendMessageRequest:
+      title: Send message request
+      description: Send message request information
+      type: object
+      required:
+        - iun
+        - recipientTaxID
+        - senderDenomination
+      properties:
+        subject:
+          type: string
+          description: titolo della notifica
+        noticeNumber:
+          type: string
+          description: Numero Avviso di pagamento del sistema pagoPA, usato per pagamento online
+        creditorTaxId:
+          type: string
+          description: Codice fiscale dell'ente a cui fa riferimento il "numero avviso".
+        iun:
+          type: string
+          description: L'Identificativo Univoco Notifica assegnato da PN
+        amount:
+          description: costo di pagamento richiesto in eurocents
+          example: 1200
+          type: integer
+        due_date:
+          description: data di scadenza del pagamento
+          type: string
+          format: date-time
+          example: '2022-06-16T00:00:00.000Z'
+        senderDenomination:
+          description: Denominazione dell'ente mittente
+          type: string
+        recipientTaxID:
+          type: string
+          description: Codice Fiscale del destinatario
+    SendMessageResponse:
+      title: Send message response
+      description: Send message response information
+      type: object
+      properties:
+        id:
+          type: string
+          description: identifier of the created message.
