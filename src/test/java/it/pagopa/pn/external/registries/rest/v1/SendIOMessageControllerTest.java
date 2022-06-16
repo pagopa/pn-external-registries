@@ -12,7 +12,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.Date;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,7 +32,7 @@ class SendIOMessageControllerTest {
         SendMessageRequestDto requestDto = new SendMessageRequestDto()
                 .amount( 2000 )
                 .creditorTaxId( "creditorTaxId" )
-                .dueDate( Date.from( Instant.now() ) )
+                .dueDate(OffsetDateTime.ofInstant( Instant.now(), ZoneId.of( "UTC" ) ))
                 .iun( "iun" )
                 .noticeNumber( "noticeNumber" )
                 .recipientTaxID( "recipientTaxId" )

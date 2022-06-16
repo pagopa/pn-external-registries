@@ -273,7 +273,7 @@
                                 <configPackage>
                                     it.pagopa.pn.external.registries.generated.openapi.server.io.v1.config
                                 </configPackage>
-                                <dateLibrary>java11</dateLibrary>
+                                <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
                                 <annotationLibrary>none</annotationLibrary>

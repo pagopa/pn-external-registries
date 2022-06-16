@@ -1008,7 +1008,7 @@ definitions:
       time_to_live:
         $ref: '#/definitions/TimeToLiveSeconds'
       created_at:
-        $ref: '#/definitions/Timestamp'
+        $ref: '#/definitions/Timestamp2'
       content:
         $ref: '#/definitions/NewMessageContent'
       sender_service_id:
@@ -1044,7 +1044,7 @@ definitions:
         description: Either a ServiceId or a simple string representing the sender name
         minLength: 1
       original_receipt_date:
-        $ref: '#/definitions/Timestamp'
+        $ref: '#/definitions/Timestamp2'
       has_attachments:
         type: boolean
         default: false
@@ -1102,7 +1102,7 @@ definitions:
           English and country US.
     required:
       - sender_allowed
-  Timestamp:
+  Timestamp2:
     type: string
     format: UTCISODateFromString
     description: A date-time field in ISO-8601 format and UTC timezone.
@@ -1190,35 +1190,37 @@ definitions:
       - $ref: '#/definitions/MessageContentBase'
       - type: object
         properties:
-          payment_data:
-            $ref: '#/definitions/PaymentData'
-          prescription_data:
-            $ref: '#/definitions/PrescriptionData'
-          legal_data:
-            $ref: '#/definitions/LegalData'
-          eu_covid_cert:
-            $ref: '#/definitions/EUCovidCert'
-          third_party_data:
-            $ref: '#/definitions/ThirdPartyData'
+          # in attesa della issue: https://pagopa.atlassian.net/browse/ICC-112
+          #payment_data:
+          #  $ref: '#/definitions/PaymentData'
+          #prescription_data:
+          #  $ref: '#/definitions/PrescriptionData'
+          #legal_data:
+          #  $ref: '#/definitions/LegalData'
+          #eu_covid_cert:
+          #  $ref: '#/definitions/EUCovidCert'
+          #third_party_data:
+          #  $ref: '#/definitions/ThirdPartyData'
           due_date:
-            $ref: '#/definitions/Timestamp'
+            $ref: '#/definitions/Timestamp2'
   NewMessageContent:
     allOf:
       - $ref: '#/definitions/MessageContentBase'
       - type: object
         properties:
-          payment_data:
-            $ref: '#/definitions/PaymentDataWithRequiredPayee'
+          # in attesa della issue: https://pagopa.atlassian.net/browse/ICC-112
+          #payment_data:
+          #  $ref: '#/definitions/PaymentDataWithRequiredPayee'
           due_date:
-            $ref: '#/definitions/Timestamp'
-          prescription_data:
-            $ref: '#/definitions/PrescriptionData'
-          eu_covid_cert:
-            $ref: '#/definitions/EUCovidCert'
-          third_party_data:
-            $ref: '#/definitions/ThirdPartyData'
-          legal_data:
-            $ref: '#/definitions/LegalData'
+            $ref: '#/definitions/Timestamp2'
+          #prescription_data:
+          #  $ref: '#/definitions/PrescriptionData'
+          #eu_covid_cert:
+          #  $ref: '#/definitions/EUCovidCert'
+          #third_party_data:
+          #  $ref: '#/definitions/ThirdPartyData'
+          #legal_data:
+          #  $ref: '#/definitions/LegalData'
   NewMessage:
     type: object
     properties:
@@ -1226,16 +1228,17 @@ definitions:
         $ref: '#/definitions/TimeToLiveSeconds'
       content:
         $ref: '#/definitions/MessageContent'
-      default_addresses:
-        type: object
-        description: |-
-          Default addresses for notifying the recipient of the message in case
-          no address for the related channel is set in his profile.
-        properties:
-          email:
-            type: string
-            format: email
-            example: foobar@example.com
+      # in attesa della issue: https://pagopa.atlassian.net/browse/ICC-112
+      #default_addresses:
+      #  type: object
+      #  description: |-
+      #    Default addresses for notifying the recipient of the message in case
+      #    no address for the related channel is set in his profile.
+      #  properties:
+      #    email:
+      #      type: string
+      #      format: email
+      #      example: foobar@example.com
       fiscal_code:
         $ref: '#/definitions/FiscalCode'
       feature_level_type:
