@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
@@ -37,8 +37,8 @@ public class SendIOMessageService {
                     .flatMap( r -> {
                         log.info("Get profile by post iun={}", r.getIun());
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
-                        //content.setDueDate(Timestamp.from( r.getDueDate().toInstant() ) );
-                        content.setDueDate( r.getDueDate().toString() );
+                        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        content.setDueDate( fmt.format(r.getDueDate() ));
                         content.setSubject( r.getSubject() );
                         content.setMarkdown( MARKDOWN_MESSAGE );
                         //content.setThirdPartyData( new ThirdPartyData()

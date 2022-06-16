@@ -16,10 +16,10 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.core.publisher.Mono;
 
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,7 +47,7 @@ class SendIOMessageServiceTest {
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
                 .amount( 2000 )
                 .creditorTaxId( "creditorTaxId" )
-                .dueDate( Date.from( Instant.now() ) )
+                .dueDate( OffsetDateTime.ofInstant( Instant.now(), ZoneId.of( "UTC" ) ) )
                 .iun( "iun" )
                 .noticeNumber( "noticeNumber" )
                 .recipientTaxID( "recipientTaxId" )
