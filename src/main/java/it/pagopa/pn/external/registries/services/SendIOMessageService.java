@@ -22,7 +22,7 @@ public class SendIOMessageService {
 
     private final PnExternalRegistriesConfig cfg;
 
-    private static final String MARKDOWN_MESSAGE = "Per visualizzare il contenuto del certificato,  **aggiorna IO all'ultima versione disponibile**:\\n\\n- [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\\n\\n- [Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)\\n\\n***\\n\\nIn order to visualize your EU Digital Covid Certificate, **you have to update IO to the last available version**:\\n\\n- [Update for Android devices](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\\n\\n- [Update for iOS devices](https://apps.apple.com/it/app/io/id1501681835)";
+    private static final String MARKDOWN_MESSAGE = "Ciao,\n\nper ricevere messaggi su IO dal servizio \"Avvisi di cortesia\" di Piattaforma Notifiche, devi **aggiornare l'app all'ultima versione disponibile**:\n\n [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\n\n[Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)";
 
     public SendIOMessageService(IOClient client, PnExternalRegistriesConfig cfg) {
         this.client = client;
@@ -38,7 +38,7 @@ public class SendIOMessageService {
                         log.info("Get profile by post iun={}", r.getIun());
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
                         //content.setDueDate(Timestamp.from( r.getDueDate().toInstant() ) );
-                        content.setDueDate( "2022-10-13T00:00:00.000Z" );
+                        content.setDueDate( r.getDueDate().toString() );
                         content.setSubject( r.getSubject() );
                         content.setMarkdown( MARKDOWN_MESSAGE );
                         //content.setThirdPartyData( new ThirdPartyData()
