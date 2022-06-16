@@ -88,22 +88,23 @@ class IOClientTest {
     void submitMessageforUserWithFiscalCodeInBody() {
         //Given
         MessageContent messageContent = new MessageContent()
-                .dueDate( Timestamp.from( Instant.parse("2018-10-13T00:00:00.000Z") ) )
+                .dueDate( "2018-10-13T00:00:00.000Z" )
                 .markdown( "Per visualizzare il contenuto del certificato,  **aggiorna IO all'ultima versione disponibile**:\\n\\n- [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\\n\\n- [Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)\\n\\n***\\n\\nIn order to visualize your EU Digital Covid Certificate, **you have to update IO to the last available version**:\\n\\n- [Update for Android devices](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\\n\\n- [Update for iOS devices](https://apps.apple.com/it/app/io/id1501681835)" )
-                .paymentData( new PaymentData()
+                /*.paymentData( new PaymentData()
                         .amount( 9999999L )
                         .noticeNumber( "331613939824840064" )
                         .payee( new Payee()
                                 .fiscalCode( "EEEEEE00E00E000A" ))
-                )
+                )*/
                 .subject( "Comune di Milano: infrazione della strada" )
-                .thirdPartyData( new ThirdPartyData()
+                /*.thirdPartyData( new ThirdPartyData()
                         .id( "IUN" )
                         .originalSender( "Comune di Milano" )
-                        .originalReceiptDate( Timestamp.from( Instant.parse( "2022-06-14T00:00:00.000Z" ) ) )
+                        .originalReceiptDate( "2022-06-14T00:00:00.000Z" )
                         .hasAttachments( true )
-               .summary( "Infrazione della strada" ));
+               .summary( "Infrazione della strada" ))*/;
         NewMessage message = new NewMessage()
+                .fiscalCode( "EEEEEE00E00E000A" )
                 .content( messageContent );
 
         CreatedMessage createdMessage = new CreatedMessage()

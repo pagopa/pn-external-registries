@@ -37,12 +37,13 @@ public class SendIOMessageService {
                     .flatMap( r -> {
                         log.info("Get profile by post iun={}", r.getIun());
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
-                        content.setDueDate(Timestamp.from( r.getDueDate().toInstant() ) );
+                        //content.setDueDate(Timestamp.from( r.getDueDate().toInstant() ) );
+                        content.setDueDate( "2022-10-13T00:00:00.000Z" );
                         content.setSubject( r.getSubject() );
                         content.setMarkdown( MARKDOWN_MESSAGE );
-                        content.setThirdPartyData( new ThirdPartyData()
-                                .id( r.getIun() )
-                                .originalSender( r.getSenderDenomination() ));
+                        //content.setThirdPartyData( new ThirdPartyData()
+                        //        .id( r.getIun() )
+                        //       .originalSender( r.getSenderDenomination() ));
                         return client.getProfileByPOST(fiscalCodePayload);
                     })
                     .flatMap( r -> {
