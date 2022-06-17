@@ -1,38 +1,18 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaContactsDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 public class MockResponses {
 
-    @JsonProperty("pa-list")
-    private List<MockPa> palist;
 
     private List<MockDomicilie> domiciles;
 
-    public List<MockPa> getPalist() {
-        return palist;
-    }
 
-    public void setPalist(List<MockPa> palist) {
-        this.palist = palist;
-    }
 
     public List<MockDomicilie> getDomiciles() {
         return domiciles;
@@ -40,66 +20,6 @@ public class MockResponses {
 
     public void setDomiciles(List<MockDomicilie> domiciles) {
         this.domiciles = domiciles;
-    }
-
-    public PaInfoDto getOnePa(String id) {
-        MockPa pa = null;
-        PaInfoDto ret;
-        if (palist != null) {
-            for (MockPa p: palist) {
-                if (id.equals(p.getId())) {
-                    pa = p;
-                    break;
-                }
-            }
-        }
-        if (pa == null)
-            return null;
-        else {
-            ret = new PaInfoDto();
-            ret.setId(pa.getId());
-            ret.setName(pa.getName());
-            ret.setTaxId(pa.getTaxId());
-            PaContactsDto pac = new PaContactsDto();
-            pac.setEmail(pa.getGeneralContacts().getEmail());
-            pac.setTel(pa.getGeneralContacts().getTel());
-            pac.setWeb(pa.getGeneralContacts().getWeb());
-            pac.setPec(pa.getGeneralContacts().getPec());
-            ret.setGeneralContacts(pac);
-        }
-        return ret;
-    }
-
-    public List<PaSummaryDto> listOnboardedPa(String paNameFilter) {
-        List<PaSummaryDto> list = new ArrayList<>();
-
-        if (palist != null) {
-            for (MockPa p: palist) {
-                if (paNameFilter == null || p.getName().toLowerCase().contains(paNameFilter.toLowerCase())) {
-                    PaSummaryDto pa = new PaSummaryDto();
-                    pa.setId(p.getId());
-                    pa.setName(p.getName());
-                    list.add(pa);
-                }
-            }
-        }
-        return list;
-    }
-
-    public List<PaSummaryDto> listOnboardedPa( List<String> ids ) {
-        List<PaSummaryDto> list = new ArrayList<>();
-
-        if (palist != null) {
-            for (MockPa p: palist) {
-                if ( ids.contains(p.getId()) ) {
-                    PaSummaryDto pa = new PaSummaryDto();
-                    pa.setId(p.getId());
-                    pa.setName(p.getName());
-                    list.add(pa);
-                }
-            }
-        }
-        return list;
     }
 
     public AnalogDomicileDto getOneAnalogDomicile(String recipientType, String opaqueId) {

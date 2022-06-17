@@ -1,18 +1,17 @@
 openapi: 3.0.1
 info:
-  title: Informazioni IPA di interesse per PN
+  title: API di integrazione con self care
   version: v1
-  description: |
-      # Questo è un wrapper con caching temporaneo sulle  API di SelfCare
+  description: Api di integrazione al sistema Self Care
   license:
     name: PagoPA PN license
-    url: http://pippo.pappo.it
+    url: http://pn.pagopa.it
 servers:
-  - url: https://servizio-anonimizzazione
-    description: finto
+  - url: https://placeholder
+    description: placeholder
 tags:
-  - name: InfoPA
-    description: Informazioni sulle PA aderenti a PN
+  - name: SelfCare
+    description: Integrazione verso portale selfcare
 paths:
   '/ext-registry/pa/v1/activated-on-pn':
     get:
@@ -87,7 +86,39 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'  
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+  '/ext-registry/pa/v1/groups':
+    get:
+      operationId: getGroups
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PA can use groups to better organize work in its organization.
+        Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
+      tags:
+        - InfoPA
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
 components:
   schemas:
     PaNameFilter:
@@ -159,6 +190,26 @@ components:
           format: uri
           pattern: 'http.*'
           minLength: 1
+    PaGroupList:
+      title: Groups defined in Self Care
+      description: Contains the list of groups defined in SelfCare
+      type: array
+      items:
+        type: PaGroup
+        $ref: '#/components/schemas/PaGroup'
+    PaGroup:
+      title: Group defined in Self Care
+      description: Contains tha name list of groups defined in SelfCare
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
     SelfCarePaId:
       title: The PA id used by self care
       description: An unique ID that identify a Public Administration

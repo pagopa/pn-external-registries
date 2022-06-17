@@ -29,4 +29,8 @@ public class PnExternalRegistriesConfig {
     private String checkoutApiKey;
     private String checkoutBaseUrl;
 
+    private String selfcareApiKey;
+    private String selfcareBaseUrl;
+    private String selfcarePnProductId;
+    private String selfcareUid;
 }

@@ -1,23 +1,19 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
-import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.services.InfoSelfcareService;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @WebFluxTest(controllers = {InfoPaController.class})
@@ -28,7 +24,7 @@ class InfoPaControllerTest {
     WebTestClient webTestClient;
 
     @MockBean
-    private InfoPapiImpl svc;
+    private InfoSelfcareService svc;
 
     @Test
     void getOnePa() {
