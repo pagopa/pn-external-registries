@@ -15,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Collections;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
@@ -26,8 +24,8 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.external-registry.IO-base-url=http://localhost:9999",
-        "pn.external-registry.IO-api-key=fake_api_key"
+        "pn.external-registry.io-base-url=http://localhost:9999",
+        "pn.external-registry.io-api-key=fake_api_key"
 })
 class IOClientTest {
 

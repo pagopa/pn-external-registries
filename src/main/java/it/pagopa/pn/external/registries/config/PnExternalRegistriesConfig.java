@@ -29,8 +29,8 @@ public class PnExternalRegistriesConfig {
     private String checkoutApiKey;
     private String checkoutBaseUrl;
 
-    private String IOApiKey;
-    private String IOBaseUrl;
+    private String ioApiKey;
+    private String ioBaseUrl;
 
     private boolean enableIoMessage;
 

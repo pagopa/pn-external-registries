@@ -38,11 +38,11 @@ public class IOClient {
 
         WebClient webClient = ApiClient.buildWebClientBuilder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .defaultHeader(HEADER_API_KEY, config.getIOApiKey())
+                .defaultHeader(HEADER_API_KEY, config.getIoApiKey())
                 .build();
 
         ApiClient apiClient = new ApiClient( webClient );
-        apiClient.setBasePath( config.getIOBaseUrl() );
+        apiClient.setBasePath( config.getIoBaseUrl() );
         this.defaultApiClient = new DefaultApi( apiClient );
     }
 
