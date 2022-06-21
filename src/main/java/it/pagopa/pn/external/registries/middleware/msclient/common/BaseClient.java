@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.common;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.services.AccessTokenCacheService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import reactor.netty.http.client.HttpClient;
 
 import java.util.concurrent.TimeUnit;
 
-public abstract class BaseClient {
+public abstract class BaseClient extends CommonBaseClient {
 
     private final AccessTokenCacheService accessTokenCacheService;
     private final String purposeId;
@@ -29,7 +30,7 @@ public abstract class BaseClient {
         HttpClient httpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
                 .doOnConnected(connection -> connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
 
-        return builder
+        return super.enrichBuilder(builder)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .filters(filterList -> {
                     filterList.add(ExchangeFilterFunction.ofRequestProcessor(this::bearerAuthFilter));
