@@ -1,5 +1,8 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.api.v1.mock.InfoDomicilieImpl;
+import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
+import it.pagopa.pn.external.registries.api.v1.mock.MockResponsesHolder;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
@@ -10,9 +13,7 @@ import it.pagopa.pn.external.registries.mapper.InstitutionResourceDtoToPaSummary
 import it.pagopa.pn.external.registries.mapper.UserGroupToPaGroupDtoMapper;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,8 @@ import java.util.Locale;
 @Slf4j
 @Service
 public class InfoSelfcareService {
+
+    // FIXME: da sistemare una volta che le specifiche saranno più chiare
 
     private final SelfcareClient selfcareClient;
 

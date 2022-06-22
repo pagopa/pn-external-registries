@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.UserGroupPlainResourceDto;
@@ -7,7 +8,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGr
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareClient;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,30 +24,30 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 @SpringBootTest
 @ActiveProfiles("test")
-class InfoSelfcareServiceTest {
+class InfoSelfcareServiceMockTest {
 
     private final Duration d = Duration.ofMillis(3000);
 
     @Autowired
-    private InfoSelfcareService service;
+    private InfoSelfcareServiceMock service;
 
     @MockBean
     private SelfcareClient selfcareClient;
+
+    @MockBean
+    private InfoPapiImpl infoPapi;
 
     @Test
     void getOnePa() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        InstitutionResourceDto inst = new InstitutionResourceDto();
+        PaInfoDto inst = new PaInfoDto();
         inst.setId(id);
         inst.setName("Comune di Milano");
-        inst.setStatus("ACTIVE");
-        inst.setFiscalCode("123456789");
 
-        Mockito.when(selfcareClient.getInstitution(Mockito.anyString())).thenReturn(Mono.just(inst));
+        Mockito.when(infoPapi.getOnePa(Mockito.anyString())).thenReturn(Mono.just(inst));
 
         // WHEN
         PaInfoDto res = service.getOnePa(id).block();
@@ -63,7 +63,7 @@ class InfoSelfcareServiceTest {
     void getOnePaNotExist() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        Mockito.when(selfcareClient.getInstitution(Mockito.anyString())).thenReturn(Mono.error(new WebClientResponseException(404, null,null,null,null )));
+        Mockito.when(infoPapi.getOnePa(Mockito.anyString())).thenReturn(Mono.error(new NotFoundException()));
 
 
         // WHEN
@@ -79,16 +79,14 @@ class InfoSelfcareServiceTest {
         //GIVEN
         String name = "comune";
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        InstitutionResourceDto inst = new InstitutionResourceDto();
+        PaSummaryDto inst = new PaSummaryDto();
         inst.setId(id);
         inst.setName("Comune di Milano");
-        inst.setStatus("ACTIVE");
-        inst.setFiscalCode("123456789");
 
-        List<InstitutionResourceDto> list = new ArrayList<>();
+        List<PaSummaryDto> list = new ArrayList<>();
         list.add(inst);
 
-        Mockito.when(selfcareClient.getInstitutions()).thenReturn(Flux.fromIterable(list));
+        Mockito.when(infoPapi.listOnboardedPaByName(name)).thenReturn(Flux.fromIterable(list));
 
 
         // WHEN
@@ -104,16 +102,14 @@ class InfoSelfcareServiceTest {
     void listOnboardedPaByIds() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        InstitutionResourceDto inst = new InstitutionResourceDto();
+        PaSummaryDto inst = new PaSummaryDto();
         inst.setId(id);
         inst.setName("Comune di Milano");
-        inst.setStatus("ACTIVE");
-        inst.setFiscalCode("123456789");
 
-        List<InstitutionResourceDto> list = new ArrayList<>();
+        List<PaSummaryDto> list = new ArrayList<>();
         list.add(inst);
 
-        Mockito.when(selfcareClient.getInstitutions()).thenReturn(Flux.fromIterable(list));
+        Mockito.when(infoPapi.listOnboardedPaByIds(List.of(id))).thenReturn(Flux.fromIterable(list));
 
         // WHEN
         List<PaSummaryDto> res = service.listOnboardedPaByIds(List.of(id)).collectList().block();

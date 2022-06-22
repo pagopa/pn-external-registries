@@ -1,0 +1,37 @@
+pa-list:
+  - id: 'c_f205'
+    name: 'Comune di Milano'
+    taxId: '01199250158'
+    generalContacts:
+      pec: 'protocollo@postacert.comune.milano.it'
+      email: 'protocollo@comune.milano.it'
+      tel: '023456789'
+      web: 'www.comune.milano.it'
+
+domiciles:
+  - id: 'c0a235b2-a454-11ec-b909-0242ac120002'
+    recipientType: PF
+    digital:
+      domicileType: PEC
+      address: 'nome.cognome.1@works.pec.it'
+    analog:
+      at: 'da compilare'
+      address: 'ImmediateResponse(OK)'
+      cap: '40100'
+      municipality: 'Bologna'
+      province: 'BO'
+      addressDetails: 'Via dei pini, 14'
+      state: 'ITALIA'
+  - id: 'dcfb7a3c-ab8b-11ec-b909-0242ac120002'
+    recipientType: PF
+    digital:
+      domicileType: PEC
+      address: 'nome1.cognome1.1@works.pec.it'
+    analog:
+      at: 'da compilare'
+      address: 'ImmediateResponse(OK)'
+      cap: '35100'
+      municipality: 'Padova'
+      province: 'PD'
+      addressDetails: 'Via dei tigli, 1'
+      state: 'ITALIA'

@@ -4,7 +4,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.Info
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.services.InfoSelfcareService;
+import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +19,9 @@ import java.util.List;
 @Slf4j
 public class InfoPaController implements InfoPaApi {
 
-    private final InfoSelfcareService infoSelfcareService;
+    private final InfoSelfcareServiceMock infoSelfcareService;
 
-    public InfoPaController(InfoSelfcareService infoSelfcareService) {
+    public InfoPaController(InfoSelfcareServiceMock infoSelfcareService) {
         this.infoSelfcareService = infoSelfcareService;
     }
 
