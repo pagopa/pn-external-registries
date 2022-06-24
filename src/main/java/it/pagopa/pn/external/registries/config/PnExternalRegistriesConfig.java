@@ -41,4 +41,6 @@ public class PnExternalRegistriesConfig {
     private String selfcareBaseUrl;
     private String selfcarePnProductId;
     private String selfcareUid;
+
+    private String mockDataResources;
 }

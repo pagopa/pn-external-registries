@@ -1,8 +1,5 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.api.v1.mock.InfoDomicilieImpl;
-import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
-import it.pagopa.pn.external.registries.api.v1.mock.MockResponsesHolder;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;

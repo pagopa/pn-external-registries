@@ -14,14 +14,14 @@ import java.util.UUID;
 @Service
 public class InfoDomicilieImpl {
 
-    private final MockResponsesHolder mrh;
+    private final MockResponses mrh;
 
-    public InfoDomicilieImpl(MockResponsesHolder mrh) {
+    public InfoDomicilieImpl(MockResponses mrh) {
         this.mrh = mrh;
     }
 
     public  Mono<AnalogDomicileDto> getOneAnalogDomicile(RecipientTypeDto recipientType, UUID opaqueId) {
-        AnalogDomicileDto dto = mrh.getMockData().getOneAnalogDomicile(recipientType.getValue(), opaqueId.toString());
+        AnalogDomicileDto dto = mrh.getOneAnalogDomicile(recipientType.getValue(), opaqueId.toString());
 
         if (dto != null) {
             return Mono.just(dto);
@@ -32,7 +32,7 @@ public class InfoDomicilieImpl {
     }
 
     public  Mono<DigitalDomicileDto> getOneDigitalDomicile(RecipientTypeDto recipientType, UUID opaqueId) {
-        DigitalDomicileDto dto = mrh.getMockData().getOneDigitalDomicile(recipientType.getValue(), opaqueId.toString());
+        DigitalDomicileDto dto = mrh.getOneDigitalDomicile(recipientType.getValue(), opaqueId.toString());
 
         if (dto != null) {
             return Mono.just(dto);
