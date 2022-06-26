@@ -66,6 +66,10 @@ Parameters:
   NetworkLoadBalancerLink:
     Type: String
     Description: 'network load balancer link for API-GW'
+  
+  Version:
+    Type: String
+    Description: 'keep track of used projects commitIds'
 
 Resources:
 
