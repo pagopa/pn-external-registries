@@ -27,16 +27,19 @@ public class InfoSelfcareServiceMock extends InfoSelfcareService {
 
     @Override
     public Mono<PaInfoDto> getOnePa(String id) throws PnException {
+        log.info("getOnePa - id={}", id);
         return infoPapi.getOnePa(id);
     }
 
     @Override
     public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
+        log.info("listOnboardedPaByName - paNameFilter={}", paNameFilter);
         return infoPapi.listOnboardedPaByName(paNameFilter);
     }
 
     @Override
     public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
+        log.info("listOnboardedPaByIds - ids={}", ids);
         return infoPapi.listOnboardedPaByIds(ids);
     }
 

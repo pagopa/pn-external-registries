@@ -30,25 +30,28 @@ public class InfoSelfcareService {
     }
 
     public Mono<PaInfoDto> getOnePa(String id) throws PnException {
+        log.info("getOnePa - id={}", id);
         return selfcareClient.getInstitution(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
                 .map(InstitutionResourceDtoToPaInfoDto::toDto);
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
+        log.info("listOnboardedPaByName - paNameFilter={}", paNameFilter);
         return selfcareClient.getInstitutions()
                 .filter(inst -> inst.getName().toLowerCase(Locale.ROOT).contains(paNameFilter))
                 .map(InstitutionResourceDtoToPaSummaryDto::toDto);
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
+        log.info("listOnboardedPaByIds - ids={}", ids);
         return selfcareClient.getInstitutions()
                 .filter(inst -> ids.contains(inst.getId()))
                 .map(InstitutionResourceDtoToPaSummaryDto::toDto);
     }
 
     public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups) {
-        log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups);
+        log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups);
         return selfcareClient.getUserGroups(xPagopaPnCxId)
                 .filter(grp -> xPagopaPnCxGroups == null || xPagopaPnCxGroups.isEmpty()
                         || xPagopaPnCxGroups.contains(grp.getId()))
