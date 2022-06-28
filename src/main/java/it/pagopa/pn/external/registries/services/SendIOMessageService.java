@@ -41,9 +41,9 @@ public class SendIOMessageService {
                         content.setDueDate( fmt.format(r.getDueDate() ));
                         content.setSubject( r.getSubject() );
                         content.setMarkdown( MARKDOWN_MESSAGE );
-                        //content.setThirdPartyData( new ThirdPartyData()
-                        //        .id( r.getIun() )
-                        //       .originalSender( r.getSenderDenomination() ));
+                        content.setThirdPartyData( new ThirdPartyData()
+                               .id( r.getIun() )
+                               .originalSender( r.getSenderDenomination() ));
                         return client.getProfileByPOST(fiscalCodePayload);
                     })
                     .flatMap( r -> {
