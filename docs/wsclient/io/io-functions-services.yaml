@@ -1199,8 +1199,8 @@ definitions:
           #  $ref: '#/definitions/LegalData'
           #eu_covid_cert:
           #  $ref: '#/definitions/EUCovidCert'
-          #third_party_data:
-          #  $ref: '#/definitions/ThirdPartyData'
+          third_party_data:
+            $ref: '#/definitions/ThirdPartyData'
           due_date:
             $ref: '#/definitions/Timestamp2'
   NewMessageContent:
