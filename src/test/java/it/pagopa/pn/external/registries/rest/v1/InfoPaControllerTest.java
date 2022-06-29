@@ -1,15 +1,14 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
-import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,18 +16,20 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @WebFluxTest(controllers = {InfoPaController.class})
 class InfoPaControllerTest {
+
+    public static final String PN_PAGOPA_USER_ID = "x-pagopa-pn-cx-id";
+    public static final String PN_PAGOPA_UID = "x-pagopa-pn-uid";
+    public static final String PN_PAGOPA_GROUPS = "x-pagopa-pn-cx-groups";
 
 
     @Autowired
     WebTestClient webTestClient;
 
     @MockBean
-    private InfoPapiImpl svc;
+    private InfoSelfcareServiceMock svc;
 
     @Test
     void getOnePa() {
@@ -107,4 +108,37 @@ class InfoPaControllerTest {
                 .exchange()
                 .expectStatus().isOk().expectBodyList(PaSummaryDto.class).hasSize(1);
     }
+
+
+    @Test
+    void getGroups() {
+
+        // Given
+        String url = "/ext-registry/pa/v1/groups";
+
+        List<PaGroupDto> res = new ArrayList<>();
+        PaGroupDto dto = new PaGroupDto();
+        dto.setId("123456789");
+        dto.setName("amministrazione");
+        res.add(dto);
+        dto = new PaGroupDto();
+        dto.setId("987654321");
+        dto.setName("dirigenza");
+        res.add(dto);
+
+        // When
+        Mockito.when(svc.getGroups(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(Flux.fromIterable(res));
+
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .header( PN_PAGOPA_USER_ID, "internaluserid1234")
+                .header( PN_PAGOPA_UID, "PF-internaluserid1234")
+                .header( PN_PAGOPA_GROUPS, "")
+                .exchange()
+                .expectStatus().isOk().expectBodyList(PaGroupDto.class).hasSize(2);
+    }
+
 }

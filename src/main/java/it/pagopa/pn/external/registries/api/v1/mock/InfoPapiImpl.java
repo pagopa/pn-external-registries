@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
@@ -15,14 +16,16 @@ import java.util.List;
 @Service
 public class InfoPapiImpl {
 
-    private final MockResponsesHolder mrh;
+    private final MockResponses mrh;
+    private final PnExternalRegistriesConfig config;
 
-    public InfoPapiImpl(MockResponsesHolder mrh) {
+    public InfoPapiImpl(MockResponses mrh, PnExternalRegistriesConfig config) {
         this.mrh = mrh;
+        this.config = config;
     }
 
     public Mono<PaInfoDto> getOnePa(String id) throws PnException {
-        PaInfoDto paInfo = mrh.getMockData().getOnePa(id);
+        PaInfoDto paInfo = mrh.getOnePa(id);
 
         if (paInfo != null) {
             return Mono.just(paInfo);
@@ -32,14 +35,14 @@ public class InfoPapiImpl {
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
-        List<PaSummaryDto> list = mrh.getMockData().listOnboardedPa(paNameFilter);
+        List<PaSummaryDto> list = mrh.listOnboardedPa(paNameFilter);
 
         return  Flux.fromIterable( list );
 
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
-        List<PaSummaryDto> list = mrh.getMockData().listOnboardedPa( ids );
+        List<PaSummaryDto> list = mrh.listOnboardedPa( ids );
 
         return Flux.fromIterable( list );
 

@@ -1,9 +1,10 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
-import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InfoPaApi;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,11 +19,12 @@ import java.util.List;
 @Slf4j
 public class InfoPaController implements InfoPaApi {
 
-    private final InfoPapiImpl infoPapi;
+    private final InfoSelfcareServiceMock infoSelfcareService;
 
-    public InfoPaController(InfoPapiImpl infoPapi) {
-        this.infoPapi = infoPapi;
+    public InfoPaController(InfoSelfcareServiceMock infoSelfcareService) {
+        this.infoSelfcareService = infoSelfcareService;
     }
+
 
     /**
      * GET /ext-registry-private/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
@@ -35,8 +37,8 @@ public class InfoPaController implements InfoPaApi {
      */
     @Override
     public Mono<ResponseEntity<PaInfoDto>> getOnePa(String id, ServerWebExchange exchange) {
-        log.debug("getOnePa - id = {}", id);
-        return infoPapi.getOnePa(id)
+        log.debug("getOnePa - id={}", id);
+        return infoSelfcareService.getOnePa(id)
                 .map(m -> ResponseEntity.ok().body(m));
     }
 
@@ -51,14 +53,20 @@ public class InfoPaController implements InfoPaApi {
      */
     @Override
     public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, List<String> ids, ServerWebExchange exchange) {
-        log.debug("listOnboardedPa - paNameFilter = {} ids:{}", paNameFilter, ids);
+        log.debug("listOnboardedPa - paNameFilter={} ids={}", paNameFilter, ids);
         if( ids == null || ids.isEmpty() ) {
 
-            return Mono.fromSupplier(() -> ResponseEntity.ok(infoPapi.listOnboardedPaByName(paNameFilter)));
+            return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.listOnboardedPaByName(paNameFilter)));
         }
         else {
-            return Mono.fromSupplier(() -> ResponseEntity.ok(infoPapi.listOnboardedPaByIds( ids)));
+            return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.listOnboardedPaByIds( ids)));
         }
     }
 
+
+    @Override
+    public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, ServerWebExchange exchange) {
+        log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups);
+        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups)));
+    }
 }

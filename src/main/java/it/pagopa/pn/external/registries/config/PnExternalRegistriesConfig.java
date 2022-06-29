@@ -37,4 +37,10 @@ public class PnExternalRegistriesConfig {
 
     private boolean enableIoMessage;
 
+    private String selfcareApiKey;
+    private String selfcareBaseUrl;
+    private String selfcarePnProductId;
+    private String selfcareUid;
+
+    private String mockDataResources;
 }

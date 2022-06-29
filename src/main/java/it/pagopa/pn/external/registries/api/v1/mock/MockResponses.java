@@ -1,10 +1,10 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaContactsDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
@@ -13,15 +13,22 @@ import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domic
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Component
 public class MockResponses {
 
-    @JsonProperty("pa-list")
+    public MockResponses(PnExternalRegistriesConfig pnExternalRegistriesConfig) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.findAndRegisterModules();
+
+        this.palist = mapper.readValue( pnExternalRegistriesConfig.getMockDataResources(), new TypeReference<List<MockPa>>(){});
+    }
+
     private List<MockPa> palist;
 
     private List<MockDomicilie> domiciles;
