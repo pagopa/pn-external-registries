@@ -100,6 +100,13 @@ paths:
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
         - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            type: PaGroupStatus
+            $ref: '#/components/schemas/PaGroupStatus'
       responses:
         '200':
           description: OK
@@ -209,7 +216,15 @@ components:
         description:
           type: string
         status:
-          type: string
+          type: PaGroupStatus
+          $ref: '#/components/schemas/PaGroupStatus'
+    PaGroupStatus:
+      title: Status of group defined in Self Care
+      description: Contains tha name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
     SelfCarePaId:
       title: The PA id used by self care
       description: An unique ID that identify a Public Administration

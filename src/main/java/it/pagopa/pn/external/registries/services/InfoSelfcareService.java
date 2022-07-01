@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.services;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.mapper.InstitutionResourceDtoToPaInfoDto;
@@ -50,9 +51,10 @@ public class InfoSelfcareService {
                 .map(InstitutionResourceDtoToPaSummaryDto::toDto);
     }
 
-    public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups) {
-        log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups);
+    public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter) {
+        log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
         return selfcareClient.getUserGroups(xPagopaPnCxId)
+                .filter(grp -> statusFilter == null || statusFilter.getValue().equals(grp.getStatus().getValue()))
                 .filter(grp -> xPagopaPnCxGroups == null || xPagopaPnCxGroups.isEmpty()
                         || xPagopaPnCxGroups.contains(grp.getId()))
                 .map(UserGroupToPaGroupDtoMapper::toDto);

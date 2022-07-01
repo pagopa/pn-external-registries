@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InfoPaApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
@@ -65,8 +66,8 @@ public class InfoPaController implements InfoPaApi {
 
 
     @Override
-    public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, ServerWebExchange exchange) {
-        log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups);
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups)));
+    public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
+        log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
+        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)));
     }
 }
