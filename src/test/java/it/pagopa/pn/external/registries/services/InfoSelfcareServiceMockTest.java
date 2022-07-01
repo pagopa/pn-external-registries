@@ -2,7 +2,6 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.UserGroupPlainResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -68,9 +66,7 @@ class InfoSelfcareServiceMockTest {
 
         // WHEN
         Mono<PaInfoDto> mono =service.getOnePa(id);
-        assertThrows(NotFoundException.class, () -> {
-            mono.block(d);
-        });
+        assertThrows(NotFoundException.class, () -> mono.block(d));
         //THEN
     }
 
@@ -137,7 +133,7 @@ class InfoSelfcareServiceMockTest {
         Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,null).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,null, statusFilter).collectList().block();
 
 
         //THEN
@@ -166,7 +162,7 @@ class InfoSelfcareServiceMockTest {
         Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id)).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,List.of(id), statusFilter).collectList().block();
 
 
         //THEN

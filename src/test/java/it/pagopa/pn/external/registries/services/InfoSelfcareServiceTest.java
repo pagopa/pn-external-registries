@@ -141,7 +141,7 @@ class InfoSelfcareServiceTest {
         Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,null).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,null, statusFilter).collectList().block();
 
 
         //THEN
@@ -170,7 +170,7 @@ class InfoSelfcareServiceTest {
         Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id)).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,List.of(id), statusFilter).collectList().block();
 
 
         //THEN
