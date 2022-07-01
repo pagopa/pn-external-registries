@@ -127,7 +127,7 @@ class InfoPaControllerTest {
         res.add(dto);
 
         // When
-        Mockito.when(svc.getGroups(Mockito.any(), Mockito.any(), Mockito.any(), null))
+        Mockito.when(svc.getGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Flux.fromIterable(res));
 
 
