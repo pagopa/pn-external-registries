@@ -52,7 +52,7 @@ public class InfoSelfcareService {
     }
 
     public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter) {
-        log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups);
+        log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
         return selfcareClient.getUserGroups(xPagopaPnCxId)
                 .filter(grp -> statusFilter == null || statusFilter.getValue().equals(grp.getStatus().getValue()))
                 .filter(grp -> xPagopaPnCxGroups == null || xPagopaPnCxGroups.isEmpty()
