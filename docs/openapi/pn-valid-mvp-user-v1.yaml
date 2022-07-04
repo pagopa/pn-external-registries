@@ -23,18 +23,16 @@ paths:
       requestBody:
         required: true
         content:
-          text/plain:
+          application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/TaxId'
+              $ref: '#/components/schemas/TaxId'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MvpUserList'
+                $ref: '#/components/schemas/MvpUser'
         '400':
           description: Invalid input
           content:
@@ -54,10 +52,6 @@ components:
       minLength: 16
       maxLength: 16
       pattern: "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$"
-    MvpUserList:
-      type: array
-      items:
-        $ref: '#/components/schemas/MvpUser'
     MvpUser:
       type: object
       required:
