@@ -13,7 +13,7 @@ tags:
   - name: IO
     description: Informazioni sullo stato del pagamento
 paths:
-  /ext-registry/io/v1/sendmessage:
+  /ext-registry-private/io/v1/sendmessage:
     post:
       operationId: sendIOMessage
       summary: Send message to APPIO
