@@ -103,6 +103,7 @@ class IOClientTest {
                .summary( "Infrazione della strada" ))*/;
         NewMessage message = new NewMessage()
                 .fiscalCode( "EEEEEE00E00E000A" )
+                .featureLevelType("ADVANCED")
                 .content( messageContent );
 
         CreatedMessage createdMessage = new CreatedMessage()
