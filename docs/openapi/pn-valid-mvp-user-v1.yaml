@@ -14,7 +14,7 @@ tags:
     description: Api per de
 paths:
   '/ext-registry-b2b/pa/v1/mvp-valid-users':
-    get:
+    post:
       operationId: checkValidUsers
       summary: List of valid users for the MPV context
       description: Return if the user are in the context of MVP or not

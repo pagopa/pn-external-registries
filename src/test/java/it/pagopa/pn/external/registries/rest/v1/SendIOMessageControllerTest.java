@@ -42,7 +42,7 @@ class SendIOMessageControllerTest {
         SendMessageResponseDto responseDto = new SendMessageResponseDto()
                 .id( "messageResponseId" );
 
-        String url = "/ext-registry/io/v1/sendmessage";
+        String url = "/ext-registry-private/io/v1/sendmessage";
 
         //When
         Mockito.when( service.sendIOMessage( Mockito.any() ) ).thenReturn( Mono.just( responseDto ) );
