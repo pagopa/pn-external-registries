@@ -50,6 +50,10 @@ Parameters:
   VpcId:
     Type: String
     Description: 'VpcId where the microservice is going to be deployed'
+  
+  EcsDefaultSecurityGroup:
+    Type: String
+    Description: 'Default security group required by infrastructure'
 
   ApplicationLoadBalancerListenerArn:
     Type: String
@@ -62,6 +66,10 @@ Parameters:
   NetworkLoadBalancerLink:
     Type: String
     Description: 'network load balancer link for API-GW'
+  
+  Version:
+    Type: String
+    Description: 'keep track of used projects commitIds'
 
 Resources:
 
@@ -82,11 +90,11 @@ Resources:
         ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:CheckoutApiKey}}'
         ContainerEnvEntry5: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:IoApiKey}}'
         ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
-
         MappedPaths: '/ext-registry/*,/ext-registry-private/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
         VpcId: !Ref VpcId
+        EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
 
@@ -161,3 +169,4 @@ Resources:
         ServiceApiPath: 'ext-registry'
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
