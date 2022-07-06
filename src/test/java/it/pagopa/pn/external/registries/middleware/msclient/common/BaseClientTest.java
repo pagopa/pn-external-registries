@@ -167,7 +167,7 @@ class BaseClientTest {
         //THEN
     }
 
-    private static class FakeApiClient extends BaseClient
+    private static class FakeApiClient extends TokenBaseClient
     {
         ApiClient apiClient;
         public FakeApiClient(AccessTokenCacheService accessTokenCacheService){
