@@ -37,8 +37,10 @@ public class SendIOMessageService {
                     .flatMap( r -> {
                         log.info("Get profile by post iun={}", r.getIun());
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
-                        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                        content.setDueDate( fmt.format(r.getDueDate() ));
+                        if (r.getDueDate()!=null) {
+                            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            content.setDueDate( fmt.format(r.getDueDate() ));
+                        }
                         content.setSubject( r.getSubject() );
                         content.setMarkdown( MARKDOWN_MESSAGE );
                         content.setThirdPartyData( new ThirdPartyData()
