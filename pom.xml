@@ -449,7 +449,6 @@
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
-                            <!--<modelNameSuffix>Dto</modelNameSuffix>-->
                         </configuration>
                     </execution>
                 </executions>
