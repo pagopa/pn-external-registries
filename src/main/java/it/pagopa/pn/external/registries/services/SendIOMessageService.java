@@ -49,6 +49,7 @@ public class SendIOMessageService {
                     .flatMap( r -> {
                         log.info( "Submit message" );
                         NewMessage m = new NewMessage();
+                        m.setFeatureLevelType("ADVANCED");
                         m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
                         m.setContent( content );
                         return client.submitMessageforUserWithFiscalCodeInBody(m);
