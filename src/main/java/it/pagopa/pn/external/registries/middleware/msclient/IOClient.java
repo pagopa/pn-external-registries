@@ -40,7 +40,10 @@ public class IOClient extends OcpBaseClient {
     }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        return ioApi.submitMessageforUserWithFiscalCodeInBody( message );
+        return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
+            log.error("error submitMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
+            return Mono.error(throwable);
+        });
     }
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
