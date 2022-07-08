@@ -170,6 +170,11 @@ components:
         recipientTaxID:
           type: string
           description: Codice Fiscale del destinatario
+        requestAcceptedDate:
+          description: data perfezionamento notifica per il mittente
+          type: string
+          format: date-time
+          example: '2022-06-16T00:00:00.000Z'
     SendMessageResponse:
       title: Send message response
       description: Send message response information
