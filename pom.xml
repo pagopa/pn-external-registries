@@ -395,13 +395,13 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pn-external-registries-selfcare-client</id>
+                        <id>pn-external-registries-selfcare-usergroup-client</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>${project.basedir}/docs/wsclient/selfcare/selc-dashboard-v1.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/docs/wsclient/selfcare/selc-usergroup-v1.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <generateApiDocumentation>false</generateApiDocumentation>
@@ -411,12 +411,41 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.config
+                                </configPackage>
+                                <dateLibrary>java11</dateLibrary>
+                            </configOptions>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pn-external-registries-selfcare-institutions-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/wsclient/selfcare/selc-institutions-v1.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>webclient</library>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <configOptions>
+                                <swaggerAnnotations>false</swaggerAnnotations>
+                                <openApiNullable>false</openApiNullable>
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.dto
+                                </modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.api
+                                </apiPackage>
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>

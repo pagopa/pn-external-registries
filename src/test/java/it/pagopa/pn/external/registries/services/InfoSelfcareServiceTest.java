@@ -1,13 +1,14 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.InstitutionResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.UserGroupPlainResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.dto.InstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,7 +37,10 @@ class InfoSelfcareServiceTest {
     private InfoSelfcareService service;
 
     @MockBean
-    private SelfcareClient selfcareClient;
+    private SelfcareInstitutionsClient selfcareInstitutionsClient;
+
+    @MockBean
+    private SelfcareUserGroupClient selfcareUserGroupClient;
 
     @Test
     void getOnePa() {
@@ -48,7 +52,7 @@ class InfoSelfcareServiceTest {
         inst.setStatus("ACTIVE");
         inst.setFiscalCode("123456789");
 
-        Mockito.when(selfcareClient.getInstitution(Mockito.anyString())).thenReturn(Mono.just(inst));
+        Mockito.when(selfcareInstitutionsClient.getInstitution(Mockito.anyString())).thenReturn(Mono.just(inst));
 
         // WHEN
         PaInfoDto res = service.getOnePa(id).block();
@@ -64,7 +68,7 @@ class InfoSelfcareServiceTest {
     void getOnePaNotExist() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        Mockito.when(selfcareClient.getInstitution(Mockito.anyString())).thenReturn(Mono.error(new WebClientResponseException(404, null,null,null,null )));
+        Mockito.when(selfcareInstitutionsClient.getInstitution(Mockito.anyString())).thenReturn(Mono.error(new WebClientResponseException(404, null,null,null,null )));
 
 
         // WHEN
@@ -89,7 +93,7 @@ class InfoSelfcareServiceTest {
         List<InstitutionResourceDto> list = new ArrayList<>();
         list.add(inst);
 
-        Mockito.when(selfcareClient.getInstitutions()).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareInstitutionsClient.getInstitutions()).thenReturn(Flux.fromIterable(list));
 
 
         // WHEN
@@ -114,7 +118,7 @@ class InfoSelfcareServiceTest {
         List<InstitutionResourceDto> list = new ArrayList<>();
         list.add(inst);
 
-        Mockito.when(selfcareClient.getInstitutions()).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareInstitutionsClient.getInstitutions()).thenReturn(Flux.fromIterable(list));
 
         // WHEN
         List<PaSummaryDto> res = service.listOnboardedPaByIds(List.of(id)).collectList().block();
@@ -130,16 +134,16 @@ class InfoSelfcareServiceTest {
     void getGroups() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        UserGroupPlainResourceDto inst = new UserGroupPlainResourceDto();
+        UserGroupResourceDto inst = new UserGroupResourceDto();
         inst.setId(id);
         inst.setName("gruppo1");
-        inst.setStatus(UserGroupPlainResourceDto.StatusEnum.ACTIVE);
+        inst.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
 
 
-        List<UserGroupPlainResourceDto> list = new ArrayList<>();
+        List<UserGroupResourceDto> list = new ArrayList<>();
         list.add(inst);
 
-        Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
         List<PaGroupDto> res = service.getGroups(id,id,null, null).collectList().block();
@@ -154,21 +158,21 @@ class InfoSelfcareServiceTest {
     void getGroupsFiltered() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        List<UserGroupPlainResourceDto> list = new ArrayList<>();
-        UserGroupPlainResourceDto inst1 = new UserGroupPlainResourceDto();
+        List<UserGroupResourceDto> list = new ArrayList<>();
+        UserGroupResourceDto inst1 = new UserGroupResourceDto();
         inst1.setId(id);
         inst1.setName("gruppo1");
-        inst1.setStatus(UserGroupPlainResourceDto.StatusEnum.ACTIVE);
+        inst1.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst1);
 
-        UserGroupPlainResourceDto inst2 = new UserGroupPlainResourceDto();
+        UserGroupResourceDto inst2 = new UserGroupResourceDto();
         inst2.setId(id+"2");
         inst2.setName("gruppo2");
-        inst2.setStatus(UserGroupPlainResourceDto.StatusEnum.ACTIVE);
+        inst2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst2);
 
 
-        Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
         List<PaGroupDto> res = service.getGroups(id,id,List.of(id), null).collectList().block();
@@ -185,27 +189,27 @@ class InfoSelfcareServiceTest {
     void getGroupsFilteredActive() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        List<UserGroupPlainResourceDto> list = new ArrayList<>();
-        UserGroupPlainResourceDto inst1 = new UserGroupPlainResourceDto();
+        List<UserGroupResourceDto> list = new ArrayList<>();
+        UserGroupResourceDto inst1 = new UserGroupResourceDto();
         inst1.setId(id);
         inst1.setName("gruppo1");
-        inst1.setStatus(UserGroupPlainResourceDto.StatusEnum.ACTIVE);
+        inst1.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst1);
 
-        UserGroupPlainResourceDto inst2 = new UserGroupPlainResourceDto();
+        UserGroupResourceDto inst2 = new UserGroupResourceDto();
         inst2.setId(id+"2");
         inst2.setName("gruppo2");
-        inst2.setStatus(UserGroupPlainResourceDto.StatusEnum.ACTIVE);
+        inst2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst2);
 
-        UserGroupPlainResourceDto inst3 = new UserGroupPlainResourceDto();
+        UserGroupResourceDto inst3 = new UserGroupResourceDto();
         inst3.setId(id+"3");
         inst3.setName("gruppo3");
-        inst3.setStatus(UserGroupPlainResourceDto.StatusEnum.SUSPENDED);
+        inst3.setStatus(UserGroupResourceDto.StatusEnum.SUSPENDED);
         list.add(inst3);
 
 
-        Mockito.when(selfcareClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
 
         // WHEN
         List<PaGroupDto> res = service.getGroups(id,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block();

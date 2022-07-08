@@ -1,59 +1,62 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.mapper.InstitutionResourceDtoToPaInfoDto;
-import it.pagopa.pn.external.registries.mapper.InstitutionResourceDtoToPaSummaryDto;
 import it.pagopa.pn.external.registries.mapper.UserGroupToPaGroupDtoMapper;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Locale;
 
 @Slf4j
 @Service
 public class InfoSelfcareService {
 
-    // FIXME: da sistemare una volta che le specifiche saranno più chiare
+    // FIXME: da sistemare INSTITUTIONS una volta che le specifiche saranno più chiare
 
-    private final SelfcareClient selfcareClient;
+    private final SelfcareUserGroupClient selfcareUserGroupClient;
+    private final SelfcareInstitutionsClient selfcareInstitutionsClient;
 
-    public InfoSelfcareService(SelfcareClient selfcareClient) {
-        this.selfcareClient = selfcareClient;
+    public InfoSelfcareService(SelfcareUserGroupClient selfcareUserGroupClient, SelfcareInstitutionsClient selfcareInstitutionsClient) {
+        this.selfcareUserGroupClient = selfcareUserGroupClient;
+        this.selfcareInstitutionsClient = selfcareInstitutionsClient;
     }
 
     public Mono<PaInfoDto> getOnePa(String id) throws PnException {
         log.info("getOnePa - id={}", id);
-        return selfcareClient.getInstitution(id)
+        /*return selfcareClient.getInstitution(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
-                .map(InstitutionResourceDtoToPaInfoDto::toDto);
+                .map(InstitutionResourceDtoToPaInfoDto::toDto);*/
+        return Mono.error(new InternalErrorException());
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
         log.info("listOnboardedPaByName - paNameFilter={}", paNameFilter);
-        return selfcareClient.getInstitutions()
+        /*return selfcareClient.getInstitutions()
                 .filter(inst -> inst.getName().toLowerCase(Locale.ROOT).contains(paNameFilter))
-                .map(InstitutionResourceDtoToPaSummaryDto::toDto);
+                .map(InstitutionResourceDtoToPaSummaryDto::toDto);*/
+        return Flux.error(new InternalErrorException());
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
         log.info("listOnboardedPaByIds - ids={}", ids);
-        return selfcareClient.getInstitutions()
+        /*return selfcareClient.getInstitutions()
                 .filter(inst -> ids.contains(inst.getId()))
-                .map(InstitutionResourceDtoToPaSummaryDto::toDto);
+                .map(InstitutionResourceDtoToPaSummaryDto::toDto);*/
+        return Flux.error(new InternalErrorException());
     }
 
     public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter) {
         log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
-        return selfcareClient.getUserGroups(xPagopaPnCxId)
+        return selfcareUserGroupClient.getUserGroups(xPagopaPnCxId)
                 .filter(grp -> statusFilter == null || statusFilter.getValue().equals(grp.getStatus().getValue()))
                 .filter(grp -> xPagopaPnCxGroups == null || xPagopaPnCxGroups.isEmpty()
                         || xPagopaPnCxGroups.contains(grp.getId()))
