@@ -48,8 +48,13 @@ class SendIOMessageServiceTest {
                 .noticeNumber( "noticeNumber" )
                 .recipientTaxID( "recipientTaxId" )
                 .creditorTaxId( "creditorTaxId" )
-                .subject( "subject" );
+                .subject( "subject" )
+                .requestAcceptedDate(OffsetDateTime.now());
 
+        String truncatedSubject = messageRequestDto.getSubject().substring(0, Math.min(messageRequestDto.getSubject().length(), 120));
+
+        System.out.println("Truncated Subject "+ truncatedSubject);
+        
         //When
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );

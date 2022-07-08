@@ -35,18 +35,28 @@ public class SendIOMessageService {
         if (cfg.isEnableIoMessage()) {
             return sendMessageRequestDto
                     .flatMap( r -> {
+                        String truncatedSubject = r.getSubject().substring(0, Math.min(r.getSubject().length(), 120));
                         log.info("Get profile by post iun={}", r.getIun());
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
                         if (r.getDueDate()!=null) {
                             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
                             content.setDueDate( fmt.format(r.getDueDate() ));
                         }
-                        content.setSubject( r.getSubject() );
+                        String subject = truncatedSubject + "-" + r.getSenderDenomination();
+                        content.setSubject( subject );
                         content.setMarkdown( MARKDOWN_MESSAGE );
+
+                        String requestAcceptedDate = null;
+                        
+                        if(r.getRequestAcceptedDate() != null){
+                            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            requestAcceptedDate = fmt.format( r.getRequestAcceptedDate() );
+                        }
                         content.setThirdPartyData( new ThirdPartyData()
                                .id( r.getIun() )
                                .originalSender( r.getSenderDenomination() )
-                               .summary( r.getSubject() )
+                               .originalReceiptDate(requestAcceptedDate)
+                               .summary( truncatedSubject )
                         );
                         return client.getProfileByPOST(fiscalCodePayload);
                     })
