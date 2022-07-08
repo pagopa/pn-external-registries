@@ -4,7 +4,8 @@ import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -16,12 +17,12 @@ import java.util.List;
 @Service
 public class InfoSelfcareServiceMock extends InfoSelfcareService {
 
-    // FIXME: cestinare una volta che InfoSelfcareService è completato e funzionante
+    // FIXME: cestinare una volta che InfoSelfcareService è completato e funzionante. Questa classe fa l'override dei metodi di instituions
 
     private final InfoPapiImpl infoPapi;
 
-    public InfoSelfcareServiceMock(SelfcareClient selfcareClient, InfoPapiImpl infoPapi) {
-        super(selfcareClient);
+    public InfoSelfcareServiceMock(SelfcareUserGroupClient selfcareUserGroupClient, SelfcareInstitutionsClient selfcareInstitutionsClient, InfoPapiImpl infoPapi) {
+        super(selfcareUserGroupClient, selfcareInstitutionsClient);
         this.infoPapi = infoPapi;
     }
 

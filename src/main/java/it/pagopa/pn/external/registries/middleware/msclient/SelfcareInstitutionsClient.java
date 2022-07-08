@@ -4,11 +4,8 @@ import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.api.InstitutionsApi;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.api.UserGroupsApi;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.InstitutionResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.client.v1.dto.UserGroupPlainResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.api.InstitutionsApi;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,34 +22,28 @@ import java.time.Duration;
 
 @Component
 @Slf4j
-public class SelfcareClient extends OcpBaseClient {
+public class SelfcareInstitutionsClient extends OcpBaseClient {
 
     private static final String HEADER_SELFCARE_UID = "x-selfcare-uid";
 
     private InstitutionsApi institutionsApi;
-    private UserGroupsApi userGroupsApi;
     private final PnExternalRegistriesConfig config;
 
-    public SelfcareClient(PnExternalRegistriesConfig config) { this.config = config; }
+    public SelfcareInstitutionsClient(PnExternalRegistriesConfig config) {
+        this.config = config; }
 
     @PostConstruct
     public void init() {
-
-        ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcareApiKey()).build());
-        apiClient.setBasePath(config.getSelfcareBaseUrl());
-        this.institutionsApi = new InstitutionsApi( apiClient );
-
-        apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcareApiKey()).build());
-        apiClient.setBasePath(config.getSelfcareBaseUrl());
-        this.userGroupsApi = new UserGroupsApi( apiClient );
+    // TODO implemetnare quando ci saranno le aPI corrette
     }
 
     @Override
     protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey){
         return super.initWebClient(builder, apiKey)
-                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareUid());
+                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareInstitutionsApiKey());
     }
 
+    // TODO: implementare quando ci saranno le API corrette. I metodi dovrebbero essere cmq questi
     public Mono<InstitutionResourceDto> getInstitution(String institutionId) throws WebClientResponseException {
 
         return institutionsApi.getInstitutionUsingGET(institutionId)
@@ -79,18 +70,6 @@ public class SelfcareClient extends OcpBaseClient {
                 )
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getInstitutions response error {}", x.getResponseBodyAsString(), x);
-                    return Mono.error(new InternalErrorException());
-                });
-    }
-
-    public Flux<UserGroupPlainResourceDto> getUserGroups(String institutionId) {
-        return userGroupsApi.getUserGroupsUsingGET(institutionId, 0, 100, null, config.getSelfcarePnProductId(), null)
-                .retryWhen(
-                        Retry.backoff(2, Duration.ofMillis(25))
-                                .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
-                )
-                .onErrorResume(WebClientResponseException.class, x -> {
-                    log.error("getUserGroups response error {}", x.getResponseBodyAsString(), x);
                     return Mono.error(new InternalErrorException());
                 });
     }

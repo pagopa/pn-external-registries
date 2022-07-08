@@ -27,6 +27,10 @@ Parameters:
     Type: String
     Description: 'Checkout endpoint base url'
 
+  SelfcareUsergroupBaseUrl:
+    Type: String
+    Description: 'Selfcare endpoint base url'
+
   ContainerImageUri:
     Type: String
     Description: 'Exact container image URI with full repository and image digest'
@@ -90,6 +94,7 @@ Resources:
         ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:CheckoutApiKey}}'
         ContainerEnvEntry5: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:IoApiKey}}'
         ContainerEnvEntry6: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
+        ContainerEnvEntry7: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
