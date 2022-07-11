@@ -40,7 +40,7 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
     @Override
     protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey){
         return super.initWebClient(builder, apiKey)
-                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareInstitutionsApiKey());
+                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareinstitutionsApiKey());
     }
 
     // TODO: implementare quando ci saranno le API corrette. I metodi dovrebbero essere cmq questi

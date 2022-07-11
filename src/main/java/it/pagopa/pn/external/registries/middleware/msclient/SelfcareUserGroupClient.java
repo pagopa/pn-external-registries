@@ -34,19 +34,19 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
     public void init() {
 
 
-        ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcareUsergroupApiKey()).build());
-        apiClient.setBasePath(config.getSelfcareUsergroupBaseUrl());
+        ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
+        apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
         this.userGroupsApi = new UserGroupApi( apiClient );
     }
 
     @Override
     protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey){
         return super.initWebClient(builder, apiKey)
-                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareUsergroupUid());
+                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareusergroupUid());
     }
 
     public Flux<UserGroupResourceDto> getUserGroups(String institutionId) {
-        return userGroupsApi.getUserGroupsUsingGET(institutionId, 0, 100, null, config.getSelfcareUsergroupPnProductId(), null)
+        return userGroupsApi.getUserGroupsUsingGET(institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null)
                 .retryWhen(
                         Retry.backoff(2, Duration.ofMillis(25))
                                 .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
