@@ -51,7 +51,7 @@ public class InfoPaymentService {
         try {
             result = objectMapper.readValue( checkoutResult, PartyTimeoutFaultPaymentProblemJsonDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getDetail() );
+                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
@@ -72,7 +72,7 @@ public class InfoPaymentService {
         try {
             result = objectMapper.readValue( checkoutResult, PartyConfigurationFaultPaymentProblemJsonDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getDetail() );
+                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
@@ -93,7 +93,7 @@ public class InfoPaymentService {
         try {
             result = objectMapper.readValue( checkoutResult, GatewayFaultPaymentProblemJsonDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getDetail() );
+                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
@@ -114,7 +114,7 @@ public class InfoPaymentService {
         try {
             result = objectMapper.readValue( checkoutResult, PaymentStatusFaultPaymentProblemJsonDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getDetail() );
+                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
@@ -135,7 +135,7 @@ public class InfoPaymentService {
         try {
             result = objectMapper.readValue( checkoutResult, ValidationFaultPaymentProblemJsonDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getDetail() );
+                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
