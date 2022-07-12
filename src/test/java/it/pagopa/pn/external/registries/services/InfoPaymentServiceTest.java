@@ -32,7 +32,7 @@ class InfoPaymentServiceTest {
     void getInfoPaymentConflict() {
 
         ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
-        responseBody.setDetail( "PAYMENT_DUPLICATED" );
+        responseBody.setCategory( "PAYMENT_DUPLICATED" );
         responseBody.detailV2( "PPT_PAGAMENTO_IN_CORSO" );
 
         byte[] responseBodyBites = new byte[0];
