@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
 import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
@@ -21,7 +22,7 @@ public class MVPValidUserService {
     public Mono<MvpUserDto> checkValidUser(Mono<String> body) {
         return body
                 .flatMap( r -> {
-                    log.info( "Get mvp user profile by post" );
+                    log.info("Get mvp user profile by post taxId={}", LogUtils.maskTaxId(r));
                     FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
                     fiscalCodePayload.setFiscalCode( r );
                     return client.getProfileByPOST( fiscalCodePayload ).then( Mono.just( r ) );
