@@ -19,19 +19,17 @@ public class MVPValidUserService {
     }
 
     public Mono<MvpUserDto> checkValidUser(Mono<String> body) {
-        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        AtomicReference<String> taxId = new AtomicReference<>("");
         return body
                 .flatMap( r -> {
                     log.info( "Get mvp user profile by post" );
+                    FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
                     fiscalCodePayload.setFiscalCode( r );
-                    taxId.set(r);
-                    return client.getProfileByPOST( fiscalCodePayload );
+                    return client.getProfileByPOST( fiscalCodePayload ).then( Mono.just( r ) );
                 })
                 .map( r -> {
                     MvpUserDto res = new MvpUserDto();
                     res.setValid( true );
-                    res.setTaxId(taxId.get());
+                    res.setTaxId( r );
                     return res;
                 });
     }
