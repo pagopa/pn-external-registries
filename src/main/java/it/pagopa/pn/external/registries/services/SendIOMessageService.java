@@ -35,17 +35,34 @@ public class SendIOMessageService {
         if (cfg.isEnableIoMessage()) {
             return sendMessageRequestDto
                     .flatMap( r -> {
+                        String ioSubject = r.getSubject() + "-" + r.getSenderDenomination();
+
+                        String truncatedIoSubject = ioSubject;
+                        if(ioSubject.length() > 120){
+                            truncatedIoSubject = ioSubject.substring(0, 120);
+                        }
+                        
                         log.info("Get profile by post iun={}", r.getIun());
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
                         if (r.getDueDate()!=null) {
                             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
                             content.setDueDate( fmt.format(r.getDueDate() ));
                         }
-                        content.setSubject( r.getSubject() );
+                        content.setSubject( truncatedIoSubject );
                         content.setMarkdown( MARKDOWN_MESSAGE );
+
+                        String requestAcceptedDate = null;
+                        
+                        if(r.getRequestAcceptedDate() != null){
+                            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            requestAcceptedDate = fmt.format( r.getRequestAcceptedDate() );
+                        }
                         content.setThirdPartyData( new ThirdPartyData()
                                .id( r.getIun() )
-                               .originalSender( r.getSenderDenomination() ));
+                               .originalSender( r.getSenderDenomination() )
+                               .originalReceiptDate(requestAcceptedDate)
+                               .summary( r.getSubject() )
+                        );
                         return client.getProfileByPOST(fiscalCodePayload);
                     })
                     .flatMap( r -> {
