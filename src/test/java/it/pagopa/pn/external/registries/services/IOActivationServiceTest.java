@@ -5,6 +5,7 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activ
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.msclient.IOActivationClient;
 import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class IOActivationServiceTest {
     private IOActivationService service;
 
     @Mock
-    IOClient ioClient;
+    IOActivationClient ioClient;
 
     @Mock
     PnExternalRegistriesConfig cfg;
