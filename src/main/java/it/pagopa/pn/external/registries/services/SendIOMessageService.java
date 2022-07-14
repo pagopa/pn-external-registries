@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
@@ -23,8 +24,6 @@ public class SendIOMessageService {
 
     private final PnExternalRegistriesConfig cfg;
 
-    private static final String MARKDOWN_UPGRADE_APP_IO_MESSAGE = "Ciao,\n\nper ricevere messaggi su IO dal servizio \"Avvisi di cortesia\" di Piattaforma Notifiche, devi **aggiornare l'app all'ultima versione disponibile**:\n\n [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\n\n[Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)";
-    private static final String MARKDOWN_MESSAGE = "Ciao,\n\nper ricevere messaggi su IO dal servizio \"Avvisi di cortesia\" di Piattaforma Notifiche, devi **aggiornare l'app all'ultima versione disponibile**:\n\n [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\n\n[Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)";
 
     public SendIOMessageService(IOClient client, PnExternalRegistriesConfig cfg) {
         this.client = client;
@@ -36,7 +35,12 @@ public class SendIOMessageService {
         MessageContent content = new MessageContent();
         if (cfg.isEnableIoMessage()) {
             return sendMessageRequestDto
+                    .map(r -> {
+                        log.info( "Submit message taxId={} iun={}", LogUtils.maskTaxId(r.getRecipientTaxID()), r.getIun());
+                        return r;
+                    })
                     .flatMap( r -> {
+
                         String ioSubject = r.getSubject() + "-" + r.getSenderDenomination();
 
                         String truncatedIoSubject = ioSubject;
@@ -51,7 +55,7 @@ public class SendIOMessageService {
                             content.setDueDate( fmt.format(r.getDueDate() ));
                         }
                         content.setSubject( truncatedIoSubject );
-                        content.setMarkdown( MARKDOWN_UPGRADE_APP_IO_MESSAGE );
+                        content.setMarkdown( cfg.getAppIoTemplate().getMarkdownUpgradeAppIoMessage() );
 
                         String requestAcceptedDate = null;
                         
@@ -68,14 +72,15 @@ public class SendIOMessageService {
                         return client.getProfileByPOST(fiscalCodePayload);
                     })
                     .flatMap( r -> {
-                        log.info( "Submit message" );
+                        log.info( "Proceeding with send message iun={}", content.getThirdPartyData().getId());
                         NewMessage m = new NewMessage();
                         m.setFeatureLevelType("ADVANCED");
                         m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
                         m.setContent( content );
-                        return client.submitMessageforUserWithFiscalCodeInBody(m);
+                        return client.submitActivationMessageforUserWithFiscalCodeInBody(m);
                     })
                     .map( r -> {
+                        log.info( "Sent message iun={}", content.getThirdPartyData().getId());
                         SendMessageResponseDto res = new SendMessageResponseDto();
                         res.setId(r.getId());
                         return res;
@@ -91,12 +96,17 @@ public class SendIOMessageService {
         MessageContent content = new MessageContent();
         if (cfg.isEnableIoActivationMessage()) {
             return sendMessageRequestDto
+                    .map(r -> {
+                        log.info( "Submit activation message taxId={}", LogUtils.maskTaxId(r.getRecipientTaxID()));
+                        return r;
+                    })
                     .zipWhen( r -> client.getProfileByPOST(fiscalCodePayload), (r, a) ->r)
                     .flatMap( r -> {
-                        log.info( "Submit message" );
+                        log.info( "Proceeding with send activation message taxId={}", LogUtils.maskTaxId(r.getRecipientTaxID()));
 
                         fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
-                        content.setMarkdown( MARKDOWN_MESSAGE );
+                        content.setMarkdown( cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() );
+                        content.setSubject(cfg.getAppIoTemplate().getSubjectActivationAppIoMessage());
 
                         NewMessage m = new NewMessage();
                         m.setFeatureLevelType("ADVANCED");
@@ -105,6 +115,8 @@ public class SendIOMessageService {
                         return client.submitMessageforUserWithFiscalCodeInBody(m);
                     })
                     .map( r -> {
+                        log.info( "Sent activation message");
+
                         SendMessageResponseDto res = new SendMessageResponseDto();
                         res.setId(r.getId());
                         return res;

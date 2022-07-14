@@ -1,27 +1,23 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import javax.annotation.PostConstruct;
-import java.net.ConnectException;
-import java.time.Duration;
 
 @Component
 @Slf4j
 public class IOClient extends OcpBaseClient {
-
-    public static final String IO_STATUS_ACTIVE = "ACTIVE";
-    public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
     private DefaultApi ioApi;
     private DefaultApi ioActivationMessageApi;
@@ -47,6 +43,7 @@ public class IOClient extends OcpBaseClient {
     }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
+        log.info("[enter] submitMessageforUserWithFiscalCodeInBody taxId={}", LogUtils.maskTaxId(message.getFiscalCode()));
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
             log.error("error submitMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
             return Mono.error(throwable);
@@ -54,13 +51,15 @@ public class IOClient extends OcpBaseClient {
     }
 
     public Mono<CreatedMessage> submitActivationMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
+        log.info("[enter] submitActivationMessageforUserWithFiscalCodeInBody taxId={}", LogUtils.maskTaxId(message.getFiscalCode()));
+        return ioActivationMessageApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
             log.error("error submitActivationMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
             return Mono.error(throwable);
         });
     }
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
+        log.info("[enter] getProfileByPOST taxId={}", LogUtils.maskTaxId(payload.getFiscalCode()));
         return ioApi.getProfileByPOST( payload );
     }
 
