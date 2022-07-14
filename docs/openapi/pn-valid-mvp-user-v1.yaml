@@ -60,8 +60,17 @@ components:
       properties:
         taxId:
           type: string
-        valid:
-          type: boolean
+        status:
+          type: string
+          description: >
+            Stato attivazione invio messaggi tramite AppIo:
+            * APPIO_NOT_ACTIVE: L'AppIo non è attiva per l'utente.
+            * APPIO_ACTIVE_PN_NOT_ACTIVE: L'AppIo è attiva per l'utente, ma non è stato attivata la ricezione messaggi da Piattaforma notifiche.
+            * APPIO_ACTIVE_PN_ACTIVE: L'AppIo è attiva per l'utente ed è stata attivata la ricezione messaggi da Piattaforma notifiche.
+          enum:
+            - APPIO_NOT_ACTIVE
+            - PN_NOT_ACTIVE
+            - PN_ACTIVE
 
   securitySchemes:
     ApiKeyAuth:

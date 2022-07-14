@@ -28,7 +28,7 @@ class MVPValidUserControllerTest {
     void checkMvpUserSuccess() {
         // Given
         MvpUserDto mvpUserDto = new MvpUserDto()
-                .valid( true )
+                .status(MvpUserDto.StatusEnum.PN_ACTIVE)
                 .taxId( TAX_ID );
 
         String url = "/ext-registry-b2b/pa/v1/mvp-valid-users";
@@ -42,7 +42,8 @@ class MVPValidUserControllerTest {
                 .contentType( MediaType.APPLICATION_JSON )
                 .body(Mono.just( TAX_ID ), String.class)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus()
+                .isOk();
     }
 
 }

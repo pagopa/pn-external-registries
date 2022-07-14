@@ -5,7 +5,10 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Fisca
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
 import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,17 +24,29 @@ public class MVPValidUserService {
 
     public Mono<MvpUserDto> checkValidUser(Mono<String> body) {
         return body
-                .flatMap( r -> {
-                    log.info("Get mvp user profile by post taxId={}", LogUtils.maskTaxId(r));
+                .flatMap( taxId -> {
+                    log.info("Get mvp user profile by post taxId={}", LogUtils.maskTaxId(taxId));
                     FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-                    fiscalCodePayload.setFiscalCode( r );
-                    return client.getProfileByPOST( fiscalCodePayload ).then( Mono.just( r ) );
-                })
-                .map( r -> {
-                    MvpUserDto res = new MvpUserDto();
-                    res.setValid( true );
-                    res.setTaxId( r );
-                    return res;
+                    fiscalCodePayload.setFiscalCode( taxId );
+
+                    return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
+                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed());
+                        
+                        return new MvpUserDto()
+                                .taxId(taxId)
+                                .status( res.getSenderAllowed() ? MvpUserDto.StatusEnum.PN_ACTIVE : MvpUserDto.StatusEnum.PN_NOT_ACTIVE);
+                        
+                    }).onErrorResume( WebClientResponseException.class, exception ->{
+                        if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
+                            log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
+                            return Mono.just( new MvpUserDto()
+                                    .taxId(taxId)
+                                    .status(MvpUserDto.StatusEnum.APPIO_NOT_ACTIVE)
+                            );
+                        }
+                        log.error("Error in call getProfileByPOST ex={} for taxId={} ", exception, LogUtils.maskTaxId(taxId));
+                        return Mono.error(exception);
+                    });
                 });
     }
 }
