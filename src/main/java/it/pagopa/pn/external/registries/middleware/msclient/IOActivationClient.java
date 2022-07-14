@@ -33,7 +33,7 @@ public class IOActivationClient extends OcpBaseClient {
     @PostConstruct
     public void init() {
 
-        ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getIoactApiKey()).build());
+        ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getIoApiKey()).build());
         apiClient.setBasePath( config.getIoBaseUrl() );
 
         this.ioApi = new DefaultApi( apiClient );

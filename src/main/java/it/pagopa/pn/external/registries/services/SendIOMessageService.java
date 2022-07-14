@@ -5,6 +5,7 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Fisca
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
@@ -22,6 +23,7 @@ public class SendIOMessageService {
 
     private final PnExternalRegistriesConfig cfg;
 
+    private static final String MARKDOWN_UPGRADE_APP_IO_MESSAGE = "Ciao,\n\nper ricevere messaggi su IO dal servizio \"Avvisi di cortesia\" di Piattaforma Notifiche, devi **aggiornare l'app all'ultima versione disponibile**:\n\n [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\n\n[Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)";
     private static final String MARKDOWN_MESSAGE = "Ciao,\n\nper ricevere messaggi su IO dal servizio \"Avvisi di cortesia\" di Piattaforma Notifiche, devi **aggiornare l'app all'ultima versione disponibile**:\n\n [Aggiorna per dispositivi Android](https://play.google.com/store/apps/details?id=it.pagopa.io.app)\n\n[Aggiorna per dispositivi iOS](https://apps.apple.com/it/app/io/id1501681835)";
 
     public SendIOMessageService(IOClient client, PnExternalRegistriesConfig cfg) {
@@ -49,7 +51,7 @@ public class SendIOMessageService {
                             content.setDueDate( fmt.format(r.getDueDate() ));
                         }
                         content.setSubject( truncatedIoSubject );
-                        content.setMarkdown( MARKDOWN_MESSAGE );
+                        content.setMarkdown( MARKDOWN_UPGRADE_APP_IO_MESSAGE );
 
                         String requestAcceptedDate = null;
                         
@@ -67,6 +69,35 @@ public class SendIOMessageService {
                     })
                     .flatMap( r -> {
                         log.info( "Submit message" );
+                        NewMessage m = new NewMessage();
+                        m.setFeatureLevelType("ADVANCED");
+                        m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
+                        m.setContent( content );
+                        return client.submitMessageforUserWithFiscalCodeInBody(m);
+                    })
+                    .map( r -> {
+                        SendMessageResponseDto res = new SendMessageResponseDto();
+                        res.setId(r.getId());
+                        return res;
+                    });
+        } else {
+            log.info( "Send IO message is disabled" );
+            return Mono.empty();
+        }
+    }
+
+    public Mono<SendMessageResponseDto> sendIOActivationMessage( Mono<SendActivationMessageRequestDto> sendMessageRequestDto ) {
+        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+        MessageContent content = new MessageContent();
+        if (cfg.isEnableIoActivationMessage()) {
+            return sendMessageRequestDto
+                    .zipWhen( r -> client.getProfileByPOST(fiscalCodePayload), (r, a) ->r)
+                    .flatMap( r -> {
+                        log.info( "Submit message" );
+
+                        fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
+                        content.setMarkdown( MARKDOWN_MESSAGE );
+
                         NewMessage m = new NewMessage();
                         m.setFeatureLevelType("ADVANCED");
                         m.setFiscalCode( fiscalCodePayload.getFiscalCode() );

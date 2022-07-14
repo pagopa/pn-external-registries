@@ -24,6 +24,7 @@ public class IOClient extends OcpBaseClient {
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
     private DefaultApi ioApi;
+    private DefaultApi ioActivationMessageApi;
     private final PnExternalRegistriesConfig config;
 
     public IOClient(PnExternalRegistriesConfig config) {
@@ -37,11 +38,24 @@ public class IOClient extends OcpBaseClient {
         apiClient.setBasePath( config.getIoBaseUrl() );
 
         this.ioApi = new DefaultApi( apiClient );
+        // è la stessa API ma con diverso API-KEY!
+        apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getIoactApiKey()).build());
+        apiClient.setBasePath( config.getIoBaseUrl() );
+
+        this.ioActivationMessageApi = new DefaultApi( apiClient );
+
     }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
             log.error("error submitMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
+            return Mono.error(throwable);
+        });
+    }
+
+    public Mono<CreatedMessage> submitActivationMessageforUserWithFiscalCodeInBody(NewMessage message) {
+        return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
+            log.error("error submitActivationMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
             return Mono.error(throwable);
         });
     }

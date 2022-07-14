@@ -45,6 +45,38 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'pn-errors.yaml#/components/schemas/Problem'
+  /ext-registry-private/io/v1/sendactivationmessage:
+    post:
+      operationId: sendIOActivationMessage
+      summary: Send activation message to APPIO
+      description: Use to send courtesy message to APPIO
+      tags:
+        - SendIOActivationMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendActivationMessageRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
   /ext-registry-private/io/v1/activations:
     post:
       operationId: getServiceActivationByPOST
@@ -134,6 +166,16 @@ paths:
                 $ref: 'pn-errors.yaml#/components/schemas/Problem'
 components:
   schemas:
+    SendActivationMessageRequest:
+      title: Send activation message request
+      description: Send message request information
+      type: object
+      required:
+        - recipientTaxID
+      properties:
+        recipientTaxID:
+          type: string
+          description: Codice Fiscale del destinatario
     SendMessageRequest:
       title: Send message request
       description: Send message request information

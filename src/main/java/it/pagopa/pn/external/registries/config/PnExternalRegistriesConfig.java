@@ -37,6 +37,7 @@ public class PnExternalRegistriesConfig {
     private String ioBaseUrl;
 
     private boolean enableIoMessage;
+    private boolean enableIoActivationMessage;
 
     private String selfcareusergroupApiKey;
     private String selfcareusergroupBaseUrl;
