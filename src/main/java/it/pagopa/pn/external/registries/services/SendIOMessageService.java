@@ -77,7 +77,7 @@ public class SendIOMessageService {
                         m.setFeatureLevelType("ADVANCED");
                         m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
                         m.setContent( content );
-                        return client.submitActivationMessageforUserWithFiscalCodeInBody(m);
+                        return client.submitMessageforUserWithFiscalCodeInBody(m);
                     })
                     .map( r -> {
                         log.info( "Sent message iun={}", content.getThirdPartyData().getId());
@@ -112,7 +112,7 @@ public class SendIOMessageService {
                         m.setFeatureLevelType("ADVANCED");
                         m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
                         m.setContent( content );
-                        return client.submitMessageforUserWithFiscalCodeInBody(m);
+                        return client.submitActivationMessageforUserWithFiscalCodeInBody(m);
                     })
                     .map( r -> {
                         log.info( "Sent activation message");

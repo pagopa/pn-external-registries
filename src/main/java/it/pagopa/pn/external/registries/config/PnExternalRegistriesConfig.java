@@ -70,6 +70,7 @@ public class PnExternalRegistriesConfig {
 
     @PostConstruct
     public void init(){
+        this.appIoTemplate = new AppIoTemplate();
         this.appIoTemplate.markdownUpgradeAppIoMessage = fetchMessage("markdown_upgrade_app_io_message.md");
         this.appIoTemplate.markdownActivationAppIoMessage = fetchMessage("markdown_activation_app_io_message.md");
         this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");

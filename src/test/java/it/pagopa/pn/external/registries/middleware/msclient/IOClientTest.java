@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
 import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
@@ -22,7 +24,8 @@ import static org.mockserver.model.HttpResponse.response;
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
-        "pn.external-registry.io-api-key=fake_api_key"
+        "pn.external-registry.io-api-key=fake_api_key",
+        "pn.external-registry.ioact-api-key=fake_api_key_activation"
 })
 class IOClientTest {
 
@@ -65,6 +68,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
                         .withPath( "/profiles" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -119,6 +123,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
                         .withPath( "/messages" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -127,6 +132,49 @@ class IOClientTest {
 
         //When
         CreatedMessage createdMessageResult = client.submitMessageforUserWithFiscalCodeInBody( message ).block();
+
+        //Then
+        Assertions.assertNotNull( createdMessageResult );
+    }
+
+
+    @Test
+    void submitActivationMessageforUserWithFiscalCodeInBody() {
+        //Given
+        MessageContent messageContent = new MessageContent()
+                .markdown( "markdown di attivazione" )
+                .subject( "attiva piattaforma notifiche" );
+
+        NewMessage message = new NewMessage()
+                .fiscalCode( "EEEEEE00E00E000A" )
+                .featureLevelType("ADVANCED")
+                .content( messageContent );
+
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( CreatedMessage.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( createdMessage );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+        new MockServerClient( "localhost", 9999 )
+                .when( request()
+                        .withMethod( "POST" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
+                        .withPath( "/messages" ))
+                .respond( response()
+                        .withBody( responseBodyBites )
+                        .withContentType( MediaType.APPLICATION_JSON )
+                        .withStatusCode( 200 ));
+
+        //When
+        CreatedMessage createdMessageResult = client.submitActivationMessageforUserWithFiscalCodeInBody( message ).block();
 
         //Then
         Assertions.assertNotNull( createdMessageResult );
