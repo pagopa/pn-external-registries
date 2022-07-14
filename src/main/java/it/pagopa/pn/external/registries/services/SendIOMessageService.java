@@ -92,25 +92,27 @@ public class SendIOMessageService {
     }
 
     public Mono<SendMessageResponseDto> sendIOActivationMessage( Mono<SendActivationMessageRequestDto> sendMessageRequestDto ) {
-        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        MessageContent content = new MessageContent();
         if (cfg.isEnableIoActivationMessage()) {
             return sendMessageRequestDto
                     .map(r -> {
                         log.info( "Submit activation message taxId={}", LogUtils.maskTaxId(r.getRecipientTaxID()));
                         return r;
                     })
-                    .zipWhen( r -> client.getProfileByPOST(fiscalCodePayload), (r, a) ->r)
+                    .zipWhen( r -> {
+                        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+                        fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
+                        return client.getProfileByPOST(fiscalCodePayload);
+                    }, (r, a) ->r)
                     .flatMap( r -> {
                         log.info( "Proceeding with send activation message taxId={}", LogUtils.maskTaxId(r.getRecipientTaxID()));
 
-                        fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
+                        MessageContent content = new MessageContent();
                         content.setMarkdown( cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() );
                         content.setSubject(cfg.getAppIoTemplate().getSubjectActivationAppIoMessage());
 
                         NewMessage m = new NewMessage();
                         m.setFeatureLevelType("ADVANCED");
-                        m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
+                        m.setFiscalCode( r.getRecipientTaxID() );
                         m.setContent( content );
                         return client.submitActivationMessageforUserWithFiscalCodeInBody(m);
                     })
