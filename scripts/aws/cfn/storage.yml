@@ -23,13 +23,28 @@ Parameters:
 Conditions:
   Never: !Equals [ 'true', 'false' ]
 
-# dummy (null) resource, never created
+
 Resources:
-  NullResource:
-    Type: Custom::Null
-    Condition: Never
+  OptInSentTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-OptInSent'
+      AttributeDefinitions:
+        - AttributeName: "pk"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "pk"
+          KeyType: "HASH"
+      BillingMode: "PAY_PER_REQUEST"
 
 Outputs:
-  Dummy:
-    Description: 'The deploy scripts need at least one Output'
-    Value: 'FooBar'
+
+  # Table parameters
+  OptInSentTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref OptInSentTable
+  OptInSentTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${OptInSentTable.Arn}'
+
+

@@ -75,6 +75,13 @@ Parameters:
     Type: String
     Description: 'keep track of used projects commitIds'
 
+  OptInSentTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing OptInSent information'
+
+  OptInSentTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing OptInSent information'
 Resources:
 
   # PN-External-Registry microservice
@@ -97,6 +104,7 @@ Resources:
         ContainerEnvEntry7: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
         ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
         ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:SelfcareUsergroupApiKey}}'
+        ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_OPT_IN=${OptInSentTableName}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
@@ -104,6 +112,31 @@ Resources:
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
+
+
+  ExternalRegistryMicroserviceTaskPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub '${ProjectName}-ExternalRegistry-CustomTaskPolicy'
+      Roles:
+        - !GetAtt ExternalRegistryMicroservice.Outputs.TaskRoleName
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:BatchWriteItem
+              - dynamodb:ExecuteTransaction
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:DeleteItem
+              - dynamodb:Query
+              - dynamodb:TransactGetItems
+              - dynamodb:TransactWriteItems
+              - dynamodb:UpdateItem
+            Resource:
+              - !Ref OptInSentTableArn
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND    ###
   ###   La chiave viene impiegata per firmare il client assertion che serve          ###

@@ -1,13 +1,14 @@
 package it.pagopa.pn.external.registries.middleware.db.io.entities;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.UpdateBehavior;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
 import java.time.Instant;
 
+@DynamoDbBean
+@Data
+@NoArgsConstructor
 @EqualsAndHashCode
 public class OptInSentEntity {
 
