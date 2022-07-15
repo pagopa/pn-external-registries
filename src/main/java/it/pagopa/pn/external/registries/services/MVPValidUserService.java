@@ -34,14 +34,13 @@ public class MVPValidUserService {
                         
                         return new MvpUserDto()
                                 .taxId(taxId)
-                                .status( res.getSenderAllowed() ? MvpUserDto.StatusEnum.PN_ACTIVE : MvpUserDto.StatusEnum.PN_NOT_ACTIVE);
-                        
+                                .valid(true);
                     }).onErrorResume( WebClientResponseException.class, exception ->{
                         if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
                             log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
                             return Mono.just( new MvpUserDto()
                                     .taxId(taxId)
-                                    .status(MvpUserDto.StatusEnum.APPIO_NOT_ACTIVE)
+                                    .valid(false)
                             );
                         }
                         log.error("Error in call getProfileByPOST ex={} for taxId={} ", exception, LogUtils.maskTaxId(taxId));

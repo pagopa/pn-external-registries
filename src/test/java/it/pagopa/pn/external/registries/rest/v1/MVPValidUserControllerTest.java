@@ -28,7 +28,7 @@ class MVPValidUserControllerTest {
     void checkMvpUserPnActive() {
         // Given
         MvpUserDto mvpUserDto = new MvpUserDto()
-                .status(MvpUserDto.StatusEnum.PN_ACTIVE)
+                .valid(true)
                 .taxId( TAX_ID );
 
 
@@ -47,7 +47,7 @@ class MVPValidUserControllerTest {
                         elem -> {
                             MvpUserDto dto = elem.getResponseBody();
                             assert dto != null;
-                            Assertions.assertEquals(mvpUserDto.getStatus(), dto.getStatus());
+                            Assertions.assertTrue(mvpUserDto.getValid());
                             Assertions.assertEquals(mvpUserDto.getTaxId(), dto.getTaxId());
                         }
                 );

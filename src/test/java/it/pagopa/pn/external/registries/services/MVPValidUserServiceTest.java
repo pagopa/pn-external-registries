@@ -41,7 +41,7 @@ class MVPValidUserServiceTest {
         // Then
         Assertions.assertNotNull( mvpUserDto );
         Assertions.assertEquals( TAX_ID, mvpUserDto.getTaxId() );
-        Assertions.assertEquals(MvpUserDto.StatusEnum.PN_ACTIVE, mvpUserDto.getStatus() );
+        Assertions.assertTrue(mvpUserDto.getValid());
     }
 
     @Test
@@ -59,7 +59,7 @@ class MVPValidUserServiceTest {
         // Then
         Assertions.assertNotNull( mvpUserDto );
         Assertions.assertEquals( TAX_ID, mvpUserDto.getTaxId() );
-        Assertions.assertEquals(MvpUserDto.StatusEnum.PN_NOT_ACTIVE, mvpUserDto.getStatus() );
+        Assertions.assertTrue(mvpUserDto.getValid());
     }
     
 }
