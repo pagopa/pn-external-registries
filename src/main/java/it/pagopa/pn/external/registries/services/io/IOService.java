@@ -6,12 +6,16 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Fisca
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.time.format.DateTimeFormatter;
@@ -90,8 +94,9 @@ public class IOService {
             return Mono.empty();
         }
     }
+    
 
-    public Mono<SendMessageResponseDto> sendIOActivationMessage( Mono<SendActivationMessageRequestDto> sendMessageRequestDto ) {
+    /*public Mono<SendMessageResponseDto> sendIOActivationMessage( Mono<SendActivationMessageRequestDto> sendMessageRequestDto ) {
         if (cfg.isEnableIoActivationMessage()) {
             return sendMessageRequestDto
                     .map(r -> {
@@ -127,5 +132,34 @@ public class IOService {
             log.info( "Send IO message is disabled" );
             return Mono.empty();
         }
+    }*/
+
+    public Mono<UserStatusResponseDto> getUserStatus(Mono<UserStatusRequestDto> body) {
+        return body
+                .flatMap( userStatusRequestDto -> {
+                    String taxId = userStatusRequestDto.getTaxId();
+                    log.info("Start getProfileByPOST taxId={}", LogUtils.maskTaxId(taxId));
+                    FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+                    fiscalCodePayload.setFiscalCode( taxId );
+
+                    return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
+                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed());
+
+                        return new UserStatusResponseDto()
+                                .taxId(taxId)
+                                .status( res.getSenderAllowed() ? UserStatusResponseDto.StatusEnum.PN_ACTIVE : UserStatusResponseDto.StatusEnum.PN_NOT_ACTIVE);
+
+                    }).onErrorResume( WebClientResponseException.class, exception ->{
+                        if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
+                            log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
+                            return Mono.just( new UserStatusResponseDto()
+                                    .taxId(taxId)
+                                    .status(UserStatusResponseDto.StatusEnum.APPIO_NOT_ACTIVE)
+                            );
+                        }
+                        log.error("Error in call getProfileByPOST ex={} for taxId={} ", exception, LogUtils.maskTaxId(taxId));
+                        return Mono.error(exception);
+                    });
+                });
     }
 }
