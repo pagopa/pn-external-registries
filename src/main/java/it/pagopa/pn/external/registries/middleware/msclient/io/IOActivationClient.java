@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.middleware.msclient;
+package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.utils.LogUtils;
@@ -18,7 +18,7 @@ import java.time.Duration;
 
 @Component
 @Slf4j
-public class IOClient extends OcpBaseClient {
+public class IOActivationClient extends OcpBaseClient {
 
     public static final String IO_STATUS_ACTIVE = "ACTIVE";
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
@@ -26,7 +26,7 @@ public class IOClient extends OcpBaseClient {
     private DefaultApi ioApi;
     private final PnExternalRegistriesConfig config;
 
-    public IOClient(PnExternalRegistriesConfig config) {
+    public IOActivationClient(PnExternalRegistriesConfig config) {
         this.config = config;
     }
 
@@ -37,17 +37,6 @@ public class IOClient extends OcpBaseClient {
         apiClient.setBasePath( config.getIoBaseUrl() );
 
         this.ioApi = new DefaultApi( apiClient );
-    }
-
-    public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
-            log.error("error submitMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
-            return Mono.error(throwable);
-        });
-    }
-
-    public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        return ioApi.getProfileByPOST( payload );
     }
 
     /**

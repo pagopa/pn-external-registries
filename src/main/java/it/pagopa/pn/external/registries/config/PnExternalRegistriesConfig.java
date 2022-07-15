@@ -1,13 +1,20 @@
 package it.pagopa.pn.external.registries.config;
 
 import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
+import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.util.ResourceUtils;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,9 +40,11 @@ public class PnExternalRegistriesConfig {
     private String checkoutBaseUrl;
 
     private String ioApiKey;
+    private String ioactApiKey;
     private String ioBaseUrl;
 
     private boolean enableIoMessage;
+    private boolean enableIoActivationMessage;
 
     private String selfcareusergroupApiKey;
     private String selfcareusergroupBaseUrl;
@@ -48,4 +57,35 @@ public class PnExternalRegistriesConfig {
     private String selfcareinstitutionsUid;
 
     private String mockDataResources;
+
+    private AppIoTemplate appIoTemplate;
+
+    @Data
+    public static class AppIoTemplate{
+        private String markdownUpgradeAppIoMessage;
+        private String markdownActivationAppIoMessage;
+        private String subjectActivationAppIoMessage;
+    }
+
+
+    @PostConstruct
+    public void init(){
+        this.appIoTemplate = new AppIoTemplate();
+        this.appIoTemplate.markdownUpgradeAppIoMessage = fetchMessage("markdown_upgrade_app_io_message.md");
+        this.appIoTemplate.markdownActivationAppIoMessage = fetchMessage("markdown_activation_app_io_message.md");
+        this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");
+    }
+
+    private String fetchMessage(String filename){
+        try( InputStream in = getInputStreamFromResource(filename)) {
+            return IOUtils.toString(in, StandardCharsets.UTF_8.name());
+        } catch (Exception e) {
+            log.error("cannot load message from resources", e);
+            throw new InternalErrorException();
+        }
+    }
+
+    private InputStream getInputStreamFromResource(String filename) throws IOException {
+        return ResourceUtils.getURL("classpath:appio_message_templates/" + filename).openStream();
+    }
 }

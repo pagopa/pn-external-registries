@@ -1,15 +1,10 @@
-package it.pagopa.pn.external.registries.rest.v1;
+package it.pagopa.pn.external.registries.rest.io.v1;
 
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.ApiUtil;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.IoActivationApi;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.SendIoMessageApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
-import it.pagopa.pn.external.registries.services.IOActivationService;
-import it.pagopa.pn.external.registries.services.SendIOMessageService;
+import it.pagopa.pn.external.registries.services.io.IOActivationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;

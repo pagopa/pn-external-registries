@@ -1,11 +1,10 @@
-package it.pagopa.pn.external.registries.services;
+package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
+import it.pagopa.pn.external.registries.services.io.IOActivationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +16,6 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +26,7 @@ class IOActivationServiceTest {
     private IOActivationService service;
 
     @Mock
-    IOClient ioClient;
+    IOActivationClient ioClient;
 
     @Mock
     PnExternalRegistriesConfig cfg;

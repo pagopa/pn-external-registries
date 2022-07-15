@@ -1,15 +1,16 @@
-package it.pagopa.pn.external.registries.services;
+package it.pagopa.pn.external.registries.services.io;
 
-import it.pagopa.pn.api.dto.events.EndWorkflowStatus;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.services.io.IOService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -27,13 +28,28 @@ import java.util.Collections;
 class SendIOMessageServiceTest {
 
     @InjectMocks
-    private SendIOMessageService service;
+    private IOService service;
 
     @Mock
     IOClient ioClient;
 
     @Mock
     PnExternalRegistriesConfig cfg;
+
+    @BeforeEach
+    public void init(){
+/*
+        cfg = new PnExternalRegistriesConfig();
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = new PnExternalRegistriesConfig.AppIoTemplate();
+        appIoTemplate.setMarkdownActivationAppIoMessage("markdownActivationAppIoMessage");
+        appIoTemplate.setMarkdownUpgradeAppIoMessage("markdownUpgradeAppIoMessage");
+        appIoTemplate.setSubjectActivationAppIoMessage("subjectActivationAppIoMessage");
+        cfg.setAppIoTemplate(appIoTemplate);
+        cfg.setEnableIoMessage(true);
+        cfg.setEnableIoActivationMessage(true);
+
+        service = new SendIOMessageService(ioClient, cfg);*/
+    }
 
     @Test
     void sendIOMessageSuccess() {
@@ -57,7 +73,10 @@ class SendIOMessageServiceTest {
                 .requestAcceptedDate(OffsetDateTime.now());
         
         //When
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
 
@@ -111,9 +130,11 @@ class SendIOMessageServiceTest {
                 .requestAcceptedDate(OffsetDateTime.now());
         
         assert messageRequestDto.getSenderDenomination().length() + messageRequestDto.getSubject().length() > 120;
-        
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+
         //When
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
 
@@ -132,5 +153,34 @@ class SendIOMessageServiceTest {
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
     }
+
+    @Test
+    void sendIOActivationMessageSuccess() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendActivationMessageRequestDto messageRequestDto = new SendActivationMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+
+        SendMessageResponseDto responseDto = service.sendIOActivationMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+
+
+    }
+
 
 }

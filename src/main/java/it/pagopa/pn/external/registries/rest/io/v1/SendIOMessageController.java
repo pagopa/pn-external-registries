@@ -1,9 +1,9 @@
-package it.pagopa.pn.external.registries.rest.v1;
+package it.pagopa.pn.external.registries.rest.io.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.SendIoMessageApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.services.SendIOMessageService;
+import it.pagopa.pn.external.registries.services.io.IOService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,9 +14,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class SendIOMessageController implements SendIoMessageApi {
 
-    private  final SendIOMessageService service;
+    private  final IOService service;
 
-    public SendIOMessageController(SendIOMessageService service) {
+    public SendIOMessageController(IOService service) {
         this.service = service;
     }
 

@@ -93,9 +93,10 @@ Resources:
         ContainerEnvEntry3: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_BASE_URL=${CheckoutBaseUrl}'
         ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:CheckoutApiKey}}'
         ContainerEnvEntry5: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:IoApiKey}}'
-        ContainerEnvEntry6: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
-        ContainerEnvEntry7: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
-        ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:SelfcareUsergroupApiKey}}'
+        ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:IoActApiKey}}'
+        ContainerEnvEntry7: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
+        ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
+        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:SelfcareUsergroupApiKey}}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds

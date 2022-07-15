@@ -1,8 +1,9 @@
-package it.pagopa.pn.external.registries.middleware.msclient;
+package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -22,7 +23,8 @@ import static org.mockserver.model.HttpResponse.response;
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
-        "pn.external-registry.io-api-key=fake_api_key"
+        "pn.external-registry.io-api-key=fake_api_key",
+        "pn.external-registry.ioact-api-key=fake_api_key_activation"
 })
 class IOClientTest {
 
@@ -65,6 +67,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
                         .withPath( "/profiles" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -119,6 +122,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
                         .withPath( "/messages" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -132,164 +136,47 @@ class IOClientTest {
         Assertions.assertNotNull( createdMessageResult );
     }
 
+
     @Test
-    void upsertServiceActivation() {
+    void submitActivationMessageforUserWithFiscalCodeInBody() {
         //Given
-        Activation responseDto = new Activation();
-        responseDto.setFiscalCode("EEEEEE00E00E000A");
-        responseDto.setStatus("ACTIVE");
-        responseDto.setVersion(1);
-        responseDto.setServiceId("PN");
+        MessageContent messageContent = new MessageContent()
+                .markdown( "markdown di attivazione" )
+                .subject( "attiva piattaforma notifiche" );
+
+        NewMessage message = new NewMessage()
+                .fiscalCode( "EEEEEE00E00E000A" )
+                .featureLevelType("ADVANCED")
+                .content( messageContent );
+
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
 
         byte[] responseBodyBites = new byte[0];
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( Activation.class );
+        mapper.writerFor( CreatedMessage.class );
         try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
+            responseBodyBites = mapper.writeValueAsBytes( createdMessage );
         } catch ( JsonProcessingException e ){
             e.printStackTrace();
         }
-
-
-        ActivationPayload fiscalCodePayload = new ActivationPayload();
-        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000A" );
-        fiscalCodePayload.setStatus("ACTIVE");
-        byte[] reqBodyBites = new byte[0];
-
-        mapper.writerFor( ActivationPayload.class );
-        try {
-            reqBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        new MockServerClient( "localhost", 9999 )
-                .when( request()
-                        .withMethod( "PUT" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/activations/" ))
-                .respond( response()
-                        .withBody( responseBodyBites )
-                        .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 200 ));
-
-        //When
-        Activation limitedProfile = client.upsertServiceActivation( fiscalCodePayload.getFiscalCode(), true ).block();
-
-        //Then
-        Assertions.assertEquals( "ACTIVE", limitedProfile.getStatus() );
-    }
-
-
-    @Test
-    void upsertServiceActivation_FAIL() {
-        //Given
-        Activation responseDto = new Activation();
-        responseDto.setFiscalCode("EEEEEE00E00E000A");
-        responseDto.setStatus("INACTIVE");
-        responseDto.setVersion(1);
-        responseDto.setServiceId("PN");
-
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( Activation.class );
-        try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        ActivationPayload fiscalCodePayload = new ActivationPayload();
-        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000A" );
-        fiscalCodePayload.setStatus("ACTIVE");
-        byte[] reqBodyBites = new byte[0];
-
-        mapper.writerFor( ActivationPayload.class );
-        try {
-            reqBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        new MockServerClient( "localhost", 9999 )
-                .when( request()
-                        .withMethod( "PUT" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/activations/" ))
-                .respond( response()
-                        .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 500 ));
-
 
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/activations/" ))
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
+                        .withPath( "/messages" ))
                 .respond( response()
                         .withBody( responseBodyBites )
                         .withContentType( MediaType.APPLICATION_JSON )
                         .withStatusCode( 200 ));
 
         //When
-        Activation limitedProfile = client.upsertServiceActivation( fiscalCodePayload.getFiscalCode(), true ).block();
+        CreatedMessage createdMessageResult = client.submitActivationMessageforUserWithFiscalCodeInBody( message ).block();
 
         //Then
-        assert limitedProfile != null;
-        Assertions.assertEquals( "INACTIVE", limitedProfile.getStatus() );
+        Assertions.assertNotNull( createdMessageResult );
     }
 
-    @Test
-    void getServiceActivation() {
-        //Given
-        Activation responseDto = new Activation();
-        responseDto.setFiscalCode("EEEEEE00E00E000A");
-        responseDto.setStatus("ACTIVE");
-        responseDto.setVersion(1);
-        responseDto.setServiceId("PN");
-
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( Activation.class );
-        try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000A" );
-        byte[] reqBodyBites = new byte[0];
-
-        mapper.writerFor( FiscalCodePayload.class );
-        try {
-            reqBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        new MockServerClient( "localhost", 9999 )
-                .when( request()
-                        .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/activations/" ))
-                .respond( response()
-                        .withBody( responseBodyBites )
-                        .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 200 ));
-
-        //When
-        Activation limitedProfile = client.getServiceActivation( fiscalCodePayload.getFiscalCode() ).block();
-
-        //Then
-        Assertions.assertNotNull( limitedProfile );
-    }
 }
