@@ -23,7 +23,7 @@ import java.time.ZoneId;
 import java.util.Collections;
 
 @SpringBootTest
-class SendIOMessageServiceTest {
+class IOServiceTest {
 
     @InjectMocks
     private IOService service;
@@ -161,7 +161,7 @@ class SendIOMessageServiceTest {
         CreatedMessage createdMessage = new CreatedMessage()
                 .id( "createdMessageId" );
 
-        SendActivationMessageRequestDto messageRequestDto = new SendActivationMessageRequestDto()
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
@@ -172,7 +172,7 @@ class SendIOMessageServiceTest {
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
 
-        SendMessageResponseDto responseDto = service.sendIOActivationMessage( Mono.just( messageRequestDto ) ).block();
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
         //Then
         Assertions.assertNotNull( responseDto );*/
