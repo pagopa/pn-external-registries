@@ -1,8 +1,8 @@
-package it.pagopa.pn.external.registries.rest.v1;
+package it.pagopa.pn.external.registries.rest.io.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
-import it.pagopa.pn.external.registries.services.IOActivationService;
-import it.pagopa.pn.external.registries.services.SendIOMessageService;
+import it.pagopa.pn.external.registries.rest.io.v1.IOActivationController;
+import it.pagopa.pn.external.registries.services.io.IOActivationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebFluxTest(controllers = {IOActivationController.class})
 class IOActivationControllerTest {

@@ -3,12 +3,10 @@ package it.pagopa.pn.external.registries.services;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
-import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j

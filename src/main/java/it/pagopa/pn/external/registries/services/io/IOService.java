@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.services;
+package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
@@ -9,7 +9,7 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Third
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -18,14 +18,14 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
-public class SendIOMessageService {
+public class IOService {
 
     private final IOClient client;
 
     private final PnExternalRegistriesConfig cfg;
 
 
-    public SendIOMessageService(IOClient client, PnExternalRegistriesConfig cfg) {
+    public IOService(IOClient client, PnExternalRegistriesConfig cfg) {
         this.client = client;
         this.cfg = cfg;
     }

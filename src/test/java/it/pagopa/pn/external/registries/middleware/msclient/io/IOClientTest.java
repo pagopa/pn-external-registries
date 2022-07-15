@@ -1,9 +1,9 @@
-package it.pagopa.pn.external.registries.middleware.msclient;
+package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 

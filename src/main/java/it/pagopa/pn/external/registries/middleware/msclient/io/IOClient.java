@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.middleware.msclient;
+package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;

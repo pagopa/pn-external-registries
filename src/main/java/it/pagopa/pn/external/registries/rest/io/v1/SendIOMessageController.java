@@ -1,11 +1,9 @@
-package it.pagopa.pn.external.registries.rest.v1;
+package it.pagopa.pn.external.registries.rest.io.v1;
 
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.SendIoActivationMessageApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.SendIoMessageApi;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.services.SendIOMessageService;
+import it.pagopa.pn.external.registries.services.io.IOService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,18 +12,18 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @Slf4j
-public class SendIOActivationMessageController implements SendIoActivationMessageApi {
+public class SendIOMessageController implements SendIoMessageApi {
 
-    private  final SendIOMessageService service;
+    private  final IOService service;
 
-    public SendIOActivationMessageController(SendIOMessageService service) {
+    public SendIOMessageController(IOService service) {
         this.service = service;
     }
 
     @Override
-    public Mono<ResponseEntity<SendMessageResponseDto>> sendIOActivationMessage(Mono<SendActivationMessageRequestDto> sendMessageRequestDto, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<SendMessageResponseDto>> sendIOMessage(Mono<SendMessageRequestDto> sendMessageRequestDto, ServerWebExchange exchange) {
         log.info( "[enter] send IO message" );
-        return service.sendIOActivationMessage( sendMessageRequestDto )
+        return service.sendIOMessage( sendMessageRequestDto )
                 .map( body -> {
                     log.debug( "[exit]" );
                     return ResponseEntity.ok( body );

@@ -1,8 +1,9 @@
-package it.pagopa.pn.external.registries.rest.v1;
+package it.pagopa.pn.external.registries.rest.io.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.services.SendIOMessageService;
+import it.pagopa.pn.external.registries.rest.io.v1.SendIOMessageController;
+import it.pagopa.pn.external.registries.services.io.IOService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @WebFluxTest(controllers = {SendIOMessageController.class})
 class SendIOMessageControllerTest {
 
@@ -24,7 +23,7 @@ class SendIOMessageControllerTest {
     WebTestClient webTestClient;
 
     @MockBean
-    SendIOMessageService service;
+    IOService service;
 
     @Test
     void sendIOMessageSuccess() {

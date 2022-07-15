@@ -1,4 +1,4 @@
-package it.pagopa.pn.external.registries.middleware.msclient;
+package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.utils.LogUtils;

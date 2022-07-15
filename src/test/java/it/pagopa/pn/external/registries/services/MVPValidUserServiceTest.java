@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
-import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,8 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class MVPValidUserServiceTest {

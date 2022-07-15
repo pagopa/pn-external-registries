@@ -1,15 +1,14 @@
-package it.pagopa.pn.external.registries.services;
+package it.pagopa.pn.external.registries.services.io;
 
-import it.pagopa.pn.api.dto.events.EndWorkflowStatus;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.middleware.msclient.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.services.io.IOService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -31,7 +28,7 @@ import java.util.Collections;
 class SendIOMessageServiceTest {
 
     @InjectMocks
-    private SendIOMessageService service;
+    private IOService service;
 
     @Mock
     IOClient ioClient;
