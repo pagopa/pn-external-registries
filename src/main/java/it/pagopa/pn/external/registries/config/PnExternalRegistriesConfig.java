@@ -58,6 +58,8 @@ public class PnExternalRegistriesConfig {
 
     private String mockDataResources;
 
+    private String dynamodbTableNameOptIn;
+
     private AppIoTemplate appIoTemplate;
 
     @Data
