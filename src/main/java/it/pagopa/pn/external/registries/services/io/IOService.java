@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services.io;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
@@ -40,45 +41,46 @@ public class IOService {
         this.optInSentDao = optInSentDao;
     }
 
-    public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDto )
+    public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDtoMono )
     {
-        return sendMessageRequestDto
-                .map(sendMessageRequestDto1 -> {
-                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto1.getRecipientTaxID()), sendMessageRequestDto1.getIun());
-                    return sendMessageRequestDto1;
+        return sendMessageRequestDtoMono
+                .map(sendMessageRequestDto -> {
+                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
+                    return sendMessageRequestDto;
                 })
-                .zipWhen(sendMessageRequestDto1 -> this.getIOActivationStatus(sendMessageRequestDto1.getRecipientTaxID()),
-                    (sendMessageRequestDto0, iostatus0) -> new Object(){
-                        public final String ioStatus = iostatus0;   // TODO enum status
+                .zipWhen(sendMessageRequestDto -> {
+                            UserStatusRequestDto requestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
+                            return this.getUserStatus( Mono.just(requestDto) );
+                        },
+                    (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
+                        public final UserStatusResponseDto responseStatusDto = responseStatusDto0;
                         public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
                     })
                 .flatMap(res -> {
-                        if (res.ioStatus == "nondisponibile")   // TODO sistema col check enum
-                        {
+                    UserStatusResponseDto.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+
+                    switch (ioStatus){
+                        case APPIO_NOT_ACTIVE:
                             log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
-                            SendMessageResponseDto sendres = new SendMessageResponseDto();
-                            sendres.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
-                            return Mono.just(sendres);
-                        }
-                        else if (res.ioStatus == "abilitato_pn") // TODO sistema col check enum
+                            SendMessageResponseDto responseDto = new SendMessageResponseDto();
+                            responseDto.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
+                            return Mono.just(responseDto);
+                        case PN_ACTIVE:
                             return sendIOCourtesyMessage(res.sendMessageRequestDto);
-                        else
+                        case PN_NOT_ACTIVE:
                             return manageOptIn(res.sendMessageRequestDto);
+                        default:
+                            log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
+                            return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID())));
+                    }
                 });
     }
-
-    public Mono<String> getIOActivationStatus(String taxId)
-    {
-        // TODO usa il tuo metodo che tornerà un enum immagino
-        //this.getprofiles(taxId).................
-        return Mono.just("");
-    }
-
+    
     private Mono<SendMessageResponseDto> manageOptIn(SendMessageRequestDto sendMessageRequestDto) {
         String hashedTaxId = DigestUtils.sha256Hex(sendMessageRequestDto.getRecipientTaxID());
         log.info("Managing send optin message taxId={} hashedTaxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), hashedTaxId, sendMessageRequestDto.getIun());
         return this.optInSentDao.get(hashedTaxId)
-                .map(ent -> ent.getLastModified())
+                .map(OptInSentEntity::getLastModified)
                 .defaultIfEmpty(Instant.EPOCH)
                 .flatMap(lastSendDate -> {
                     if (lastSendDate.isBefore(Instant.now().minus(cfg.getIoOptinMinDays(), ChronoUnit.DAYS)))

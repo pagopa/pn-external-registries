@@ -33,6 +33,7 @@ public class SendIOMessageController implements SendIoMessageApi {
                 .switchIfEmpty( Mono.just( ResponseEntity.<SendMessageResponseDto>notFound().build() ) );
     }
 
+    @Override
     public Mono<ResponseEntity<UserStatusResponseDto>> userStatus(Mono<UserStatusRequestDto> userStatusRequestDto, final ServerWebExchange exchange) {
         log.info( "[enter] userStatus" );
         return service.getUserStatus( userStatusRequestDto )
