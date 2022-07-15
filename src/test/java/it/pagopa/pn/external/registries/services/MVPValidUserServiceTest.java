@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -26,7 +27,7 @@ class MVPValidUserServiceTest {
     IOClient ioClient;
 
     @Test
-    void checkUser() {
+    void checkValidUserPnActive() {
         // Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( true )
@@ -39,6 +40,26 @@ class MVPValidUserServiceTest {
 
         // Then
         Assertions.assertNotNull( mvpUserDto );
+        Assertions.assertEquals( TAX_ID, mvpUserDto.getTaxId() );
+        Assertions.assertEquals(MvpUserDto.StatusEnum.PN_ACTIVE, mvpUserDto.getStatus() );
     }
 
+    @Test
+    void checkValidUserPnNotActive() {
+        // Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+
+        // When
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+
+        MvpUserDto mvpUserDto = service.checkValidUser( Mono.just( TAX_ID ) ).block();
+
+        // Then
+        Assertions.assertNotNull( mvpUserDto );
+        Assertions.assertEquals( TAX_ID, mvpUserDto.getTaxId() );
+        Assertions.assertEquals(MvpUserDto.StatusEnum.PN_NOT_ACTIVE, mvpUserDto.getStatus() );
+    }
+    
 }
