@@ -62,6 +62,8 @@ public class PnExternalRegistriesConfig {
 
     private AppIoTemplate appIoTemplate;
 
+    private int ioOptinMinDays;
+
     @Data
     public static class AppIoTemplate{
         private String markdownUpgradeAppIoMessage;
