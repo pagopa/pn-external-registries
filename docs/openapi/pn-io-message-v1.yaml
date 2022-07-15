@@ -221,6 +221,8 @@ components:
             - NOT_SENT_OPTIN_ALREADY_SENT
             - NOT_SENT_OPTIN_DISABLED_BY_CONF
             - NOT_SENT_COURTESY_DISABLED_BY_CONF
+            - NOT_SENT_OPTIN_EXCEPTION
+            - NOT_SENT_COURTESY_EXCEPTION
             - SENT_COURTESY
             - SENT_OPTIN
         id:
