@@ -225,6 +225,9 @@ components:
             - NOT_SENT_COURTESY_EXCEPTION
             - SENT_COURTESY
             - SENT_OPTIN
+            - ERROR_USER_STATUS
+            - ERROR_COURTESY
+            - ERROR_OPTIN
         id:
           type: string
           description: identifier of the created message.
@@ -297,7 +300,9 @@ components:
             * APPIO_NOT_ACTIVE: AppIo isn't active for the user.
             * APPIO_ACTIVE_PN_NOT_ACTIVE: Appio is active for the user, but messages from Piattaforma Notifiche is not active.
             * APPIO_ACTIVE_PN_ACTIVE: Appio is active for the user and messages from Piattaforma Notifiche is active.
+            * ERROR: Error in call appIo WebService.
           enum:
             - APPIO_NOT_ACTIVE
             - PN_NOT_ACTIVE
             - PN_ACTIVE
+            - ERROR
