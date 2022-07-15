@@ -62,13 +62,18 @@ public class IOService {
                     switch (ioStatus){
                         case APPIO_NOT_ACTIVE:
                             log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
-                            SendMessageResponseDto responseDto = new SendMessageResponseDto();
-                            responseDto.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
-                            return Mono.just(responseDto);
+                            SendMessageResponseDto resAppIoUnavailable = new SendMessageResponseDto();
+                            resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
+                            return Mono.just(resAppIoUnavailable);
                         case PN_ACTIVE:
                             return sendIOCourtesyMessage(res.sendMessageRequestDto);
                         case PN_NOT_ACTIVE:
                             return manageOptIn(res.sendMessageRequestDto);
+                        case ERROR:
+                            log.info("Error in get user status, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                            SendMessageResponseDto resErrorUserStatus = new SendMessageResponseDto();
+                            resErrorUserStatus.setResult(SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS);
+                            return Mono.just(resErrorUserStatus);
                         default:
                             log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
                             return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID())));
@@ -142,6 +147,11 @@ public class IOService {
                     res.setResult(SendMessageResponseDto.ResultEnum.SENT_COURTESY);
                     res.setId(response.getId());
                     return res;
+                }).onErrorResume( exception ->{
+                        log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
+                        SendMessageResponseDto res = new SendMessageResponseDto();
+                        res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
+                        return Mono.just(res);
                 });
         } else {
             log.warn( "Send IO message is disabled!!!" );
@@ -172,7 +182,12 @@ public class IOService {
                     res.setResult(SendMessageResponseDto.ResultEnum.SENT_OPTIN);
                     res.setId(r.getId());
                     return res;
-                });
+                }).onErrorResume( exception ->{
+                        log.error( "Error in submitActivationMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
+                        SendMessageResponseDto res = new SendMessageResponseDto();
+                        res.setResult(SendMessageResponseDto.ResultEnum.ERROR_OPTIN);
+                        return Mono.just(res);
+                    });
         } else {
             log.info( "Send IO message is disabled" );
             SendMessageResponseDto res = new SendMessageResponseDto();
@@ -205,7 +220,10 @@ public class IOService {
                             );
                         }
                         log.error("Error in call getProfileByPOST ex={} for taxId={} ", exception, LogUtils.maskTaxId(taxId));
-                        return Mono.error(exception);
+                        return Mono.just( new UserStatusResponseDto()
+                                .taxId(taxId)
+                                .status(UserStatusResponseDto.StatusEnum.ERROR)
+                        );
                     });
                 });
     }
