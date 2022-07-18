@@ -9,12 +9,14 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import javax.annotation.PostConstruct;
 import java.net.ConnectException;
 import java.time.Duration;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -51,6 +53,16 @@ public class IOActivationClient extends OcpBaseClient {
     {
         log.info("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
 
+        if (!checkWhitelist(taxId))
+        {
+            log.warn("taxId is not in whitelist, mocking IO response");
+            Activation res = new Activation();
+            res.setVersion(1);
+            res.setStatus(IO_STATUS_INACTIVE);
+            res.setFiscalCode(taxId);
+            return Mono.just(res);
+        }
+
         ActivationPayload dto = new ActivationPayload();
         dto.setFiscalCode(taxId);
         dto.setStatus(activated? IO_STATUS_ACTIVE : IO_STATUS_INACTIVE);
@@ -81,6 +93,16 @@ public class IOActivationClient extends OcpBaseClient {
     {
         log.info("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
 
+        if (!checkWhitelist(taxId))
+        {
+            log.warn("taxId is not in whitelist, mocking IO response");
+            Activation res = new Activation();
+            res.setVersion(1);
+            res.setStatus(IO_STATUS_INACTIVE);
+            res.setFiscalCode(taxId);
+            return Mono.just(res);
+        }
+
         FiscalCodePayload dto = new FiscalCodePayload();
         dto.setFiscalCode(taxId);
 
@@ -93,5 +115,11 @@ public class IOActivationClient extends OcpBaseClient {
                     log.info("getServiceActivation response taxid={} status={} serviceId={} version={}", LogUtils.maskTaxId(x.getFiscalCode()), x.getStatus(), x.getServiceId(), x.getVersion());
                     return x;
                 });
+    }
+
+
+    private boolean checkWhitelist(String taxId)
+    {
+        return  (CollectionUtils.isEmpty(config.getIoWhitelist()) || config.getIoWhitelist().get(0).equals("*") || config.getIoWhitelist().contains(taxId));
     }
 }

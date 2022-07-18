@@ -11,9 +11,13 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMe
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -44,6 +48,15 @@ public class IOClient extends OcpBaseClient {
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
         log.info("[enter] submitMessageforUserWithFiscalCodeInBody taxId={}", LogUtils.maskTaxId(message.getFiscalCode()));
+
+        if (!checkWhitelist(message.getFiscalCode()))
+        {
+            log.warn("submitMessageforUserWithFiscalCodeInBody taxId is not in whitelist, mocking IO response");
+            CreatedMessage res = new CreatedMessage();
+            res.setId(UUID.randomUUID().toString());
+            return Mono.just(res);
+        }
+
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
             log.error("error submitMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
             return Mono.error(throwable);
@@ -52,6 +65,15 @@ public class IOClient extends OcpBaseClient {
 
     public Mono<CreatedMessage> submitActivationMessageforUserWithFiscalCodeInBody(NewMessage message) {
         log.info("[enter] submitActivationMessageforUserWithFiscalCodeInBody taxId={}", LogUtils.maskTaxId(message.getFiscalCode()));
+
+        if (!checkWhitelist(message.getFiscalCode()))
+        {
+            log.warn("submitActivationMessageforUserWithFiscalCodeInBody taxId is not in whitelist, mocking IO response");
+            CreatedMessage res = new CreatedMessage();
+            res.setId(UUID.randomUUID().toString());
+            return Mono.just(res);
+        }
+
         return ioActivationMessageApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
             log.error("error submitActivationMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
             return Mono.error(throwable);
@@ -60,7 +82,21 @@ public class IOClient extends OcpBaseClient {
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
         log.info("[enter] getProfileByPOST taxId={}", LogUtils.maskTaxId(payload.getFiscalCode()));
+
+        if (!checkWhitelist(payload.getFiscalCode()))
+        {
+            log.warn("getProfileByPOST taxId is not in whitelist, mocking IO response");
+            LimitedProfile res = new LimitedProfile();
+            res.setSenderAllowed(false);
+            res.setPreferredLanguages(List.of("it"));
+            return Mono.just(res);
+        }
+
         return ioApi.getProfileByPOST( payload );
     }
 
+    private boolean checkWhitelist(String taxId)
+    {
+        return  (CollectionUtils.isEmpty(config.getIoWhitelist()) || config.getIoWhitelist().get(0).equals("*") || config.getIoWhitelist().contains(taxId));
+    }
 }

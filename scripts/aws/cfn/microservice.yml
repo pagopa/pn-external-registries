@@ -82,6 +82,11 @@ Parameters:
   OptInSentTableArn:
     Type: String
     Description: 'ARN of dynamodb table containing OptInSent information'
+
+  IoWhiteList:
+    Type: String
+    Description: 'Lista di CF validi per IO. Se vale * si intende tutti'
+
 Resources:
 
   # PN-External-Registry microservice
@@ -105,6 +110,7 @@ Resources:
         ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
         ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:SelfcareUsergroupApiKey}}'
         ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_OPT_IN=${OptInSentTableName}'
+        ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=${IoWhiteList}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
