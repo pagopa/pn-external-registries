@@ -14,21 +14,25 @@ import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntit
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @Slf4j
 public class IOService {
 
+    private static final String IO_LOCALE_IT_IT = "it_IT";
     private final IOClient client;
 
     private final PnExternalRegistriesConfig cfg;
@@ -50,14 +54,14 @@ public class IOService {
                 })
                 .zipWhen(sendMessageRequestDto -> {
                             UserStatusRequestDto requestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
-                            return this.getUserStatus( Mono.just(requestDto) );
+                            return this.getUserStatusInternal( Mono.just(requestDto) );
                         },
                     (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
-                        public final UserStatusResponseDto responseStatusDto = responseStatusDto0;
+                        public final UserStatusResponseInternal responseStatusDto = responseStatusDto0;
                         public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
                     })
                 .flatMap(res -> {
-                    UserStatusResponseDto.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+                    UserStatusResponseInternal.StatusEnum ioStatus = res.responseStatusDto.getStatus();
 
                     switch (ioStatus){
                         case APPIO_NOT_ACTIVE:
@@ -66,7 +70,7 @@ public class IOService {
                             resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
                             return Mono.just(resAppIoUnavailable);
                         case PN_ACTIVE:
-                            return sendIOCourtesyMessage(res.sendMessageRequestDto);
+                            return sendIOCourtesyMessage(res.sendMessageRequestDto, isPreferredLanguageIT(res.responseStatusDto.getPreferredLanguages()));
                         case PN_NOT_ACTIVE:
                             return manageOptIn(res.sendMessageRequestDto);
                         case ERROR:
@@ -100,7 +104,7 @@ public class IOService {
                 });
     }
 
-    private Mono<SendMessageResponseDto> sendIOCourtesyMessage( SendMessageRequestDto sendMessageRequestDto ) {
+    private Mono<SendMessageResponseDto> sendIOCourtesyMessage( SendMessageRequestDto sendMessageRequestDto, boolean localeIsIT ) {
         log.info( "Submit message taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
         if (cfg.isEnableIoMessage()) {
             FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
@@ -120,7 +124,7 @@ public class IOService {
                 content.setDueDate( fmt.format(sendMessageRequestDto.getDueDate() ));
             }
             content.setSubject( truncatedIoSubject );
-            content.setMarkdown( cfg.getAppIoTemplate().getMarkdownUpgradeAppIoMessage() );
+            content.setMarkdown( localeIsIT?cfg.getAppIoTemplate().getMarkdownUpgradeAppIoITMessage():cfg.getAppIoTemplate().getMarkdownUpgradeAppIoENMessage());
 
             String requestAcceptedDate = null;
 
@@ -196,7 +200,7 @@ public class IOService {
         }
     }
 
-    public Mono<UserStatusResponseDto> getUserStatus(Mono<UserStatusRequestDto> body) {
+    private Mono<UserStatusResponseInternal> getUserStatusInternal(Mono<UserStatusRequestDto> body) {
         return body
                 .flatMap( userStatusRequestDto -> {
                     String taxId = userStatusRequestDto.getTaxId();
@@ -205,27 +209,42 @@ public class IOService {
                     fiscalCodePayload.setFiscalCode( taxId );
 
                     return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
-                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed());
+                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={} preferredLangs={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed(), res.getPreferredLanguages());
 
-                        return new UserStatusResponseDto()
+                        return UserStatusResponseInternal.builder()
                                 .taxId(taxId)
-                                .status( res.getSenderAllowed() ? UserStatusResponseDto.StatusEnum.PN_ACTIVE : UserStatusResponseDto.StatusEnum.PN_NOT_ACTIVE);
+                                .preferredLanguages(res.getPreferredLanguages())
+                                .status( res.getSenderAllowed() ? UserStatusResponseInternal.StatusEnum.PN_ACTIVE : UserStatusResponseInternal.StatusEnum.PN_NOT_ACTIVE)
+                                .build();
 
                     }).onErrorResume( WebClientResponseException.class, exception ->{
                         if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
                             log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
-                            return Mono.just( new UserStatusResponseDto()
+                            return Mono.just(UserStatusResponseInternal.builder()
                                     .taxId(taxId)
-                                    .status(UserStatusResponseDto.StatusEnum.APPIO_NOT_ACTIVE)
+                                    .status(UserStatusResponseInternal.StatusEnum.APPIO_NOT_ACTIVE)
+                                    .build()
                             );
                         }
                         log.error("Error in call getProfileByPOST ex={} for taxId={} ", exception, LogUtils.maskTaxId(taxId));
-                        return Mono.just( new UserStatusResponseDto()
+                        return Mono.just(UserStatusResponseInternal.builder()
                                 .taxId(taxId)
-                                .status(UserStatusResponseDto.StatusEnum.ERROR)
+                                .status(UserStatusResponseInternal.StatusEnum.ERROR)
+                                .build()
                         );
                     });
                 });
     }
 
+    public Mono<UserStatusResponseDto> getUserStatus(Mono<UserStatusRequestDto> body) {
+        return this.getUserStatusInternal(body)
+                        .map(userStatusResponseInternal -> new UserStatusResponseDto()
+                                .taxId(userStatusResponseInternal.getTaxId())
+                                .status( UserStatusResponseDto.StatusEnum.fromValue(userStatusResponseInternal.getStatus().getValue())));
+    }
+
+    private boolean isPreferredLanguageIT(List<String> preferredLanguages)
+    {
+        return CollectionUtils.isEmpty(preferredLanguages) || preferredLanguages.contains(IO_LOCALE_IT_IT);
+    }
 }
