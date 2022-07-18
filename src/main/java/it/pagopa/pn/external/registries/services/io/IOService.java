@@ -1,20 +1,29 @@
 package it.pagopa.pn.external.registries.services.io;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendActivationMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
+import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
+import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Slf4j
@@ -24,108 +33,199 @@ public class IOService {
 
     private final PnExternalRegistriesConfig cfg;
 
+    private final OptInSentDao optInSentDao;
 
-    public IOService(IOClient client, PnExternalRegistriesConfig cfg) {
+    public IOService(IOClient client, PnExternalRegistriesConfig cfg, OptInSentDao optInSentDao) {
         this.client = client;
         this.cfg = cfg;
+        this.optInSentDao = optInSentDao;
     }
 
-    public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDto ) {
-        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        MessageContent content = new MessageContent();
+    public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDtoMono )
+    {
+        return sendMessageRequestDtoMono
+                .map(sendMessageRequestDto -> {
+                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
+                    return sendMessageRequestDto;
+                })
+                .zipWhen(sendMessageRequestDto -> {
+                            UserStatusRequestDto requestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
+                            return this.getUserStatus( Mono.just(requestDto) );
+                        },
+                    (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
+                        public final UserStatusResponseDto responseStatusDto = responseStatusDto0;
+                        public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
+                    })
+                .flatMap(res -> {
+                    UserStatusResponseDto.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+
+                    switch (ioStatus){
+                        case APPIO_NOT_ACTIVE:
+                            log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                            SendMessageResponseDto resAppIoUnavailable = new SendMessageResponseDto();
+                            resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
+                            return Mono.just(resAppIoUnavailable);
+                        case PN_ACTIVE:
+                            return sendIOCourtesyMessage(res.sendMessageRequestDto);
+                        case PN_NOT_ACTIVE:
+                            return manageOptIn(res.sendMessageRequestDto);
+                        case ERROR:
+                            log.info("Error in get user status, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                            SendMessageResponseDto resErrorUserStatus = new SendMessageResponseDto();
+                            resErrorUserStatus.setResult(SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS);
+                            return Mono.just(resErrorUserStatus);
+                        default:
+                            log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
+                            return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID())));
+                    }
+                });
+    }
+    
+    private Mono<SendMessageResponseDto> manageOptIn(SendMessageRequestDto sendMessageRequestDto) {
+        String hashedTaxId = DigestUtils.sha256Hex(sendMessageRequestDto.getRecipientTaxID());
+        log.info("Managing send optin message taxId={} hashedTaxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), hashedTaxId, sendMessageRequestDto.getIun());
+        return this.optInSentDao.get(hashedTaxId)
+                .map(OptInSentEntity::getLastModified)
+                .defaultIfEmpty(Instant.EPOCH)
+                .flatMap(lastSendDate -> {
+                    if (lastSendDate.isBefore(Instant.now().minus(cfg.getIoOptinMinDays(), ChronoUnit.DAYS)))
+                        return sendIOOptInMessage(sendMessageRequestDto)
+                                .zipWhen(r -> optInSentDao.save(new OptInSentEntity(hashedTaxId)),
+                                        (resp, nd) -> resp);
+                    else
+                    {
+                        log.info("Not sending because a recent optin has already been sent taxId={} iun={}",  LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
+                        return Mono.empty();
+                    }
+                });
+    }
+
+    private Mono<SendMessageResponseDto> sendIOCourtesyMessage( SendMessageRequestDto sendMessageRequestDto ) {
+        log.info( "Submit message taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
         if (cfg.isEnableIoMessage()) {
-            return sendMessageRequestDto
-                    .map(r -> {
-                        log.info( "Submit message taxId={} iun={}", LogUtils.maskTaxId(r.getRecipientTaxID()), r.getIun());
-                        return r;
-                    })
-                    .flatMap( r -> {
+            FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+            MessageContent content = new MessageContent();
 
-                        String ioSubject = r.getSubject() + "-" + r.getSenderDenomination();
+            String ioSubject = sendMessageRequestDto.getSubject() + "-" + sendMessageRequestDto.getSenderDenomination();
 
-                        String truncatedIoSubject = ioSubject;
-                        if(ioSubject.length() > 120){
-                            truncatedIoSubject = ioSubject.substring(0, 120);
-                        }
-                        
-                        log.info("Get profile by post iun={}", r.getIun());
-                        fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
-                        if (r.getDueDate()!=null) {
-                            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            content.setDueDate( fmt.format(r.getDueDate() ));
-                        }
-                        content.setSubject( truncatedIoSubject );
-                        content.setMarkdown( cfg.getAppIoTemplate().getMarkdownUpgradeAppIoMessage() );
+            String truncatedIoSubject = ioSubject;
+            if(ioSubject.length() > 120){
+                truncatedIoSubject = ioSubject.substring(0, 120);
+            }
 
-                        String requestAcceptedDate = null;
-                        
-                        if(r.getRequestAcceptedDate() != null){
-                            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            requestAcceptedDate = fmt.format( r.getRequestAcceptedDate() );
-                        }
-                        content.setThirdPartyData( new ThirdPartyData()
-                               .id( r.getIun() )
-                               .originalSender( r.getSenderDenomination() )
-                               .originalReceiptDate(requestAcceptedDate)
-                               .summary( r.getSubject() )
-                        );
-                        return client.getProfileByPOST(fiscalCodePayload);
-                    })
-                    .flatMap( r -> {
-                        log.info( "Proceeding with send message iun={}", content.getThirdPartyData().getId());
-                        NewMessage m = new NewMessage();
-                        m.setFeatureLevelType("ADVANCED");
-                        m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
-                        m.setContent( content );
-                        return client.submitMessageforUserWithFiscalCodeInBody(m);
-                    })
-                    .map( r -> {
-                        log.info( "Sent message iun={}", content.getThirdPartyData().getId());
+            log.info("Get profile by post iun={}", sendMessageRequestDto.getIun());
+            fiscalCodePayload.setFiscalCode(sendMessageRequestDto.getRecipientTaxID());
+            if (sendMessageRequestDto.getDueDate()!=null) {
+                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                content.setDueDate( fmt.format(sendMessageRequestDto.getDueDate() ));
+            }
+            content.setSubject( truncatedIoSubject );
+            content.setMarkdown( cfg.getAppIoTemplate().getMarkdownUpgradeAppIoMessage() );
+
+            String requestAcceptedDate = null;
+
+            if(sendMessageRequestDto.getRequestAcceptedDate() != null){
+                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                requestAcceptedDate = fmt.format( sendMessageRequestDto.getRequestAcceptedDate() );
+            }
+            content.setThirdPartyData( new ThirdPartyData()
+                   .id( sendMessageRequestDto.getIun() )
+                   .originalSender( sendMessageRequestDto.getSenderDenomination() )
+                   .originalReceiptDate(requestAcceptedDate)
+                   .summary( sendMessageRequestDto.getSubject() )
+            );
+
+            log.info( "Proceeding with send message iun={}", content.getThirdPartyData().getId());
+            NewMessage m = new NewMessage();
+            m.setFeatureLevelType("ADVANCED");
+            m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
+            m.setContent( content );
+            return client.submitMessageforUserWithFiscalCodeInBody(m)
+                .map( response -> {
+                    log.info( "Sent message iun={}", content.getThirdPartyData().getId());
+                    SendMessageResponseDto res = new SendMessageResponseDto();
+                    res.setResult(SendMessageResponseDto.ResultEnum.SENT_COURTESY);
+                    res.setId(response.getId());
+                    return res;
+                }).onErrorResume( exception ->{
+                        log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
                         SendMessageResponseDto res = new SendMessageResponseDto();
-                        res.setId(r.getId());
-                        return res;
-                    });
+                        res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
+                        return Mono.just(res);
+                });
         } else {
-            log.info( "Send IO message is disabled" );
-            return Mono.empty();
+            log.warn( "Send IO message is disabled!!!" );
+            SendMessageResponseDto res = new SendMessageResponseDto();
+            res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_COURTESY_DISABLED_BY_CONF);
+            return Mono.just(res);
         }
     }
 
-    public Mono<SendMessageResponseDto> sendIOActivationMessage( Mono<SendActivationMessageRequestDto> sendMessageRequestDto ) {
+    private Mono<SendMessageResponseDto> sendIOOptInMessage( SendMessageRequestDto sendMessageRequestDto ) {
+        log.info( "Submit activation message taxId={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()));
         if (cfg.isEnableIoActivationMessage()) {
-            return sendMessageRequestDto
-                    .map(r -> {
-                        log.info( "Submit activation message taxId={}", LogUtils.maskTaxId(r.getRecipientTaxID()));
-                        return r;
-                    })
-                    .zipWhen( r -> {
-                        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-                        fiscalCodePayload.setFiscalCode(r.getRecipientTaxID());
-                        return client.getProfileByPOST(fiscalCodePayload);
-                    }, (r, a) ->r)
-                    .flatMap( r -> {
-                        log.info( "Proceeding with send activation message taxId={}", LogUtils.maskTaxId(r.getRecipientTaxID()));
+            log.info( "Proceeding with send activation message taxId={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()));
 
-                        MessageContent content = new MessageContent();
-                        content.setMarkdown( cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() );
-                        content.setSubject(cfg.getAppIoTemplate().getSubjectActivationAppIoMessage());
+            MessageContent content = new MessageContent();
+            content.setMarkdown( cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() );
+            content.setSubject(cfg.getAppIoTemplate().getSubjectActivationAppIoMessage());
 
-                        NewMessage m = new NewMessage();
-                        m.setFeatureLevelType("ADVANCED");
-                        m.setFiscalCode( r.getRecipientTaxID() );
-                        m.setContent( content );
-                        return client.submitActivationMessageforUserWithFiscalCodeInBody(m);
-                    })
-                    .map( r -> {
-                        log.info( "Sent activation message");
+            NewMessage m = new NewMessage();
+            m.setFeatureLevelType("ADVANCED");
+            m.setFiscalCode( sendMessageRequestDto.getRecipientTaxID() );
+            m.setContent( content );
+            return client.submitActivationMessageforUserWithFiscalCodeInBody(m)
+                .map( r -> {
+                    log.info( "Sent activation message");
 
+                    SendMessageResponseDto res = new SendMessageResponseDto();
+                    res.setResult(SendMessageResponseDto.ResultEnum.SENT_OPTIN);
+                    res.setId(r.getId());
+                    return res;
+                }).onErrorResume( exception ->{
+                        log.error( "Error in submitActivationMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
                         SendMessageResponseDto res = new SendMessageResponseDto();
-                        res.setId(r.getId());
-                        return res;
+                        res.setResult(SendMessageResponseDto.ResultEnum.ERROR_OPTIN);
+                        return Mono.just(res);
                     });
         } else {
             log.info( "Send IO message is disabled" );
-            return Mono.empty();
+            SendMessageResponseDto res = new SendMessageResponseDto();
+            res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_DISABLED_BY_CONF);
+            return Mono.just(res);
         }
     }
+
+    public Mono<UserStatusResponseDto> getUserStatus(Mono<UserStatusRequestDto> body) {
+        return body
+                .flatMap( userStatusRequestDto -> {
+                    String taxId = userStatusRequestDto.getTaxId();
+                    log.info("Start getProfileByPOST taxId={}", LogUtils.maskTaxId(taxId));
+                    FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+                    fiscalCodePayload.setFiscalCode( taxId );
+
+                    return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
+                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed());
+
+                        return new UserStatusResponseDto()
+                                .taxId(taxId)
+                                .status( res.getSenderAllowed() ? UserStatusResponseDto.StatusEnum.PN_ACTIVE : UserStatusResponseDto.StatusEnum.PN_NOT_ACTIVE);
+
+                    }).onErrorResume( WebClientResponseException.class, exception ->{
+                        if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
+                            log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
+                            return Mono.just( new UserStatusResponseDto()
+                                    .taxId(taxId)
+                                    .status(UserStatusResponseDto.StatusEnum.APPIO_NOT_ACTIVE)
+                            );
+                        }
+                        log.error("Error in call getProfileByPOST ex={} for taxId={} ", exception, LogUtils.maskTaxId(taxId));
+                        return Mono.just( new UserStatusResponseDto()
+                                .taxId(taxId)
+                                .status(UserStatusResponseDto.StatusEnum.ERROR)
+                        );
+                    });
+                });
+    }
+
 }
