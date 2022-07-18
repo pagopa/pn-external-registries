@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,6 +43,7 @@ public class PnExternalRegistriesConfig {
     private String ioApiKey;
     private String ioactApiKey;
     private String ioBaseUrl;
+    private List<String> ioWhitelist;
 
     private boolean enableIoMessage;
     private boolean enableIoActivationMessage;

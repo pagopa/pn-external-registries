@@ -95,6 +95,57 @@ class IOActivationClientTest {
 
 
     @Test
+    void upsertServiceActivation_mocked() {
+        //Given
+        Activation responseDto = new Activation();
+        responseDto.setFiscalCode("CSRGGL44L13H501E");
+        responseDto.setStatus("ACTIVE");
+        responseDto.setVersion(1);
+        responseDto.setServiceId("PN");
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( Activation.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( responseDto );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+
+        ActivationPayload fiscalCodePayload = new ActivationPayload();
+        fiscalCodePayload.setFiscalCode( "CSRGGL44L13H501E" );
+        fiscalCodePayload.setStatus("ACTIVE");
+        byte[] reqBodyBites = new byte[0];
+
+        mapper.writerFor( ActivationPayload.class );
+        try {
+            reqBodyBites = mapper.writeValueAsBytes( responseDto );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+
+        new MockServerClient( "localhost", 9999 )
+                .when( request()
+                        .withMethod( "PUT" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
+                        .withPath( "/activations/" ))
+                .respond( response()
+                        .withBody( responseBodyBites )
+                        .withContentType( MediaType.APPLICATION_JSON )
+                        .withStatusCode( 500 ));
+
+        //When
+        Activation limitedProfile = client.upsertServiceActivation( fiscalCodePayload.getFiscalCode(), true ).block();
+
+        //Then
+        Assertions.assertEquals( "INACTIVE", limitedProfile.getStatus() );
+    }
+
+
+    @Test
     void upsertServiceActivation_FAIL() {
         //Given
         Activation responseDto = new Activation();
@@ -196,6 +247,56 @@ class IOActivationClientTest {
                         .withBody( responseBodyBites )
                         .withContentType( MediaType.APPLICATION_JSON )
                         .withStatusCode( 200 ));
+
+        //When
+        Activation limitedProfile = client.getServiceActivation( fiscalCodePayload.getFiscalCode() ).block();
+
+        //Then
+        Assertions.assertNotNull( limitedProfile );
+    }
+
+
+    @Test
+    void getServiceActivation_mocked() {
+        //Given
+        Activation responseDto = new Activation();
+        responseDto.setFiscalCode("CSRGGL44L13H501E");
+        responseDto.setStatus("ACTIVE");
+        responseDto.setVersion(1);
+        responseDto.setServiceId("PN");
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( Activation.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( responseDto );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+
+        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+        fiscalCodePayload.setFiscalCode( "CSRGGL44L13H501E" );
+        byte[] reqBodyBites = new byte[0];
+
+        mapper.writerFor( FiscalCodePayload.class );
+        try {
+            reqBodyBites = mapper.writeValueAsBytes( responseDto );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+
+        new MockServerClient( "localhost", 9999 )
+                .when( request()
+                        .withMethod( "POST" )
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
+                        .withPath( "/activations/" ))
+                .respond( response()
+                        .withBody( responseBodyBites )
+                        .withContentType( MediaType.APPLICATION_JSON )
+                        .withStatusCode( 500 ));
 
         //When
         Activation limitedProfile = client.getServiceActivation( fiscalCodePayload.getFiscalCode() ).block();
