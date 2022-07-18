@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.middleware.db.io.dao;
 
-import it.pagopa.pn.commons.log.PnAuditLogBuilder;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
 import org.junit.jupiter.api.Assertions;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
@@ -25,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
         "aws.endpoint-url=http://localhost:4566"
 })
 @SpringBootTest
-class OptInSentDaoTest {
+class OptInSentDaoTestIT {
 
     private final Duration d = Duration.ofMillis(3000);
 
