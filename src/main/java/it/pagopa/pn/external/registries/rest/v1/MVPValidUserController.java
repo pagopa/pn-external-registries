@@ -4,8 +4,10 @@ import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
 import it.pagopa.pn.external.registries.services.MVPValidUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +27,6 @@ public class MVPValidUserController implements MvpContextApi {
                 .map( b -> {
                     log.debug( "[exit]" );
                     return ResponseEntity.ok( b );
-                } )
-                .switchIfEmpty( Mono.just( ResponseEntity.<MvpUserDto>notFound().build() ) );
+                } );
     }
 }
