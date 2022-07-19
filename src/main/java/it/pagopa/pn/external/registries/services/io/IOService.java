@@ -110,7 +110,7 @@ public class IOService {
             FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
             MessageContent content = new MessageContent();
 
-            String ioSubject = sendMessageRequestDto.getSenderDenomination() + " - " + sendMessageRequestDto.getSubject();
+            String ioSubject = sendMessageRequestDto.getSubject();
 
             String truncatedIoSubject = ioSubject;
             if(ioSubject.length() > 120){
