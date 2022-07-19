@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Collections;
 
@@ -110,13 +111,12 @@ class IOClientTest {
                 .respond( response()
                         .withBody( responseBodyBites )
                         .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 500 ));
+                        .withStatusCode( 200 ));
 
         //When
-        LimitedProfile limitedProfile = client.getProfileByPOST( fiscalCodePayload ).block();
+        Assertions.assertThrows(WebClientResponseException.class, () -> client.getProfileByPOST( fiscalCodePayload ).block());
 
         //Then
-        Assertions.assertNotNull( limitedProfile );
     }
 
     @Test

@@ -68,7 +68,8 @@ public class PnExternalRegistriesConfig {
 
     @Data
     public static class AppIoTemplate{
-        private String markdownUpgradeAppIoMessage;
+        private String markdownUpgradeAppIoENMessage;
+        private String markdownUpgradeAppIoITMessage;
         private String markdownActivationAppIoMessage;
         private String subjectActivationAppIoMessage;
     }
@@ -77,7 +78,8 @@ public class PnExternalRegistriesConfig {
     @PostConstruct
     public void init(){
         this.appIoTemplate = new AppIoTemplate();
-        this.appIoTemplate.markdownUpgradeAppIoMessage = fetchMessage("markdown_upgrade_app_io_message.md");
+        this.appIoTemplate.markdownUpgradeAppIoITMessage = fetchMessage("markdown_upgrade_app_io_message_IT.md");
+        this.appIoTemplate.markdownUpgradeAppIoENMessage = fetchMessage("markdown_upgrade_app_io_message_EN.md");
         this.appIoTemplate.markdownActivationAppIoMessage = fetchMessage("markdown_activation_app_io_message.md");
         this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");
     }

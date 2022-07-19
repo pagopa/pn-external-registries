@@ -10,8 +10,10 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Limit
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
@@ -86,10 +88,8 @@ public class IOClient extends OcpBaseClient {
         if (!checkWhitelist(payload.getFiscalCode()))
         {
             log.warn("getProfileByPOST taxId is not in whitelist, mocking IO response");
-            LimitedProfile res = new LimitedProfile();
-            res.setSenderAllowed(false);
-            res.setPreferredLanguages(List.of("it"));
-            return Mono.just(res);
+            WebClientResponseException res = WebClientResponseException.create(404, "not found (mocked)", HttpHeaders.EMPTY, new byte[0], null);
+            return Mono.error(res);
         }
 
         return ioApi.getProfileByPOST( payload );
