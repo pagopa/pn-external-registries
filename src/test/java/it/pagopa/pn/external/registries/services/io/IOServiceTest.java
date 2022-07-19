@@ -86,7 +86,7 @@ class IOServiceTest {
         ArgumentCaptor<NewMessage> newMessageCaptor = ArgumentCaptor.forClass(NewMessage.class);
         Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
         NewMessage newMessage = newMessageCaptor.getValue();
-        String ioSubject = messageRequestDto.getSubject() + "-" + messageRequestDto.getSenderDenomination();
+        String ioSubject = messageRequestDto.getSenderDenomination() + " - " + messageRequestDto.getSubject();
         
         Assertions.assertEquals(ioSubject, newMessage.getContent().getSubject());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
@@ -144,7 +144,7 @@ class IOServiceTest {
         ArgumentCaptor<NewMessage> newMessageCaptor = ArgumentCaptor.forClass(NewMessage.class);
         Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
         NewMessage newMessage = newMessageCaptor.getValue();
-        String ioSubject = messageRequestDto.getSubject() + "-" + messageRequestDto.getSenderDenomination();
+        String ioSubject = messageRequestDto.getSenderDenomination() + " - " + messageRequestDto.getSubject();
         String ioSubjectTruncated = ioSubject.substring(0, 120);
 
         Assertions.assertEquals(ioSubjectTruncated, newMessage.getContent().getSubject());
