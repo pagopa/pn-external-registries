@@ -1,1 +1,1 @@
-Notifiche Digitali sta provando a contattarti
+Vuoi ricevere le notifiche digitali?
