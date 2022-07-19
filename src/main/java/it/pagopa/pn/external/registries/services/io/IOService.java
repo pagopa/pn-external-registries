@@ -99,7 +99,9 @@ public class IOService {
                     else
                     {
                         log.info("Not sending because a recent optin has already been sent taxId={} iun={}",  LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
-                        return Mono.empty();
+                        SendMessageResponseDto res = new SendMessageResponseDto();
+                        res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_ALREADY_SENT);
+                        return Mono.just(res);
                     }
                 });
     }
