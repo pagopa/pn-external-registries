@@ -6,6 +6,8 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Limit
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
@@ -17,11 +19,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
 @SpringBootTest
@@ -52,6 +58,90 @@ class IOServiceTest {
         cfg.setEnableIoActivationMessage(true);
 
         service = new SendIOMessageService(ioClient, cfg);*/
+    }
+
+    @Test
+    void getUserStatus() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+
+        UserStatusRequestDto userStatusRequestDto = new UserStatusRequestDto()
+                .taxId("123123123");
+
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        //When
+
+        UserStatusResponseDto responseDto = service.getUserStatus( Mono.just( userStatusRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals(UserStatusResponseDto.StatusEnum.PN_ACTIVE, responseDto.getStatus());
+    }
+
+    @Test
+    void getUserStatusNotActive() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+
+        UserStatusRequestDto userStatusRequestDto = new UserStatusRequestDto()
+                .taxId("123123123");
+
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        //When
+
+        UserStatusResponseDto responseDto = service.getUserStatus( Mono.just( userStatusRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals(UserStatusResponseDto.StatusEnum.PN_NOT_ACTIVE, responseDto.getStatus());
+
+    }
+
+    @Test
+    void getUserStatusAppIONotAvailable() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+
+        UserStatusRequestDto userStatusRequestDto = new UserStatusRequestDto()
+                .taxId("123123123");
+
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.error( new WebClientResponseException(404, "404 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        //When
+
+        UserStatusResponseDto responseDto = service.getUserStatus( Mono.just( userStatusRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals(UserStatusResponseDto.StatusEnum.APPIO_NOT_ACTIVE, responseDto.getStatus());
+
+    }
+
+
+    @Test
+    void getUserStatusAppIOError() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+
+        UserStatusRequestDto userStatusRequestDto = new UserStatusRequestDto()
+                .taxId("123123123");
+
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        //When
+
+        UserStatusResponseDto responseDto = service.getUserStatus( Mono.just( userStatusRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals(UserStatusResponseDto.StatusEnum.ERROR, responseDto.getStatus());
+
     }
 
     @Test
@@ -130,6 +220,8 @@ class IOServiceTest {
                         "1111111111" +
                         "1111111111" +
                         "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
                         "1111111111" )
                 .requestAcceptedDate(OffsetDateTime.now());
         
@@ -196,5 +288,278 @@ class IOServiceTest {
 
     }
 
+
+    @Test
+    void sendIOActivationMessageNotSent() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( cfg.getIoOptinMinDays() ).thenReturn( 100 );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_ALREADY_SENT, responseDto.getResult());
+
+
+    }
+
+
+    @Test
+    void sendIOActivationMessageAppioNotActive() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( cfg.getIoOptinMinDays() ).thenReturn( 100 );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn(Mono.error(new WebClientResponseException(404, "404 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset())));
+        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE, responseDto.getResult());
+
+
+    }
+
+
+    @Test
+    void sendIOActivationMessageAppioError() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( cfg.getIoOptinMinDays() ).thenReturn( 100 );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn(Mono.error(new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset())));
+        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS, responseDto.getResult());
+
+
+    }
+
+
+    @Test
+    void sendIOActivationMessageMessageError() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .subject("subject 123 123 123 123 123")
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.EPOCH);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.ERROR_COURTESY, responseDto.getResult());
+
+
+    }
+
+    @Test
+    void sendIOActivationMessageMessageDisabled() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .subject("subject 123 123 123 123 123")
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.EPOCH);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.isEnableIoMessage() ).thenReturn( false );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_COURTESY_DISABLED_BY_CONF, responseDto.getResult());
+
+
+    }
+
+
+    @Test
+    void sendIOActivationMessageMessageActivationError() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.EPOCH);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.ERROR_OPTIN, responseDto.getResult());
+
+
+    }
+
+
+    @Test
+    void sendIOActivationMessageMessageActivationDisabled() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" );
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.EPOCH);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( false );
+        Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_DISABLED_BY_CONF, responseDto.getResult());
+
+
+    }
 
 }
