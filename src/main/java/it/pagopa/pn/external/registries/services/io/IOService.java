@@ -189,7 +189,7 @@ public class IOService {
                     res.setId(r.getId());
                     return res;
                 }).onErrorResume( exception ->{
-                        log.error( "Error in submitActivationMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
+                        log.error( "Error in submitActivationMessageforUserWithFiscalCodeInBody iun={}", sendMessageRequestDto.getIun());
                         SendMessageResponseDto res = new SendMessageResponseDto();
                         res.setResult(SendMessageResponseDto.ResultEnum.ERROR_OPTIN);
                         return Mono.just(res);
