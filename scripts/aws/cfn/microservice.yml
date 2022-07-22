@@ -83,10 +83,6 @@ Parameters:
     Type: String
     Description: 'ARN of dynamodb table containing OptInSent information'
 
-  IoWhiteList:
-    Type: String
-    Description: 'Lista di CF validi per IO. Se vale * si intende tutti'
-
   PortalUrl:
     Type: String
     Description: 'Url del portale della da inserire negli avvisi a IO'
@@ -107,14 +103,14 @@ Resources:
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
         ContainerEnvEntry2: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
         ContainerEnvEntry3: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_BASE_URL=${CheckoutBaseUrl}'
-        ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:CheckoutApiKey}}'
-        ContainerEnvEntry5: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:IoApiKey}}'
-        ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:IoActApiKey}}'
+        ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:CheckoutApiKey}}'
+        ContainerEnvEntry5: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoApiKey}}'
+        ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoActApiKey}}'
         ContainerEnvEntry7: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
         ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
-        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:SelfcareUsergroupApiKey}}'
+        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:SelfcareUsergroupApiKey}}'
         ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_OPT_IN=${OptInSentTableName}'
-        ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=${IoWhiteList}'
+        ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoWhiteList}}'
         ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/faq.html'
         ContainerEnvEntry13: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
