@@ -94,7 +94,7 @@ public class IOService {
                 .flatMap(lastSendDate -> {
                     if (lastSendDate.isBefore(Instant.now().minus(cfg.getIoOptinMinDays(), ChronoUnit.DAYS)))
                         return sendIOOptInMessage(sendMessageRequestDto)
-                                .zipWhen(r -> optInSentDao.save(new OptInSentEntity(hashedTaxId)),
+                                .zipWhen(r -> optInSentDao.save(new OptInSentEntity(hashedTaxId)).thenReturn(new Object()),
                                         (resp, nd) -> resp);
                     else
                     {
@@ -173,7 +173,7 @@ public class IOService {
             log.info( "Proceeding with send activation message taxId={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()));
 
             MessageContent content = new MessageContent();
-            content.setMarkdown( cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() );
+            content.setMarkdown( composeFinalMarkdown(cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() ));
             content.setSubject(cfg.getAppIoTemplate().getSubjectActivationAppIoMessage());
 
             NewMessage m = new NewMessage();
@@ -243,6 +243,14 @@ public class IOService {
                         .map(userStatusResponseInternal -> new UserStatusResponseDto()
                                 .taxId(userStatusResponseInternal.getTaxId())
                                 .status( UserStatusResponseDto.StatusEnum.fromValue(userStatusResponseInternal.getStatus().getValue())));
+    }
+
+    private String composeFinalMarkdown(String markdown)
+    {
+        // per ora si fa una semplice sostituzione cablata sui nomi delle variabili
+        return markdown
+                .replace("${piattaformaNotificheURLTOS}", cfg.getPiattaformanotificheurlTos())
+                .replace("${piattaformaNotificheURLPrivacy}", cfg.getPiattaformanotificheurlPrivacy());
     }
 
     private boolean isPreferredLanguageIT(List<String> preferredLanguages)

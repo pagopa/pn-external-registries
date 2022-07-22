@@ -87,6 +87,10 @@ Parameters:
     Type: String
     Description: 'Lista di CF validi per IO. Se vale * si intende tutti'
 
+  PortalUrl:
+    Type: String
+    Description: 'Url del portale della da inserire negli avvisi a IO'
+
 Resources:
 
   # PN-External-Registry microservice
@@ -111,6 +115,8 @@ Resources:
         ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Apikey:SecretString:SelfcareUsergroupApiKey}}'
         ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_OPT_IN=${OptInSentTableName}'
         ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=${IoWhiteList}'
+        ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/faq.html'
+        ContainerEnvEntry13: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
