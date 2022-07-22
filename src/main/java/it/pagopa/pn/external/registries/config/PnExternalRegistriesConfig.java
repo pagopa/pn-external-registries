@@ -62,6 +62,9 @@ public class PnExternalRegistriesConfig {
 
     private String dynamodbTableNameOptIn;
 
+    private String piattaformanotificheurlTos;
+    private String piattaformanotificheurlPrivacy;
+
     private AppIoTemplate appIoTemplate;
 
     private int ioOptinMinDays;
@@ -72,6 +75,7 @@ public class PnExternalRegistriesConfig {
         private String markdownUpgradeAppIoITMessage;
         private String markdownActivationAppIoMessage;
         private String subjectActivationAppIoMessage;
+
     }
 
 

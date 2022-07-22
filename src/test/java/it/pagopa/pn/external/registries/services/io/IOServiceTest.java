@@ -6,6 +6,8 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Limit
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
+import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
+import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,9 @@ class IOServiceTest {
 
     @Mock
     IOClient ioClient;
+
+    @Mock
+    OptInSentDao optInSentDao;
 
     @Mock
     PnExternalRegistriesConfig cfg;
@@ -89,6 +94,7 @@ class IOServiceTest {
         String ioSubject = messageRequestDto.getSubject();
         
         Assertions.assertEquals(ioSubject, newMessage.getContent().getSubject());
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
@@ -148,6 +154,7 @@ class IOServiceTest {
         String ioSubjectTruncated = ioSubject.substring(0, 120);
 
         Assertions.assertEquals(ioSubjectTruncated, newMessage.getContent().getSubject());
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
     }
@@ -155,8 +162,8 @@ class IOServiceTest {
     @Test
     void sendIOActivationMessageSuccess() {
         //Given
-/*        LimitedProfile limitedProfile = new LimitedProfile()
-                .senderAllowed( true )
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
                 .preferredLanguages(Collections.singletonList( "IT-It" ));
         CreatedMessage createdMessage = new CreatedMessage()
                 .id( "createdMessageId" );
@@ -165,17 +172,26 @@ class IOServiceTest {
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        OptInSentEntity optInSentEntity = new OptInSentEntity("123");
+        optInSentEntity.setLastModified(Instant.EPOCH);
 
         //When
         Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
+        Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
         //Then
-        Assertions.assertNotNull( responseDto );*/
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_OPTIN, responseDto.getResult());
 
 
     }
