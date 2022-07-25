@@ -108,7 +108,7 @@ Resources:
         ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoActApiKey}}'
         ContainerEnvEntry7: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList:1}}'
         ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
-        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:SelfcareUsergroupApiKey}}'
+        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:SelfCareApiKey}}'
         ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_OPT_IN=${OptInSentTableName}'
         ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoWhiteList}}'
         ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/faq.html'
