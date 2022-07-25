@@ -12,7 +12,7 @@ Ciao,
 
 da oggi potrai ricevere direttamente in app le raccomandate che di solito ti vengono inviate in cartaceo!
 
-##Quali sono i vantaggi?
+## Quali sono i vantaggi?
 
 - **Niente più raccomandate di carta:** le comunicazioni importanti diventano immediate e digitali;
 
