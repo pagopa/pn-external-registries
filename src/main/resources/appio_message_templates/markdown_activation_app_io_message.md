@@ -24,10 +24,10 @@ da oggi potrai ricevere direttamente in app le raccomandate che di solito ti ven
 
 - **Risparmia spazio**: non servirà più conservare i documenti stampati.
 
-##Cos'è una notifica?
+## Cos'è una notifica?
 Una notifica è una **comunicazione a valore legale**, emessa in via ufficiale da un'amministrazione. Confermare la lettura in app di un messaggio inviato dal servizio “Avvisi di cortesia” di Piattaforma Notifiche equivale a firmare la ricevuta di ritorno di una raccomandata tradizionale.
 
-##Perché dovrei attivare il servizio?
+## Perché dovrei attivare il servizio?
 Perché IO è integrata a Piattaforma Notifiche e, tramite il servizio “Avvisi di cortesia”, ti invierà un messaggio ogni volta che ricevi una notifica. Potrai leggerla, visualizzare gli allegati e pagare eventuali spese direttamente in app.
 Se la leggi subito, inoltre, non riceverai a casa la raccomandata carteacea e risparmierai sui costi di spedizione.
 
