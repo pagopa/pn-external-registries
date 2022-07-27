@@ -83,6 +83,10 @@ components:
           description: Amount for required payment in eurocents
           example: 1200
           type: integer
+        url:
+          description: Checkout base url used for check payment info
+          example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+          type: string
     PaymentStatus:
       title: Payment status
       example: 'REQUIRED'

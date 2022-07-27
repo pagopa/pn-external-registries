@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.DetailDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
@@ -18,9 +19,11 @@ import reactor.core.publisher.Mono;
 public class InfoPaymentService {
     public static final String MSG = "Unable to map response from checkout to paymentInfoDto";
     private final CheckoutClient checkoutClient;
+    private final PnExternalRegistriesConfig config;
 
-    public InfoPaymentService(CheckoutClient checkoutClient) {
+    public InfoPaymentService(CheckoutClient checkoutClient, PnExternalRegistriesConfig config) {
         this.checkoutClient = checkoutClient;
+        this.config = config;
     }
 
     public Mono<PaymentInfoDto> getPaymentInfo(String paymentId) {
@@ -28,7 +31,8 @@ public class InfoPaymentService {
         return checkoutClient.getPaymentInfo(paymentId)
                 .map(r -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
-                    .amount( r.getImportoSingoloVersamento() ))
+                    .amount( r.getImportoSingoloVersamento() )
+                    .url( config.getCheckoutBaseUrl() ))
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
