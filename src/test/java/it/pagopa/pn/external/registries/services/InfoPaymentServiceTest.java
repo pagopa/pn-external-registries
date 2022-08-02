@@ -23,7 +23,7 @@ import java.time.Duration;
 @SpringBootTest
 class InfoPaymentServiceTest {
 
-    private final String CHECKOUT_BASE_URL = "https://api.uat.platform.pagopa.it/checkout/auth/payments/v2";
+    private final String CHECKOUT_SITE_URL = "https://uat.checkout.pagopa.it";
 
     @InjectMocks
     private InfoPaymentService service;
@@ -70,13 +70,13 @@ class InfoPaymentServiceTest {
 
         //When
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
-        Mockito.when( config.getCheckoutBaseUrl() ).thenReturn( CHECKOUT_BASE_URL );
+        Mockito.when( config.getCheckoutSiteUrl() ).thenReturn(CHECKOUT_SITE_URL);
         PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id" ).block();
 
         //Then
         Assertions.assertNotNull( result );
         Assertions.assertEquals( PaymentStatusDto.REQUIRED , result.getStatus() );
-        Assertions.assertEquals( CHECKOUT_BASE_URL, result.getUrl() );
+        Assertions.assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
     }
 
 }

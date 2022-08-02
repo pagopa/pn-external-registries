@@ -32,7 +32,7 @@ public class InfoPaymentService {
                 .map(r -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
                     .amount( r.getImportoSingoloVersamento() )
-                    .url( config.getCheckoutBaseUrl() ))
+                    .url( config.getCheckoutSiteUrl() ))
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
@@ -50,7 +50,7 @@ public class InfoPaymentService {
     private Mono<PaymentInfoDto> fromCheckoutGWTimeoutToPn(String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
-        PartyTimeoutFaultPaymentProblemJsonDto result = null;
+        PartyTimeoutFaultPaymentProblemJsonDto result;
         PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
         try {
             result = objectMapper.readValue( checkoutResult, PartyTimeoutFaultPaymentProblemJsonDto.class );
@@ -71,7 +71,7 @@ public class InfoPaymentService {
     private Mono<PaymentInfoDto> fromCheckoutServiceUnavToPn(String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
-        PartyConfigurationFaultPaymentProblemJsonDto result = null;
+        PartyConfigurationFaultPaymentProblemJsonDto result;
         PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
         try {
             result = objectMapper.readValue( checkoutResult, PartyConfigurationFaultPaymentProblemJsonDto.class );
@@ -92,7 +92,7 @@ public class InfoPaymentService {
     private Mono<PaymentInfoDto> fromCheckoutBadGatewayToPn(String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
-        GatewayFaultPaymentProblemJsonDto result = null;
+        GatewayFaultPaymentProblemJsonDto result;
         PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
         try {
             result = objectMapper.readValue( checkoutResult, GatewayFaultPaymentProblemJsonDto.class );
@@ -113,7 +113,7 @@ public class InfoPaymentService {
     private Mono<PaymentInfoDto> fromCheckoutConflictToPn(String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentStatusFaultPaymentProblemJsonDto result = null;
+        PaymentStatusFaultPaymentProblemJsonDto result;
         PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
         try {
             result = objectMapper.readValue( checkoutResult, PaymentStatusFaultPaymentProblemJsonDto.class );
@@ -134,7 +134,7 @@ public class InfoPaymentService {
     private Mono<PaymentInfoDto> fromCheckoutNotFoundToPn(String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
-        ValidationFaultPaymentProblemJsonDto result = null;
+        ValidationFaultPaymentProblemJsonDto result;
         PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
         try {
             result = objectMapper.readValue( checkoutResult, ValidationFaultPaymentProblemJsonDto.class );
