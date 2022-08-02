@@ -38,7 +38,8 @@ public class PnExternalRegistriesConfig {
     private String anprJWTHeaderDigestKeystoreAlias;
 
     private String checkoutApiKey;
-    private String checkoutBaseUrl;
+    private String checkoutApiBaseUrl;
+    private String checkoutSiteUrl;
 
     private String ioApiKey;
     private String ioactApiKey;
