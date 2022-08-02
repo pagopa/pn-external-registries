@@ -23,9 +23,13 @@ Parameters:
     Type: String
     Description: 'Comma separated list of domains allowed to make cross origin request'
 
-  CheckoutBaseUrl:
+  CheckoutApiBaseUrl:
     Type: String
     Description: 'Checkout endpoint base url'
+
+  CheckoutSiteUrl:
+   Type: String
+   Description: 'Checkout site url'
 
   SelfcareUsergroupBaseUrl:
     Type: String
