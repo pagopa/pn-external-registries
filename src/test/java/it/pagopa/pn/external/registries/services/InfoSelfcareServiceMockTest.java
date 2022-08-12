@@ -2,7 +2,8 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.dto.UserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
@@ -135,7 +136,10 @@ class InfoSelfcareServiceMockTest {
         List<UserGroupResourceDto> list = new ArrayList<>();
         list.add(inst);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(list);
+
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
         List<PaGroupDto> res = service.getGroups(id,id,null, null).collectList().block();
@@ -163,8 +167,10 @@ class InfoSelfcareServiceMockTest {
         inst2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst2);
 
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
         List<PaGroupDto> res = service.getGroups(id,id,List.of(id), null).collectList().block();
@@ -199,8 +205,10 @@ class InfoSelfcareServiceMockTest {
         inst3.setStatus(UserGroupResourceDto.StatusEnum.SUSPENDED);
         list.add(inst3);
 
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Flux.fromIterable(list));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
         List<PaGroupDto> res = service.getGroups(id,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block();

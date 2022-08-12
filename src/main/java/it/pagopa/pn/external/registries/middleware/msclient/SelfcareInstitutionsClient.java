@@ -4,8 +4,9 @@ import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.api.InstitutionsApi;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.institutions.client.v1.dto.InstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api.InstitutionsApi;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import reactor.util.retry.Retry;
 import javax.annotation.PostConstruct;
 import java.net.ConnectException;
 import java.time.Duration;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -44,9 +46,9 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
     }
 
     // TODO: implementare quando ci saranno le API corrette. I metodi dovrebbero essere cmq questi
-    public Mono<InstitutionResourceDto> getInstitution(String institutionId) throws WebClientResponseException {
+    public Mono<InstitutionDto> getInstitution(String institutionId) throws WebClientResponseException {
 
-        return institutionsApi.getInstitutionUsingGET(institutionId)
+        return institutionsApi.getInstitution(UUID.fromString(institutionId), config.getSelfcareinstitutionsApiKey())
                 .retryWhen(
                         Retry.backoff(2, Duration.ofMillis(25))
                                 .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
@@ -63,7 +65,7 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
 
     public Flux<InstitutionResourceDto> getInstitutions() throws WebClientResponseException {
 
-        return institutionsApi.getInstitutionsUsingGET()
+        return institutionsApi.getInstitutionsUsingGET(config.getSelfcareinstitutionsPnProductId(), config.getSelfcareinstitutionsApiKey())
                 .retryWhen(
                         Retry.backoff(2, Duration.ofMillis(25))
                                 .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
