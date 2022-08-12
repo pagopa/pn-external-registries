@@ -3,9 +3,10 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.api.UserGroupApi;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.dto.UserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.ApiClient;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api.UserGroupApi;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -45,8 +46,8 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
                 .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareusergroupUid());
     }
 
-    public Flux<UserGroupResourceDto> getUserGroups(String institutionId) {
-        return userGroupsApi.getUserGroupsUsingGET(institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null)
+    public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
+        return userGroupsApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null, null)
                 .retryWhen(
                         Retry.backoff(2, Duration.ofMillis(25))
                                 .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)

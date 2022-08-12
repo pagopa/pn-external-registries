@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.exceptions.PnException;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,6 +59,8 @@ public class InfoSelfcareService {
     public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter) {
         log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
         return selfcareUserGroupClient.getUserGroups(xPagopaPnCxId)
+                .map(PageOfUserGroupResourceDto::getContent)
+                .flatMapMany(Flux::fromIterable)
                 .filter(grp -> statusFilter == null || statusFilter.getValue().equals(grp.getStatus().getValue()))
                 .filter(grp -> xPagopaPnCxGroups == null || xPagopaPnCxGroups.isEmpty()
                         || xPagopaPnCxGroups.contains(grp.getId()))
