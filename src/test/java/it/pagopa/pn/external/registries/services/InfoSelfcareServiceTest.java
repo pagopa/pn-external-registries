@@ -137,6 +137,7 @@ class InfoSelfcareServiceTest {
     void getGroups() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        String uid = "f0bcd468-d853-4c64-bfb1-3e47b52455f1";
         UserGroupResourceDto inst = new UserGroupResourceDto();
         inst.setId(id);
         inst.setName("gruppo1");
@@ -149,10 +150,10 @@ class InfoSelfcareServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id,uid)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,null, null).collectList().block();
+        List<PaGroupDto> res = service.getGroups(uid,id,null, null).collectList().block();
 
 
         //THEN
@@ -164,6 +165,7 @@ class InfoSelfcareServiceTest {
     void getGroupsFiltered() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        String uid = "f0bcd468-d853-4c64-bfb1-3e47b52455f1";
         List<UserGroupResourceDto> list = new ArrayList<>();
         UserGroupResourceDto inst1 = new UserGroupResourceDto();
         inst1.setId(id);
@@ -180,10 +182,10 @@ class InfoSelfcareServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id,uid)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id), null).collectList().block();
+        List<PaGroupDto> res = service.getGroups(uid,id,List.of(id), null).collectList().block();
 
 
         //THEN
@@ -197,6 +199,7 @@ class InfoSelfcareServiceTest {
     void getGroupsFilteredActive() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        String uid = "f0bcd468-d853-4c64-bfb1-3e47b52455f1";
         List<UserGroupResourceDto> list = new ArrayList<>();
         UserGroupResourceDto inst1 = new UserGroupResourceDto();
         inst1.setId(id);
@@ -219,10 +222,10 @@ class InfoSelfcareServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        Mockito.when(selfcareUserGroupClient.getUserGroups(id,uid)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block();
+        List<PaGroupDto> res = service.getGroups(uid,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block();
 
 
         //THEN

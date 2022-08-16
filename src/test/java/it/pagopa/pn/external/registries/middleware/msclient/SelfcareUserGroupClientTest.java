@@ -84,7 +84,7 @@ class SelfcareUserGroupClientTest {
                         .withStatusCode(200));
 
         //When
-        PageOfUserGroupResourceDto response = client.getUserGroups("77777777777302000100000019421").block();
+        PageOfUserGroupResourceDto response = client.getUserGroups("77777777777302000100000019421", "f0bcd468-d853-4c64-bfb1-3e47b52455f1").block();
 
         //Then
         Assertions.assertNotNull( response );

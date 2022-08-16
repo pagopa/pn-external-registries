@@ -46,8 +46,8 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
                 .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareusergroupUid());
     }
 
-    public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
-        return userGroupsApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null, null)
+    public Mono<PageOfUserGroupResourceDto> getUserGroups(String userId, String institutionId) {
+        return userGroupsApi.getUserGroupsUsingGET(userId, institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null, null)
                 .retryWhen(
                         Retry.backoff(2, Duration.ofMillis(25))
                                 .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)

@@ -58,7 +58,7 @@ public class InfoSelfcareService {
 
     public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter) {
         log.info("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
-        return selfcareUserGroupClient.getUserGroups(xPagopaPnCxId)
+        return selfcareUserGroupClient.getUserGroups(xPagopaPnCxId, xPagopaPnUid)
                 .map(PageOfUserGroupResourceDto::getContent)
                 .flatMapMany(Flux::fromIterable)
                 .filter(grp -> statusFilter == null || statusFilter.getValue().equals(grp.getStatus().getValue()))
