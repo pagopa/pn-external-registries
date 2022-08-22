@@ -56,7 +56,6 @@ public class InfoPaController implements InfoPaApi {
     public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, List<String> ids, ServerWebExchange exchange) {
         log.debug("listOnboardedPa - paNameFilter={} ids={}", paNameFilter, ids);
         if( ids == null || ids.isEmpty() ) {
-
             return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.listOnboardedPaByName(paNameFilter)));
         }
         else {
