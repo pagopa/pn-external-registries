@@ -33,8 +33,6 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
 
     @PostConstruct
     public void init() {
-
-
         ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
         apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
         this.userGroupsApi = new UserGroupApi( apiClient );

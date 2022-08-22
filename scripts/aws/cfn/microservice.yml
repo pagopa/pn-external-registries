@@ -35,6 +35,10 @@ Parameters:
     Type: String
     Description: 'Selfcare endpoint base url'
 
+  SelfcareUsergroupPnProductId:
+    Type: String
+    Description: 'Selfcare product id'
+
   ContainerImageUri:
     Type: String
     Description: 'Exact container image URI with full repository and image digest'
@@ -118,6 +122,7 @@ Resources:
         ContainerEnvEntry13: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoWhiteList}}'
         ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/faq.html'
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
+        ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
