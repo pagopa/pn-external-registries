@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @Slf4j
-public class InfoDomicileController implements InfoDomicileApi {
+public class InfoDomicileController implements InfoDomicileApi { 
 
     private final InfoDomicilieImpl infoDomicilie;
 
@@ -59,3 +59,4 @@ public class InfoDomicileController implements InfoDomicileApi {
                 .map(m -> ResponseEntity.ok().body(m));
     }
 }
+
