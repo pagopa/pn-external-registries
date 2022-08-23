@@ -63,7 +63,7 @@ public class InfoPaymentService {
                 log.error(MSG);
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error(MSG, e);
         }
         return Mono.just( paymentInfoDto );
     }
@@ -84,7 +84,7 @@ public class InfoPaymentService {
                 log.error( MSG );
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error(MSG, e);
         }
         return Mono.just( paymentInfoDto );
     }
@@ -105,7 +105,7 @@ public class InfoPaymentService {
                 log.error( MSG );
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error(MSG, e);
         }
         return Mono.just( paymentInfoDto );
     }
@@ -126,7 +126,7 @@ public class InfoPaymentService {
                 log.error( MSG );
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error(MSG, e);
         }
         return Mono.just( paymentInfoDto );
     }
@@ -147,7 +147,7 @@ public class InfoPaymentService {
                 log.error( MSG );
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error(MSG, e);
         }
         return Mono.just( paymentInfoDto );
     }
