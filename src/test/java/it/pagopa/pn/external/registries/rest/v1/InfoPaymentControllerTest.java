@@ -26,6 +26,7 @@ class InfoPaymentControllerTest {
         PaymentInfoDto dto = new PaymentInfoDto();
         dto.setStatus( PaymentStatusDto.SUCCEEDED );
         dto.setAmount( 20 );
+        dto.setUrl( "https://api.uat.platform.pagopa.it/checkout/auth/payments/v2" );
 
         String url = "/ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}"
                 .replace( "{paTaxId}", "77777777777" )

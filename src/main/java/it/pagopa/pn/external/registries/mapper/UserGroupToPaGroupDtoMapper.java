@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.mapper;
 
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.usergroup.client.v1.dto.UserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import org.springframework.stereotype.Component;

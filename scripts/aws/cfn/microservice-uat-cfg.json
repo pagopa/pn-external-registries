@@ -1,7 +1,9 @@
 {
   "Parameters" : {
-    "CheckoutBaseUrl": "https://api.uat.platform.pagopa.it/checkout/auth/payments/v2",
-    "SelfcareUsergroupBaseUrl": "https://api.dev.selfcare.pagopa.it/external/",
-    "PortalUrl": "https://portale-develop.fe.dev.pn.pagopa.it"
+    "CheckoutApiBaseUrl": "https://api.uat.platform.pagopa.it/checkout/auth/payments/v2",
+    "CheckoutSiteUrl": "https://uat.checkout.pagopa.it",
+    "SelfcareUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/v1",
+    "PortalUrl": "https://portale-login.uat.pn.pagopa.it",
+    "SelfcareUsergroupPnProductId": "prod-pn-uat"
   }
 }

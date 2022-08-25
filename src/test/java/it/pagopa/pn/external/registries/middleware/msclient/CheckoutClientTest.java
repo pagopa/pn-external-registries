@@ -26,7 +26,7 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.external-registry.checkout-base-url=http://localhost:9999",
+        "pn.external-registry.checkout-api-base-url=http://localhost:9999",
         "pn.external-registry.checkout-api-key=fake_api_key"
 })
 class CheckoutClientTest {
