@@ -236,7 +236,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-ExternalRegistry-web'
         WAFRuleVendors: "AWS, AWS, AWS, AWS"
         WAFRuleNames: "AWSManagedRulesBotControlRuleSet, AWSManagedRulesKnownBadInputsRuleSet, AWSManagedRulesAdminProtectionRuleSet, AWSManagedRulesCommonRuleSet"
-        APIGatewayARN: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
+        APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
 
   # Expose PN-ExternalRegistry microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -260,4 +260,4 @@ Resources:
         WAFName: !Sub '${ProjectName}-ExternalRegistry-b2b'
         WAFRuleVendors: "AWS,AWS,AWS"
         WAFRuleNames: "AWSManagedRulesKnownBadInputsRuleSet,AWSManagedRulesAdminProtectionRuleSet,AWSManagedRulesCommonRuleSet"
-        APIGatewayARN: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+        APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
