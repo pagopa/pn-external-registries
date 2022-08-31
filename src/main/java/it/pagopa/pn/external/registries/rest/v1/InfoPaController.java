@@ -26,7 +26,6 @@ public class InfoPaController implements InfoPaApi {
         this.infoSelfcareService = infoSelfcareService;
     }
 
-
     /**
      * GET /ext-registry-private/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
      * Used by the Notification detail page
