@@ -1,17 +1,15 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
+import it.pagopa.pn.external.registries.exceptions.PnAnalogDomicileNotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnDigitalDomicileNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.RecipientTypeDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -55,7 +53,7 @@ class InfoDomicilieImplTest {
 
 
         // WHEN
-        assertThrows(NotFoundException.class, () -> service.getOneAnalogDomicile(RecipientTypeDto.PF, id));
+        assertThrows(PnAnalogDomicileNotFoundException.class, () -> service.getOneAnalogDomicile(RecipientTypeDto.PF, id));
         //THEN
     }
 
@@ -81,7 +79,7 @@ class InfoDomicilieImplTest {
 
 
         // WHEN
-        assertThrows(NotFoundException.class, () -> service.getOneDigitalDomicile(RecipientTypeDto.PF, id));
+        assertThrows(PnDigitalDomicileNotFoundException.class, () -> service.getOneDigitalDomicile(RecipientTypeDto.PF, id));
         //THEN
     }
 }

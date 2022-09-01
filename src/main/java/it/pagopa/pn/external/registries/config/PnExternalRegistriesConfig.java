@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.config;
 
 import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_BADCONFIGURATION_MISSING_TEMPLATE;
 
 
 @Configuration
@@ -94,7 +96,7 @@ public class PnExternalRegistriesConfig {
             return IOUtils.toString(in, StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             log.error("cannot load message from resources", e);
-            throw new InternalErrorException();
+            throw new PnInternalException("cannot load template ", ERROR_CODE_BADCONFIGURATION_MISSING_TEMPLATE);
         }
     }
 
