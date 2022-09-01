@@ -30,11 +30,11 @@ public class InfoInternalPaController implements InternalOnlyApi {
      *         or Internal Server Error (status code 500)
      */
     @Override
-    public Mono<ResponseEntity<Flux<PaGroupDto>>> getAllGroupsPrivate(String internalPaId, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
-        log.debug("getAllGroups internalPaId={}", internalPaId);
+    public Mono<ResponseEntity<Flux<PaGroupDto>>> getAllGroupsPrivate(String institutionId, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
+        log.debug("getAllGroups institutionId={}", institutionId);
         // first argument is the id of the current user logged in -> because we need the all groups independently from the user, it is passed as null
         // second argument is the id of the current PA
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getGroups(null, internalPaId, null, statusFilter)));
+        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getGroups(null, institutionId, null, statusFilter)));
     }
 
 }
