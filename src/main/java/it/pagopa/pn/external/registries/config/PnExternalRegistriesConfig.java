@@ -67,6 +67,7 @@ public class PnExternalRegistriesConfig {
     private String piattaformanotificheurlPrivacy;
 
     private AppIoTemplate appIoTemplate;
+    private Topics topics;
 
     private int ioOptinMinDays;
 
@@ -79,6 +80,10 @@ public class PnExternalRegistriesConfig {
 
     }
 
+    @Data
+    public static class Topics {
+        private String deliveryPushInput;
+    }
 
     @PostConstruct
     public void init(){

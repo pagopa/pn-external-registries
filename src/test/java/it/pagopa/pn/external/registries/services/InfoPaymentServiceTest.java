@@ -55,7 +55,7 @@ class InfoPaymentServiceTest {
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
 
-        PaymentInfoDto result = service.getPaymentInfo( "asdasda" ).block(Duration.ofMillis( 3000 ));
+        PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
 
         Assertions.assertNotNull( result );
         Assertions.assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
@@ -71,7 +71,7 @@ class InfoPaymentServiceTest {
         //When
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
         Mockito.when( config.getCheckoutSiteUrl() ).thenReturn(CHECKOUT_SITE_URL);
-        PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id" ).block();
+        PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id", "fakeNoticeNumber" ).block();
 
         //Then
         Assertions.assertNotNull( result );

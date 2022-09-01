@@ -33,7 +33,7 @@ class InfoPaymentControllerTest {
                 .replace( "{noticeNumber}", "302000100000019421" );
 
         //When
-        Mockito.when( service.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.just( dto ) );
+        Mockito.when( service.getPaymentInfo( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.just( dto ) );
 
         //Then
         webTestClient.get()

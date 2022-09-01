@@ -14,25 +14,37 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+
 @Service
 @Slf4j
 public class InfoPaymentService {
     public static final String MSG = "Unable to map response from checkout to paymentInfoDto";
     private final CheckoutClient checkoutClient;
     private final PnExternalRegistriesConfig config;
+    private final SendPaymentNotificationService sendPaymentNotificationService;
 
-    public InfoPaymentService(CheckoutClient checkoutClient, PnExternalRegistriesConfig config) {
+    public InfoPaymentService(CheckoutClient checkoutClient, PnExternalRegistriesConfig config,
+                              SendPaymentNotificationService sendPaymentNotificationService) {
         this.checkoutClient = checkoutClient;
         this.config = config;
+        this.sendPaymentNotificationService = sendPaymentNotificationService;
     }
 
-    public Mono<PaymentInfoDto> getPaymentInfo(String paymentId) {
+    public Mono<PaymentInfoDto> getPaymentInfo(String paTaxId, String noticeNumber) {
+        String paymentId = paTaxId + noticeNumber;
+        
         log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
-                .map(r -> new PaymentInfoDto()
+                .zipWhen( paymentInfoResponse-> {
+                    return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber, Instant.now());
+                            
+                }, (paymentInfoResponse0, s0)  -> paymentInfoResponse0)
+                .map(paymentInfoResponse0 -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
-                    .amount( r.getImportoSingoloVersamento() )
-                    .url( config.getCheckoutSiteUrl() ))
+                    .amount( paymentInfoResponse0.getImportoSingoloVersamento() )
+                    .url( config.getCheckoutSiteUrl() )
+                )
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
