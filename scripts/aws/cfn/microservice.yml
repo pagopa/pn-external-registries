@@ -261,3 +261,41 @@ Resources:
         WAFRuleVendors: "AWS,AWS,AWS"
         WAFRuleNames: "AWSManagedRulesKnownBadInputsRuleSet,AWSManagedRulesAdminProtectionRuleSet,AWSManagedRulesCommonRuleSet"
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+  # PN-External-Registry public api
+  ExternalRegistryPublicB2BPaResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ParentId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RootResourceId
+      PathPart: pa
+  ExternalRegistryPublicB2BV1Resource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ParentId: !Ref ExternalRegistryPublicB2BPaResource
+      PathPart: v1
+  ExternalRegistryPublicB2BGroupsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ParentId: !Ref ExternalRegistryPublicB2BV1Resource
+      PathPart: groups
+
+  ExternalRegistryPublicB2BGroupsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub 'Proxy to ${MicroServiceUniqueName} public groups API'
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ResourceId: !Ref ExternalRegistryPublicB2BGroupsResource
+      HttpMethod: GET
+      ApiKeyRequired: true
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.AuthorizerARN
+      Integration:
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref NetworkLoadBalancerLink
+        IntegrationHttpMethod: GET
+        Type: HTTP_PROXY
+        Uri: !Sub 'http://${ApplicationLoadBalancerDomain}:8080/${ServiceApiPath}/pa/v1/groups'
+        PassthroughBehavior: "WHEN_NO_MATCH"
+        TimeoutInMillis: 29000
