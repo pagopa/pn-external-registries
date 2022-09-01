@@ -284,7 +284,7 @@ Resources:
   ExternalRegistryPublicB2BGroupsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
-      OperationName: !Sub 'Proxy to ${MicroServiceUniqueName} public groups API'
+      OperationName: !Sub 'Proxy to ${ProjectName}-ExternalRegistry public groups API'
       RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
       ResourceId: !Ref ExternalRegistryPublicB2BGroupsResource
       HttpMethod: GET
@@ -296,6 +296,6 @@ Resources:
         ConnectionId: !Ref NetworkLoadBalancerLink
         IntegrationHttpMethod: GET
         Type: HTTP_PROXY
-        Uri: !Sub 'http://${ApplicationLoadBalancerDomain}:8080/${ServiceApiPath}/pa/v1/groups'
+        Uri: !Sub 'http://${ApplicationLoadBalancerDomain}:8080/ext-registry-b2b/pa/v1/groups'
         PassthroughBehavior: "WHEN_NO_MATCH"
         TimeoutInMillis: 29000
