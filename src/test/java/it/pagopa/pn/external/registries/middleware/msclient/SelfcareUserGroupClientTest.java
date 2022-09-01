@@ -51,7 +51,6 @@ class SelfcareUserGroupClientTest {
         mockServer.stop();
     }
 
-
     @Test
     void getUserGroups() {
 

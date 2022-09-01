@@ -26,7 +26,6 @@ public class InfoPaController implements InfoPaApi {
         this.infoSelfcareService = infoSelfcareService;
     }
 
-
     /**
      * GET /ext-registry-private/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
      * Used by the Notification detail page
@@ -63,7 +62,14 @@ public class InfoPaController implements InfoPaApi {
         }
     }
 
-
+    /**
+     * GET /ext-registry/pa/v1/groups : Retrieve the groups defined in Self Care of the current user
+     * Used by the new notification page
+     *
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
     @Override
     public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
         log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);

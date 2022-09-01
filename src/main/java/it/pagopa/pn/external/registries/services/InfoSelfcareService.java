@@ -66,5 +66,4 @@ public class InfoSelfcareService {
                         || xPagopaPnCxGroups.contains(grp.getId()))
                 .map(UserGroupToPaGroupDtoMapper::toDto);
     }
-
 }
