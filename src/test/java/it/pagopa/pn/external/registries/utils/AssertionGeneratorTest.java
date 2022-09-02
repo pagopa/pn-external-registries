@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
         "pn.external-registry.pdnd-m2m.grant-type=client_credentials",
         "pn.external-registry.pdnd-m2m.client-id=43ce03cd-30ae-4e79-be48-dbb40207e3e1",
 
-        "aws.region-code=eu-central-1",
+        "aws.region-code=us-east-1",
         "aws.profile-name=default",
-        "aws.endpoint-url",
+        "aws.endpoint-url=http://localhost:4566",
 })
 class AssertionGeneratorTest {
 

@@ -36,10 +36,10 @@ public class InfoPaymentService {
         
         log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
-                .zipWhen( paymentInfoResponse-> {
-                    return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber, Instant.now());
-                            
-                }, (paymentInfoResponse0, s0)  -> paymentInfoResponse0)
+                .zipWhen( paymentInfoResponse ->
+                        sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber, Instant.now())
+                                .thenReturn( new Object() )
+                        , (paymentInfoResponse0, s0)  -> paymentInfoResponse0)
                 .map(paymentInfoResponse0 -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
                     .amount( paymentInfoResponse0.getImportoSingoloVersamento() )
