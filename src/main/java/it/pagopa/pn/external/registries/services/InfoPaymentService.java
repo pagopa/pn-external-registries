@@ -36,10 +36,7 @@ public class InfoPaymentService {
         
         log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
-                .zipWhen( paymentInfoResponse ->
-                        sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber, Instant.now())
-                                .thenReturn( new Object() )
-                        , (paymentInfoResponse0, s0)  -> paymentInfoResponse0)
+                .flatMap( x -> sendPaymentNotificationService.sendPaymentNotification( paTaxId, noticeNumber, Instant.now() ).thenReturn( x ))
                 .map(paymentInfoResponse0 -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
                     .amount( paymentInfoResponse0.getImportoSingoloVersamento() )
