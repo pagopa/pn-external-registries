@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.msclient.common;
 
 import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.ApiClient;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import it.pagopa.pn.external.registries.services.AccessTokenCacheService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,6 +11,9 @@ import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -41,6 +45,15 @@ class BaseClientTest {
     AccessTokenCacheService accessTokenCacheService;
 
     private static ClientAndServer mockServer;
+
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
 
     @BeforeAll
     public static void startMockServer() {

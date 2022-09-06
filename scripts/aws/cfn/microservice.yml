@@ -261,6 +261,7 @@ Resources:
         WAFRuleVendors: "AWS,AWS,AWS"
         WAFRuleNames: "AWSManagedRulesKnownBadInputsRuleSet,AWSManagedRulesAdminProtectionRuleSet,AWSManagedRulesCommonRuleSet"
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+
   # PN-External-Registry public api
   ExternalRegistryPublicB2BPaResource:
     Type: AWS::ApiGateway::Resource

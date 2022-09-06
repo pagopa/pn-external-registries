@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.rest.v1;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
 import it.pagopa.pn.external.registries.services.InfoPaymentService;
+import it.pagopa.pn.external.registries.services.SendPaymentNotificationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ class InfoPaymentControllerTest {
     @MockBean
     InfoPaymentService service;
 
+    @MockBean
+    SendPaymentNotificationService sendPaymentNotificationService;
+
     @Test
     void getPaymentInfoSuccess() {
         //Given
@@ -33,7 +37,7 @@ class InfoPaymentControllerTest {
                 .replace( "{noticeNumber}", "302000100000019421" );
 
         //When
-        Mockito.when( service.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.just( dto ) );
+        Mockito.when( service.getPaymentInfo( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.just( dto ) );
 
         //Then
         webTestClient.get()

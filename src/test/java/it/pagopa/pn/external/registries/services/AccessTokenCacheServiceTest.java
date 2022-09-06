@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.services;
 import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto.ClientCredentialsResponseDto;
 
 import it.pagopa.pn.external.registries.middleware.msclient.PDNDClient;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
@@ -18,7 +22,7 @@ import java.util.Date;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(classes = {AccessTokenCacheService.class, AccessTokenCacheServiceTest.ContextConfiguration.class})
 @Slf4j
 public class AccessTokenCacheServiceTest {
 
@@ -28,6 +32,15 @@ public class AccessTokenCacheServiceTest {
 
     @MockBean
     private PDNDClient pdndClient;
+
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
 
     @DisplayName("Simulazione richiesta token, devono essere uguali")
     @Test
