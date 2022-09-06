@@ -2,17 +2,25 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.msclient.PDNDClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -20,7 +28,7 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest
+@SpringBootTest(classes = {IOActivationClient.class, PnExternalRegistriesConfig.class})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
@@ -28,13 +36,29 @@ import static org.mockserver.model.HttpResponse.response;
 })
 class IOActivationClientTest {
 
-    @Autowired
+
     private IOActivationClient client;
+
+    @Mock
+    private PnExternalRegistriesConfig cfg;
 
     private ClientAndServer mockServer;
 
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
+
     @BeforeEach
     public void startMockServer() {
+        Mockito.when( cfg.getIoBaseUrl() ).thenReturn( "http://localhost:9999" );
+        Mockito.when( cfg.getIoApiKey() ).thenReturn( "fake_api_key" );
+        this.client = new IOActivationClient(cfg);
+        this.client.init();
         mockServer = startClientAndServer(9999);
     }
 
@@ -93,56 +117,6 @@ class IOActivationClientTest {
         Assertions.assertEquals( "ACTIVE", limitedProfile.getStatus() );
     }
 
-
-    @Test
-    void upsertServiceActivation_mocked() {
-        //Given
-        Activation responseDto = new Activation();
-        responseDto.setFiscalCode("CSRGGL44L13H501E");
-        responseDto.setStatus("ACTIVE");
-        responseDto.setVersion(1);
-        responseDto.setServiceId("PN");
-
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( Activation.class );
-        try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        ActivationPayload fiscalCodePayload = new ActivationPayload();
-        fiscalCodePayload.setFiscalCode( "CSRGGL44L13H501E" );
-        fiscalCodePayload.setStatus("ACTIVE");
-        byte[] reqBodyBites = new byte[0];
-
-        mapper.writerFor( ActivationPayload.class );
-        try {
-            reqBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        new MockServerClient( "localhost", 9999 )
-                .when( request()
-                        .withMethod( "PUT" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/activations/" ))
-                .respond( response()
-                        .withBody( responseBodyBites )
-                        .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 500 ));
-
-        //When
-        Activation limitedProfile = client.upsertServiceActivation( fiscalCodePayload.getFiscalCode(), true ).block();
-
-        //Then
-        Assertions.assertEquals( "INACTIVE", limitedProfile.getStatus() );
-    }
 
 
     @Test
@@ -255,53 +229,4 @@ class IOActivationClientTest {
         Assertions.assertNotNull( limitedProfile );
     }
 
-
-    @Test
-    void getServiceActivation_mocked() {
-        //Given
-        Activation responseDto = new Activation();
-        responseDto.setFiscalCode("CSRGGL44L13H501E");
-        responseDto.setStatus("ACTIVE");
-        responseDto.setVersion(1);
-        responseDto.setServiceId("PN");
-
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( Activation.class );
-        try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        fiscalCodePayload.setFiscalCode( "CSRGGL44L13H501E" );
-        byte[] reqBodyBites = new byte[0];
-
-        mapper.writerFor( FiscalCodePayload.class );
-        try {
-            reqBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        new MockServerClient( "localhost", 9999 )
-                .when( request()
-                        .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/activations/" ))
-                .respond( response()
-                        .withBody( responseBodyBites )
-                        .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 500 ));
-
-        //When
-        Activation limitedProfile = client.getServiceActivation( fiscalCodePayload.getFiscalCode() ).block();
-
-        //Then
-        Assertions.assertNotNull( limitedProfile );
-    }
 }

@@ -2,14 +2,21 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -20,7 +27,7 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest
+@SpringBootTest(classes = {IOClient.class, PnExternalRegistriesConfig.class})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
@@ -29,18 +36,38 @@ import static org.mockserver.model.HttpResponse.response;
 })
 class IOClientTest {
 
-    @Autowired
     private IOClient client;
 
-    private ClientAndServer mockServer;
+    @Mock
+    private PnExternalRegistriesConfig cfg;
+
+    private static ClientAndServer mockServer;
+
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
 
     @BeforeEach
-    public void startMockServer() {
+    void setup() {
+        Mockito.when( cfg.getIoBaseUrl()).thenReturn( "http://localhost:9999" );
+        Mockito.when( cfg.getIoApiKey() ).thenReturn( "fake_api_key" );
+        Mockito.when( cfg.getIoactApiKey() ).thenReturn( "fake_api_key_activation" );
+        this.client = new IOClient( cfg );
+        this.client.init();
+    }
+
+    @BeforeAll
+    public static void startMockServer() {
         mockServer = startClientAndServer(9999);
     }
 
-    @AfterEach
-    public void stopMockServer() {
+    @AfterAll
+    public static void stopMockServer() {
         mockServer.stop();
     }
 
@@ -80,43 +107,6 @@ class IOClientTest {
 
         //Then
         Assertions.assertNotNull( limitedProfile );
-    }
-
-    @Test
-    void getProfileByPOST_mocked() {
-        //Given
-        LimitedProfile responseDto = new LimitedProfile()
-                .preferredLanguages(Collections.singletonList( "it_IT" ))
-                .senderAllowed( true );
-
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( LimitedProfile.class );
-        try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
-        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        fiscalCodePayload.setFiscalCode( "CSRGGL44L13H501E" );
-
-        new MockServerClient( "localhost", 9999 )
-                .when( request()
-                        .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
-                        .withPath( "/profiles" ))
-                .respond( response()
-                        .withBody( responseBodyBites )
-                        .withContentType( MediaType.APPLICATION_JSON )
-                        .withStatusCode( 200 ));
-
-        //When
-        Assertions.assertThrows(WebClientResponseException.class, () -> client.getProfileByPOST( fiscalCodePayload ).block());
-
-        //Then
     }
 
     @Test
