@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: OpenAPI servizi ad uso solo interno
+  description: >-
+    API accessibili solo da microservizi interni
+  version: v1.0
+  contact:
+    email: pn@pagopa.it
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: http://internal-pn-in-appli-em20o634urpg-965454854.eu-central-1.elb.amazonaws.com:8080
+    description: Generated server url
+paths:
+  '/ext-registry-private/pa/v1/groups-all':
+    get:
+      operationId: getAllGroupsPrivate
+      summary: Retrieve all groups of the current PA defined in Self Care
+      description: >
+        PA can use groups to better organize work in its organization.
+        Return all the groups of the current PA
+      tags:
+        - internal-only
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            type: PaGroupStatus
+            $ref: 'pn-selfcare-v1.yaml#/components/schemas/PaGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'pn-selfcare-v1.yaml#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+
+

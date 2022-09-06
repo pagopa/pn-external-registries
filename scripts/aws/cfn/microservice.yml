@@ -228,6 +228,15 @@ Resources:
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+  ExternalRegistryMicroservicePublicWebApiWaf:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
+      Parameters:
+        WAFName: !Sub '${ProjectName}-ExternalRegistry-web'
+        WAFRuleVendors: "AWS, AWS, AWS, AWS"
+        WAFRuleNames: "AWSManagedRulesBotControlRuleSet, AWSManagedRulesKnownBadInputsRuleSet, AWSManagedRulesAdminProtectionRuleSet, AWSManagedRulesCommonRuleSet"
+        APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
 
   # Expose PN-ExternalRegistry microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -243,3 +252,56 @@ Resources:
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+  ExternalRegistryMicroservicePublicB2BApiWaf:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
+      Parameters:
+        WAFName: !Sub '${ProjectName}-ExternalRegistry-b2b'
+        WAFRuleVendors: "AWS,AWS,AWS"
+        WAFRuleNames: "AWSManagedRulesKnownBadInputsRuleSet,AWSManagedRulesAdminProtectionRuleSet,AWSManagedRulesCommonRuleSet"
+        APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+  # PN-External-Registry public api
+  ExternalRegistryPublicB2BPaResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ParentId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RootResourceId
+      PathPart: pa
+  ExternalRegistryPublicB2BV1Resource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ParentId: !Ref ExternalRegistryPublicB2BPaResource
+      PathPart: v1
+  ExternalRegistryPublicB2BGroupsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ParentId: !Ref ExternalRegistryPublicB2BV1Resource
+      PathPart: groups
+
+  ExternalRegistryPublicB2BGroupsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: !Sub 'Proxy to ${ProjectName}-ExternalRegistry public groups API'
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      ResourceId: !Ref ExternalRegistryPublicB2BGroupsResource
+      HttpMethod: GET
+      ApiKeyRequired: true
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.AuthorizerARN
+      Integration:
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref NetworkLoadBalancerLink
+        IntegrationHttpMethod: GET
+        Type: HTTP_PROXY
+        Uri: !Sub 'http://${ApplicationLoadBalancerDomain}:8080/ext-registry/pa/v1/groups'
+        RequestParameters:
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+        PassthroughBehavior: "WHEN_NO_MATCH"
+        TimeoutInMillis: 29000
