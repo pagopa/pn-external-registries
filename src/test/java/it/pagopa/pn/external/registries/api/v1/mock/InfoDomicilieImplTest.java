@@ -1,14 +1,19 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
+import it.pagopa.pn.external.registries.exceptions.NotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnAnalogDomicileNotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnDigitalDomicileNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.RecipientTypeDto;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import it.pagopa.pn.external.registries.services.SendPaymentNotificationService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
@@ -21,8 +26,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class InfoDomicilieImplTest {
     private final Duration d = Duration.ofMillis(3000);
 
-    @Autowired
     private InfoDomicilieImpl service;
+
+    @MockBean
+    private SendPaymentNotificationService paymentNotificationService;
+
+    @MockBean
+    private SqsNotificationPaidProducer producer;
+
+    @MockBean
+    private MockResponses mrh;
+
+    @BeforeEach
+    void setup(){
+        this.service = new InfoDomicilieImpl( mrh );
+    }
 
     @Test @Disabled("viene ignorato il mock")
     void getOneAnalogDomicile() {

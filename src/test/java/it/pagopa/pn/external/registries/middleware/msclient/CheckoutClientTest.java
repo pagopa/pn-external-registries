@@ -6,16 +6,17 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.EnteBeneficiarioDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -23,7 +24,7 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest
+@SpringBootTest(classes = {CheckoutClient.class, PnExternalRegistriesConfig.class})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.checkout-api-base-url=http://localhost:9999",
@@ -31,10 +32,28 @@ import static org.mockserver.model.HttpResponse.response;
 })
 class CheckoutClientTest {
 
-    @Autowired
     private CheckoutClient client;
 
+    @Mock
+    private PnExternalRegistriesConfig cfg;
+
     private static ClientAndServer mockServer;
+
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
+
+    @BeforeEach
+    void setup() {
+        Mockito.when( cfg.getCheckoutApiBaseUrl() ).thenReturn( "http://localhost:9999" );
+        this.client = new CheckoutClient(cfg);
+        this.client.init();
+    }
 
     @BeforeAll
     public static void startMockServer() {

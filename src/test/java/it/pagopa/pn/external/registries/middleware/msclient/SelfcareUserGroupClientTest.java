@@ -3,19 +3,22 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import it.pagopa.pn.external.registries.utils.AssertionGenerator;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -26,25 +29,43 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest
+@SpringBootTest(classes = {SelfcareUserGroupClient.class, PnExternalRegistriesConfig.class})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.selfcareusergroup-base-url=http://localhost:9999"
 })
 class SelfcareUserGroupClientTest {
 
-    @Autowired
+
     private SelfcareUserGroupClient client;
+
+    @MockBean
+    private PnExternalRegistriesConfig cfg;
 
     @MockBean
     private AssertionGenerator assertionGenerator;
 
     private static ClientAndServer mockServer;
 
-    @BeforeAll
-    public static void startMockServer() {
-        mockServer = startClientAndServer(9999);
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
     }
+
+    @BeforeEach
+    void setup() {
+        Mockito.when( cfg.getSelfcareusergroupUid() ).thenReturn( "fake_sc_user" );
+        Mockito.when( cfg.getSelfcareusergroupBaseUrl() ).thenReturn( "http://localhost:9999" );
+        this.client = new SelfcareUserGroupClient( cfg );
+        this.client.init();
+    }
+
+    @BeforeAll
+    public static void startMockServer() { mockServer = startClientAndServer(9999); }
 
     @AfterAll
     public static void stopMockServer() {
