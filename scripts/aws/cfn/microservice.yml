@@ -95,6 +95,14 @@ Parameters:
     Type: String
     Description: 'Url del portale della da inserire negli avvisi a IO'
 
+  DeliveryPushInputsQueueName:
+    Type: String
+    Description: 'Queue to pull for inputs event'
+
+  DeliveryPushInputsQueueARN:
+    Type: String
+    Description: 'Queue to pull for inputs event'
+
 Resources:
 
   # PN-External-Registry microservice
@@ -123,6 +131,7 @@ Resources:
         ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/faq.html'
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
+        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
@@ -155,6 +164,16 @@ Resources:
               - dynamodb:UpdateItem
             Resource:
               - !Ref OptInSentTableArn
+          - Effect: Allow
+            Action:
+              - sqs:ChangeMessageVisibility
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - sqs:ReceiveMessage
+              - sqs:SendMessage
+            Resource:
+              - !Ref DeliveryPushInputsQueueARN
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND    ###
   ###   La chiave viene impiegata per firmare il client assertion che serve          ###
