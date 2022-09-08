@@ -20,9 +20,12 @@ public class SendPaymentNotificationService {
     }
 
     public Mono<Void> sendPaymentNotification(String paTaxId, String noticeCode){
-        log.info( "Send payment event for paTaxId={} noticeCode={}", paTaxId, noticeCode );
-        PnExtRegistryNotificationPaidEvent event = buildNotificationPaid( paTaxId, noticeCode );
-        return Mono.fromRunnable(() -> notificationPaidProducer.push(event));
+        return Mono.fromRunnable(() -> {
+            log.info( "Send payment event for paTaxId={} noticeCode={}", paTaxId, noticeCode );
+            PnExtRegistryNotificationPaidEvent event = buildNotificationPaid( paTaxId, noticeCode );
+
+            notificationPaidProducer.push(event);
+        });
     }
 
     private PnExtRegistryNotificationPaidEvent buildNotificationPaid( String paTaxId, String noticeCode ) {

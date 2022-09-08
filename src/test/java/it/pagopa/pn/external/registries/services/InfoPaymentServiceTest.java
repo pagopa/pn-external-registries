@@ -23,7 +23,6 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.Instant;
 
 @SpringBootTest
 class InfoPaymentServiceTest {
@@ -71,6 +70,7 @@ class InfoPaymentServiceTest {
         WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
+        Mockito.when( sendPaymentNotificationService.sendPaymentNotification( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.empty() );
 
         PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
 
