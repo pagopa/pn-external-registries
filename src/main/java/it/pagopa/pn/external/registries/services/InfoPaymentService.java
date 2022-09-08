@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.DetailDto;
@@ -20,7 +21,7 @@ import java.time.temporal.ChronoUnit;
 @Service
 @Slf4j
 public class InfoPaymentService {
-    public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paymentId={}";
+    public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId={} noticeCode={}";
     private final CheckoutClient checkoutClient;
     private final PnExternalRegistriesConfig config;
     private final SendPaymentNotificationService sendPaymentNotificationService;
@@ -66,7 +67,8 @@ public class InfoPaymentService {
                 }
             }
         } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paTaxId+noticeNumber, e);
+            log.error(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber, e);
+            return Mono.error( e );
         }
         return Mono.just( paymentInfoDto );
     }
