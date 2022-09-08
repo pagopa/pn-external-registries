@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Slf4j
@@ -36,7 +37,8 @@ public class InfoPaymentService {
         
         log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
-                .flatMap( x -> sendPaymentNotificationService.sendPaymentNotification( paTaxId, noticeNumber, Instant.now() ).thenReturn( x ))
+                .flatMap( x -> sendPaymentNotificationService.sendPaymentNotification(
+                        paTaxId, noticeNumber, Instant.now().truncatedTo(ChronoUnit.SECONDS) ).thenReturn( x ))
                 .map(paymentInfoResponse0 -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
                     .amount( paymentInfoResponse0.getImportoSingoloVersamento() )
