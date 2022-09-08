@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
@@ -76,7 +76,7 @@ class InfoSelfcareServiceTest {
 
         // WHEN
         Mono<PaInfoDto> mono =service.getOnePa(id);
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(PnPANotFoundException.class, () -> {
             mono.block(d);
         });
         //THEN
