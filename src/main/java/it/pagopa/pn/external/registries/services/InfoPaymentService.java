@@ -62,7 +62,7 @@ public class InfoPaymentService {
                 paymentInfoDto.setDetail(detailDto);
                 paymentInfoDto.setDetailV2(result.getDetailV2());
                 paymentInfoDto.setStatus(getPaymentStatus(detailDto));
-                if (HttpStatus.CONFLICT.equals(status)) {
+                if (HttpStatus.CONFLICT.equals(status) && DetailDto.PAYMENT_DUPLICATED.equals(paymentInfoDto.getDetail()) ) {
                     return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber).thenReturn(paymentInfoDto);
                 }
             }
