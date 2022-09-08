@@ -1,7 +1,8 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
-import it.pagopa.pn.external.registries.exceptions.PnException;
+
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
@@ -32,12 +33,12 @@ public class InfoSelfcareService {
         this.selfcareInstitutionsClient = selfcareInstitutionsClient;
     }
 
-    public Mono<PaInfoDto> getOnePa(String id) throws PnException {
+    public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
         log.info("getOnePa - id={}", id);
         /*return selfcareClient.getInstitution(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
                 .map(InstitutionResourceDtoToPaInfoDto::toDto);*/
-        return Mono.error(new InternalErrorException());
+        return Mono.error(new PnInternalException("richiesta mock implementata", "NOT_IMPLEMENTED"));
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
@@ -45,7 +46,7 @@ public class InfoSelfcareService {
         /*return selfcareClient.getInstitutions()
                 .filter(inst -> inst.getName().toLowerCase(Locale.ROOT).contains(paNameFilter))
                 .map(InstitutionResourceDtoToPaSummaryDto::toDto);*/
-        return Flux.error(new InternalErrorException());
+        return Flux.error(new PnInternalException("richiesta mock implementata", "NOT_IMPLEMENTED"));
     }
 
     public Flux<PaSummaryDto> listOnboardedPaByIds( List<String> ids) {
@@ -53,7 +54,7 @@ public class InfoSelfcareService {
         /*return selfcareClient.getInstitutions()
                 .filter(inst -> ids.contains(inst.getId()))
                 .map(InstitutionResourceDtoToPaSummaryDto::toDto);*/
-        return Flux.error(new InternalErrorException());
+        return Flux.error(new PnInternalException("richiesta mock implementata", "NOT_IMPLEMENTED"));
     }
 
     public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter) {

@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnAnalogDomicileNotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnDigitalDomicileNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.RecipientTypeDto;
@@ -27,7 +28,7 @@ public class InfoDomicilieImpl {
             return Mono.just(dto);
         } else {
             log.warn("recipientType {} - opaqueId {} not found", recipientType, opaqueId);
-            throw new NotFoundException();
+            throw new PnAnalogDomicileNotFoundException();
         }
     }
 
@@ -38,7 +39,7 @@ public class InfoDomicilieImpl {
             return Mono.just(dto);
         } else {
             log.warn("recipientType {} - opaqueId {} not found", recipientType, opaqueId);
-            throw new NotFoundException();
+            throw new PnDigitalDomicileNotFoundException();
         }
     }
 

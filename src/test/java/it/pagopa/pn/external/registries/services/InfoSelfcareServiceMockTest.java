@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
@@ -80,12 +80,12 @@ class InfoSelfcareServiceMockTest {
     void getOnePaNotExist() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        Mockito.when(infoPapi.getOnePa(Mockito.anyString())).thenReturn(Mono.error(new NotFoundException()));
+        Mockito.when(infoPapi.getOnePa(Mockito.anyString())).thenReturn(Mono.error(new PnPANotFoundException()));
 
 
         // WHEN
         Mono<PaInfoDto> mono =service.getOnePa(id);
-        assertThrows(NotFoundException.class, () -> mono.block(d));
+        assertThrows(PnPANotFoundException.class, () -> mono.block(d));
         //THEN
     }
 

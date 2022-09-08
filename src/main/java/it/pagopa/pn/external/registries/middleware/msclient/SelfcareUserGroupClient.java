@@ -1,24 +1,24 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
 import io.netty.handler.timeout.TimeoutException;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api.UserGroupApi;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import javax.annotation.PostConstruct;
 import java.net.ConnectException;
 import java.time.Duration;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR;
 
 @Component
 @Slf4j
@@ -52,7 +52,7 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
                 )
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getUserGroups response error {}", x.getResponseBodyAsString(), x);
-                    return Mono.error(new InternalErrorException());
+                    return Mono.error(new PnInternalException("Errore lettura usergroups", ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR, x));
                 });
     }
 }

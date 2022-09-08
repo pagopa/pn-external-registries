@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnAnalogDomicileNotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnDigitalDomicileNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.AnalogDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.DigitalDomicileDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto.RecipientTypeDto;
@@ -68,7 +69,7 @@ class InfoDomicilieImplTest {
 
 
         // WHEN
-        assertThrows(NotFoundException.class, () -> service.getOneAnalogDomicile(RecipientTypeDto.PF, id));
+        assertThrows(PnAnalogDomicileNotFoundException.class, () -> service.getOneAnalogDomicile(RecipientTypeDto.PF, id));
         //THEN
     }
 
@@ -94,7 +95,7 @@ class InfoDomicilieImplTest {
 
 
         // WHEN
-        assertThrows(NotFoundException.class, () -> service.getOneDigitalDomicile(RecipientTypeDto.PF, id));
+        assertThrows(PnDigitalDomicileNotFoundException.class, () -> service.getOneDigitalDomicile(RecipientTypeDto.PF, id));
         //THEN
     }
 }
