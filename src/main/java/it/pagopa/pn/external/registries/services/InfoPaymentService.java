@@ -45,81 +45,11 @@ public class InfoPaymentService {
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
-                    switch (httpStatus) {
-                        case NOT_FOUND: { return fromCheckoutNotFoundToPn( paymentId, ex.getResponseBodyAsString() ); }
-                        case CONFLICT: { return fromCheckoutConflictToPn( paTaxId, noticeNumber, ex.getResponseBodyAsString() ); }
-                        case BAD_GATEWAY: { return fromCheckoutBadGatewayToPn( paymentId, ex.getResponseBodyAsString() ); }
-                        case SERVICE_UNAVAILABLE: { return fromCheckoutServiceUnavToPn( paymentId, ex.getResponseBodyAsString() ); }
-                        case GATEWAY_TIMEOUT: { return fromCheckoutGWTimeoutToPn( paymentId, ex.getResponseBodyAsString() ); }
-                        default: throw new UnsupportedOperationException( String.format("Unable to manage status response from checkout for paymentId=%s", paymentId) );
-                    }
+                    return fromCheckoutToPn( paTaxId, noticeNumber, httpStatus, ex.getResponseBodyAsString() );
         });
     }
 
-    private Mono<PaymentInfoDto> fromCheckoutGWTimeoutToPn(String paymentId, String checkoutResult) {
-        log.info( checkoutResult );
-        ObjectMapper objectMapper = new ObjectMapper();
-        PartyTimeoutFaultPaymentProblemJsonDto result;
-        PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-        try {
-            result = objectMapper.readValue( checkoutResult, PartyTimeoutFaultPaymentProblemJsonDto.class );
-            if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
-                paymentInfoDto.setDetail( detailDto );
-                paymentInfoDto.setDetailV2( result.getDetailV2() );
-                paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
-            } else {
-                log.error(JSON_PROCESSING_ERROR_MSG, paymentId);
-            }
-        } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paymentId, e);
-        }
-        return Mono.just( paymentInfoDto );
-    }
-
-    private Mono<PaymentInfoDto> fromCheckoutServiceUnavToPn(String paymentId, String checkoutResult) {
-        log.info( checkoutResult );
-        ObjectMapper objectMapper = new ObjectMapper();
-        PartyConfigurationFaultPaymentProblemJsonDto result;
-        PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-        try {
-            result = objectMapper.readValue( checkoutResult, PartyConfigurationFaultPaymentProblemJsonDto.class );
-            if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
-                paymentInfoDto.setDetail( detailDto );
-                paymentInfoDto.setDetailV2( result.getDetailV2() );
-                paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
-            } else {
-                log.error( JSON_PROCESSING_ERROR_MSG, paymentId );
-            }
-        } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paymentId, e);
-        }
-        return Mono.just( paymentInfoDto );
-    }
-
-    private Mono<PaymentInfoDto> fromCheckoutBadGatewayToPn(String paymentId, String checkoutResult) {
-        log.info( checkoutResult );
-        ObjectMapper objectMapper = new ObjectMapper();
-        GatewayFaultPaymentProblemJsonDto result;
-        PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-        try {
-            result = objectMapper.readValue( checkoutResult, GatewayFaultPaymentProblemJsonDto.class );
-            if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
-                paymentInfoDto.setDetail( detailDto );
-                paymentInfoDto.setDetailV2( result.getDetailV2() );
-                paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
-            } else {
-                log.error( JSON_PROCESSING_ERROR_MSG, paymentId );
-            }
-        } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paymentId, e);
-        }
-        return Mono.just( paymentInfoDto );
-    }
-
-    private Mono<PaymentInfoDto> fromCheckoutConflictToPn(String paTaxId, String noticeNumber, String checkoutResult) {
+    private Mono<PaymentInfoDto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
         PaymentStatusFaultPaymentProblemJsonDto result;
@@ -127,37 +57,16 @@ public class InfoPaymentService {
         try {
             result = objectMapper.readValue( checkoutResult, PaymentStatusFaultPaymentProblemJsonDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
-                paymentInfoDto.setDetail( detailDto );
-                paymentInfoDto.setDetailV2( result.getDetailV2() );
-                paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
-                return sendPaymentNotificationService.sendPaymentNotification( paTaxId, noticeNumber ).thenReturn(paymentInfoDto);
-            } else {
-                log.error( JSON_PROCESSING_ERROR_MSG, paTaxId+noticeNumber );
+                DetailDto detailDto = DetailDto.fromValue(result.getCategory());
+                paymentInfoDto.setDetail(detailDto);
+                paymentInfoDto.setDetailV2(result.getDetailV2());
+                paymentInfoDto.setStatus(getPaymentStatus(detailDto));
+                if (HttpStatus.CONFLICT.equals(status)) {
+                    return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber).thenReturn(paymentInfoDto);
+                }
             }
         } catch (JsonProcessingException e) {
             log.error(JSON_PROCESSING_ERROR_MSG, paTaxId+noticeNumber, e);
-        }
-        return Mono.just( paymentInfoDto );
-    }
-
-    private Mono<PaymentInfoDto> fromCheckoutNotFoundToPn(String paymentId, String checkoutResult) {
-        log.info( checkoutResult );
-        ObjectMapper objectMapper = new ObjectMapper();
-        ValidationFaultPaymentProblemJsonDto result;
-        PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-        try {
-            result = objectMapper.readValue( checkoutResult, ValidationFaultPaymentProblemJsonDto.class );
-            if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue( result.getCategory() );
-                paymentInfoDto.setDetail( detailDto );
-                paymentInfoDto.setDetailV2( result.getDetailV2() );
-                paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
-            } else {
-                log.error( JSON_PROCESSING_ERROR_MSG, paymentId );
-            }
-        } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paymentId, e);
         }
         return Mono.just( paymentInfoDto );
     }
