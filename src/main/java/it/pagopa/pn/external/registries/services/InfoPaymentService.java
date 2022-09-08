@@ -37,8 +37,6 @@ public class InfoPaymentService {
         
         log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
-                .flatMap( x -> sendPaymentNotificationService.sendPaymentNotification(
-                        paTaxId, noticeNumber, Instant.now().truncatedTo(ChronoUnit.SECONDS) ).thenReturn( x ))
                 .map(paymentInfoResponse0 -> new PaymentInfoDto()
                     .status( PaymentStatusDto.REQUIRED )
                     .amount( paymentInfoResponse0.getImportoSingoloVersamento() )
@@ -49,7 +47,7 @@ public class InfoPaymentService {
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
                     switch (httpStatus) {
                         case NOT_FOUND: { return fromCheckoutNotFoundToPn( paymentId, ex.getResponseBodyAsString() ); }
-                        case CONFLICT: { return fromCheckoutConflictToPn( paymentId, ex.getResponseBodyAsString() ); }
+                        case CONFLICT: { return fromCheckoutConflictToPn( paTaxId, noticeNumber, ex.getResponseBodyAsString() ); }
                         case BAD_GATEWAY: { return fromCheckoutBadGatewayToPn( paymentId, ex.getResponseBodyAsString() ); }
                         case SERVICE_UNAVAILABLE: { return fromCheckoutServiceUnavToPn( paymentId, ex.getResponseBodyAsString() ); }
                         case GATEWAY_TIMEOUT: { return fromCheckoutGWTimeoutToPn( paymentId, ex.getResponseBodyAsString() ); }
@@ -121,7 +119,7 @@ public class InfoPaymentService {
         return Mono.just( paymentInfoDto );
     }
 
-    private Mono<PaymentInfoDto> fromCheckoutConflictToPn(String paymentId, String checkoutResult) {
+    private Mono<PaymentInfoDto> fromCheckoutConflictToPn(String paTaxId, String noticeNumber, String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
         PaymentStatusFaultPaymentProblemJsonDto result;
@@ -133,11 +131,12 @@ public class InfoPaymentService {
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
+                sendPaymentNotificationService.sendPaymentNotification( paTaxId, noticeNumber );
             } else {
-                log.error( JSON_PROCESSING_ERROR_MSG, paymentId );
+                log.error( JSON_PROCESSING_ERROR_MSG, paTaxId+noticeNumber );
             }
         } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paymentId, e);
+            log.error(JSON_PROCESSING_ERROR_MSG, paTaxId+noticeNumber, e);
         }
         return Mono.just( paymentInfoDto );
     }
