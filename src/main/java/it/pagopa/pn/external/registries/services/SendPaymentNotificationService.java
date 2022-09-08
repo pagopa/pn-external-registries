@@ -19,17 +19,19 @@ public class SendPaymentNotificationService {
         this.notificationPaidProducer = notificationPaidProducer;
     }
 
-    public Mono<Void> sendPaymentNotification(String paTaxId, String noticeCode, Instant eventDate){
-        PnExtRegistryNotificationPaidEvent event = buildNotificationPaid( paTaxId, noticeCode, eventDate );
+    public Mono<Void> sendPaymentNotification(String paTaxId, String noticeCode){
+        log.info( "Send payment event for paTaxId={} noticeCode={}", paTaxId, noticeCode );
+        PnExtRegistryNotificationPaidEvent event = buildNotificationPaid( paTaxId, noticeCode );
         return Mono.fromRunnable(() -> notificationPaidProducer.push(event));
     }
 
-    private PnExtRegistryNotificationPaidEvent buildNotificationPaid( String paTaxId, String noticeCode, Instant eventDate ) {
+    private PnExtRegistryNotificationPaidEvent buildNotificationPaid( String paTaxId, String noticeCode ) {
+        Instant eventDate = Instant.now();
         return PnExtRegistryNotificationPaidEvent.builder()
                 .header( StandardEventHeader.builder()
                         .iun( paTaxId ) //TODO non c'è lo iun capire se obbligatorio
-                        .eventId( paTaxId + "_notification_paid" + noticeCode +"_eventDate"+eventDate )
-                        .createdAt( Instant.now() )
+                        .eventId( paTaxId + "_notification_paid_" + noticeCode )
+                        .createdAt( eventDate )
                         .eventType( EventType.NOTIFICATION_PAID.name() )
                         .publisher( EventPublisher.EXTERNAL_REGISTRY.name())
                         .build()
