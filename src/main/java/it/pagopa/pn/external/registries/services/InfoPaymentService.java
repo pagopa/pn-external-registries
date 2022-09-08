@@ -131,7 +131,7 @@ public class InfoPaymentService {
                 paymentInfoDto.setDetail( detailDto );
                 paymentInfoDto.setDetailV2( result.getDetailV2() );
                 paymentInfoDto.setStatus( getPaymentStatus( detailDto ) );
-                sendPaymentNotificationService.sendPaymentNotification( paTaxId, noticeNumber );
+                return sendPaymentNotificationService.sendPaymentNotification( paTaxId, noticeNumber ).thenReturn(paymentInfoDto);
             } else {
                 log.error( JSON_PROCESSING_ERROR_MSG, paTaxId+noticeNumber );
             }
