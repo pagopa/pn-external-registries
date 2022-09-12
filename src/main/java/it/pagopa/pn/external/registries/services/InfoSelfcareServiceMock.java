@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
-import it.pagopa.pn.external.registries.exceptions.PnException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
@@ -27,7 +27,7 @@ public class InfoSelfcareServiceMock extends InfoSelfcareService {
     }
 
     @Override
-    public Mono<PaInfoDto> getOnePa(String id) throws PnException {
+    public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
         log.info("getOnePa - id={}", id);
         return infoPapi.getOnePa(id);
     }

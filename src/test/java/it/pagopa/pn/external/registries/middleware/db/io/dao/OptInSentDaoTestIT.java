@@ -2,12 +2,14 @@ package it.pagopa.pn.external.registries.middleware.db.io.dao;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
@@ -37,6 +39,10 @@ class OptInSentDaoTestIT {
     PnExternalRegistriesConfig pnExternalRegistriesConfig;
 
     TestDao<OptInSentEntity> testDao;
+
+    @MockBean
+    private SqsNotificationPaidProducer producer;
+
 
     @BeforeEach
     void setup() {

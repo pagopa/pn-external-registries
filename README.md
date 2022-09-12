@@ -9,4 +9,3 @@
 ./mvnw clean spring-boot:build-image
 ```
 
-

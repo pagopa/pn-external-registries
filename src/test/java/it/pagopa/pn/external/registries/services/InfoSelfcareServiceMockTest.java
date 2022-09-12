@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
@@ -10,11 +10,15 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaIn
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,7 +29,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(classes = {InfoSelfcareServiceMock.class})
 @ActiveProfiles("test")
 class InfoSelfcareServiceMockTest {
 
@@ -42,6 +46,15 @@ class InfoSelfcareServiceMockTest {
 
     @MockBean
     private InfoPapiImpl infoPapi;
+
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
 
     @Test
     void getOnePa() {
@@ -67,12 +80,12 @@ class InfoSelfcareServiceMockTest {
     void getOnePaNotExist() {
         //GIVEN
         String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
-        Mockito.when(infoPapi.getOnePa(Mockito.anyString())).thenReturn(Mono.error(new NotFoundException()));
+        Mockito.when(infoPapi.getOnePa(Mockito.anyString())).thenReturn(Mono.error(new PnPANotFoundException()));
 
 
         // WHEN
         Mono<PaInfoDto> mono =service.getOnePa(id);
-        assertThrows(NotFoundException.class, () -> mono.block(d));
+        assertThrows(PnPANotFoundException.class, () -> mono.block(d));
         //THEN
     }
 

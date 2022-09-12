@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.rest.io.v1;
 
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnIOUserNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api.IoActivationApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.services.io.IOActivationService;
@@ -28,7 +28,7 @@ public class IOActivationController implements IoActivationApi {
                     log.debug( "[exit] getServiceActivationByPOST");
                     return ResponseEntity.ok( body );
                 } )
-                .switchIfEmpty( Mono.error( new NotFoundException()) );
+                .switchIfEmpty( Mono.error( new PnIOUserNotFoundException()) );
 
     }
 
@@ -40,6 +40,6 @@ public class IOActivationController implements IoActivationApi {
                     log.debug( "[exit] upsertServiceActivation");
                     return ResponseEntity.ok( body );
                 } )
-                .switchIfEmpty( Mono.error( new NotFoundException()) );
+                .switchIfEmpty( Mono.error( new PnIOUserNotFoundException()) );
     }
 }

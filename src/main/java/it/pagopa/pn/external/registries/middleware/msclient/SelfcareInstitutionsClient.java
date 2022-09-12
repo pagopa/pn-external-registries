@@ -1,9 +1,9 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
 import io.netty.handler.timeout.TimeoutException;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.exceptions.InternalErrorException;
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api.InstitutionsApi;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionResourceDto;
@@ -21,6 +21,8 @@ import javax.annotation.PostConstruct;
 import java.net.ConnectException;
 import java.time.Duration;
 import java.util.UUID;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PAREADERROR;
 
 @Component
 @Slf4j
@@ -56,9 +58,9 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getInstitution response error {}", x.getResponseBodyAsString(), x);
                     if (x.getStatusCode() == HttpStatus.NOT_FOUND)
-                        return Mono.error(new NotFoundException());
+                        return Mono.error(new PnPANotFoundException());
 
-                    return Mono.error(new InternalErrorException());
+                    return Mono.error(new PnInternalException("Errore recupero dati PA", ERROR_CODE_EXTERNALREGISTRIES_PAREADERROR, x));
                 });
     }
 
@@ -72,7 +74,7 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
                 )
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getInstitutions response error {}", x.getResponseBodyAsString(), x);
-                    return Mono.error(new InternalErrorException());
+                    return Mono.error(new PnInternalException("Errore recupero lista PA", ERROR_CODE_EXTERNALREGISTRIES_PAREADERROR));
                 });
     }
 }

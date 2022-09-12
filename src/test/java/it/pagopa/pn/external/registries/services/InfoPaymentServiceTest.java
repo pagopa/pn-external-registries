@@ -8,12 +8,16 @@ import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
@@ -29,10 +33,22 @@ class InfoPaymentServiceTest {
     private InfoPaymentService service;
 
     @Mock
+    private SendPaymentNotificationService sendPaymentNotificationService;
+
+    @Mock
     private CheckoutClient checkoutClient;
 
     @Mock
     PnExternalRegistriesConfig config;
+
+    @Configuration
+    static class ContextConfiguration {
+        @Primary
+        @Bean
+        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
+            return Mockito.mock( SqsNotificationPaidProducer.class);
+        }
+    }
 
     @Test
     void getInfoPaymentConflict() {
@@ -54,8 +70,9 @@ class InfoPaymentServiceTest {
         WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
+        Mockito.when( sendPaymentNotificationService.sendPaymentNotification( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.empty() );
 
-        PaymentInfoDto result = service.getPaymentInfo( "asdasda" ).block(Duration.ofMillis( 3000 ));
+        PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
 
         Assertions.assertNotNull( result );
         Assertions.assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
@@ -71,7 +88,8 @@ class InfoPaymentServiceTest {
         //When
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
         Mockito.when( config.getCheckoutSiteUrl() ).thenReturn(CHECKOUT_SITE_URL);
-        PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id" ).block();
+        Mockito.when( sendPaymentNotificationService.sendPaymentNotification( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.empty() );
+        PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id", "fakeNoticeNumber" ).block();
 
         //Then
         Assertions.assertNotNull( result );

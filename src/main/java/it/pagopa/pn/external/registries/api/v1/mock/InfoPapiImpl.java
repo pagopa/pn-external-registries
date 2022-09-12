@@ -1,8 +1,8 @@
 package it.pagopa.pn.external.registries.api.v1.mock;
 
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.exceptions.NotFoundException;
-import it.pagopa.pn.external.registries.exceptions.PnException;
+import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +24,13 @@ public class InfoPapiImpl {
         this.config = config;
     }
 
-    public Mono<PaInfoDto> getOnePa(String id) throws PnException {
+    public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
         PaInfoDto paInfo = mrh.getOnePa(id);
 
         if (paInfo != null) {
             return Mono.just(paInfo);
         } else {
-            throw new NotFoundException();
+            throw new PnPANotFoundException();
         }
     }
 
