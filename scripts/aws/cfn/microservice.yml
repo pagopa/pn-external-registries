@@ -332,7 +332,7 @@ Resources:
         TimeoutInMillis: 29000
 
   # PN-External-Registry public api deployment
-  ExternalRegistryPublicB2BDeployment$_PN_PLACEHOLDER_EPOCHSECONDS_$:
+  ExternalRegistryPublicB2BDeploymentPnPlaceholderEpochSeconds:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
       - ExternalRegistryPublicB2BGroupsMethod
