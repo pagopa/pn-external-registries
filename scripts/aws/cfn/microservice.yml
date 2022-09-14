@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 'Example microservice deploy'
+Transform:
+  - UpdateDeploymentApi
 
 Parameters:
   ProjectName:
@@ -328,3 +330,11 @@ Resources:
           integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
         PassthroughBehavior: "WHEN_NO_MATCH"
         TimeoutInMillis: 29000
+
+  # PN-External-Registry public api deployment
+  ExternalRegistryPublicB2BDeploymentPnPlaceholderEpochSeconds:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ExternalRegistryPublicB2BGroupsMethod
+    Properties:
+      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
