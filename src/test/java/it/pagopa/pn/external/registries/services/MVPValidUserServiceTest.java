@@ -1,8 +1,9 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,10 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+
+import static it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient.IO_STATUS_ACTIVE;
+import static it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient.IO_STATUS_INACTIVE;
 
 @SpringBootTest
 class MVPValidUserServiceTest {
@@ -26,7 +29,7 @@ class MVPValidUserServiceTest {
     private MVPValidUserService service;
 
     @Mock
-    IOClient ioClient;
+    IOActivationClient ioActivationClient;
 
     @Configuration
     static class ContextConfiguration {
@@ -40,12 +43,13 @@ class MVPValidUserServiceTest {
     @Test
     void checkValidUserPnActive() {
         // Given
-        LimitedProfile limitedProfile = new LimitedProfile()
-                .senderAllowed( true )
-                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        Activation activation = new Activation();
+        activation.setVersion(1);
+        activation.setStatus(IO_STATUS_ACTIVE);
+        activation.setFiscalCode(TAX_ID);
 
         // When
-        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioActivationClient.getServiceActivation( Mockito.any() ) ).thenReturn( Mono.just( activation ) );
 
         MvpUserDto mvpUserDto = service.checkValidUser( Mono.just( TAX_ID ) ).block();
 
@@ -58,19 +62,21 @@ class MVPValidUserServiceTest {
     @Test
     void checkValidUserPnNotActive() {
         // Given
-        LimitedProfile limitedProfile = new LimitedProfile()
-                .senderAllowed( false )
-                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        Activation activation = new Activation();
+        activation.setVersion(1);
+        activation.setStatus(IO_STATUS_INACTIVE);
+        activation.setFiscalCode(TAX_ID);
+
 
         // When
-        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioActivationClient.getServiceActivation( Mockito.any() ) ).thenReturn( Mono.just( activation ) );
 
         MvpUserDto mvpUserDto = service.checkValidUser( Mono.just( TAX_ID ) ).block();
 
         // Then
         Assertions.assertNotNull( mvpUserDto );
         Assertions.assertEquals( TAX_ID, mvpUserDto.getTaxId() );
-        Assertions.assertTrue(mvpUserDto.getValid());
+        Assertions.assertFalse(mvpUserDto.getValid());
     }
     
 }

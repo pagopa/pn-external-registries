@@ -1,22 +1,22 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.commons.utils.LogUtils;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient.IO_STATUS_ACTIVE;
+
 @Service
 @Slf4j
 public class MVPValidUserService {
-    private final IOClient client;
+    private final IOActivationClient client;
 
-    public MVPValidUserService(IOClient client) {
+    public MVPValidUserService(IOActivationClient client) {
         this.client = client;
     }
 
@@ -24,15 +24,13 @@ public class MVPValidUserService {
         return body
                 .flatMap( taxId -> {
                     log.info("Get mvp user profile by post taxId={}", LogUtils.maskTaxId(taxId));
-                    FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-                    fiscalCodePayload.setFiscalCode( taxId );
 
-                    return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
-                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed());
+                    return client.getServiceActivation( taxId ).map( res ->{
+                        log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getStatus());
                         
                         return new MvpUserDto()
                                 .taxId(taxId)
-                                .valid(true);
+                                .valid(IO_STATUS_ACTIVE.equals(res.getStatus()));
                     }).onErrorResume( WebClientResponseException.class, exception ->{
                         if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
                             log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
