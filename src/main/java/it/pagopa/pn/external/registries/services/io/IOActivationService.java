@@ -1,8 +1,11 @@
 package it.pagopa.pn.external.registries.services.io;
 
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationPayloadDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationStatusDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.FiscalCodePayloadDto;
 import it.pagopa.pn.external.registries.mapper.ActivationToActivationDtoMapper;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,10 +14,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class IOActivationService {
 
-    private final IOActivationClient client;
+    private final IOCourtesyMessageClient client;
 
 
-    public IOActivationService(IOActivationClient client) {
+    public IOActivationService(IOCourtesyMessageClient client) {
         this.client = client;
     }
 

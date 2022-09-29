@@ -3,9 +3,9 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.msclient.PDNDClient;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +16,6 @@ import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,16 +27,16 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest(classes = {IOActivationClient.class, PnExternalRegistriesConfig.class})
+@SpringBootTest(classes = {IOCourtesyMessageClient.class, PnExternalRegistriesConfig.class})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
         "pn.external-registry.io-api-key=fake_api_key"
 })
-class IOActivationClientTest {
+class IOCourtesyMessageClientTest {
 
 
-    private IOActivationClient client;
+    private IOCourtesyMessageClient client;
 
     @Mock
     private PnExternalRegistriesConfig cfg;
@@ -57,7 +56,7 @@ class IOActivationClientTest {
     public void startMockServer() {
         Mockito.when( cfg.getIoBaseUrl() ).thenReturn( "http://localhost:9999" );
         Mockito.when( cfg.getIoApiKey() ).thenReturn( "fake_api_key" );
-        this.client = new IOActivationClient(cfg);
+        this.client = new IOCourtesyMessageClient(cfg);
         this.client.init();
         mockServer = startClientAndServer(9999);
     }
