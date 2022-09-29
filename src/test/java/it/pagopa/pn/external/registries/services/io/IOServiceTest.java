@@ -10,7 +10,8 @@ import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserS
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,10 @@ class IOServiceTest {
     private IOService service;
 
     @Mock
-    IOClient ioClient;
+    IOCourtesyMessageClient ioClient;
+
+    @Mock
+    IOOptInClient ioOptinClient;
 
     @Mock
     OptInSentDao optInSentDao;
@@ -288,7 +292,7 @@ class IOServiceTest {
         Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
-        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
         Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 
@@ -327,7 +331,7 @@ class IOServiceTest {
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( cfg.getIoOptinMinDays() ).thenReturn( 100 );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
-        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
         Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 
@@ -366,7 +370,7 @@ class IOServiceTest {
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( cfg.getIoOptinMinDays() ).thenReturn( 100 );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn(Mono.error(new WebClientResponseException(404, "404 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset())));
-        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
         Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 
@@ -405,7 +409,7 @@ class IOServiceTest {
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( cfg.getIoOptinMinDays() ).thenReturn( 100 );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn(Mono.error(new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset())));
-        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
         Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 
@@ -523,7 +527,7 @@ class IOServiceTest {
         Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
-        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
         Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
         Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 
@@ -562,7 +566,7 @@ class IOServiceTest {
         Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
-        Mockito.when( ioClient.submitActivationMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.error( new WebClientResponseException(500, "500 fake", HttpHeaders.EMPTY, new byte[0], Charset.defaultCharset()) ) );
         Mockito.when( optInSentDao.get(Mockito.anyString())).thenReturn( Mono.just( optInSentEntity ) );
         Mockito.when( optInSentDao.save(Mockito.any())).thenReturn( Mono.empty() );
 

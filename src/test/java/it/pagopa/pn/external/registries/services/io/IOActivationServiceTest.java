@@ -3,9 +3,8 @@ package it.pagopa.pn.external.registries.services.io;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOActivationClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
-import it.pagopa.pn.external.registries.services.io.IOActivationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +20,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class IOActivationServiceTest {
@@ -30,7 +29,7 @@ class IOActivationServiceTest {
     private IOActivationService service;
 
     @Mock
-    IOActivationClient ioClient;
+    IOCourtesyMessageClient ioClient;
 
     @Mock
     PnExternalRegistriesConfig cfg;

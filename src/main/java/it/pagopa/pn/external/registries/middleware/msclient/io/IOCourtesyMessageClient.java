@@ -3,43 +3,31 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
-import javax.annotation.PostConstruct;
 import java.net.ConnectException;
 import java.time.Duration;
-import java.util.List;
 
 @Component
 @Slf4j
-public class IOActivationClient extends OcpBaseClient {
+public class IOCourtesyMessageClient extends IOClient {
 
     public static final String IO_STATUS_ACTIVE = "ACTIVE";
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
-    private DefaultApi ioApi;
-    private final PnExternalRegistriesConfig config;
 
-    public IOActivationClient(PnExternalRegistriesConfig config) {
-        this.config = config;
+    public IOCourtesyMessageClient(PnExternalRegistriesConfig config)
+    {
+        super(config, config.getIoApiKey());
     }
 
-    @PostConstruct
-    public void init() {
-
-        ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getIoApiKey()).build());
-        apiClient.setBasePath( config.getIoBaseUrl() );
-
-        this.ioApi = new DefaultApi( apiClient );
-    }
 
     /**
      * Crea (o aggiorna) lo stato in IO
@@ -115,11 +103,5 @@ public class IOActivationClient extends OcpBaseClient {
                     log.info("getServiceActivation response taxid={} status={} serviceId={} version={}", LogUtils.maskTaxId(x.getFiscalCode()), x.getStatus(), x.getServiceId(), x.getVersion());
                     return x;
                 });
-    }
-
-
-    private boolean checkWhitelist(String taxId)
-    {
-        return  (CollectionUtils.isEmpty(config.getIoWhitelist()) || config.getIoWhitelist().get(0).equals("*") || config.getIoWhitelist().contains(taxId));
     }
 }

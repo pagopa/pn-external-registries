@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.services.io;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
@@ -13,7 +14,8 @@ import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,14 +35,16 @@ import java.util.List;
 public class IOService {
 
     private static final String IO_LOCALE_IT_IT = "it_IT";
-    private final IOClient client;
+    private final IOCourtesyMessageClient courtesyMessageClient;
+    private final IOOptInClient optInClient;
 
     private final PnExternalRegistriesConfig cfg;
 
     private final OptInSentDao optInSentDao;
 
-    public IOService(IOClient client, PnExternalRegistriesConfig cfg, OptInSentDao optInSentDao) {
-        this.client = client;
+    public IOService(IOCourtesyMessageClient courtesyMessageClient, IOOptInClient optInClient, PnExternalRegistriesConfig cfg, OptInSentDao optInSentDao) {
+        this.courtesyMessageClient = courtesyMessageClient;
+        this.optInClient = optInClient;
         this.cfg = cfg;
         this.optInSentDao = optInSentDao;
     }
@@ -80,7 +84,7 @@ public class IOService {
                             return Mono.just(resErrorUserStatus);
                         default:
                             log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
-                            return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID())));
+                            return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_IOINVALIDSTATUS));
                     }
                 });
     }
@@ -146,7 +150,7 @@ public class IOService {
             m.setFeatureLevelType("ADVANCED");
             m.setFiscalCode( fiscalCodePayload.getFiscalCode() );
             m.setContent( content );
-            return client.submitMessageforUserWithFiscalCodeInBody(m)
+            return courtesyMessageClient.submitMessageforUserWithFiscalCodeInBody(m)
                 .map( response -> {
                     log.info( "Sent message iun={}", content.getThirdPartyData().getId());
                     SendMessageResponseDto res = new SendMessageResponseDto();
@@ -180,7 +184,7 @@ public class IOService {
             m.setFeatureLevelType("ADVANCED");
             m.setFiscalCode( sendMessageRequestDto.getRecipientTaxID() );
             m.setContent( content );
-            return client.submitActivationMessageforUserWithFiscalCodeInBody(m)
+            return optInClient.submitMessageforUserWithFiscalCodeInBody(m)
                 .map( r -> {
                     log.info( "Sent activation message");
 
@@ -210,7 +214,7 @@ public class IOService {
                     FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
                     fiscalCodePayload.setFiscalCode( taxId );
 
-                    return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
+                    return courtesyMessageClient.getProfileByPOST( fiscalCodePayload ).map( res ->{
                         log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={} preferredLangs={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed(), res.getPreferredLanguages());
 
                         return UserStatusResponseInternal.builder()

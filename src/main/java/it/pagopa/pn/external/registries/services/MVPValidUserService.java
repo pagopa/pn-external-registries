@@ -3,10 +3,9 @@ package it.pagopa.pn.external.registries.services;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -14,9 +13,9 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class MVPValidUserService {
-    private final IOClient client;
+    private final IOOptInClient client;
 
-    public MVPValidUserService(IOClient client) {
+    public MVPValidUserService(IOOptInClient client) {
         this.client = client;
     }
 
