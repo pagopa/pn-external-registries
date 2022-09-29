@@ -10,6 +10,6 @@ public class IOOptInClient extends IOClient {
 
     public IOOptInClient(PnExternalRegistriesConfig config)
     {
-        super(config, config.getIoactApiKey());
+        super(config, config.getIoactApiKey(), "OptIn");
     }
 }

@@ -24,10 +24,12 @@ class IOClient extends OcpBaseClient {
     protected DefaultApi ioApi;
     private final String apiKey;
     private final PnExternalRegistriesConfig config;
+    String ioMode;
 
-    public IOClient(PnExternalRegistriesConfig config, String apiKey) {
+    public IOClient(PnExternalRegistriesConfig config, String apiKey, String ioMode) {
         this.config = config;
         this.apiKey = apiKey;
+        this.ioMode = ioMode;
     }
 
     @PostConstruct
@@ -40,7 +42,7 @@ class IOClient extends OcpBaseClient {
     }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        log.info("[enter] submitMessageforUserWithFiscalCodeInBody taxId={}", LogUtils.maskTaxId(message.getFiscalCode()));
+        log.info("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
         {
@@ -51,14 +53,14 @@ class IOClient extends OcpBaseClient {
         }
 
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
-            log.error("error submitMessageforUserWithFiscalCodeInBody message={}", elabExceptionMessage(throwable), throwable);
+            log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
             return Mono.error(throwable);
         });
     }
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        log.info("[enter] getProfileByPOST taxId={}", LogUtils.maskTaxId(payload.getFiscalCode()));
+        log.info("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))
         {

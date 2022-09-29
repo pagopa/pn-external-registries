@@ -25,7 +25,7 @@ public class IOCourtesyMessageClient extends IOClient {
 
     public IOCourtesyMessageClient(PnExternalRegistriesConfig config)
     {
-        super(config, config.getIoApiKey());
+        super(config, config.getIoApiKey(), "Courtesy");
     }
 
 
