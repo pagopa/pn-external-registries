@@ -20,6 +20,8 @@ paths:
       description: Use with API to implement PA choose in domicile and mandate creation pages.
       tags:
         - InfoPA
+      security:                                                                # ONLY EXTERNAL
+        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
         - name: paNameFilter
           description: Se valorizzato indica il prefisso della denominazione della PA
@@ -47,46 +49,13 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
-  '/ext-registry-private/pa/v1/activated-on-pn/{id}':
-    get:
-      operationId: getOnePa
-      summary: Retrieve detailed information about one PA
-      description: Used by the Notification detail page
-      tags:
-        - InfoPA
-      parameters:
-        - name: id
-          description: The identifier of one PA
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/SelfCarePaId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaInfo'
-        '400':
-          description: Invalid input
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
-        '500':
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
   '/ext-registry/pa/v1/groups':
     get:
       operationId: getGroups
@@ -96,10 +65,9 @@ paths:
         Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
       tags:
         - InfoPA
+      security:                                                                # ONLY EXTERNAL
+        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
-        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
-        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
-        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'
         - name: statusFilter
           description: Se valorizzato indica di tornare solo i gruppi nello stato passato
           in: query
@@ -119,13 +87,13 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
     PaNameFilter:
@@ -230,3 +198,11 @@ components:
       description: An unique ID that identify a Public Administration
       type: string
       minLength: 1
+
+  securitySchemes:                                      # ONLY EXTERNAL
+    bearerAuth:                                         # ONLY EXTERNAL
+      type: http                                        # ONLY EXTERNAL
+      scheme: bearer                                    # ONLY EXTERNAL
+      bearerFormat: JWT                                 # ONLY EXTERNAL
+security:                                               # ONLY EXTERNAL
+ - bearerAuth: []                                       # ONLY EXTERNAL
