@@ -27,16 +27,16 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest(classes = {IOClient.class, PnExternalRegistriesConfig.class})
+@SpringBootTest(classes = {IOOptInClient.class, PnExternalRegistriesConfig.class})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
         "pn.external-registry.io-api-key=fake_api_key",
         "pn.external-registry.ioact-api-key=fake_api_key_activation"
 })
-class IOClientTest {
+class IOOptInTest {
 
-    private IOClient client;
+    private IOOptInClient client;
 
     @Mock
     private PnExternalRegistriesConfig cfg;
@@ -55,9 +55,8 @@ class IOClientTest {
     @BeforeEach
     void setup() {
         Mockito.when( cfg.getIoBaseUrl()).thenReturn( "http://localhost:9999" );
-        Mockito.when( cfg.getIoApiKey() ).thenReturn( "fake_api_key" );
         Mockito.when( cfg.getIoactApiKey() ).thenReturn( "fake_api_key_activation" );
-        this.client = new IOClient( cfg );
+        this.client = new IOOptInClient(cfg);
         this.client.init();
     }
 
@@ -95,7 +94,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
                         .withPath( "/profiles" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -150,7 +149,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
                         .withPath( "/messages" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -206,7 +205,7 @@ class IOClientTest {
         new MockServerClient( "localhost", 9999 )
                 .when( request()
                         .withMethod( "POST" )
-                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key")
+                        .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
                         .withPath( "/messages" ))
                 .respond( response()
                         .withBody( responseBodyBites )
@@ -256,7 +255,7 @@ class IOClientTest {
                         .withStatusCode( 200 ));
 
         //When
-        CreatedMessage createdMessageResult = client.submitActivationMessageforUserWithFiscalCodeInBody( message ).block();
+        CreatedMessage createdMessageResult = client.submitMessageforUserWithFiscalCodeInBody( message ).block();
 
         //Then
         Assertions.assertNotNull( createdMessageResult );
@@ -299,7 +298,7 @@ class IOClientTest {
                         .withStatusCode( 500 ));
 
         //When
-        CreatedMessage createdMessageResult = client.submitActivationMessageforUserWithFiscalCodeInBody( message ).block();
+        CreatedMessage createdMessageResult = client.submitMessageforUserWithFiscalCodeInBody( message ).block();
 
         //Then
         Assertions.assertNotNull( createdMessageResult );
