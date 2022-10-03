@@ -113,11 +113,6 @@ aws ssm put-parameter --profile dev --region=eu-south-1 --no-cli-pager \
 --description "Mock della lista della PA di Self-care" \
 --value "$PA_LIST"
 
-aws ssm put-parameter --profile uat --region=eu-south-1 --no-cli-pager \
---name "MockPaList" --type "String" --overwrite \
---description "Mock della lista della PA di Self-care" \
---value "$PA_LIST"
-
 aws ssm put-parameter --profile svil --region=eu-south-1 --no-cli-pager \
 --name "MockPaList" --type "String" --overwrite \
 --description "Mock della lista della PA di Self-care" \
