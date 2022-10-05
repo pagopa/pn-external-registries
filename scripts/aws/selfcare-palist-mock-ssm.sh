@@ -6,7 +6,8 @@ PA_LIST=$(cat <<-END
       "taxId":"90067990102",
       "mailAddress":"protocollo@pec.unionecomunigolfoparadiso.ge.it",
       "status":"ACTIVE",
-      "address":"Via Stagno, 19"
+      "address":"Via Stagno, 19",
+      "generalContacts":{}
    },
    {
       "id":"7ac8d531-9c46-48eb-965a-25c12fa1fd81",
@@ -14,7 +15,8 @@ PA_LIST=$(cat <<-END
       "taxId":"80078750587",
       "mailAddress":"ufficiosegreteria.direttoregenerale@postacert.inps.gov.it",
       "status":"ACTIVE",
-      "address":"Via Ciro Il Grande, 21"
+      "address":"Via Ciro Il Grande, 21",
+      "generalContacts":{}
    },
    {
       "id":"4db741cf-17e1-4751-9b7b-7675ccca472b",
@@ -22,7 +24,8 @@ PA_LIST=$(cat <<-END
       "taxId":"06363391001",
       "mailAddress":"agenziaentratepec@pce.agenziaentrate.it",
       "status":"ACTIVE",
-      "address":"Via Giorgione 106"
+      "address":"Via Giorgione 106",
+      "generalContacts":{}
    },
    {
       "id":"5fc82440-0a04-401e-b1f9-b1e9af2429ab",
@@ -30,7 +33,8 @@ PA_LIST=$(cat <<-END
       "taxId":"00115020117",
       "mailAddress":"protocollo@pec.castelnuovomagra.com",
       "status":"ACTIVE",
-      "address":"Via Canale"
+      "address":"Via Canale",
+      "generalContacts":{}
    },
    {
       "id":"cc1c6a8e-5967-42c6-9d83-bfb12ba1665a",
@@ -38,7 +42,8 @@ PA_LIST=$(cat <<-END
       "taxId":"01307110484",
       "mailAddress":"protocollo@pec.comune.fi.it",
       "status":"ACTIVE",
-      "address":"Palazzo Vecchio, Piazza Della Signoria"
+      "address":"Palazzo Vecchio, Piazza Della Signoria",
+      "generalContacts":{}
    },
    {
       "id":"ef29949d-1167-4af9-86f4-23bcaaf6e41b",
@@ -46,7 +51,8 @@ PA_LIST=$(cat <<-END
       "taxId":"13756881002",
       "mailAddress":"protocollo@pec.agenziariscossione.gov.it",
       "status":"ACTIVE",
-      "address":"Via Giuseppe Grezar,14"
+      "address":"Via Giuseppe Grezar,14",
+      "generalContacts":{}
    },
    {
       "id":"1962d21c-c701-4805-93f6-53a877898756",
@@ -54,7 +60,8 @@ PA_LIST=$(cat <<-END
       "taxId":"15376371009",
       "mailAddress":"selfcare@pec.pagopa.it",
       "status":"ACTIVE",
-      "address":"Piazza Colonna, 370"
+      "address":"Piazza Colonna, 370",
+      "generalContacts":{}
    },
    {
       "id":"b6c5b42a-8a07-436f-96ce-8c2ab7f4dbd2",
@@ -62,7 +69,8 @@ PA_LIST=$(cat <<-END
       "taxId":"03334231200",
       "mailAddress":"comune.valsamoggia@cert.provincia.bo.it",
       "status":"ACTIVE",
-      "address":"Piazza Garibaldi 1 loc. Bazzano"
+      "address":"Piazza Garibaldi 1 loc. Bazzano",
+      "generalContacts":{}
    },
    {
       "id":"88d30379-9249-443d-82f5-084fb7a81daf",
@@ -70,7 +78,8 @@ PA_LIST=$(cat <<-END
       "taxId":"01165400589",
       "mailAddress":"presidenza@postacert.inail.it",
       "status":"ACTIVE",
-      "address":"Via IV Novembre 144"
+      "address":"Via IV Novembre 144",
+      "generalContacts":{}
    },
    {
       "id":"79e9ab1c-2f25-4dc9-8e59-843f7dc8c5a7",
@@ -78,7 +87,8 @@ PA_LIST=$(cat <<-END
       "taxId":"06396970482",
       "mailAddress":"comune.figlineincisa@postacert.toscana.it",
       "status":"ACTIVE",
-      "address":"Piazza Del Municipio, 5"
+      "address":"Piazza Del Municipio, 5",
+      "generalContacts":{}
    },
    {
       "id":"16dabc75-f12e-42c4-aa0c-be9c22e9c89e",
@@ -86,7 +96,8 @@ PA_LIST=$(cat <<-END
       "taxId":"00074260845",
       "mailAddress":"servizio.protocollo@pec.comune.agrigento.it",
       "status":"ACTIVE",
-      "address":"Piazza Pirandello, 35"
+      "address":"Piazza Pirandello, 35",
+      "generalContacts":{}
    },
    {
       "id":"026e8c72-7944-4dcd-8668-f596447fec6d",
@@ -94,7 +105,8 @@ PA_LIST=$(cat <<-END
       "taxId":"01199250158",
       "mailAddress":"protocollo@postacert.comune.milano.it",
       "status":"ACTIVE",
-      "address":"Piazza Della Scala, 2"
+      "address":"Piazza Della Scala, 2",
+      "generalContacts":{}
    },
    {
       "id":"a95dace4-4a47-4149-a814-0e669113ce40",
@@ -102,8 +114,18 @@ PA_LIST=$(cat <<-END
       "taxId":"00215150236",
       "mailAddress":"protocollo.informatico@pec.comune.verona.it",
       "status":"ACTIVE",
-      "address":"Piazza Bra, 1"
+      "address":"Piazza Bra, 1",
+      "generalContacts":{}
    },
+   {
+      "id":"614b68f2-f80f-4ebc-be30-2ad87e88aa10",
+      "name":"Comune di Mantova",
+      "taxId":"00189800204",
+      "mailAddress":"comune.mantova.aoo@legalmail.it",
+      "status":"ACTIVE",
+      "address":"Via Roma, 39",
+      "generalContacts":{}
+   }
 ]
 END
 )
