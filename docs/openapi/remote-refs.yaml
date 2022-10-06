@@ -20,3 +20,11 @@ components:
     ############################################################################################
     Problem:
       $ref: 'https://raw.githubusercontent.com/pagopa/pn-commons/61cdf0712f133c8c69e056abfad6ce5223242ba0/docs/openapi/pn-errors.yaml#/components/schemas/Problem'
+
+    ############################################################################################
+    ###                     PARAMETRI DI AUTENTICAZIONE E AUTORIZZAZIONE                     ###
+    ############################################################################################
+    paTaxId:
+      $ref: 'https://raw.githubusercontent.com/pagopa/pn-delivery/f1845e78c4d93f164d79f841ab92cd980c2c3125/docs/openapi/schemas-pn-notification-v1.yaml#/components/schemas/paTaxId'
+    noticeCode:
+      $ref: 'https://raw.githubusercontent.com/pagopa/pn-delivery/f1845e78c4d93f164d79f841ab92cd980c2c3125/docs/openapi/schemas-pn-notification-v1.yaml#/components/schemas/noticeCode'
