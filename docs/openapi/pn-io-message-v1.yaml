@@ -38,13 +38,13 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
   /ext-registry-private/io/v1/activations:
     post:
       operationId: getServiceActivationByPOST
@@ -80,7 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '429':
           description: Too many requests
         '500':
@@ -88,7 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
     put:
       operationId: upsertServiceActivation
       summary: Upsert a Service Activation for a User
@@ -123,7 +123,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '429':
           description: Too many requests
         '500':
@@ -131,7 +131,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
   /ext-registry-private/io/v1/user-status:
     post:
@@ -158,13 +158,13 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
 components:
   schemas:

@@ -1,0 +1,244 @@
+openapi: 3.0.1
+info:
+  title: API di integrazione con self care
+  version: v1
+  description: Api di integrazione al sistema Self Care
+  license:
+    name: PagoPA PN license
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: SelfCare
+    description: Integrazione verso portale selfcare
+paths:
+  '/ext-registry/pa/v1/activated-on-pn':
+    get:
+      operationId: listOnboardedPa
+      summary: List PA that use PN
+      description: Use with API to implement PA choose in domicile and mandate creation pages.
+      tags:
+        - InfoPA
+#      security:                                                                # ONLY EXTERNAL
+#        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:
+        - name: paNameFilter
+          description: Se valorizzato indica il prefisso della denominazione della PA
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaNameFilter'
+        - name: id
+          description: Se valorizzato indica gli id delle PA di cui si vuole la denominazione
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaSummariesList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry-private/pa/v1/activated-on-pn/{id}':                                           # NO EXTERNAL
+    get:                                                                                        # NO EXTERNAL
+      operationId: getOnePa                                                                     # NO EXTERNAL
+      summary: Retrieve detailed information about one PA                                       # NO EXTERNAL
+      description: Used by the Notification detail page                                         # NO EXTERNAL
+      tags:                                                                                     # NO EXTERNAL
+        - InfoPA                                                                                # NO EXTERNAL
+      parameters:                                                                               # NO EXTERNAL
+        - name: id                                                                              # NO EXTERNAL
+          description: The identifier of one PA                                                 # NO EXTERNAL
+          in: path                                                                              # NO EXTERNAL
+          required: true                                                                        # NO EXTERNAL
+          schema:                                                                               # NO EXTERNAL
+            $ref: '#/components/schemas/SelfCarePaId'                                           # NO EXTERNAL
+      responses:                                                                                # NO EXTERNAL
+        '200':                                                                                  # NO EXTERNAL
+          description: OK                                                                       # NO EXTERNAL
+          content:                                                                              # NO EXTERNAL
+            application/json:                                                                   # NO EXTERNAL
+              schema:                                                                           # NO EXTERNAL
+                $ref: '#/components/schemas/PaInfo'                                             # NO EXTERNAL
+        '400':                                                                                  # NO EXTERNAL
+          description: Invalid input                                                            # NO EXTERNAL
+          content:                                                                              # NO EXTERNAL
+            application/problem+json:                                                           # NO EXTERNAL
+              schema:                                                                           # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                            # NO EXTERNAL
+        '500':                                                                                  # NO EXTERNAL
+          description: Internal Server Error                                                    # NO EXTERNAL
+          content:                                                                              # NO EXTERNAL
+            application/problem+json:                                                           # NO EXTERNAL
+              schema:                                                                           # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                            # NO EXTERNAL
+  '/ext-registry/pa/v1/groups':
+    get:
+      operationId: getGroups
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PA can use groups to better organize work in its organization.
+        Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
+      tags:
+        - InfoPA
+#      security:                                                                # ONLY EXTERNAL
+#        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                          # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                         # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'                     # NO EXTERNAL
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            type: PaGroupStatus
+            $ref: '#/components/schemas/PaGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+components:
+  schemas:
+    PaNameFilter:
+      title: Admitted character for PA denomination field
+      type: string
+      minLength: 3
+      pattern: "[A-Za-z0-9 _]*"
+    PaSummary:
+      title: PA in short
+      description: PA with minimal information
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+    PaSummariesList:
+      title: Brief list of PAs
+      description: Contains a list of PA with minimal information
+      type: array
+      items:
+        type: PaSummary
+        $ref: '#/components/schemas/PaSummary'
+    PaInfo:
+      title: PA Info by IPA
+      description: Denomination, fiscal code, pec, email, tel, www site, ...
+      type: object
+      required:
+        - id
+        - name
+        - taxId
+        - generalContacts
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+          minLength: 1
+        taxId:
+          description: codice fiscale
+          type: string
+          minLength: 1
+        generalContacts:
+          description: General PA contact information
+          $ref: '#/components/schemas/PaContacts'
+    PaContacts:
+      title: Contact Information
+      description: pec, email, tel, www site, ...
+      type: object
+      properties:
+        pec:
+          type: string
+          format: email
+          minLength: 1
+        email:
+          type: string
+          format: email
+          minLength: 1
+        tel:
+          type: string
+          pattern: '^\\+?([0-9]|-)*'
+          minLength: 1
+          maxLength: 20
+        web:
+          type: string
+          format: uri
+          pattern: 'http.*'
+          minLength: 1
+    PaGroupList:
+      title: Groups defined in Self Care
+      description: Contains the list of groups defined in SelfCare
+      type: array
+      items:
+        type: PaGroup
+        $ref: '#/components/schemas/PaGroup'
+    PaGroup:
+      title: Group defined in Self Care
+      description: Contains tha name list of groups defined in SelfCare
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: PaGroupStatus
+          $ref: '#/components/schemas/PaGroupStatus'
+    PaGroupStatus:
+      title: Status of group defined in Self Care
+      description: Contains tha name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+    SelfCarePaId:
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
+      type: string
+      minLength: 1
+
+#  securitySchemes:                                      # ONLY EXTERNAL
+#    bearerAuth:                                         # ONLY EXTERNAL
+#      type: http                                        # ONLY EXTERNAL
+#      scheme: bearer                                    # ONLY EXTERNAL
+#      bearerFormat: JWT                                 # ONLY EXTERNAL
+#security:                                               # ONLY EXTERNAL
+# - bearerAuth: []                                       # ONLY EXTERNAL

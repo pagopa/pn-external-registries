@@ -30,25 +30,25 @@ paths:
           required: false
           schema:
             type: PaGroupStatus
-            $ref: 'pn-selfcare-v1.yaml#/components/schemas/PaGroupStatus'
+            $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PaGroupStatus'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: 'pn-selfcare-v1.yaml#/components/schemas/PaGroupList'
+                $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PaGroupList'
         '400':
           description: Invalid input
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: 'pn-errors.yaml#/components/schemas/Problem'
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
 
