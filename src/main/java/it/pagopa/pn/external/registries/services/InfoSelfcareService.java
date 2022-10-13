@@ -63,8 +63,7 @@ public class InfoSelfcareService {
                 .map(PageOfUserGroupResourceDto::getContent)
                 .flatMapMany(Flux::fromIterable)
                 .filter(grp -> statusFilter == null || statusFilter.getValue().equals(grp.getStatus().getValue()))
-                .filter(grp -> xPagopaPnCxGroups == null || xPagopaPnCxGroups.isEmpty()
-                        || xPagopaPnCxGroups.contains(grp.getId()))
+                .filter(grp -> xPagopaPnCxGroups != null && xPagopaPnCxGroups.contains(grp.getId()))
                 .map(UserGroupToPaGroupDtoMapper::toDto);
     }
 }
