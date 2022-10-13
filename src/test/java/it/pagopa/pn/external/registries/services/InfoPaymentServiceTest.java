@@ -97,4 +97,31 @@ class InfoPaymentServiceTest {
         Assertions.assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
     }
 
+    @Test
+    void getInfoPaymentKo() {
+        ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
+        responseBody.setCategory("GENERIC_ERROR");
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor(ValidationFaultPaymentProblemJsonDto.class);
+        try {
+            responseBodyBites = mapper.writeValueAsBytes(responseBody);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        WebClientResponseException ex = WebClientResponseException.Conflict.create(502, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
+
+        Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
+        Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
+
+        PaymentInfoDto result = service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000));
+
+        Assertions.assertNotNull(result);
+        System.out.println(result);
+        Assertions.assertEquals(PaymentStatusDto.FAILURE, result.getStatus());
+    }
+
 }

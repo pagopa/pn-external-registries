@@ -45,7 +45,7 @@ public class InfoPaymentService {
                 )
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
-                    log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
+                    log.error( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
                     return fromCheckoutToPn( paTaxId, noticeNumber, httpStatus, ex.getResponseBodyAsString() );
         });
     }
