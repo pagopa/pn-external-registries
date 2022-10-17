@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.exceptions.*;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.DetailDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
@@ -17,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
 
 @Service
 @Slf4j
@@ -65,9 +68,41 @@ public class InfoPaymentService {
                 if (HttpStatus.CONFLICT.equals(status) && DetailDto.PAYMENT_DUPLICATED.equals(paymentInfoDto.getDetail()) ) {
                     return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber).thenReturn(paymentInfoDto);
                 }
+                if (HttpStatus.BAD_REQUEST.equals(status)) {
+                    throw new PnCheckoutBadRequestException(
+                            "Formally invalid input",
+                            ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
+                }
+                if (HttpStatus.NOT_FOUND.equals(status)) {
+                    throw new PnCheckoutBadRequestException(
+                            "Node cannot find the services needed to process this request in its configuration." +
+                                    "This error is most likely to occur when submitting a non-existing RPT id",
+                            ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
+                }
+                if (HttpStatus.BAD_GATEWAY.equals(status)) {
+                    throw new PnCheckoutServerErrorException(
+                            "PagoPA services are not available or request is rejected by PagoPa",
+                            ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_GATEWAY);
+                }
+                if (HttpStatus.SERVICE_UNAVAILABLE.equals(status)) {
+                    throw new PnCheckoutServerErrorException(
+                            "EC services are not available",
+                            ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_SERVICE_UNAVAILABLE);
+                }
+                if (HttpStatus.GATEWAY_TIMEOUT.equals(status)) {
+                    throw new PnCheckoutServerErrorException(
+                            "Timeout from PagoPA services",
+                            ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_GATEWAY_TIMEOUT);
+                }
             }
         } catch (JsonProcessingException e) {
             log.error(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber, e);
+            return Mono.error( e );
+        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException e) {
+            log.error(
+                    "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
+                    status, paTaxId, noticeNumber, e
+            );
             return Mono.error( e );
         }
         return Mono.just( paymentInfoDto );
