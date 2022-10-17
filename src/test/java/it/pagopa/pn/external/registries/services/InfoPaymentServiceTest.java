@@ -3,7 +3,10 @@ package it.pagopa.pn.external.registries.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
+import it.pagopa.pn.external.registries.exceptions.PnCheckoutInternalException;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ProblemJsonDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
@@ -23,6 +26,10 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 class InfoPaymentServiceTest {
@@ -74,8 +81,8 @@ class InfoPaymentServiceTest {
 
         PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
 
-        Assertions.assertNotNull( result );
-        Assertions.assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
     }
 
     @Test
@@ -92,13 +99,12 @@ class InfoPaymentServiceTest {
         PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id", "fakeNoticeNumber" ).block();
 
         //Then
-        Assertions.assertNotNull( result );
-        Assertions.assertEquals( PaymentStatusDto.REQUIRED , result.getStatus() );
-        Assertions.assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.REQUIRED , result.getStatus() );
+        assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
     }
-
     @Test
-    void getInfoPaymentKo() {
+    void getInfoPaymentKo_502() {
         ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
         responseBody.setCategory("GENERIC_ERROR");
 
@@ -117,11 +123,13 @@ class InfoPaymentServiceTest {
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
         Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
 
-        PaymentInfoDto result = service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000));
+        PnCheckoutInternalException thrown = assertThrows(
+                PnCheckoutInternalException.class,
+                () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
+                "Formally invalid input"
+        );
 
-        Assertions.assertNotNull(result);
-        System.out.println(result);
-        Assertions.assertEquals(PaymentStatusDto.FAILURE, result.getStatus());
+        assertTrue(thrown.getMessage().contains("PagoPA services are not available or request is rejected by PagoPa"));
     }
 
 }
