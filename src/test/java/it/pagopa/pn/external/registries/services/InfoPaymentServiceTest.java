@@ -28,8 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST;
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 class InfoPaymentServiceTest {
@@ -104,7 +104,7 @@ class InfoPaymentServiceTest {
         assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
     }
     @Test
-    void getInfoPaymentKo_502() {
+    void getInfoPaymentKo_500() {
         ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
         responseBody.setCategory("GENERIC_ERROR");
 
@@ -126,10 +126,42 @@ class InfoPaymentServiceTest {
         PnCheckoutInternalException thrown = assertThrows(
                 PnCheckoutInternalException.class,
                 () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
-                "Formally invalid input"
+                ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST
         );
 
         assertTrue(thrown.getMessage().contains("PagoPA services are not available or request is rejected by PagoPa"));
+    }
+
+    @Test
+    void getInfoPaymentKo_400() {
+        ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
+        responseBody.setCategory("GENERIC_ERROR");
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor(ValidationFaultPaymentProblemJsonDto.class);
+        try {
+            responseBodyBites = mapper.writeValueAsBytes(responseBody);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        WebClientResponseException ex = WebClientResponseException.Conflict.create(404, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
+
+        Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
+        Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
+
+        PnCheckoutBadRequestException thrown = assertThrows(
+                PnCheckoutBadRequestException.class,
+                () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
+                ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND
+        );
+
+        assertTrue(thrown.getMessage().contains(
+                "Node cannot find the services needed to process this request in its configuration." +
+        "This error is most likely to occur when submitting a non-existing RPT id"
+        ));
     }
 
 }
