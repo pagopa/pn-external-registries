@@ -4,16 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
-import it.pagopa.pn.external.registries.exceptions.PnCheckoutInternalException;
+import it.pagopa.pn.external.registries.exceptions.PnCheckoutServerErrorException;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ProblemJsonDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -103,8 +103,10 @@ class InfoPaymentServiceTest {
         assertEquals( PaymentStatusDto.REQUIRED , result.getStatus() );
         assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
     }
-    @Test
-    void getInfoPaymentKo_500() {
+
+    @ParameterizedTest
+    @ValueSource(ints = { 502, 503, 504})
+    void getInfoPaymentKo_500(int statusCode) {
         ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
         responseBody.setCategory("GENERIC_ERROR");
 
@@ -118,22 +120,22 @@ class InfoPaymentServiceTest {
             e.printStackTrace();
         }
 
-        WebClientResponseException ex = WebClientResponseException.Conflict.create(502, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
+        WebClientResponseException ex = WebClientResponseException.Conflict.create(statusCode, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
         Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
 
-        PnCheckoutInternalException thrown = assertThrows(
-                PnCheckoutInternalException.class,
+        PnCheckoutServerErrorException thrown = assertThrows(
+                PnCheckoutServerErrorException.class,
                 () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
                 ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST
         );
-
-        assertTrue(thrown.getMessage().contains("PagoPA services are not available or request is rejected by PagoPa"));
+        assertTrue(thrown.getMessage().contains("Checkout server error"));
     }
 
-    @Test
-    void getInfoPaymentKo_400() {
+    @ParameterizedTest
+    @ValueSource(ints = { 400, 404})
+    void getInfoPaymentKo_400(int statusCode) {
         ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
         responseBody.setCategory("GENERIC_ERROR");
 
@@ -147,7 +149,7 @@ class InfoPaymentServiceTest {
             e.printStackTrace();
         }
 
-        WebClientResponseException ex = WebClientResponseException.Conflict.create(404, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
+        WebClientResponseException ex = WebClientResponseException.Conflict.create(statusCode, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
         Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
@@ -157,11 +159,7 @@ class InfoPaymentServiceTest {
                 () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
                 ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND
         );
-
-        assertTrue(thrown.getMessage().contains(
-                "Node cannot find the services needed to process this request in its configuration." +
-        "This error is most likely to occur when submitting a non-existing RPT id"
-        ));
+        assertTrue(thrown.getMessage().contains("Checkout bad request"));
     }
 
 }

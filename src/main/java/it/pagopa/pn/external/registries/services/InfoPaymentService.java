@@ -80,17 +80,17 @@ public class InfoPaymentService {
                             ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
                 }
                 if (HttpStatus.BAD_GATEWAY.equals(status)) {
-                    throw new PnCheckoutInternalException(
+                    throw new PnCheckoutServerErrorException(
                             "PagoPA services are not available or request is rejected by PagoPa",
                             ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_GATEWAY);
                 }
                 if (HttpStatus.SERVICE_UNAVAILABLE.equals(status)) {
-                    throw new PnCheckoutInternalException(
+                    throw new PnCheckoutServerErrorException(
                             "EC services are not available",
                             ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_SERVICE_UNAVAILABLE);
                 }
                 if (HttpStatus.GATEWAY_TIMEOUT.equals(status)) {
-                    throw new PnCheckoutInternalException(
+                    throw new PnCheckoutServerErrorException(
                             "Timeout from PagoPA services",
                             ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_GATEWAY_TIMEOUT);
                 }
@@ -98,7 +98,7 @@ public class InfoPaymentService {
         } catch (JsonProcessingException e) {
             log.error(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber, e);
             return Mono.error( e );
-        } catch (PnCheckoutBadRequestException | PnCheckoutInternalException e) {
+        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException e) {
             log.error(
                     "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
                     status, paTaxId, noticeNumber, e
