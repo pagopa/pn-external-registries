@@ -161,7 +161,7 @@ class InfoSelfcareServiceMockTest {
 
     // THEN
     assertNotNull(res);
-    assertEquals(0, res.size());
+    assertEquals(inst.getName(), res.get(0).getName());
   }
 
   @Test
