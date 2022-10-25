@@ -342,7 +342,7 @@ Resources:
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/microservice-cloudwatch-dashboard.yaml"
       Parameters:
-        DashboardName: !Sub "${ProjectName}-delivery-push"
+        DashboardName: !Sub "${ProjectName}-external-registries"
         DynamoDBTableNames: !Join 
           - ',' 
           - - !Ref OptInSentTableName 
