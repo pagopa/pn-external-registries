@@ -1,10 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.api.dto.events.EventPublisher;
-import it.pagopa.pn.api.dto.events.EventType;
-import it.pagopa.pn.api.dto.events.PnExtRegistryNotificationPaidEvent;
-import it.pagopa.pn.api.dto.events.StandardEventHeader;
-import it.pagopa.pn.commons.abstractions.MomProducer;
+import it.pagopa.pn.api.dto.events.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
