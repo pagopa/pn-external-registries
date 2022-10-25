@@ -335,3 +335,28 @@ Resources:
       - ExternalRegistryPublicB2BGroupsMethod
     Properties:
       RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+
+  ## Dashboard
+  ExternalRegistriesMicroserviceCloudWatchDashboard:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/microservice-cloudwatch-dashboard.yaml"
+      Parameters:
+        DashboardName: !Sub "${ProjectName}-delivery-push"
+        DynamoDBTableNames: !Join 
+          - ',' 
+          - - !Ref OptInSentTableName 
+        RestApiStageArns: !Join
+          - ','
+          - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiStageArn
+        RestApiNames: !Join
+          - ','
+          - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiName
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
+        AlarmArns: !Join
+          - ','
+          - - !GetAtt ExternalRegistryMicroservice.Outputs.AutoScalingAlarmArn
+        QueueArns: !Join
+          - ','
+          - - !Ref DeliveryPushInputsQueueARN
