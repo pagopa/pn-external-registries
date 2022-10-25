@@ -30,10 +30,13 @@ public class SendPaymentNotificationService {
 
     private PnExtRegistryNotificationPaidEvent buildNotificationPaid( String paTaxId, String noticeCode ) {
         Instant eventDate = Instant.now();
+        String eventId = paTaxId + "_notification_paid_" + noticeCode;
         return PnExtRegistryNotificationPaidEvent.builder()
+                .messageDeduplicationId(eventId)
+                .messageGroupId("delivery")
                 .header( StandardEventHeader.builder()
                         .iun( paTaxId ) //TODO non c'è lo iun capire se obbligatorio
-                        .eventId( paTaxId + "_notification_paid_" + noticeCode )
+                        .eventId( eventId )
                         .createdAt( eventDate )
                         .eventType( EventType.NOTIFICATION_PAID.name() )
                         .publisher( EventPublisher.EXTERNAL_REGISTRY.name())
