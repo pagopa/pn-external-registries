@@ -357,6 +357,7 @@ Resources:
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.AutoScalingAlarmArn
+            - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushInputsQueueARN
