@@ -363,7 +363,3 @@ Resources:
             - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
-            - !Ref DeliveryPushInputsQueueAlarmARN
-        QueueArns: !Join
-          - ','
-          - - !Ref DeliveryPushInputsQueueARN
