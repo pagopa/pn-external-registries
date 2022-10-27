@@ -106,9 +106,6 @@ Parameters:
     Type: String
     Description: 'Queue to pull for inputs event'
 
-  DeliveryPushInputsQueueAlarmARN:
-    Type: String
-    Description: 'Alarm for queue to pull inputs event'
 Resources:
 
   # PN-External-Registry microservice
