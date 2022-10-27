@@ -106,6 +106,9 @@ Parameters:
     Type: String
     Description: 'Queue to pull for inputs event'
 
+  DeliveryPushInputsQueueAlarmARN:
+    Type: String
+    Description: 'Alarm for queue to pull inputs event'
 Resources:
 
   # PN-External-Registry microservice
@@ -358,6 +361,9 @@ Resources:
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.AutoScalingAlarmArn
             - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
+            - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
+            - !Ref DeliveryPushInputsQueueAlarmARN
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushInputsQueueARN
