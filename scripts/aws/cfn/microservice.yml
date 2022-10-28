@@ -335,3 +335,28 @@ Resources:
       - ExternalRegistryPublicB2BGroupsMethod
     Properties:
       RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+
+  ## Dashboard
+  ExternalRegistriesMicroserviceCloudWatchDashboard:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/microservice-cloudwatch-dashboard.yaml"
+      Parameters:
+        DashboardName: !Sub "${ProjectName}-external-registries"
+        DynamoDBTableNames: !Join 
+          - ',' 
+          - - !Ref OptInSentTableName 
+        RestApiStageArns: !Join
+          - ','
+          - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiStageArn
+        RestApiNames: !Join
+          - ','
+          - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiName
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
+        AlarmArns: !Join
+          - ','
+          - - !GetAtt ExternalRegistryMicroservice.Outputs.AutoScalingAlarmArn
+            - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
+            - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
