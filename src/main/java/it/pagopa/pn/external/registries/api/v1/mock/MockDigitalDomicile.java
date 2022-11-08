@@ -8,9 +8,6 @@ public class MockDigitalDomicile {
     private String DomicileType;
     private String address;
 
-  public MockDigitalDomicile() {
-  }
-
   public String getDomicileType() {
     return DomicileType;
   }

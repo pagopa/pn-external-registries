@@ -20,9 +20,6 @@ public class MockAnalogDomicile {
 
   private String state;
 
-  public MockAnalogDomicile() {
-  }
-
   public String getAt() {
     return at;
   }

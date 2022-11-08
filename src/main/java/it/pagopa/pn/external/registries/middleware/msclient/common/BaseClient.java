@@ -25,6 +25,7 @@ public abstract class BaseClient extends CommonBaseClient {
         return super.enrichBuilder(builder.clientConnector(new ReactorClientHttpConnector(httpClient)));
     }
 
+    @Override
     protected String elabExceptionMessage(Throwable x)
     {
         try {

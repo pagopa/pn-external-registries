@@ -1,13 +1,9 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.api.PaymentInfoApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
 import it.pagopa.pn.external.registries.services.InfoPaymentService;
 import it.pagopa.pn.external.registries.services.SendPaymentNotificationService;
-import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;

@@ -22,6 +22,8 @@ import reactor.core.publisher.Mono;
 public class InfoSelfcareService {
 
   // FIXME: da sistemare INSTITUTIONS una volta che le specifiche saranno più chiare
+  private static final String MOCK_IMPLEMENTED_MSG =  "richiesta mock implementata";
+  private static final String NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
 
   private final SelfcareUserGroupClient selfcareUserGroupClient;
   private final SelfcareInstitutionsClient selfcareInstitutionsClient;
@@ -38,7 +40,7 @@ public class InfoSelfcareService {
      * return selfcareClient.getInstitution(id) .switchIfEmpty(Mono.error(new NotFoundException()))
      * .map(InstitutionResourceDtoToPaInfoDto::toDto);
      */
-    return Mono.error(new PnInternalException("richiesta mock implementata", "NOT_IMPLEMENTED"));
+    return Mono.error(new PnInternalException(MOCK_IMPLEMENTED_MSG, NOT_IMPLEMENTED));
   }
 
   public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
@@ -48,7 +50,7 @@ public class InfoSelfcareService {
      * inst.getName().toLowerCase(Locale.ROOT).contains(paNameFilter))
      * .map(InstitutionResourceDtoToPaSummaryDto::toDto);
      */
-    return Flux.error(new PnInternalException("richiesta mock implementata", "NOT_IMPLEMENTED"));
+    return Flux.error(new PnInternalException(MOCK_IMPLEMENTED_MSG, NOT_IMPLEMENTED));
   }
 
   public Flux<PaSummaryDto> listOnboardedPaByIds(List<String> ids) {
@@ -57,7 +59,7 @@ public class InfoSelfcareService {
      * return selfcareClient.getInstitutions() .filter(inst -> ids.contains(inst.getId()))
      * .map(InstitutionResourceDtoToPaSummaryDto::toDto);
      */
-    return Flux.error(new PnInternalException("richiesta mock implementata", "NOT_IMPLEMENTED"));
+    return Flux.error(new PnInternalException(MOCK_IMPLEMENTED_MSG, NOT_IMPLEMENTED));
   }
 
   public Flux<PaGroupDto> getGroups(String xPagopaPnUid, String xPagopaPnCxId,
