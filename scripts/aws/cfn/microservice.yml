@@ -106,6 +106,10 @@ Parameters:
     Type: String
     Description: 'Queue to pull for inputs event'
 
+  LogsKinesisSourceStreamArn:
+    Type: String
+    Description: 'Kinesis stream to send logs to'
+    
 Resources:
 
   # PN-External-Registry microservice
