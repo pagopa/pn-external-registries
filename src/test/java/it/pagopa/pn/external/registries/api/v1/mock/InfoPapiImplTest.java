@@ -19,15 +19,13 @@ class InfoPapiImplTest {
 
     private InfoPapiImpl service;
 
-    PnExternalRegistriesConfig pnExternalRegistriesConfig;
-
     private MockResponses mrh;
 
     @BeforeEach
     void setup(){
         mrh = Mockito.mock(MockResponses.class);
-        pnExternalRegistriesConfig = Mockito.mock(PnExternalRegistriesConfig.class);
-        this.service = new InfoPapiImpl( mrh, pnExternalRegistriesConfig );
+        PnExternalRegistriesConfig pnExternalRegistriesConfig = Mockito.mock(PnExternalRegistriesConfig.class);
+        this.service = new InfoPapiImpl( mrh, pnExternalRegistriesConfig);
     }
 
     @Test
@@ -91,6 +89,7 @@ class InfoPapiImplTest {
         paSummaryDto.setName("mocked-name");
         List<PaSummaryDto> list = new ArrayList<>();
         list.add(paSummaryDto);
+        paSummaryDto = new PaSummaryDto();
         paSummaryDto.setId("mocked-id-2");
         paSummaryDto.setName("mocked-name-2");
         list.add(paSummaryDto);
