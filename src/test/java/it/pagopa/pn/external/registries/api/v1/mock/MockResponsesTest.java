@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class MockResponsesTest {
+class MockResponsesTest {
 
     private MockResponses service;
 
@@ -132,8 +132,8 @@ public class MockResponsesTest {
 
         //THEN
         assertFalse(list.isEmpty());
-        assertEquals(list.size(), 2);
-        assertEquals(list, getPaSummary());
+        assertEquals(2, list.size());
+        assertEquals(getPaSummary(), list);
     }
 
     @Test
@@ -160,8 +160,8 @@ public class MockResponsesTest {
 
         //THEN
         assertFalse(list.isEmpty());
-        assertEquals(list.size(), 2);
-        assertEquals(list, getPaSummary());
+        assertEquals(2, list.size());
+        assertEquals(getPaSummary(), list);
     }
 
     @Test
