@@ -1,221 +1,57 @@
 package it.pagopa.pn.external.registries.middleware.msclient.common;
 
-import it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
-import it.pagopa.pn.external.registries.services.AccessTokenCacheService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.integration.ClientAndServer;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BaseClientTest {
 
-    @Mock
-    AccessTokenCacheService accessTokenCacheService;
-
-    private static ClientAndServer mockServer;
-
-    @Configuration
-    static class ContextConfiguration {
-        @Primary
-        @Bean
-        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
-            return Mockito.mock( SqsNotificationPaidProducer.class);
-        }
-    }
+    private BaseClient client;
 
     @BeforeAll
-    public static void startMockServer() {
-        mockServer = startClientAndServer(9999);
-    }
-
-
-    @AfterAll
-    public static void stopMockServer() {
-        mockServer.stop();
+    public void setup() {
+        this.client = Mockito.mock(BaseClient.class, Mockito.CALLS_REAL_METHODS);
     }
 
     @Test
-    void getApiClient() {
-        //GIVEN
-        String token = "newtoken123456";
-        String hello = "world";
-        when(accessTokenCacheService.getToken(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(Mono.just(token));
+    void elabExceptionMessageNoMsg() {
+        // GIVEN
+        Throwable exp = new Throwable();
 
+        // WHEN
+        String msg = client.elabExceptionMessage(exp);
 
-        new MockServerClient("localhost", 9999)
-                .when(request()
-                        .withMethod("GET")
-                        .withHeader("Authorization", "Bearer " + token)
-                        .withPath("/fake/helloworld/{hello}".replace("{hello}", hello)))
-                .respond(response()
-                        .withBody("hello " + hello)
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withStatusCode(200));
-
-        FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-
-        //WHEN
-        String resp = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class).block(Duration.ofMillis(3000));
-
-        //THEN
-        assertEquals("hello " +  hello, resp);
+        // THEN
+        assertEquals("", msg);
     }
 
     @Test
-    void getApiClientUnauthorizedAndRetrySuccess() {
-        // fa 2 richieste, la prima con un token scaduto, che torna 401, e in automatico avviene il rinnovo con token valido
-        //GIVEN
-        String tokenExpired = "token123456_EXPIRED";
-        String tokenValid = "token123456_VALID";
-        String hello = "world";
-        when(accessTokenCacheService.getToken(Mockito.anyString(), Mockito.anyBoolean()))
-                .thenReturn(Mono.just(tokenExpired))
-                .thenReturn(Mono.just(tokenValid));
+    void elabExceptionMessageMsg() {
+        // GIVEN
+        Throwable exp = new Throwable("fake message");
 
+        // WHEN
+        String msg = client.elabExceptionMessage(exp);
 
-        new MockServerClient("localhost", 9999)
-                .when(request()
-                        .withMethod("GET")
-                        .withHeader("Authorization", "Bearer " + tokenExpired)
-                        .withPath("/fake/helloworld/{hello}".replace("{hello}", hello)))
-                .respond(response()
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withStatusCode(HttpStatus.UNAUTHORIZED.value()));
-
-        new MockServerClient("localhost", 9999)
-                .when(request()
-                        .withMethod("GET")
-                        .withHeader("Authorization", "Bearer " + tokenValid)
-                        .withPath("/fake/helloworld/{hello}".replace("{hello}", hello)))
-                .respond(response()
-                        .withBody("hello " + hello)
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withStatusCode(200));
-        FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-
-        //WHEN
-        String resp = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class).block(Duration.ofMillis(3000));
-
-        //THEN
-        assertEquals("hello " +  hello, resp);
+        // THEN
+        assertEquals("fake message", msg);
     }
 
     @Test
-    void getApiClientUnauthorizedAndRetryFailed() {
-        // fa 2 richieste, la prima con un token scaduto, che torna 401, e in automatico avviene il rinnovo con token che però non è valido
-        // ci si aspetta un KO per Unauthorized
-        //GIVEN
-        String tokenExpired = "token123456_EXPIRED";
-        String tokenValid = "token123456_VALID";
-        String hello = "world";
-        when(accessTokenCacheService.getToken(Mockito.anyString(), Mockito.anyBoolean()))
-                .thenReturn(Mono.just(tokenExpired));
+    void elabExceptionMessageWebClient() {
+        // GIVEN
+        Throwable exp = WebClientResponseException.create(404, "fake message", HttpHeaders.EMPTY, new byte[0], null);
 
+        // WHEN
+        String msg = client.elabExceptionMessage(exp);
 
-        new MockServerClient("localhost", 9999)
-                .when(request()
-                        .withMethod("GET")
-                        .withHeader("Authorization", "Bearer " + tokenExpired)
-                        .withPath("/fake/helloworld/{hello}".replace("{hello}", hello)))
-                .respond(response()
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withStatusCode(HttpStatus.UNAUTHORIZED.value()));
-
-        new MockServerClient("localhost", 9999)
-                .when(request()
-                        .withMethod("GET")
-                        .withHeader("Authorization", "Bearer " + tokenValid)
-                        .withPath("/fake/helloworld/{hello}".replace("{hello}", hello)))
-                .respond(response()
-                        .withBody("hello " + hello)
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withStatusCode(200));
-
-        FakeApiClient fakeApiClient = new FakeApiClient(accessTokenCacheService);
-
-        //WHEN
-         Mono<String> httpcall = fakeApiClient.fakeHelloWorld(hello).bodyToMono(String.class);
-        Duration duration = Duration.ofMillis(3000);
-        try {
-            httpcall.block(duration);
-            fail("no WebClientResponseException thrown");
-        } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
-            assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
-        } catch (Exception e) {
-            fail("wrong exception thrown");
-        }
-
-        //THEN
-    }
-
-    private static class FakeApiClient extends TokenBaseClient
-    {
-        ApiClient apiClient;
-        public FakeApiClient(AccessTokenCacheService accessTokenCacheService){
-            super(accessTokenCacheService, "M2M");
-            apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder()));
-            apiClient.setBasePath("http://localhost:9999");
-        }
-
-        public WebClient.ResponseSpec fakeHelloWorld(String hello)
-        {
-            Object postBody = null;
-
-            // create path and map variables
-            final Map<String, Object> pathParams = new HashMap<>();
-            pathParams.put("hello", hello);
-
-            final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-            final HttpHeaders headerParams = new HttpHeaders();
-            final MultiValueMap<String, String> cookieParams = new LinkedMultiValueMap<>();
-            final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<>();
-
-            final String[] localVarAccepts = {
-                    "application/json"
-            };
-            final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-            final String[] localVarContentTypes = {
-                    "application/x-www-form-urlencoded"
-            };
-            final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-
-            String[] localVarAuthNames = new String[] { "bearerAuth" };
-
-            ParameterizedTypeReference<String> localVarReturnType = new ParameterizedTypeReference<>() {
-            };
-            return apiClient.invokeAPI("/fake/helloworld/{hello}", HttpMethod.GET, pathParams, queryParams, postBody, headerParams, cookieParams, formParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
-        }
+        // THEN
+        assertEquals("404 fake message;", msg);
     }
 }
