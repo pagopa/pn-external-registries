@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import it.pagopa.pn.external.registries.utils.AssertionGenerator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -23,9 +22,6 @@ class SelfcareInstituionsClientTest {
 
     @Autowired
     private SelfcareInstitutionsClient client;
-
-    @MockBean
-    private AssertionGenerator assertionGenerator;
 
     private static ClientAndServer mockServer;
 
