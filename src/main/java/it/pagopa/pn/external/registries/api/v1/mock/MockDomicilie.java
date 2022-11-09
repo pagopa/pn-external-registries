@@ -10,9 +10,6 @@ public class MockDomicilie {
     private MockAnalogDomicile analog;
     private MockDigitalDomicile digital;
 
-  public MockDomicilie() {
-  }
-
   public MockAnalogDomicile getAnalog() {
     return analog;
   }

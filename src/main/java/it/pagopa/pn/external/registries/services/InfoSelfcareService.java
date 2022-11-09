@@ -11,7 +11,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGr
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.mapper.UserGroupToPaGroupDtoMapper;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -26,39 +25,23 @@ public class InfoSelfcareService {
   private static final String NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
 
   private final SelfcareUserGroupClient selfcareUserGroupClient;
-  private final SelfcareInstitutionsClient selfcareInstitutionsClient;
 
-  public InfoSelfcareService(SelfcareUserGroupClient selfcareUserGroupClient,
-      SelfcareInstitutionsClient selfcareInstitutionsClient) {
+  public InfoSelfcareService(SelfcareUserGroupClient selfcareUserGroupClient) {
     this.selfcareUserGroupClient = selfcareUserGroupClient;
-    this.selfcareInstitutionsClient = selfcareInstitutionsClient;
   }
 
   public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
     log.info("getOnePa - id={}", id);
-    /*
-     * return selfcareClient.getInstitution(id) .switchIfEmpty(Mono.error(new NotFoundException()))
-     * .map(InstitutionResourceDtoToPaInfoDto::toDto);
-     */
     return Mono.error(new PnInternalException(MOCK_IMPLEMENTED_MSG, NOT_IMPLEMENTED));
   }
 
   public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
     log.info("listOnboardedPaByName - paNameFilter={}", paNameFilter);
-    /*
-     * return selfcareClient.getInstitutions() .filter(inst ->
-     * inst.getName().toLowerCase(Locale.ROOT).contains(paNameFilter))
-     * .map(InstitutionResourceDtoToPaSummaryDto::toDto);
-     */
     return Flux.error(new PnInternalException(MOCK_IMPLEMENTED_MSG, NOT_IMPLEMENTED));
   }
 
   public Flux<PaSummaryDto> listOnboardedPaByIds(List<String> ids) {
     log.info("listOnboardedPaByIds - ids={}", ids);
-    /*
-     * return selfcareClient.getInstitutions() .filter(inst -> ids.contains(inst.getId()))
-     * .map(InstitutionResourceDtoToPaSummaryDto::toDto);
-     */
     return Flux.error(new PnInternalException(MOCK_IMPLEMENTED_MSG, NOT_IMPLEMENTED));
   }
 
