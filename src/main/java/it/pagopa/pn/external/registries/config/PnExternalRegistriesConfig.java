@@ -15,9 +15,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_BADCONFIGURATION_MISSING_TEMPLATE;
 
@@ -29,15 +27,6 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @ToString
 @Import(SharedAutoConfiguration.class)
 public class PnExternalRegistriesConfig {
-
-    public static final String PDND_M2M_TOKEN = "pdnd";
-
-    private Map<String,AccessTokenConfig> accessTokens = new HashMap<>();
-
-    private String pdndServerUrl;
-
-    private String anprX509CertificateChain;
-    private String anprJWTHeaderDigestKeystoreAlias;
 
     private String checkoutApiKey;
     private String checkoutApiBaseUrl;
