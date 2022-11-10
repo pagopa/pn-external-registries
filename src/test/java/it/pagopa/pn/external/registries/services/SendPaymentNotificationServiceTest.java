@@ -9,7 +9,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SendPaymentNotificationServiceTest {
+class SendPaymentNotificationServiceTest {
 
     private SendPaymentNotificationService service;
 

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebFluxTest(controllers = {InfoInternalPaController.class})
-public class InfoInternalPaControllerTest {
+class InfoInternalPaControllerTest {
 
     public static final String PN_PAGOPA_USER_ID = "x-pagopa-pn-cx-id";
 
