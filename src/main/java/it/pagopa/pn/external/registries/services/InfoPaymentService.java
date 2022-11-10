@@ -79,7 +79,7 @@ public class InfoPaymentService {
                     "Timeout from PagoPA services",
                     ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_GATEWAY_TIMEOUT);
         }
-        return null;
+        return Mono.just(paymentInfoDto);
     }
 
     private Mono<PaymentInfoDto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
