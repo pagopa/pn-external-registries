@@ -7,13 +7,11 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
-import it.pagopa.pn.external.registries.utils.AssertionGenerator;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
@@ -41,9 +39,6 @@ class SelfcareUserGroupClientTest {
 
     @MockBean
     private PnExternalRegistriesConfig cfg;
-
-    @MockBean
-    private AssertionGenerator assertionGenerator;
 
     private static ClientAndServer mockServer;
 

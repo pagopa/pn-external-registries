@@ -13,9 +13,6 @@ public class MockPa {
         return id;
     }
 
-    public MockPa() {
-    }
-
     public void setId(String id) {
         this.id = id;
     }

@@ -5,18 +5,15 @@ package it.pagopa.pn.external.registries.api.v1.mock;
  */
 
 public class MockDigitalDomicile {
-    private String DomicileType;
+    private String domicileType;
     private String address;
 
-  public MockDigitalDomicile() {
-  }
-
   public String getDomicileType() {
-    return DomicileType;
+    return domicileType;
   }
 
   public void setDomicileType(String domicileType) {
-    DomicileType = domicileType;
+    this.domicileType = domicileType;
   }
 
   public String getAddress() {

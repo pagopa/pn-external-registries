@@ -34,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class InfoPaymentServiceTest {
 
+    Duration d = Duration.ofMillis(3000);
+
     private final String CHECKOUT_SITE_URL = "https://uat.checkout.pagopa.it";
 
     @InjectMocks
@@ -125,9 +127,11 @@ class InfoPaymentServiceTest {
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
         Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
 
+
+        Mono<PaymentInfoDto> mono = service.getPaymentInfo("asdasda", "asdasda");
         PnCheckoutServerErrorException thrown = assertThrows(
                 PnCheckoutServerErrorException.class,
-                () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
+                () -> mono.block(d),
                 ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST
         );
         assertTrue(thrown.getMessage().contains("Checkout server error"));
@@ -154,9 +158,10 @@ class InfoPaymentServiceTest {
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
         Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
 
+        Mono<PaymentInfoDto> mono = service.getPaymentInfo("asdasda", "asdasda");
         PnCheckoutBadRequestException thrown = assertThrows(
                 PnCheckoutBadRequestException.class,
-                () -> service.getPaymentInfo("asdasda", "asdasda").block(Duration.ofMillis(3000)),
+                () -> mono.block(d),
                 ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND
         );
         assertTrue(thrown.getMessage().contains("Checkout bad request"));

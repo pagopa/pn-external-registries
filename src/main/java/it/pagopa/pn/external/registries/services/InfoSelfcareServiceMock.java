@@ -4,7 +4,6 @@ import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.api.v1.mock.InfoPapiImpl;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,8 @@ public class InfoSelfcareServiceMock extends InfoSelfcareService {
 
     private final InfoPapiImpl infoPapi;
 
-    public InfoSelfcareServiceMock(SelfcareUserGroupClient selfcareUserGroupClient, SelfcareInstitutionsClient selfcareInstitutionsClient, InfoPapiImpl infoPapi) {
-        super(selfcareUserGroupClient, selfcareInstitutionsClient);
+    public InfoSelfcareServiceMock(SelfcareUserGroupClient selfcareUserGroupClient, InfoPapiImpl infoPapi) {
+        super(selfcareUserGroupClient);
         this.infoPapi = infoPapi;
     }
 

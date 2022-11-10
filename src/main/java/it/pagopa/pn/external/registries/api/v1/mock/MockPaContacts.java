@@ -16,9 +16,6 @@ public class MockPaContacts {
     return pec;
   }
 
-  public MockPaContacts() {
-  }
-
   public void setPec(String pec) {
     this.pec = pec;
   }
