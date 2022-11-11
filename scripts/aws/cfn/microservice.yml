@@ -106,6 +106,10 @@ Parameters:
     Type: String
     Description: 'Queue to pull for inputs event'
 
+  LogsKinesisSourceStreamArn:
+    Type: String
+    Description: 'Kinesis stream to send logs to'
+    
 Resources:
 
   # PN-External-Registry microservice
@@ -253,6 +257,7 @@ Resources:
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn        
   ExternalRegistryMicroservicePublicWebApiWaf:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -275,6 +280,7 @@ Resources:
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn        
   ExternalRegistryMicroservicePublicB2BApiWaf:
     Type: AWS::CloudFormation::Stack
     Properties:
