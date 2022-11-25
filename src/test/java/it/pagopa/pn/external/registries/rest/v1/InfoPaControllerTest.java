@@ -3,7 +3,8 @@ package it.pagopa.pn.external.registries.rest.v1;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
+import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
+import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ class InfoPaControllerTest {
     WebTestClient webTestClient;
 
     @MockBean
-    private InfoSelfcareServiceMock svc;
+    private InfoSelfcareGroupsService svc;
+
+    @MockBean
+    private InfoSelfcareInstitutionsService svcInst;
 
     @Test
     void getOnePa() {
@@ -44,7 +48,7 @@ class InfoPaControllerTest {
         dto.setTaxId("123456789");
 
         // When
-        Mockito.when(svc.getOnePa(Mockito.anyString()))
+        Mockito.when(svcInst.getOnePa(Mockito.anyString()))
                 .thenReturn(Mono.just(dto));
 
 
@@ -72,7 +76,7 @@ class InfoPaControllerTest {
         res.add(dto);
 
         // When
-        Mockito.when(svc.listOnboardedPaByName(Mockito.any()))
+        Mockito.when(svcInst.listOnboardedPaByName(Mockito.any()))
                 .thenReturn(Flux.fromIterable(res));
 
 
@@ -98,7 +102,7 @@ class InfoPaControllerTest {
 
 
         // When
-        Mockito.when(svc.listOnboardedPaByIds(Mockito.anyList()))
+        Mockito.when(svcInst.listOnboardedPaByIds(Mockito.anyList()))
                 .thenReturn(Flux.fromIterable(res));
 
 

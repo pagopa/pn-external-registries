@@ -10,6 +10,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
 import java.util.concurrent.ExecutionException;
 
 @SpringBootTest
+public
 class TestDao<T> extends BaseDao {
 
     DynamoDbAsyncTable<T> dbTable;
@@ -18,6 +19,11 @@ class TestDao<T> extends BaseDao {
     {
         this.dbTable = dynamoDbEnhancedAsyncClient.table(table, TableSchema.fromBean(typeParameter));
     }
+    public void put(T ent) throws ExecutionException, InterruptedException {
+
+        dbTable.putItem(ent).get();
+    }
+
 
     public T get(String pk, String sk) throws ExecutionException, InterruptedException {
 

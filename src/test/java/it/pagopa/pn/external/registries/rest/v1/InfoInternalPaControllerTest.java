@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
-import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
+import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ class InfoInternalPaControllerTest {
     WebTestClient webTestClient;
 
     @MockBean
-    private InfoSelfcareServiceMock svc;
+    private InfoSelfcareGroupsService svc;
 
     @Test
     void getAllGroups() {
