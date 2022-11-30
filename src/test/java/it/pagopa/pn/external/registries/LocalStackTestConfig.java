@@ -29,7 +29,6 @@ public class LocalStackTestConfig {
                     .withClasspathResourceMapping("testcontainers/credentials",
                             "/root/.aws/credentials", BindMode.READ_ONLY)
                     .withNetworkAliases("localstack")
-                    .withNetwork(Network.builder().createNetworkCmdModifier(cmd -> cmd.withName("external-registries-net")).build())
                     .waitingFor(Wait.forLogMessage(".*Initialization terminated.*", 1));
 
     static {

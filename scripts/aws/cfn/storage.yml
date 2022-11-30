@@ -37,6 +37,32 @@ Resources:
           KeyType: "HASH"
       BillingMode: "PAY_PER_REQUEST"
 
+  OnboardInstitutionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-OnboardInstitutions'
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        - AttributeName: "status"
+          AttributeType: "S"
+        - AttributeName: "lastUpdate"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      GlobalSecondaryIndexes:
+        - IndexName: "status-lastUpdate-gsi"
+          KeySchema:
+            - AttributeName: "status"
+              KeyType: "HASH"
+            - AttributeName: "lastUpdate"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+      BillingMode: "PAY_PER_REQUEST"
+
+
 Outputs:
 
   # Table parameters
@@ -46,5 +72,13 @@ Outputs:
   OptInSentTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${OptInSentTable.Arn}'
+
+  OnboardInstitutionsTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref OnboardInstitutionsTable
+  OnboardInstitutionsTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${OnboardInstitutionsTable.Arn}'
+
 
 

@@ -94,6 +94,14 @@ Parameters:
     Type: String
     Description: 'ARN of dynamodb table containing OptInSent information'
 
+  OnboardInstitutionsTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing OnboardInstitutionsTable information'
+
+  OnboardInstitutionsTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing OnboardInstitutionsTable information'
+
   PortalUrl:
     Type: String
     Description: 'Url del portale della da inserire negli avvisi a IO'
@@ -139,6 +147,7 @@ Resources:
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
         ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
+        ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
@@ -171,6 +180,7 @@ Resources:
               - dynamodb:UpdateItem
             Resource:
               - !Ref OptInSentTableArn
+              - !Ref OnboardInstitutionsTableArn
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -351,7 +361,8 @@ Resources:
         DashboardName: !Sub "${ProjectName}-external-registries"
         DynamoDBTableNames: !Join 
           - ',' 
-          - - !Ref OptInSentTableName 
+          - - !Ref OptInSentTableName
+            - !Ref OnboardInstitutionsTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn

@@ -15,6 +15,8 @@ public class OnboardInstitutionEntity {
     public static final String STATUS_ACTIVE = "ACTIVE";
     public static final String STATUS_SUSPENDED = "SUSPENDED";
 
+    public static final String GSI_INDEX_LASTUPDATE = "status-lastUpdate-gsi";
+
     public static final String COL_PK = "id";
     public static final String COL_LASTUPDATE = "lastUpdate";
     private static final String COL_STATUS = "status";
@@ -39,10 +41,10 @@ public class OnboardInstitutionEntity {
     }
 
     @Setter @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PK)}))  private String pk;
-    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_LASTUPDATE)}))  private Instant lastUpdate;
+    @Setter @Getter(onMethod=@__({@DynamoDbSecondaryPartitionKey(indexNames = { GSI_INDEX_LASTUPDATE}), @DynamoDbAttribute(COL_STATUS)}))  private String status;
+    @Setter @Getter(onMethod=@__({@DynamoDbSecondarySortKey(indexNames = { GSI_INDEX_LASTUPDATE }), @DynamoDbAttribute(COL_LASTUPDATE)}))  private Instant lastUpdate;
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_CREATED), @DynamoDbUpdateBehavior(UpdateBehavior.WRITE_IF_NOT_EXISTS)}))  private Instant created;
-    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_STATUS)}))  private String status;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_DESCRIPTION)}))  private String description;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ADDRESS)}))  private String address;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_TAXCODE)}))  private String taxCode;

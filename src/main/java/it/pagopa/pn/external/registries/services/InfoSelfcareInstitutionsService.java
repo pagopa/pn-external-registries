@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 
 import it.pagopa.pn.commons.exceptions.PnRuntimeException;
+import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaInfoDto;
@@ -31,6 +32,7 @@ public class InfoSelfcareInstitutionsService {
   public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
     log.info("getOnePa - id={}", id);
     return onboardInstitutionsDao.get(id)
+            .switchIfEmpty(Mono.error(new PnPANotFoundException()))
             .map(OnboardInstitutionEntityToPaInfoDto::toDto);
   }
 
