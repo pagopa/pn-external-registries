@@ -9,7 +9,7 @@
     </parent>
     <groupId>it.pagopa.pn.external.registries</groupId>
     <artifactId>pn-external-registries</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>pn-external-registries</name>
     <description>TODO</description>
     <scm>
