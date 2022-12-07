@@ -146,10 +146,10 @@ Resources:
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
-        TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskPolicy
+        TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
 
 
-  ExternalRegistryMicroserviceTaskPolicy:
+  ExternalRegistryMicroserviceTaskManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       #PolicyName: !Sub '${ProjectName}-ExternalRegistry-CustomTaskPolicy'
