@@ -146,14 +146,15 @@ Resources:
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
+        TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskPolicy
 
 
   ExternalRegistryMicroserviceTaskPolicy:
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      PolicyName: !Sub '${ProjectName}-ExternalRegistry-CustomTaskPolicy'
-      Roles:
-        - !GetAtt ExternalRegistryMicroservice.Outputs.TaskRoleName
+      #PolicyName: !Sub '${ProjectName}-ExternalRegistry-CustomTaskPolicy'
+      #Roles:
+      #  - !GetAtt ExternalRegistryMicroservice.Outputs.TaskRoleName
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -366,3 +367,9 @@ Resources:
             - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
+
+
+Outputs:
+  Version:
+    Description: Git commit id of this file
+    Value: !Ref Version
