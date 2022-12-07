@@ -9,14 +9,14 @@
     </parent>
     <groupId>it.pagopa.pn.external.registries</groupId>
     <artifactId>pn-external-registries</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>pn-external-registries</name>
     <description>TODO</description>
     <scm>
         <connection>${git.conn}</connection>
         <developerConnection>${git.devConn}</developerConnection>
         <url>${git.url}</url>
-      <tag>HEAD</tag>
+      <tag>v1.0.1</tag>
   </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
