@@ -133,6 +133,17 @@ public class InfoPaymentService {
                         paymentRequestDto.getPaymentNotice().getNoticeNumber()), throwable));
     }
 
+    private PaymentResponseDto manageCheckoutResponse(ResponseEntity<Void> httpResponse) {
+        if(httpResponse.getStatusCode().value() == 302) {
+            return buildPaymentResponseDto(httpResponse.getHeaders().getLocation());
+        }
+
+        if(httpResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
+        }
+        throw new PnNotFoundException("Checkout postPayment status response " + httpResponse.getStatusCode(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
+    }
+
     protected CartRequestDto toCartRequestDto(PaymentRequestDto paymentRequestDto) {
         PaymentNoticeDto paymentNoticeDto = new PaymentNoticeDto()
                 .noticeNumber(paymentRequestDto.getPaymentNotice().getNoticeNumber())
@@ -148,17 +159,6 @@ public class InfoPaymentService {
                         .returnCancelUrl(URI.create(paymentRequestDto.getReturnUrl()))
                         .returnErrorUrl(URI.create(paymentRequestDto.getReturnUrl()))
                 );
-    }
-
-    private PaymentResponseDto manageCheckoutResponse(ResponseEntity<Void> httpResponse) {
-        if(httpResponse.getStatusCode().value() == HttpStatus.FOUND.value()) {
-            return buildPaymentResponseDto(httpResponse.getHeaders().getLocation());
-        }
-
-        if(httpResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
-            throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
-        }
-        throw new PnNotFoundException("Checkout postPayment status response " + httpResponse.getStatusCode(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
     }
 
     private PaymentResponseDto buildPaymentResponseDto(URI uri) {
