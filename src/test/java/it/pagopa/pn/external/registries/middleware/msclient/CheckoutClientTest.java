@@ -3,9 +3,7 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.EnteBeneficiarioDto;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
+import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -17,8 +15,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import reactor.test.StepVerifier;
+
+import java.net.URI;
+import java.util.List;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -101,6 +105,41 @@ class CheckoutClientTest {
         //Then
         Assertions.assertNotNull( response );
         Assertions.assertEquals( 1200 , response.getImportoSingoloVersamento() );
+    }
+
+    @Test
+    void postMakePayment() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CartRequestDto cartRequestDto = new CartRequestDto()
+                .paymentNotices(List.of(new PaymentNoticeDto()
+                        .noticeNumber("302012387654312384")
+                        .amount(1500)
+                        .fiscalCode("77777777777")))
+                .returnUrls(new CartRequestReturnUrlsDto()
+                        .returnOkUrl(URI.create("https://localhost:433/ok"))
+                        .returnErrorUrl(URI.create("https://localhost:433/error"))
+                        .returnCancelUrl(URI.create("https://localhost:433/cancel")));
+
+        new MockServerClient("localhost", 9999)
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/carts")
+                        .withBody(objectMapper.writeValueAsString(cartRequestDto))
+                )
+                .respond(response()
+                        .withStatusCode(302)
+                        .withHeader(HttpHeaders.LOCATION, "https://localhost:433/ok")
+                        .withHeader(HttpHeaders.CONNECTION, "keep-alive")
+                        .withHeader(HttpHeaders.CONTENT_LENGTH, "0"));
+
+        StepVerifier.create(client.postMakePayment(cartRequestDto))
+                .expectSubscription()
+                .expectNext(ResponseEntity.status(302)
+                        .header(HttpHeaders.LOCATION, "https://localhost:433/ok")
+                        .header(HttpHeaders.CONNECTION, "keep-alive")
+                        .header(HttpHeaders.CONTENT_LENGTH, "0")
+                        .build())
+                .verifyComplete();
     }
 
 }
