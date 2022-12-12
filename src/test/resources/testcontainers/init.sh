@@ -11,7 +11,10 @@ for qn in  $( echo $queues_fifo | tr " " "\n" ) ; do
 
 done
 
+
 echo " - Create pn-opt-in TABLES"
+
+
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     dynamodb create-table \
     --table-name OptInSent  \
@@ -21,6 +24,8 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
         AttributeName=pk,KeyType=HASH \
     --provisioned-throughput \
         ReadCapacityUnits=10,WriteCapacityUnits=5
+
+
 
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     dynamodb create-table \
@@ -48,6 +53,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
             }
         }
     ]"
+
 
 
 
