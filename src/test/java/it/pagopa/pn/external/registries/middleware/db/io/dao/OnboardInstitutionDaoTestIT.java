@@ -22,7 +22,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
 class OnboardInstitutionDaoTestIT {

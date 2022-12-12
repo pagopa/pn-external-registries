@@ -36,8 +36,6 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
 @Slf4j

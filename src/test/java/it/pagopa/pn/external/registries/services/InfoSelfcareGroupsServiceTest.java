@@ -56,7 +56,7 @@ class InfoSelfcareGroupsServiceTest {
         Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,null, null).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,null, null).collectList().block(d);
 
 
         //THEN
@@ -87,7 +87,7 @@ class InfoSelfcareGroupsServiceTest {
         Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id), null).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,List.of(id), null).collectList().block(d);
 
 
         //THEN
@@ -126,7 +126,7 @@ class InfoSelfcareGroupsServiceTest {
         Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block();
+        List<PaGroupDto> res = service.getGroups(id,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block(d);
 
 
         //THEN
