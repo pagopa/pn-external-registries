@@ -5,24 +5,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutServerErrorException;
+import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
+import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.ValidationFaultPaymentProblemJsonDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
-import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -31,7 +32,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class InfoPaymentServiceTest {
 
     Duration d = Duration.ofMillis(3000);
@@ -50,14 +51,6 @@ class InfoPaymentServiceTest {
     @Mock
     PnExternalRegistriesConfig config;
 
-    @Configuration
-    static class ContextConfiguration {
-        @Primary
-        @Bean
-        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
-            return Mockito.mock( SqsNotificationPaidProducer.class);
-        }
-    }
 
     @Test
     void getInfoPaymentConflict() {
@@ -97,7 +90,6 @@ class InfoPaymentServiceTest {
         //When
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
         Mockito.when( config.getCheckoutSiteUrl() ).thenReturn(CHECKOUT_SITE_URL);
-        Mockito.when( sendPaymentNotificationService.sendPaymentNotification( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.empty() );
         PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id", "fakeNoticeNumber" ).block();
 
         //Then
@@ -125,8 +117,6 @@ class InfoPaymentServiceTest {
         WebClientResponseException ex = WebClientResponseException.Conflict.create(statusCode, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
-        Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
-
 
         Mono<PaymentInfoDto> mono = service.getPaymentInfo("asdasda", "asdasda");
         PnCheckoutServerErrorException thrown = assertThrows(
@@ -156,7 +146,6 @@ class InfoPaymentServiceTest {
         WebClientResponseException ex = WebClientResponseException.Conflict.create(statusCode, "KO", null, responseBodyBites, StandardCharsets.UTF_8);
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
-        Mockito.when(sendPaymentNotificationService.sendPaymentNotification(Mockito.anyString(), Mockito.anyString())).thenReturn(Mono.empty());
 
         Mono<PaymentInfoDto> mono = service.getPaymentInfo("asdasda", "asdasda");
         PnCheckoutBadRequestException thrown = assertThrows(
@@ -165,6 +154,70 @@ class InfoPaymentServiceTest {
                 ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND
         );
         assertTrue(thrown.getMessage().contains("Checkout bad request"));
+    }
+
+    @Test
+    void postMakePaymentOk() {
+        final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
+        CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
+
+        PaymentResponseDto expectedResponse = new PaymentResponseDto().checkoutUrl(paymentRequestDto.getReturnUrl());
+
+        Mockito.when(checkoutClient.postMakePayment(cartRequestDto))
+                .thenReturn(Mono.just(ResponseEntity.status(302).header(HttpHeaders.LOCATION, RETUNR_URL).build()));
+
+        Mono<PaymentResponseDto> response = service.postMakePayment(paymentRequestDto);
+
+        StepVerifier.create(response)
+                .expectSubscription()
+                .expectNext(expectedResponse)
+                .verifyComplete();
+    }
+
+    @Test
+    void postMakePaymentKoInternalServerError() {
+        final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
+        CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
+
+        Mockito.when(checkoutClient.postMakePayment(cartRequestDto))
+                .thenReturn(Mono.just(ResponseEntity.status(500).build()));
+
+        Mono<PaymentResponseDto> response = service.postMakePayment(paymentRequestDto);
+
+        StepVerifier.create(response)
+                .expectSubscription()
+                .expectError(PnNotFoundException.class)
+                .verify();
+    }
+
+    @Test
+    void postMakePaymentKoBadRequest() {
+        final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
+        CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
+
+        Mockito.when(checkoutClient.postMakePayment(cartRequestDto))
+                .thenReturn(Mono.just(ResponseEntity.status(400).build()));
+
+        Mono<PaymentResponseDto> response = service.postMakePayment(paymentRequestDto);
+
+        StepVerifier.create(response)
+                .expectSubscription()
+                .expectError(PnCheckoutBadRequestException.class)
+                .verify();
+    }
+
+
+
+    private PaymentRequestDto buildPaymentRequestDto(String returnUrl) {
+        return new PaymentRequestDto()
+                .paymentNotice(new PaymentNoticeDto()
+                        .noticeNumber("302012387654312384")
+                        .amount(1500)
+                        .fiscalCode("77777777777"))
+                .returnUrl(returnUrl);
     }
 
 }

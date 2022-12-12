@@ -3,8 +3,10 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -29,4 +31,9 @@ public class CheckoutClient extends OcpBaseClient {
     public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptIdFromString) throws WebClientResponseException {
         return defaultApiClient.getPaymentInfo( rptIdFromString );
     }
+
+    public Mono<ResponseEntity<Void>> postMakePayment(CartRequestDto cartRequestDto) throws WebClientResponseException {
+        return defaultApiClient.postCartsWithHttpInfo( cartRequestDto );
+    }
+
 }

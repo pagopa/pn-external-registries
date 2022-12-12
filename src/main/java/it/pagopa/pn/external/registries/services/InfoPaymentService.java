@@ -5,15 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.*;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.DetailDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
+import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentNoticeDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.util.List;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
 
@@ -116,4 +119,51 @@ public class InfoPaymentService {
             default: return PaymentStatusDto.FAILURE;
         }
     }
+
+    public Mono<PaymentResponseDto> postMakePayment(PaymentRequestDto paymentRequestDto) {
+
+        log.info( "post payment info paymentId={}", paymentRequestDto );
+        CartRequestDto cartRequestDto = toCartRequestDto(paymentRequestDto);
+
+        return checkoutClient.postMakePayment(cartRequestDto)
+                .doOnNext(voidResponseEntity -> log.info("Response Status from checkout for noticeNumber {}: {}",
+                        paymentRequestDto.getPaymentNotice().getNoticeNumber(), voidResponseEntity.getStatusCode()))
+                .map( this::manageCheckoutResponse)
+                .doOnError(throwable -> log.error(String.format("Error in postMakePayment with noticeNumber %s",
+                        paymentRequestDto.getPaymentNotice().getNoticeNumber()), throwable));
+    }
+
+    protected CartRequestDto toCartRequestDto(PaymentRequestDto paymentRequestDto) {
+        PaymentNoticeDto paymentNoticeDto = new PaymentNoticeDto()
+                .noticeNumber(paymentRequestDto.getPaymentNotice().getNoticeNumber())
+                .companyName(paymentRequestDto.getPaymentNotice().getCompanyName())
+                .fiscalCode(paymentRequestDto.getPaymentNotice().getFiscalCode())
+                .amount(paymentRequestDto.getPaymentNotice().getAmount())
+                .description(paymentRequestDto.getPaymentNotice().getDescription());
+
+        return new CartRequestDto()
+                .paymentNotices(List.of(paymentNoticeDto))
+                .returnUrls(new CartRequestReturnUrlsDto()
+                        .returnOkUrl(URI.create(paymentRequestDto.getReturnUrl()))
+                        .returnCancelUrl(URI.create(paymentRequestDto.getReturnUrl()))
+                        .returnErrorUrl(URI.create(paymentRequestDto.getReturnUrl()))
+                );
+    }
+
+    private PaymentResponseDto manageCheckoutResponse(ResponseEntity<Void> httpResponse) {
+        if(httpResponse.getStatusCode().value() == HttpStatus.FOUND.value()) {
+            return buildPaymentResponseDto(httpResponse.getHeaders().getLocation());
+        }
+
+        if(httpResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
+        }
+        throw new PnNotFoundException("Checkout postPayment status response " + httpResponse.getStatusCode(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
+    }
+
+    private PaymentResponseDto buildPaymentResponseDto(URI uri) {
+        assert (uri != null );
+        return new PaymentResponseDto().checkoutUrl(uri.toString());
+    }
+
 }

@@ -280,6 +280,67 @@ paths:
                 detail: string
                 detail_v2: string
                 instance: string
+  /carts:
+    post:
+      operationId: PostCarts
+      description: create a cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartRequest"
+        required: true
+      responses:
+        "302":
+          description: Redirect
+          headers:
+            location:
+              description: CheckOut Url
+              schema:
+                type: string
+                format: uri
+        "400":
+          description: Bad request
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+            application/json:
+              examples:
+                response:
+                  value:
+                    type: https://checkout.pagopa.it/problems/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: missing fiscalCode
+        "422":
+          description: Unprocessable Entity
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+            application/json:
+              examples:
+                response:
+                  value:
+                    type: https://checkout.pagopa.it/problems/psp-violation
+                    title: PSP Service Error
+                    status: 422
+                    detail: No PSP Service is available
+        "500":
+          description: generic error
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+            application/json:
+              examples:
+                response:
+                  value:
+                    type: https://checkout.pagopa.it/problems/constraint-violation
+                    title: Service Error
+                    status: 500
+                    detail: Generic Error
 components:
   schemas:
     HttpStatusCode:
@@ -850,6 +911,83 @@ components:
         - PPT_MULTI_BENEFICIARIO
         - PPT_ERRORE
         - GENERIC_ERROR
+    CartRequest:
+      type: object
+      required:
+        - paymentNotices
+        - returnUrls
+      properties:
+        emailNotice:
+          type: string
+          format: email
+          example: my_email@mail.it
+        paymentNotices:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentNotice"
+          minItems: 1
+          maxItems: 5
+          example:
+            - noticeNumber: "302012387654312384"
+              fiscalCode: "77777777777"
+              amount: 10000
+              companyName: "companyName"
+              description: "description"
+            - noticeNumber: "302012387654312385"
+              fiscalCode: "77777777777"
+              amount: 5000
+              companyName: "companyName"
+              description: "description"
+        returnUrls:
+          type: object
+          required:
+            - returnOkUrl
+            - returnCancelUrl
+            - returnErrorUrl
+          properties:
+            returnOkUrl:
+              type: string
+              format: uri
+              example: www.comune.di.prova.it/pagopa/success.html
+            returnCancelUrl:
+              type: string
+              format: uri
+              example: www.comune.di.prova.it/pagopa/cancel.html
+            returnErrorUrl:
+              type: string
+              format: uri
+              example: www.comune.di.prova.it/pagopa/error.html
+    PaymentNotice:
+      type: object
+      required:
+        - noticeNumber
+        - fiscalCode
+        - amount
+        - companyName
+        - description
+      properties:
+        noticeNumber:
+          description: notice number
+          type: string
+          minLength: 18
+          maxLength: 18
+        fiscalCode:
+          description: Public Administration tax code
+          type: string
+          minLength: 11
+          maxLength: 11
+        amount:
+          description: amount ( in euro cents ) of the payment notice
+          type: integer
+          minimum: 1
+        companyName:
+          description: Public Administration company name
+          type: string
+          maxLength: 140
+        description:
+          description: subject of payment
+          type: string
+          maxLength: 140
   securitySchemes:
     apiKeyHeader:
       type: apiKey

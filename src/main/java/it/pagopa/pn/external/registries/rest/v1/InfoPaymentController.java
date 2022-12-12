@@ -2,6 +2,8 @@ package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.api.PaymentInfoApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentRequestDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentResponseDto;
 import it.pagopa.pn.external.registries.services.InfoPaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,12 @@ public class InfoPaymentController implements PaymentInfoApi {
                     return ResponseEntity.ok(body);
                 })
                 .switchIfEmpty(Mono.just(ResponseEntity.<Flux<PaymentInfoDto>>notFound().build()));
+    }
+
+    @Override
+    public Mono<ResponseEntity<PaymentResponseDto>> postMakePayment(Mono<PaymentRequestDto> paymentRequestDto, final ServerWebExchange exchange) {
+        return paymentRequestDto.flatMap(infoPaymentService::postMakePayment)
+                .map(ResponseEntity::ok);
     }
     
 }
