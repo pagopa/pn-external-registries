@@ -34,6 +34,10 @@ Parameters:
    Type: String
    Description: 'Checkout site url'
 
+  CheckoutCartApiBaseUrl:
+    Type: String
+    Description: 'Checkout cart endpoint base url'
+
   SelfcareUsergroupBaseUrl:
     Type: String
     Description: 'Selfcare endpoint base url'
@@ -139,6 +143,7 @@ Resources:
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
         ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
+        ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
