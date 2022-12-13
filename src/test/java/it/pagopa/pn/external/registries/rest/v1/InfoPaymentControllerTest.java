@@ -58,19 +58,21 @@ class InfoPaymentControllerTest {
     }
 
     @Test
-    void postMakePaymentOk() throws JsonProcessingException {
-        final String url = "/ext-registry/pagopa/v1/makePayment";
+    void checkoutCartOk() throws JsonProcessingException {
+        final String url = "/ext-registry/pagopa/v1/checkout-cart";
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
                 .paymentNotice(new PaymentNoticeDto()
                         .noticeNumber("302012387654312384")
                         .amount(1500)
-                        .fiscalCode("77777777777"))
+                        .fiscalCode("77777777777")
+                        .description("description")
+                        .companyName("companyName"))
                 .returnUrl(RETUNR_URL);
 
         PaymentResponseDto expectedValue = new PaymentResponseDto().checkoutUrl(RETUNR_URL);
 
-        Mockito.when( service.postMakePayment(paymentRequestDto)).thenReturn( Mono.just( expectedValue ) );
+        Mockito.when( service.checkoutCart(paymentRequestDto)).thenReturn( Mono.just( expectedValue ) );
 
         webTestClient.post()
                 .uri(url)
@@ -80,18 +82,20 @@ class InfoPaymentControllerTest {
                 .expectBody()
                 .json(objectMapper.writeValueAsString(expectedValue));
 
-        Mockito.verify(service, Mockito.times(1)).postMakePayment(paymentRequestDto);
+        Mockito.verify(service, Mockito.times(1)).checkoutCart(paymentRequestDto);
     }
 
     @Test
-    void postMakePaymentKoBadRequestInput() {
-        final String url = "/ext-registry/pagopa/v1/makePayment";
+    void checkoutCartKoBadRequestInput() {
+        final String url = "/ext-registry/pagopa/v1/checkout-cart";
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
                 .paymentNotice(new PaymentNoticeDto()
                         .noticeNumber("302012387654312384")
                         .amount(1500)
-                        .fiscalCode(null))
+                        .fiscalCode(null)
+                        .description("description")
+                        .companyName("companyName"))
                 .returnUrl(RETUNR_URL);
 
         webTestClient.post()
@@ -100,21 +104,23 @@ class InfoPaymentControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest();
 
-        Mockito.verify(service, Mockito.times(0)).postMakePayment(paymentRequestDto);
+        Mockito.verify(service, Mockito.times(0)).checkoutCart(paymentRequestDto);
     }
 
     @Test
-    void postMakePaymentKoForException() {
-        final String url = "/ext-registry/pagopa/v1/makePayment";
+    void checkoutCartKoForException() {
+        final String url = "/ext-registry/pagopa/v1/checkout-cart";
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
                 .paymentNotice(new PaymentNoticeDto()
                         .noticeNumber("302012387654312384")
                         .amount(1500)
-                        .fiscalCode("77777777777"))
+                        .fiscalCode("77777777777")
+                        .description("description")
+                        .companyName("companyName"))
                 .returnUrl(RETUNR_URL);
 
-        Mockito.when( service.postMakePayment(paymentRequestDto)).thenThrow(new PnNotFoundException("", "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND));
+        Mockito.when( service.checkoutCart(paymentRequestDto)).thenThrow(new PnNotFoundException("", "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND));
 
         webTestClient.post()
                 .uri(url)
@@ -122,21 +128,23 @@ class InfoPaymentControllerTest {
                 .exchange()
                 .expectStatus().isNotFound();
 
-        Mockito.verify(service, Mockito.times(1)).postMakePayment(paymentRequestDto);
+        Mockito.verify(service, Mockito.times(1)).checkoutCart(paymentRequestDto);
     }
 
     @Test
-    void postMakePaymentKoForBadRequestOfCheckout() {
-        final String url = "/ext-registry/pagopa/v1/makePayment";
+    void checkoutCartKoForBadRequestOfCheckout() {
+        final String url = "/ext-registry/pagopa/v1/checkout-cart";
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
                 .paymentNotice(new PaymentNoticeDto()
                         .noticeNumber("302012387654312384")
                         .amount(1500)
-                        .fiscalCode("77777777777"))
+                        .fiscalCode("77777777777")
+                        .description("description")
+                        .companyName("companyName"))
                 .returnUrl(RETUNR_URL);
 
-        Mockito.when( service.postMakePayment(paymentRequestDto)).thenThrow(new PnCheckoutBadRequestException("", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST));
+        Mockito.when( service.checkoutCart(paymentRequestDto)).thenThrow(new PnCheckoutBadRequestException("", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST));
 
         webTestClient.post()
                 .uri(url)
@@ -144,7 +152,7 @@ class InfoPaymentControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest();
 
-        Mockito.verify(service, Mockito.times(1)).postMakePayment(paymentRequestDto);
+        Mockito.verify(service, Mockito.times(1)).checkoutCart(paymentRequestDto);
     }
 
 }

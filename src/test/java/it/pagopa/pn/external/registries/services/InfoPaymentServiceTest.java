@@ -157,17 +157,17 @@ class InfoPaymentServiceTest {
     }
 
     @Test
-    void postMakePaymentOk() {
+    void checkoutCartOk() {
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
         CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
 
         PaymentResponseDto expectedResponse = new PaymentResponseDto().checkoutUrl(paymentRequestDto.getReturnUrl());
 
-        Mockito.when(checkoutClient.postMakePayment(cartRequestDto))
+        Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
                 .thenReturn(Mono.just(ResponseEntity.status(302).header(HttpHeaders.LOCATION, RETUNR_URL).build()));
 
-        Mono<PaymentResponseDto> response = service.postMakePayment(paymentRequestDto);
+        Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
 
         StepVerifier.create(response)
                 .expectSubscription()
@@ -176,15 +176,15 @@ class InfoPaymentServiceTest {
     }
 
     @Test
-    void postMakePaymentKoInternalServerError() {
+    void checkoutCartKoInternalServerError() {
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
         CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
 
-        Mockito.when(checkoutClient.postMakePayment(cartRequestDto))
+        Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
                 .thenReturn(Mono.just(ResponseEntity.status(500).build()));
 
-        Mono<PaymentResponseDto> response = service.postMakePayment(paymentRequestDto);
+        Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
 
         StepVerifier.create(response)
                 .expectSubscription()
@@ -193,15 +193,15 @@ class InfoPaymentServiceTest {
     }
 
     @Test
-    void postMakePaymentKoBadRequest() {
+    void checkoutCartKoBadRequest() {
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
         CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
 
-        Mockito.when(checkoutClient.postMakePayment(cartRequestDto))
+        Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
                 .thenReturn(Mono.just(ResponseEntity.status(400).build()));
 
-        Mono<PaymentResponseDto> response = service.postMakePayment(paymentRequestDto);
+        Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
 
         StepVerifier.create(response)
                 .expectSubscription()

@@ -34,8 +34,8 @@ public class InfoPaymentController implements PaymentInfoApi {
     }
 
     @Override
-    public Mono<ResponseEntity<PaymentResponseDto>> postMakePayment(Mono<PaymentRequestDto> paymentRequestDto, final ServerWebExchange exchange) {
-        return paymentRequestDto.flatMap(infoPaymentService::postMakePayment)
+    public Mono<ResponseEntity<PaymentResponseDto>> checkoutCart(Mono<PaymentRequestDto> paymentRequestDto, final ServerWebExchange exchange) {
+        return paymentRequestDto.flatMap(infoPaymentService::checkoutCart)
                 .map(ResponseEntity::ok);
     }
     

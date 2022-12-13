@@ -120,16 +120,16 @@ public class InfoPaymentService {
         }
     }
 
-    public Mono<PaymentResponseDto> postMakePayment(PaymentRequestDto paymentRequestDto) {
+    public Mono<PaymentResponseDto> checkoutCart(PaymentRequestDto paymentRequestDto) {
 
-        log.info( "post payment info paymentId={}", paymentRequestDto );
+        log.info( "checkoutCart info paymentId={}", paymentRequestDto );
         CartRequestDto cartRequestDto = toCartRequestDto(paymentRequestDto);
 
-        return checkoutClient.postMakePayment(cartRequestDto)
+        return checkoutClient.checkoutCart(cartRequestDto)
                 .doOnNext(voidResponseEntity -> log.info("Response Status from checkout for noticeNumber {}: {}",
                         paymentRequestDto.getPaymentNotice().getNoticeNumber(), voidResponseEntity.getStatusCode()))
                 .map( this::manageCheckoutResponse)
-                .doOnError(throwable -> log.error(String.format("Error in postMakePayment with noticeNumber %s",
+                .doOnError(throwable -> log.error(String.format("Error in checkoutCart with noticeNumber %s",
                         paymentRequestDto.getPaymentNotice().getNoticeNumber()), throwable));
     }
 

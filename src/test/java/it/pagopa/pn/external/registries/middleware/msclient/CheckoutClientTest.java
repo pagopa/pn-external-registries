@@ -108,7 +108,7 @@ class CheckoutClientTest {
     }
 
     @Test
-    void postMakePayment() throws JsonProcessingException {
+    void checkoutCart() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         CartRequestDto cartRequestDto = new CartRequestDto()
                 .paymentNotices(List.of(new PaymentNoticeDto()
@@ -132,7 +132,7 @@ class CheckoutClientTest {
                         .withHeader(HttpHeaders.CONNECTION, "keep-alive")
                         .withHeader(HttpHeaders.CONTENT_LENGTH, "0"));
 
-        StepVerifier.create(client.postMakePayment(cartRequestDto))
+        StepVerifier.create(client.checkoutCart(cartRequestDto))
                 .expectSubscription()
                 .expectNext(ResponseEntity.status(302)
                         .header(HttpHeaders.LOCATION, "https://localhost:433/ok")

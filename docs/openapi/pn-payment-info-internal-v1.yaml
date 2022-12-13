@@ -56,9 +56,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
-  /ext-registry/pagopa/v1/makePayment:
+  /ext-registry/pagopa/v1/checkout-cart:
     post:
-      operationId: postMakePayment
+      operationId: checkoutCart
       summary: Make a payment
       description: Make a payment by calling the Checkout API
       tags:
@@ -184,6 +184,8 @@ components:
         - noticeNumber
         - fiscalCode
         - amount
+        - companyName
+        - description
       properties:
         noticeNumber:
           type: string
