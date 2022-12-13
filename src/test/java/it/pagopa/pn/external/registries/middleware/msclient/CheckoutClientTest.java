@@ -55,6 +55,7 @@ class CheckoutClientTest {
     @BeforeEach
     void setup() {
         Mockito.when( cfg.getCheckoutApiBaseUrl() ).thenReturn( "http://localhost:9999" );
+        Mockito.when( cfg.getCheckoutCartApiBaseUrl() ).thenReturn( "http://localhost:9999" );
         this.client = new CheckoutClient(cfg);
         this.client.init();
     }
