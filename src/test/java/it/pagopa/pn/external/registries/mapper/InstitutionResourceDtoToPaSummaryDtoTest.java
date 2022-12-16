@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.mapper;
 
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -14,16 +14,16 @@ class InstitutionResourceDtoToPaSummaryDtoTest {
     @Test
     void toDto() {
         //GIVEN
-        InstitutionResourceDto institutionResourceDto = new InstitutionResourceDto();
-        institutionResourceDto.setId(UUID.fromString("c0a235b2-a454-11ec-b909-0242ac120002"));
+        OnboardInstitutionEntity institutionResourceDto = new OnboardInstitutionEntity();
+        institutionResourceDto.setPk(UUID.fromString("c0a235b2-a454-11ec-b909-0242ac120002").toString());
         institutionResourceDto.setDescription("mocked-description");
 
         // WHEN
-        PaSummaryDto res = InstitutionResourceDtoToPaSummaryDto.toDto(institutionResourceDto);
+        PaSummaryDto res = OnboardInstitutionEntityToPaSummaryDto.toDto(institutionResourceDto);
 
         //THEN
         assertNotNull(res);
-        assertEquals(res.getId(),institutionResourceDto.getId().toString());
+        assertEquals(res.getId(),institutionResourceDto.getInstitutionId());
         assertEquals(res.getName(),institutionResourceDto.getDescription());
     }
 }

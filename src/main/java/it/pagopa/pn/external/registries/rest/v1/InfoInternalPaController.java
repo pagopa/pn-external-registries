@@ -3,7 +3,7 @@ package it.pagopa.pn.external.registries.rest.v1;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InternalOnlyApi;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
-import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
+import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,9 +15,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class InfoInternalPaController implements InternalOnlyApi {
 
-    private final InfoSelfcareServiceMock infoSelfcareService;
+    private final InfoSelfcareGroupsService infoSelfcareService;
 
-    public InfoInternalPaController(InfoSelfcareServiceMock infoSelfcareService) {
+    public InfoInternalPaController(InfoSelfcareGroupsService infoSelfcareService) {
         this.infoSelfcareService = infoSelfcareService;
     }
 

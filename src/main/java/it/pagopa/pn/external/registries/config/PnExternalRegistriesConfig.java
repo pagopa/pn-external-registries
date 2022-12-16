@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +22,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 
 
 @Configuration
+@EnableScheduling
 @ConfigurationProperties(prefix = "pn.external-registry")
 @Slf4j
 @Data
@@ -54,9 +56,13 @@ public class PnExternalRegistriesConfig {
     private String mockDataResources;
 
     private String dynamodbTableNameOptIn;
+    private String dynamodbTableNameOnboardInstitutions;
 
     private String piattaformanotificheurlTos;
     private String piattaformanotificheurlPrivacy;
+
+    private int fulltextsearchMaxResults;
+    private String fulltextsearchUpdateCronExpression; // usato direttamente come @value
 
     private AppIoTemplate appIoTemplate;
     private Topics topics;
