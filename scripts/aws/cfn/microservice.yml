@@ -122,6 +122,10 @@ Parameters:
     Type: String
     Description: 'Kinesis stream to send logs to'
     
+  AlbSecurityGroup:
+    Type: String
+    Description: 'Application load balancer security group'
+
 Resources:
 
   # PN-External-Registry microservice
@@ -152,7 +156,7 @@ Resources:
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
         ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
         ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
-        ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
+        ContainerEnvEntry19: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
@@ -161,6 +165,7 @@ Resources:
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
+        AlbSecurityGroup: !Ref AlbSecurityGroup
 
 
   ExternalRegistryMicroserviceTaskManagedPolicy:
