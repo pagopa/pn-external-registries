@@ -56,6 +56,42 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  /ext-registry/pagopa/v1/checkout-cart:
+    post:
+      operationId: checkoutCart
+      summary: Make a payment
+      description: Make a payment by calling the Checkout API
+      tags:
+        - PaymentInfo
+      security:                                                                # ONLY EXTERNAL
+        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
     PaymentInfo:
@@ -127,6 +163,62 @@ components:
         Classification detail to help user address the issue
       example: PPT_PSP_SCONOSCIUTO
       type: string
+    PaymentRequest:
+      title: Request to make a payment on Checkout
+      type: object
+      required:
+        - paymentNotice
+        - returnUrl
+      properties:
+        paymentNotice:
+          $ref: '#/components/schemas/PaymentNotice'
+        returnUrl:
+          description: Checkout base url used to make payment
+          example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+          type: string
+    PaymentNotice:
+      title: Request for a Payment Notice
+      description: Information of a Payment Notice
+      type: object
+      required:
+        - noticeNumber
+        - fiscalCode
+        - amount
+        - companyName
+        - description
+      properties:
+        noticeNumber:
+          type: string
+          description: The payment notice number
+          minLength: 18
+          maxLength: 18
+        fiscalCode:
+          type: string
+          description: Public Administration tax code
+          minLength: 11
+          maxLength: 11
+        amount:
+          type: integer
+          description: Amount ( in euro cents ) of the payment notice
+          minimum: 1
+        companyName:
+          type: string
+          description: Public Administration company name
+          maxLength: 140
+        description:
+          type: string
+          description: Subject of payment
+          maxLength: 140
+    PaymentResponse:
+      title: Response containing the Checkout callback URL
+      type: object
+      required:
+        - checkoutUrl
+      properties:
+        checkoutUrl:
+          type: string
+          description: The Checkout callback URL
+
 
   securitySchemes:                                      # ONLY EXTERNAL
     bearerAuth:                                         # ONLY EXTERNAL
