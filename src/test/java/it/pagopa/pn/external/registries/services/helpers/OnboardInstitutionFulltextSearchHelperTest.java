@@ -189,5 +189,11 @@ class OnboardInstitutionFulltextSearchHelperTest {
         // THEN
         Optional<PaSummaryDto> mypa1 = result1.stream().filter(x -> x.getId().equals(prev.getInstitutionId())).findFirst();
         assertTrue(mypa1.isPresent());
+
+        // WHEN
+        List<PaSummaryDto> result2 = onboardInstitutionFulltextSearchHelper.fullTextSearch("").collectList().block(d);
+
+        // THEN
+        assertTrue(result2.size() > 0);
     }
 }

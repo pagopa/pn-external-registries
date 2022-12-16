@@ -37,6 +37,9 @@ public class InfoSelfcareInstitutionsService {
   }
 
   public Flux<PaSummaryDto> listOnboardedPaByName(String paNameFilter) {
+    if (paNameFilter == null)
+      paNameFilter = "";
+
     log.info("listOnboardedPaByName - paNameFilter={}", paNameFilter);
     return onboardInstitutionFulltextSearchHelper.fullTextSearch(paNameFilter);
   }
