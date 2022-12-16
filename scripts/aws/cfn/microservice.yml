@@ -186,7 +186,8 @@ Resources:
               - dynamodb:UpdateItem
             Resource:
               - !Ref OptInSentTableArn
-              - !Ref OnboardInstitutionsTableArn
+              - !Sub "${OnboardInstitutionsTableArn}"
+              - !Sub "${OnboardInstitutionsTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
