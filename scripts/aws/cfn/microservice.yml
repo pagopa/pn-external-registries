@@ -122,6 +122,10 @@ Parameters:
     Type: String
     Description: 'Kinesis stream to send logs to'
     
+  AlbSecurityGroup:
+    Type: String
+    Description: 'Application load balancer security group'
+
 Resources:
 
   # PN-External-Registry microservice
@@ -161,6 +165,7 @@ Resources:
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
+        AlbSecurityGroup: !Ref AlbSecurityGroup
 
 
   ExternalRegistryMicroserviceTaskManagedPolicy:
