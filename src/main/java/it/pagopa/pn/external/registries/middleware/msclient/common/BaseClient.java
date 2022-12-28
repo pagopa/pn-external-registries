@@ -30,9 +30,9 @@ public abstract class BaseClient extends CommonBaseClient {
     {
         try {
             String message = x.getMessage()==null?"":x.getMessage();
-            if (x instanceof WebClientResponseException)
+            if (x instanceof WebClientResponseException webClientResponseException)
             {
-                message += ";" + ((WebClientResponseException)x).getResponseBodyAsString();
+                message += ";" + webClientResponseException.getResponseBodyAsString();
             }
             return  message;
         } catch (Exception e) {
