@@ -382,8 +382,7 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
         AlarmArns: !Join
           - ','
-          - - !GetAtt ExternalRegistryMicroservice.Outputs.AutoScalingAlarmArn
-            - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
+          - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
