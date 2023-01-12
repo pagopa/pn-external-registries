@@ -126,6 +126,22 @@ Parameters:
     Type: String
     Description: 'Application load balancer security group'
 
+  KafkaOnBoardingTopicName:
+    Type: String
+    Description: 'Kafka topic name for onboarding institutions'
+
+  KafkaOnBoardingGroupId:
+    Type: String
+    Description: 'Kafka group id for onboarding institutions'
+
+  KafkaOnBoardingBootstrapServers:
+    Type: String
+    Description: 'Kafka bootstrap servers'
+
+  KafkaOnBoardingSaslJaasConfig:
+    Type: String
+    Description: 'Kafka sasl jaas config for onboarding institutions'
+
 Resources:
 
   # PN-External-Registry microservice
@@ -157,6 +173,10 @@ Resources:
         ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
         ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
         ContainerEnvEntry19: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
+        ContainerEnvEntry20: !Sub 'PN_EXTERNAL_REGISTRY_KAFKA_ONBOARDING_TOPIC_NAME=${KafkaOnBoardingTopicName}'
+        ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_KAFKA_ONBOARDING_GROUP_ID=${KafkaOnBoardingGroupId}'
+        ContainerEnvEntry22: !Sub 'SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=${KafkaOnBoardingBootstrapServers}'
+        ContainerEnvEntry23: !Sub 'KAFKA_ONBOARDING_SASL_JAAS_PASSWORD=${KafkaOnBoardingSaslJaasConfig}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds

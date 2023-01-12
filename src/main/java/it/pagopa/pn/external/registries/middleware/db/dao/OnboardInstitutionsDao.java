@@ -56,4 +56,13 @@ public class OnboardInstitutionsDao extends BaseDao {
             Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestACTIVE).flatMapIterable(Page::items)),
                  Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestSUSPENDED).flatMapIterable(Page::items)));
     }
+
+    public Mono<Void> put(OnboardInstitutionEntity onboardInstitutionEntity) {
+         return Mono.fromFuture(onboardInstitutionsTable.putItem(onboardInstitutionEntity));
+    }
+
+    public Mono<OnboardInstitutionEntity> delete(String institutionId) {
+         return Mono.fromFuture(onboardInstitutionsTable.deleteItem(getKeyBuild(institutionId)));
+    }
+
 }

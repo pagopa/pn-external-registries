@@ -5,6 +5,8 @@
     "CheckoutCartApiBaseUrl": "https://api.uat.platform.pagopa.it/checkout/ec/v1",
     "SelfcareUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/v1",
     "PortalUrl": "https://portale-login.svil.pn.pagopa.it",
-    "SelfcareUsergroupPnProductId": "prod-pn-svil"
+    "SelfcareUsergroupPnProductId": "prod-pn-svil",
+    "KafkaOnBoardingTopicName": "sc-contracts",
+    "KafkaOnBoardingGroupId": "pn-external-registries-svil"
   }
 }
