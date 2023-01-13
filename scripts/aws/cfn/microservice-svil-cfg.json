@@ -7,6 +7,7 @@
     "PortalUrl": "https://portale-login.svil.pn.pagopa.it",
     "SelfcareUsergroupPnProductId": "prod-pn-svil",
     "KafkaOnBoardingTopicName": "sc-contracts",
-    "KafkaOnBoardingGroupId": "pn-external-registries-svil"
+    "KafkaOnBoardingGroupId": "pn-external-registries-svil",
+    "KafkaOnBoardingBootstrapServers": "selc-u-eventhub-ns.servicebus.windows.net:9093"
   }
 }

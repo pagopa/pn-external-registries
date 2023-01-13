@@ -7,6 +7,7 @@
     "PortalUrl": "https://portale-login.dev.pn.pagopa.it",
     "SelfcareUsergroupPnProductId": "prod-pn-dev",
     "KafkaOnBoardingTopicName": "sc-contracts",
-    "KafkaOnBoardingGroupId": "pn-external-registries-dev"
+    "KafkaOnBoardingGroupId": "pn-external-registries-dev",
+    "KafkaOnBoardingBootstrapServers": "selc-u-eventhub-ns.servicebus.windows.net:9093"
   }
 }

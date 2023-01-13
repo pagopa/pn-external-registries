@@ -129,18 +129,17 @@ Parameters:
   KafkaOnBoardingTopicName:
     Type: String
     Description: 'Kafka topic name for onboarding institutions'
+    Default: 'sc-contracts'
 
   KafkaOnBoardingGroupId:
     Type: String
     Description: 'Kafka group id for onboarding institutions'
+    Default: ''
 
   KafkaOnBoardingBootstrapServers:
     Type: String
     Description: 'Kafka bootstrap servers'
-
-  KafkaOnBoardingSaslJaasConfig:
-    Type: String
-    Description: 'Kafka sasl jaas config for onboarding institutions'
+    Default: ''
 
 Resources:
 
@@ -176,7 +175,7 @@ Resources:
         ContainerEnvEntry20: !Sub 'PN_EXTERNAL_REGISTRY_KAFKA_ONBOARDING_TOPIC_NAME=${KafkaOnBoardingTopicName}'
         ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_KAFKA_ONBOARDING_GROUP_ID=${KafkaOnBoardingGroupId}'
         ContainerEnvEntry22: !Sub 'SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=${KafkaOnBoardingBootstrapServers}'
-        ContainerEnvEntry23: !Sub 'KAFKA_ONBOARDING_SASL_JAAS_PASSWORD=${KafkaOnBoardingSaslJaasConfig}'
+        ContainerEnvEntry23: !Sub 'KAFKA_ONBOARDING_SASL_JAAS_PASSWORD={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:KafkaOnBoardingSaslJaasConfig}}'
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
