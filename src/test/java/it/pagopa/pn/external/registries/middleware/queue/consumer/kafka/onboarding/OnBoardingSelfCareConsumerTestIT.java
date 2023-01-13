@@ -2,20 +2,27 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboard
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.mapper.OnBoardSelfCareToOnBoardInstituteEntityMapper;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
+import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
+import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareConsumer;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareDTO;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
 import java.util.concurrent.ExecutionException;
 
@@ -27,12 +34,13 @@ import java.util.concurrent.ExecutionException;
 })
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@Import(LocalStackTestConfig.class)
 class OnBoardingSelfCareConsumerTestIT {
 
     @SpyBean
     private OnBoardingSelfCareConsumer onBoardingSelfCareConsumer;
 
-    @MockBean
+    @SpyBean
     private OnboardInstitutionsDao onboardInstitutionsDao;
 
     @MockBean
@@ -47,8 +55,22 @@ class OnBoardingSelfCareConsumerTestIT {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient;
+
+    @Autowired
+    PnExternalRegistriesConfig pnExternalRegistriesConfig;
+
+    private TestDao<OnboardInstitutionEntity> testDao;
+
+    @BeforeEach
+    public void init() {
+        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOnboardInstitutions(), OnboardInstitutionEntity.class);
+    }
+
     @Test
     void listenOKTest() throws ExecutionException, InterruptedException, JsonProcessingException {
+
         String inputRequest = inputRequestFormSelfCare();
 
         //scrivo su Kafka una Request presa dal flusso reale di SelfCare
@@ -59,6 +81,12 @@ class OnBoardingSelfCareConsumerTestIT {
         //verifico che il consumer riceva correttamente il messaggio (e quindi il deserializer funzioni)
         Mockito.verify(onBoardingSelfCareConsumer, Mockito.timeout(1000).times(1)).listen("sc-contracts", expectedValue);
         Mockito.verify(onboardInstitutionsDao, Mockito.timeout(1000).times(1)).put(mapper.toEntity(expectedValue));
+
+        try {
+            testDao.delete("7861b02d-8cb4-4de9-95d2-5ed02f3de38a", null);
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
     }
 
