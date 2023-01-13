@@ -153,6 +153,31 @@ class OnboardInstitutionDaoTestIT {
         }
     }
 
+    @Test
+    void putTest() {
+        OnboardInstitutionEntity entity = newOnboard();
+        consentDao.put(entity);
+
+        try {
+            OnboardInstitutionEntity actual = testDao.get(entity.getInstitutionId(), null);
+            Assertions.assertEquals(entity, actual);
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        finally {
+            try {
+                testDao.delete(entity.getPk(), null);
+            }
+            catch (Exception e) {
+                System.out.println("Nothing to remove");
+            }
+
+        }
+
+
+    }
+
     private OnboardInstitutionEntity newOnboard() {
         OnboardInstitutionEntity res = new OnboardInstitutionEntity();
         res.setPk("12345");
