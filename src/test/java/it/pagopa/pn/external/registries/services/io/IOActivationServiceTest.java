@@ -4,16 +4,13 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
-import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -22,7 +19,7 @@ import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class IOActivationServiceTest {
 
     @InjectMocks
@@ -33,15 +30,6 @@ class IOActivationServiceTest {
 
     @Mock
     PnExternalRegistriesConfig cfg;
-
-    @Configuration
-    static class ContextConfiguration {
-        @Primary
-        @Bean
-        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
-            return Mockito.mock( SqsNotificationPaidProducer.class);
-        }
-    }
 
 
     @Test

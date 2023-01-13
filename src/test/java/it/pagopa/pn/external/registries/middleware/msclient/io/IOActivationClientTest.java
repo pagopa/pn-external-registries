@@ -6,6 +6,7 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareConsumer;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +18,7 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -40,6 +42,9 @@ class IOCourtesyMessageClientTest {
 
     @Mock
     private PnExternalRegistriesConfig cfg;
+
+    @MockBean
+    private OnBoardingSelfCareConsumer onBoardingSelfCareConsumer;
 
     private ClientAndServer mockServer;
 

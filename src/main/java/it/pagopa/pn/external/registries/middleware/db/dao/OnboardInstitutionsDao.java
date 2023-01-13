@@ -61,8 +61,4 @@ public class OnboardInstitutionsDao extends BaseDao {
          return Mono.fromFuture(onboardInstitutionsTable.putItem(onboardInstitutionEntity));
     }
 
-    public Mono<OnboardInstitutionEntity> delete(String institutionId) {
-         return Mono.fromFuture(onboardInstitutionsTable.deleteItem(getKeyBuild(institutionId)));
-    }
-
 }

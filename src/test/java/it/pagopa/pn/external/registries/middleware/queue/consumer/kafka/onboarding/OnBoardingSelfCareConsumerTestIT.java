@@ -2,23 +2,20 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboard
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.mapper.OnBoardSelfCareToOnBoardInstituteEntityMapper;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
-import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareConsumer;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareDTO;
+import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.util.concurrent.ExecutionException;
 
@@ -30,14 +27,16 @@ import java.util.concurrent.ExecutionException;
 })
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
-@Import(LocalStackTestConfig.class)
 class OnBoardingSelfCareConsumerTestIT {
 
     @SpyBean
     private OnBoardingSelfCareConsumer onBoardingSelfCareConsumer;
 
-    @Autowired
+    @MockBean
     private OnboardInstitutionsDao onboardInstitutionsDao;
+
+    @MockBean
+    private SqsNotificationPaidProducer sqsNotificationPaidProducer;
 
     @Autowired
     private OnBoardSelfCareToOnBoardInstituteEntityMapper mapper;
@@ -59,16 +58,8 @@ class OnBoardingSelfCareConsumerTestIT {
 
         //verifico che il consumer riceva correttamente il messaggio (e quindi il deserializer funzioni)
         Mockito.verify(onBoardingSelfCareConsumer, Mockito.timeout(1000).times(1)).listen("sc-contracts", expectedValue);
+        Mockito.verify(onboardInstitutionsDao, Mockito.timeout(1000).times(1)).put(mapper.toEntity(expectedValue));
 
-        //verifico che alla fine del flusso, il consumer abbia scritto su Dynamo, verificando che il record sia presente
-        Mono<OnboardInstitutionEntity> onboardInstitutionEntityMono = onboardInstitutionsDao.get("7861b02d-8cb4-4de9-95d2-5ed02f3de38a");
-
-        StepVerifier.create(onboardInstitutionEntityMono)
-                .expectNext(mapper.toEntity(expectedValue))
-                .verifyComplete();
-
-        //clean dynamodb
-        onboardInstitutionsDao.delete("7861b02d-8cb4-4de9-95d2-5ed02f3de38a").subscribe();
     }
 
     private String inputRequestFormSelfCare() {

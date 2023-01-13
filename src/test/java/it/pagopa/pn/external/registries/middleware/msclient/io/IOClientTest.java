@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
+import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareConsumer;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -12,14 +12,13 @@ import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Collections;
 
@@ -40,6 +39,9 @@ class IOOptInTest {
 
     @Mock
     private PnExternalRegistriesConfig cfg;
+
+    @MockBean
+    private OnBoardingSelfCareConsumer onBoardingSelfCareConsumer;
 
     private static ClientAndServer mockServer;
 

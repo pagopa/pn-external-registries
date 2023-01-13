@@ -6,19 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
-import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,29 +22,17 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest(classes = {SelfcareUserGroupClient.class, PnExternalRegistriesConfig.class})
-@ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "pn.external-registry.selfcareusergroup-base-url=http://localhost:9999"
-})
+@ExtendWith(MockitoExtension.class)
 class SelfcareUserGroupClientTest {
 
 
     private SelfcareUserGroupClient client;
 
-    @MockBean
+    @Mock
     private PnExternalRegistriesConfig cfg;
 
     private static ClientAndServer mockServer;
 
-    @Configuration
-    static class ContextConfiguration {
-        @Primary
-        @Bean
-        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
-            return Mockito.mock( SqsNotificationPaidProducer.class);
-        }
-    }
 
     @BeforeEach
     void setup() {

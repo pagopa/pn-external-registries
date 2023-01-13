@@ -6,10 +6,11 @@ import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,7 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class MVPValidUserServiceTest {
 
     private static final String TAX_ID = "EEEEEE00E00E000A";

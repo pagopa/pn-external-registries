@@ -12,6 +12,7 @@ import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
+import it.pagopa.pn.external.registries.middleware.queue.consumer.kafka.onboarding.onboarding.OnBoardingSelfCareConsumer;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,9 @@ class IOServiceTest {
 
     @Mock
     PnExternalRegistriesConfig cfg;
+
+    @Mock
+    OnBoardingSelfCareConsumer onBoardingSelfCareConsumer;
 
     @Configuration
     static class ContextConfiguration {

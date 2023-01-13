@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
@@ -8,14 +7,12 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGr
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -25,21 +22,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
-@Import(LocalStackTestConfig.class)
+
+@ExtendWith(MockitoExtension.class)
 @Slf4j
-@ActiveProfiles("test")
 class InfoSelfcareGroupsServiceTest {
 
     private final Duration d = Duration.ofMillis(3000);
 
-    @Autowired
+    @InjectMocks
     private InfoSelfcareGroupsService service;
 
-    @MockBean
+    @Mock
     private SelfcareInstitutionsClient selfcareInstitutionsClient;
 
-    @MockBean
+    @Mock
     private SelfcareUserGroupClient selfcareUserGroupClient;
 
     @Test
