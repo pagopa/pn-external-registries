@@ -1,0 +1,1204 @@
+{
+    "items": [
+        {
+            "address": "Piazza Della Scala, 2",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Milano",
+            "digitalAddress": "protocollo@postacert.comune.milano.it",
+            "externalId": "01199250158",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "026e8c72-7944-4dcd-8668-f596447fec6d",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_f205",
+            "products": {
+                "prod-idpay": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-idpay"
+                },
+                "prod-pagopa": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-pagopa"
+                },
+                "prod-io-premium": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-io-premium"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-ciban": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-ciban"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-interop": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-interop"
+                },
+                "prod-io": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-io"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-pn"
+                },
+                "prod-cgn": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-cgn"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "c_f205",
+                        "vatNumber": "01199250158"
+                    },
+                    "product": "prod-pn-svil"
+                }
+            },
+            "taxCode": "01199250158",
+            "zipCode": "20121"
+        },
+        {
+            "address": "Via Calabria, 46",
+            "attributes": [
+                {
+                    "code": "S01",
+                    "description": "Societa' in Conto Economico Consolidato",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Ag.Naz.Attrazione Investimenti Sviluppo Impresa Spa",
+            "digitalAddress": "invitalia@pec.invitalia.it",
+            "externalId": "05678721001",
+            "geographicTaxonomies": [],
+            "id": "918692a6-dc2e-4f61-a36b-a8f003202f86",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "anais",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "g_43c42",
+                        "vatNumber": "05678721001"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "g_43c42",
+                        "vatNumber": "05678721001"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "05678721001",
+            "zipCode": "00187"
+        },
+        {
+            "address": "Corso Valsesia N. 119",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Gattinara",
+            "digitalAddress": "protocollo.gattinara@pec.it",
+            "externalId": "00270230022",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "17266053-8238-4330-b597-c838871ba272",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_d938",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_b988",
+                        "vatNumber": "00270230022"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "00270230022",
+            "zipCode": "13045"
+        },
+        {
+            "address": "Via Ciro Il Grande, 21",
+            "attributes": [
+                {
+                    "code": "C16",
+                    "description": "Enti di Previdenza ed Assistenza Sociale in Conto Economico Consolidato pubblici",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Istituto Nazionale Previdenza Sociale - INPS",
+            "digitalAddress": "ufficiosegreteria.direttoregenerale@postacert.inps.gov.it",
+            "externalId": "80078750587",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "7ac8d531-9c46-48eb-965a-25c12fa1fd81",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "inps",
+            "products": {
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "cc_4820d",
+                        "vatNumber": "80078750587"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "inps",
+                        "vatNumber": "80078750587"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "inps",
+                        "vatNumber": "80078750587"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-interop": {
+                    "billing": {
+                        "recipientCode": "inps",
+                        "vatNumber": "80078750587"
+                    },
+                    "product": "prod-interop"
+                },
+                "prod-cgn": {
+                    "billing": {
+                        "recipientCode": "inps",
+                        "vatNumber": "80078750587"
+                    },
+                    "product": "prod-cgn"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "inps",
+                        "vatNumber": "80078750587"
+                    },
+                    "product": "prod-pn-svil"
+                }
+            },
+            "taxCode": "80078750587",
+            "zipCode": "00144"
+        },
+        {
+            "address": "Piazza Pretoria, 1 - Palazzo Delle Aquile",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Palermo",
+            "digitalAddress": "protocollo@cert.comune.palermo.it",
+            "externalId": "80016350821",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "5b994d4a-0fa8-47ac-9c7b-354f1d44a1ce",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_g273",
+            "products": {
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "g_43c42",
+                        "vatNumber": "80016350821"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_g273",
+                        "vatNumber": "80016350821"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "c_g273",
+                        "vatNumber": "80016350821"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "c_g273",
+                        "vatNumber": "80016350821"
+                    },
+                    "product": "prod-pn-svil"
+                }
+            },
+            "taxCode": "80016350821",
+            "zipCode": "90133"
+        },
+        {
+            "address": "Piazza Europa",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Sperlonga",
+            "digitalAddress": "protocollo@pec.comune.sperlonga.lt.it",
+            "externalId": "81003790599",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "530f588c-af6d-40ae-9948-5837a080499c",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_i892",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "g_43c42",
+                        "vatNumber": "81003790599"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "81003790599",
+            "zipCode": "04029"
+        },
+        {
+            "address": "Via Rubichi, 16",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Lecce",
+            "digitalAddress": "protocollo@pec.comune.lecce.it",
+            "externalId": "80008510754",
+            "geographicTaxonomies": [],
+            "id": "8a0469f3-02f1-40b0-89e8-78518d67d1b0",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_e506",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_e506",
+                        "vatNumber": "80008510754"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-io": {
+                    "billing": {
+                        "recipientCode": "c_e506",
+                        "vatNumber": "80008510754"
+                    },
+                    "product": "prod-io"
+                },
+                "prod-interop": {
+                    "billing": {
+                        "recipientCode": "c_e506",
+                        "vatNumber": "80008510754"
+                    },
+                    "product": "prod-interop"
+                }
+            },
+            "taxCode": "80008510754",
+            "zipCode": "73100"
+        },
+        {
+            "address": "Piazza Del Popolo, 10",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Cesena",
+            "digitalAddress": "protocollo@pec.comune.cesena.fc.it",
+            "externalId": "00143280402",
+            "geographicTaxonomies": [],
+            "id": "7bf5ee25-c2bb-49ea-9795-0064acb58170",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_c573",
+            "products": {
+                "prod-io": {
+                    "billing": {
+                        "recipientCode": "c_c573",
+                        "vatNumber": "00143280402"
+                    },
+                    "product": "prod-io"
+                },
+                "prod-pagopa": {
+                    "billing": {
+                        "recipientCode": "c_c573",
+                        "vatNumber": "00143280402"
+                    },
+                    "product": "prod-pagopa"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_c573",
+                        "vatNumber": "00143280402"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "00143280402",
+            "zipCode": "47520"
+        },
+        {
+            "address": "Borgata Bach 11",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Sappada",
+            "digitalAddress": "comune.sappada@certgov.fvg.it",
+            "externalId": "00207190257",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "56ed074c-13b6-4d61-ba49-221953e6b60f",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_i421",
+            "products": {
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "f_453",
+                        "vatNumber": "00207190257"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_b988",
+                        "vatNumber": "00207190257"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "g_467",
+                        "vatNumber": "00207190257"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "c_b988",
+                        "vatNumber": "00207190257"
+                    },
+                    "product": "prod-pn-svil"
+                }
+            },
+            "taxCode": "00207190257",
+            "zipCode": "33012"
+        },
+        {
+            "address": "Palazzo Viminale",
+            "attributes": [
+                {
+                    "code": "C1",
+                    "description": "Presidenza del Consiglio dei Ministri, Ministeri e Avvocatura dello Stato",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Ministero dell'Interno",
+            "digitalAddress": "gabinetto.ministro@pec.interno.it",
+            "externalId": "97149560589",
+            "geographicTaxonomies": [],
+            "id": "f668d0aa-ce8b-4aac-aaa9-3cec5da92ee0",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "m_it",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "m_it",
+                        "vatNumber": "97149560589"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "mm_23847",
+                        "vatNumber": "97149560589"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "97149560589",
+            "zipCode": "00184"
+        },
+        {
+            "address": "Via Stagno, 19",
+            "attributes": [
+                {
+                    "code": "L18",
+                    "description": "Unioni di Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Unione Dei Comuni del Golfo Paradiso",
+            "digitalAddress": "protocollo@pec.unionecomunigolfoparadiso.ge.it",
+            "externalId": "90067990102",
+            "geographicTaxonomies": [],
+            "id": "9115f90b-1dc9-4ba8-8645-b38bda016b8f",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "udcgp",
+            "products": {
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "udcgp",
+                        "vatNumber": "90067990102"
+                    },
+                    "product": "prod-pn-svil"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "udcgp",
+                        "vatNumber": "90067990102"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "paradiso_195820",
+                        "vatNumber": "90067990102"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "90067990102",
+            "zipCode": "16030"
+        },
+        {
+            "address": "Piazza Caduti, 2",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Nibionno",
+            "digitalAddress": "anagrafe@pec.comune.nibionno.lc.it",
+            "externalId": "82002070132",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "9b42d47b-d3ac-4670-a7c3-6eda626c900e",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_f887",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "nib_124nvo",
+                        "vatNumber": "82002070132"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "82002070132",
+            "zipCode": "23895"
+        },
+        {
+            "address": "Via IV Novembre 144",
+            "attributes": [
+                {
+                    "code": "C16",
+                    "description": "Enti di Previdenza ed Assistenza Sociale in Conto Economico Consolidato pubblici",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Istituto Nazionale per l'Assicurazione contro gli Infortuni sul Lavoro - INAIL",
+            "digitalAddress": "presidenza@postacert.inail.it",
+            "externalId": "01165400589",
+            "geographicTaxonomies": [],
+            "id": "88d30379-9249-443d-82f5-084fb7a81daf",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "inail",
+            "products": {
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "i_0284",
+                        "vatNumber": "01165400589"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "inail",
+                        "vatNumber": "01165400589"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "inail",
+                        "vatNumber": "01165400589"
+                    },
+                    "product": "prod-pn-svil"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "inail",
+                        "vatNumber": "01165400589"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-interop": {
+                    "billing": {
+                        "recipientCode": "inail",
+                        "vatNumber": "01165400589"
+                    },
+                    "product": "prod-interop"
+                }
+            },
+            "taxCode": "01165400589",
+            "zipCode": "00198"
+        },
+        {
+            "address": "Via Roma, 1",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Besana in Brianza",
+            "digitalAddress": "protocollo@pec.comune.besanainbrianza.mb.it",
+            "externalId": "01556360152",
+            "geographicTaxonomies": [],
+            "id": "85504ecf-b2f5-4bba-94d3-d784b0794beb",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_a818",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "g_467",
+                        "vatNumber": "01556360152"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "01556360152",
+            "zipCode": "20842"
+        },
+        {
+            "address": "Via Roma, 5",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Ripalta Cremasca",
+            "digitalAddress": "comune.ripaltacremasca@pec.it",
+            "externalId": "00301970190",
+            "geographicTaxonomies": [],
+            "id": "c07c292c-a04a-4c71-b192-743cc295cf91",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_h315",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_h315",
+                        "vatNumber": "00301970190"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "00301970190",
+            "zipCode": "26010"
+        },
+        {
+            "address": "Via Giuseppe Grezar,14",
+            "attributes": [
+                {
+                    "code": "C10",
+                    "description": "Agenzie Fiscali",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Agenzia delle Entrate - Riscossione",
+            "digitalAddress": "protocollo@pec.agenziariscossione.gov.it",
+            "externalId": "13756881002",
+            "geographicTaxonomies": [],
+            "id": "ef29949d-1167-4af9-86f4-23bcaaf6e41b",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "esrsris",
+            "products": {
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "esrsris",
+                        "vatNumber": "13756881002"
+                    },
+                    "product": "prod-pn-svil"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "esrsris",
+                        "vatNumber": "13756881002"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "esrsris",
+                        "vatNumber": "13756881002"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "c_b988jj",
+                        "vatNumber": "13756881002"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "13756881002",
+            "zipCode": "00142"
+        },
+        {
+            "address": "Piazza Fratelli Kennedy, 1",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Bellusco",
+            "digitalAddress": "comune.bellusco@pec.regione.lombardia.it",
+            "externalId": "03352640159",
+            "geographicTaxonomies": [],
+            "id": "a7d07230-45ae-4ac1-b026-ecc55316e97f",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_a759",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "f_453",
+                        "vatNumber": "03352640159"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "03352640159",
+            "zipCode": "20882"
+        },
+        {
+            "address": "Piazza Risorgimento, 24",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Melendugno",
+            "digitalAddress": "comune.melendugno@legalmail.it",
+            "externalId": "80010060756",
+            "geographicTaxonomies": [],
+            "id": "1da68479-d104-4706-8d53-d7241471e222",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_f101",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_b988",
+                        "vatNumber": "80010060756"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "80010060756",
+            "zipCode": "73026"
+        },
+        {
+            "address": "Via Canale",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Castelnuovo Magra",
+            "digitalAddress": "protocollo@pec.castelnuovomagra.com",
+            "externalId": "00115020117",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "5fc82440-0a04-401e-b1f9-b1e9af2429ab",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_c240",
+            "products": {
+                "prod-io-premium": {
+                    "billing": {
+                        "recipientCode": "c_c240",
+                        "vatNumber": "00115020117"
+                    },
+                    "product": "prod-io-premium"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "c_c240",
+                        "vatNumber": "00115020117"
+                    },
+                    "product": "prod-pn-svil"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_c240",
+                        "vatNumber": "00115020117"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-io": {
+                    "billing": {
+                        "recipientCode": "c_c240",
+                        "vatNumber": "00115020117"
+                    },
+                    "product": "prod-io"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "cc_1739126",
+                        "vatNumber": "00115020117"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "00115020117",
+            "zipCode": "19033"
+        },
+        {
+            "address": "Via Iolanda, 18",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Cotronei",
+            "digitalAddress": "protocollo@pec.comunecotronei.it",
+            "externalId": "00297910796",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "180230ab-a0dc-4f08-b285-0c9d4698781a",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_d123",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "g_367t",
+                        "vatNumber": "00297910796"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "00297910796",
+            "zipCode": "88836"
+        },
+        {
+            "address": "Vicolo Volto Cittadella 4",
+            "attributes": [
+                {
+                    "code": "L37",
+                    "description": "Gestori di Pubblici Servizi",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Societa Locale di Riscossione Spa",
+            "digitalAddress": "solori@legalmail.it",
+            "externalId": "04222030233",
+            "geographicTaxonomies": [],
+            "id": "0a0666ff-524a-46d7-98a5-d18797d75bbb",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "slrs",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_b9886",
+                        "vatNumber": "04222030233"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "04222030233",
+            "zipCode": "37122"
+        },
+        {
+            "address": "Piazza Dante, 36",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Campi Bisenzio",
+            "digitalAddress": "comune.campi-bisenzio@postacert.toscana.it",
+            "externalId": "80016750483",
+            "geographicTaxonomies": [],
+            "id": "adf8bdfe-5d22-47b7-9b5f-2a356038260e",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_b507",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_b988",
+                        "vatNumber": "80016750483"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "80016750483",
+            "zipCode": "50013"
+        },
+        {
+            "address": "Via Giorgione 106",
+            "attributes": [
+                {
+                    "code": "C10",
+                    "description": "Agenzie Fiscali",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Agenzia delle Entrate",
+            "digitalAddress": "agenziaentratepec@pce.agenziaentrate.it",
+            "externalId": "06363391001",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "4db741cf-17e1-4751-9b7b-7675ccca472b",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "age",
+            "products": {
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "c_b988",
+                        "vatNumber": "06363391001"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "age",
+                        "vatNumber": "06363391001"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "age",
+                        "vatNumber": "06363391001"
+                    },
+                    "product": "prod-pn-dev"
+                }
+            },
+            "taxCode": "06363391001",
+            "zipCode": "00145"
+        },
+        {
+            "address": "Piazza Bra, 1",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Verona",
+            "digitalAddress": "protocollo.informatico@pec.comune.verona.it",
+            "externalId": "00215150236",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "a95dace4-4a47-4149-a814-0e669113ce40",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_l781",
+            "products": {
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "v_veronaabcf",
+                        "vatNumber": "00215150236"
+                    },
+                    "product": "prod-pn-cert"
+                },
+                "prod-pn-dev": {
+                    "billing": {
+                        "recipientCode": "c_l781",
+                        "vatNumber": "00215150236"
+                    },
+                    "product": "prod-pn-dev"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_l781",
+                        "vatNumber": "00215150236"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-cgn": {
+                    "billing": {
+                        "recipientCode": "c_l781",
+                        "vatNumber": "00215150236"
+                    },
+                    "product": "prod-cgn"
+                },
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "c_l781",
+                        "vatNumber": "00215150236"
+                    },
+                    "product": "prod-pn-svil"
+                }
+            },
+            "taxCode": "00215150236",
+            "zipCode": "37121"
+        },
+        {
+            "address": "Corso Alberto Pio 91",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Carpi",
+            "digitalAddress": "Comune.Carpi@pec.comune.carpi.mo.it",
+            "externalId": "00184280360",
+            "geographicTaxonomies": [
+                {
+                    "code": "058091",
+                    "desc": "Roma - Comune"
+                }
+            ],
+            "id": "cda0484e-3e6a-4113-a5cb-b18a6a8c7650",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_b819",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "f_873fg",
+                        "vatNumber": "00184280360"
+                    },
+                    "product": "prod-pn-coll"
+                }
+            },
+            "taxCode": "00184280360",
+            "zipCode": "41012"
+        },
+        {
+            "address": "Piazza Del Municipio, 5",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Figline e Incisa Valdarno",
+            "digitalAddress": "comune.figlineincisa@postacert.toscana.it",
+            "externalId": "06396970482",
+            "geographicTaxonomies": [],
+            "id": "79e9ab1c-2f25-4dc9-8e59-843f7dc8c5a7",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_fiv",
+            "products": {
+                "prod-pn-svil": {
+                    "billing": {
+                        "recipientCode": "c_fiv",
+                        "vatNumber": "06396970482"
+                    },
+                    "product": "prod-pn-svil"
+                },
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_fiv",
+                        "vatNumber": "06396970482"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn": {
+                    "billing": {
+                        "recipientCode": "ciao_1",
+                        "vatNumber": "06396970482"
+                    },
+                    "product": "prod-pn"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "g_43c42",
+                        "vatNumber": "06396970482"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "06396970482",
+            "zipCode": "50063"
+        },
+        {
+            "address": "Via Roma, 39",
+            "attributes": [
+                {
+                    "code": "L6",
+                    "description": "Comuni e loro Consorzi e Associazioni",
+                    "origin": "IPA"
+                }
+            ],
+            "description": "Comune di Mantova",
+            "digitalAddress": "comune.mantova.aoo@legalmail.it",
+            "externalId": "00189800204",
+            "geographicTaxonomies": [],
+            "id": "614b68f2-f80f-4ebc-be30-2ad87e88aa10",
+            "institutionType": "PA",
+            "origin": "IPA",
+            "originId": "c_e897",
+            "products": {
+                "prod-pn-coll": {
+                    "billing": {
+                        "recipientCode": "c_e897",
+                        "vatNumber": "00189800204"
+                    },
+                    "product": "prod-pn-coll"
+                },
+                "prod-pn-cert": {
+                    "billing": {
+                        "recipientCode": "m_mantova1234",
+                        "vatNumber": "00189800204"
+                    },
+                    "product": "prod-pn-cert"
+                }
+            },
+            "taxCode": "00189800204",
+            "zipCode": "46100"
+        }
+    ]
+}

@@ -1,0 +1,814 @@
+{
+  "pn-OnboardInstitutions": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "026e8c72-7944-4dcd-8668-f596447fec6d"
+          },
+          "description": {
+            "S": "Comune di Milano"
+          },
+          "taxCode": {
+            "S": "01199250158"
+          },
+          "digitalAddress": {
+            "S": "protocollo@postacert.comune.milano.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Della Scala, 2"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "918692a6-dc2e-4f61-a36b-a8f003202f86"
+          },
+          "description": {
+            "S": "Ag.Naz.Attrazione Investimenti Sviluppo Impresa Spa"
+          },
+          "taxCode": {
+            "S": "05678721001"
+          },
+          "digitalAddress": {
+            "S": "invitalia@pec.invitalia.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Calabria, 46"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "17266053-8238-4330-b597-c838871ba272"
+          },
+          "description": {
+            "S": "Comune di Gattinara"
+          },
+          "taxCode": {
+            "S": "00270230022"
+          },
+          "digitalAddress": {
+            "S": "protocollo.gattinara@pec.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Corso Valsesia N. 119"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "7ac8d531-9c46-48eb-965a-25c12fa1fd81"
+          },
+          "description": {
+            "S": "Istituto Nazionale Previdenza Sociale - INPS"
+          },
+          "taxCode": {
+            "S": "80078750587"
+          },
+          "digitalAddress": {
+            "S": "ufficiosegreteria.direttoregenerale@postacert.inps.gov.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Ciro Il Grande, 21"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "5b994d4a-0fa8-47ac-9c7b-354f1d44a1ce"
+          },
+          "description": {
+            "S": "Comune di Palermo"
+          },
+          "taxCode": {
+            "S": "80016350821"
+          },
+          "digitalAddress": {
+            "S": "protocollo@cert.comune.palermo.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Pretoria, 1 - Palazzo Delle Aquile"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "530f588c-af6d-40ae-9948-5837a080499c"
+          },
+          "description": {
+            "S": "Comune di Sperlonga"
+          },
+          "taxCode": {
+            "S": "81003790599"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comune.sperlonga.lt.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Europa"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "8a0469f3-02f1-40b0-89e8-78518d67d1b0"
+          },
+          "description": {
+            "S": "Comune di Lecce"
+          },
+          "taxCode": {
+            "S": "80008510754"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comune.lecce.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Rubichi, 16"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "7bf5ee25-c2bb-49ea-9795-0064acb58170"
+          },
+          "description": {
+            "S": "Comune di Cesena"
+          },
+          "taxCode": {
+            "S": "00143280402"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comune.cesena.fc.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Del Popolo, 10"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "56ed074c-13b6-4d61-ba49-221953e6b60f"
+          },
+          "description": {
+            "S": "Comune di Sappada"
+          },
+          "taxCode": {
+            "S": "00207190257"
+          },
+          "digitalAddress": {
+            "S": "comune.sappada@certgov.fvg.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Borgata Bach 11"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "f668d0aa-ce8b-4aac-aaa9-3cec5da92ee0"
+          },
+          "description": {
+            "S": "Ministero dell'Interno"
+          },
+          "taxCode": {
+            "S": "97149560589"
+          },
+          "digitalAddress": {
+            "S": "gabinetto.ministro@pec.interno.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Palazzo Viminale"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "9115f90b-1dc9-4ba8-8645-b38bda016b8f"
+          },
+          "description": {
+            "S": "Unione Dei Comuni del Golfo Paradiso"
+          },
+          "taxCode": {
+            "S": "90067990102"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.unionecomunigolfoparadiso.ge.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Stagno, 19"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "9b42d47b-d3ac-4670-a7c3-6eda626c900e"
+          },
+          "description": {
+            "S": "Comune di Nibionno"
+          },
+          "taxCode": {
+            "S": "82002070132"
+          },
+          "digitalAddress": {
+            "S": "anagrafe@pec.comune.nibionno.lc.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Caduti, 2"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "88d30379-9249-443d-82f5-084fb7a81daf"
+          },
+          "description": {
+            "S": "Istituto Nazionale per l'Assicurazione contro gli Infortuni sul Lavoro - INAIL"
+          },
+          "taxCode": {
+            "S": "01165400589"
+          },
+          "digitalAddress": {
+            "S": "presidenza@postacert.inail.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via IV Novembre 144"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "85504ecf-b2f5-4bba-94d3-d784b0794beb"
+          },
+          "description": {
+            "S": "Comune di Besana in Brianza"
+          },
+          "taxCode": {
+            "S": "01556360152"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comune.besanainbrianza.mb.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Roma, 1"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "c07c292c-a04a-4c71-b192-743cc295cf91"
+          },
+          "description": {
+            "S": "Comune di Ripalta Cremasca"
+          },
+          "taxCode": {
+            "S": "00301970190"
+          },
+          "digitalAddress": {
+            "S": "comune.ripaltacremasca@pec.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Roma, 5"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "ef29949d-1167-4af9-86f4-23bcaaf6e41b"
+          },
+          "description": {
+            "S": "Agenzia delle Entrate - Riscossione"
+          },
+          "taxCode": {
+            "S": "13756881002"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.agenziariscossione.gov.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Giuseppe Grezar,14"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "a7d07230-45ae-4ac1-b026-ecc55316e97f"
+          },
+          "description": {
+            "S": "Comune di Bellusco"
+          },
+          "taxCode": {
+            "S": "03352640159"
+          },
+          "digitalAddress": {
+            "S": "comune.bellusco@pec.regione.lombardia.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Fratelli Kennedy, 1"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "1da68479-d104-4706-8d53-d7241471e222"
+          },
+          "description": {
+            "S": "Comune di Melendugno"
+          },
+          "taxCode": {
+            "S": "80010060756"
+          },
+          "digitalAddress": {
+            "S": "comune.melendugno@legalmail.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Risorgimento, 24"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "5fc82440-0a04-401e-b1f9-b1e9af2429ab"
+          },
+          "description": {
+            "S": "Comune di Castelnuovo Magra"
+          },
+          "taxCode": {
+            "S": "00115020117"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.castelnuovomagra.com"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Canale"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "180230ab-a0dc-4f08-b285-0c9d4698781a"
+          },
+          "description": {
+            "S": "Comune di Cotronei"
+          },
+          "taxCode": {
+            "S": "00297910796"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comunecotronei.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Iolanda, 18"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "0a0666ff-524a-46d7-98a5-d18797d75bbb"
+          },
+          "description": {
+            "S": "Societa Locale di Riscossione Spa"
+          },
+          "taxCode": {
+            "S": "04222030233"
+          },
+          "digitalAddress": {
+            "S": "solori@legalmail.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Vicolo Volto Cittadella 4"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "adf8bdfe-5d22-47b7-9b5f-2a356038260e"
+          },
+          "description": {
+            "S": "Comune di Campi Bisenzio"
+          },
+          "taxCode": {
+            "S": "80016750483"
+          },
+          "digitalAddress": {
+            "S": "comune.campi-bisenzio@postacert.toscana.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Dante, 36"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "4db741cf-17e1-4751-9b7b-7675ccca472b"
+          },
+          "description": {
+            "S": "Agenzia delle Entrate"
+          },
+          "taxCode": {
+            "S": "06363391001"
+          },
+          "digitalAddress": {
+            "S": "agenziaentratepec@pce.agenziaentrate.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Giorgione 106"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "a95dace4-4a47-4149-a814-0e669113ce40"
+          },
+          "description": {
+            "S": "Comune di Verona"
+          },
+          "taxCode": {
+            "S": "00215150236"
+          },
+          "digitalAddress": {
+            "S": "protocollo.informatico@pec.comune.verona.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Bra, 1"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "cda0484e-3e6a-4113-a5cb-b18a6a8c7650"
+          },
+          "description": {
+            "S": "Comune di Carpi"
+          },
+          "taxCode": {
+            "S": "00184280360"
+          },
+          "digitalAddress": {
+            "S": "Comune.Carpi@pec.comune.carpi.mo.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Corso Alberto Pio 91"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "79e9ab1c-2f25-4dc9-8e59-843f7dc8c5a7"
+          },
+          "description": {
+            "S": "Comune di Figline e Incisa Valdarno"
+          },
+          "taxCode": {
+            "S": "06396970482"
+          },
+          "digitalAddress": {
+            "S": "comune.figlineincisa@postacert.toscana.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Del Municipio, 5"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "614b68f2-f80f-4ebc-be30-2ad87e88aa10"
+          },
+          "description": {
+            "S": "Comune di Mantova"
+          },
+          "taxCode": {
+            "S": "00189800204"
+          },
+          "digitalAddress": {
+            "S": "comune.mantova.aoo@legalmail.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Roma, 39"
+          }
+        }
+      }
+    }
+  ]
+}
