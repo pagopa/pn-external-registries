@@ -126,6 +126,26 @@ Parameters:
     Type: String
     Description: 'Application load balancer security group'
 
+  PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize:
+    Type: String
+    Description: 'BatchSize stream mapping'
+
+  LogsKinesisFilterPattern:
+    Type: String
+    Default: ""
+    Description: 'Log kinesis filter pattern'
+
+  KafkaBridgeOnboardingQueueARN:
+    Type: String
+    Description: 'Target queue ARN for insert trigger'
+
+  KafkaBridgeOnboardingQueueURL:
+    Type: String
+    Description: 'Target queue URL for insert trigger'
+
+Conditions:
+  SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
+
 Resources:
 
   # PN-External-Registry microservice
@@ -380,6 +400,9 @@ Resources:
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiName
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
+        LambdaArns: !Join
+          - ','
+          - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
@@ -387,6 +410,109 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+
+  # Lambda function role - this lambda needs to be triggered from a SQS queue and writes to a DynamoDB table
+  PnExternalRegistriesInsertTriggerLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-PnExternalRegistriesInsertTriggerLambdaRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub ${ProjectName}-PnExternalRegistriesInsertTriggerLambdaRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: allowSqs
+                Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ChangeMessageVisibility
+                Resource:
+                  - !Ref KafkaBridgeOnboardingQueueARN
+              - Sid: writeOnDynamoDB
+                Effect: Allow
+                Action:
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !Ref OnboardInstitutionsTableArn
+              - Sid: CanWriteLogs
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+  PnExternalRegistriesInsertTriggerLambdaEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !Ref KafkaBridgeOnboardingQueueARN
+      BatchSize: !Sub ${PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize}
+      FunctionName: !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+      Enabled: true
+      # Add an OnFailure destination on the event source mapping
+
+  PnExternalRegistriesInsertTriggerLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Description: 'It triggers the onboarding institutes written of sqs'
+      MemorySize: 128
+      Timeout: 10
+      Role: !GetAtt PnExternalRegistriesInsertTriggerLambdaRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:339249233099:layer:LambdaInsightsExtension:13"
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref KafkaBridgeOnboardingQueueURL
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          const dynamoDB = new AWS.DynamoDB.DocumentClient();
+          
+          exports.handler = async (event, context) => {
+            //messages coming in from SQS are available on the 'Records' array property of the event object
+            const { Records } = event;
+            for (const record of Records) {
+              try {
+                const body = JSON.parse(record.body);
+  
+                //logging the incoming message body (view in cloudwatch):
+                console.log("Incoming message body from SQS :", body);
+  
+                //configure params for writing data to dynamo DB:
+                const params = {
+                  TableName: 'pn-OnboardInstitutions',
+                  Item: body
+                };
+
+                //write data to dynamo DB:
+                await dynamoDB.put(params).promise();
+
+                //success logging to cloudwatch:
+                console.log('Successfully written to DynamoDB with id', body.id);
+              } catch (error) {
+                //error handling
+                console.error('Error in executing lambda handler for SQS', error);
+              }
+            }
+          }
 
 
 Outputs:
