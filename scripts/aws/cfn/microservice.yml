@@ -130,14 +130,6 @@ Parameters:
     Type: String
     Description: 'BatchSize stream mapping'
 
-  PnExternalRegistriesInsertTriggerLambdaEventSourceMappingMaximumBatchingWindowInSeconds:
-    Type: String
-    Description: 'BatchWindow stream mapping'
-
-  PnExternalRegistriesInsertTriggerLambdaEventSourceMappingMaximumRetryAttempts:
-    Type: String
-    Description: 'MaxRetry stream mapping'
-
   LogsKinesisFilterPattern:
     Type: String
     Default: ""
@@ -470,11 +462,9 @@ Resources:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
       EventSourceArn: !Ref KafkaBridgeOnboardingQueueARN
-      StartingPosition: LATEST
       BatchSize: !Sub ${PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize}
-      MaximumBatchingWindowInSeconds: !Sub ${PnExternalRegistriesInsertTriggerLambdaEventSourceMappingMaximumBatchingWindowInSeconds}
-      MaximumRetryAttempts: !Sub ${PnExternalRegistriesInsertTriggerLambdaEventSourceMappingMaximumRetryAttempts}
       FunctionName: !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+      Enabled: true
       # Add an OnFailure destination on the event source mapping
 
   ### Subscription filters with Kinesis  https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html#DestinationKinesisExample
