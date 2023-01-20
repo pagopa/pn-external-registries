@@ -138,6 +138,11 @@ Parameters:
     Type: String
     Description: 'MaxRetry stream mapping'
 
+  LogsKinesisFilterPattern:
+    Type: String
+    Default: ""
+    Description: 'Log kinesis filter pattern'
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
