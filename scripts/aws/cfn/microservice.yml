@@ -138,6 +138,9 @@ Parameters:
     Type: String
     Description: 'MaxRetry stream mapping'
 
+Conditions:
+  SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
+
 Resources:
 
   # PN-External-Registry microservice
