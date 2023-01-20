@@ -143,6 +143,14 @@ Parameters:
     Default: ""
     Description: 'Log kinesis filter pattern'
 
+  KafkaBridgeOnboardingQueueARN:
+    Type: String
+    Description: 'Target queue ARN for insert trigger'
+
+  KafkaBridgeOnboardingQueueURL:
+    Type: String
+    Description: 'Target queue URL for insert trigger'
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
