@@ -143,10 +143,6 @@ Parameters:
     Type: String
     Description: 'Target queue URL for insert trigger'
 
-  PnExternalRegistriesSecretArn:
-    Type: String
-    Description: External Registries Secret ARN
-
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -176,11 +172,11 @@ Resources:
         ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
         ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
         ContainerEnvEntry19: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
-        ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=${PnExternalRegistriesSecretArn}:CheckoutApiKey:AWSCURRENT:'
-        ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=${PnExternalRegistriesSecretArn}:IoApiKey:AWSCURRENT:'
-        ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=${PnExternalRegistriesSecretArn}:SelfCareApiKey:AWSCURRENT:'
-        ContainerSecret4: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=${PnExternalRegistriesSecretArn}:IoWhiteList:AWSCURRENT:'
-        ContainerSecret5: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY=${PnExternalRegistriesSecretArn}:IoActApiKey:AWSCURRENT:'
+        ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
+        ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
+        ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
+        ContainerSecret4: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoWhiteList:AWSCURRENT:'
+        ContainerSecret5: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoActApiKey:AWSCURRENT:'
         MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
