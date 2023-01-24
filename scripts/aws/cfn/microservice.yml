@@ -181,7 +181,7 @@ Resources:
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=${PnExternalRegistriesSecretArn}:SelfCareApiKey:AWSCURRENT:'
         ContainerSecret4: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=${PnExternalRegistriesSecretArn}:IoWhiteList:AWSCURRENT:'
         ContainerSecret5: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY=${PnExternalRegistriesSecretArn}:IoActApiKey:AWSCURRENT:'
-        MicroserviceSecretPrefix: pn-ExternalRegistries-Secrets
+        MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref SubnetsIds
