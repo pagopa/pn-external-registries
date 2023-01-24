@@ -6,6 +6,7 @@
     "SelfcareUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/v1",
     "PortalUrl": "https://portale-login.svil.pn.pagopa.it",
     "SelfcareUsergroupPnProductId": "prod-pn-svil",
-    "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10"
+    "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
+    "PnExternalRegistriesSecretArn": "arn:aws:secretsmanager:eu-south-1:748275689270:secret:pn-ExternalRegistries-Secrets-njGPec"
   }
 }
