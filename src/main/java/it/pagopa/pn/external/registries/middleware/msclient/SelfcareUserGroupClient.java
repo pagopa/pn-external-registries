@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.ApiClient;
@@ -12,11 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import javax.annotation.PostConstruct;
-import java.net.ConnectException;
-import java.time.Duration;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR;
 
@@ -46,10 +42,7 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
         return userGroupsApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null, null)
-                .retryWhen(
-                        Retry.backoff(2, Duration.ofMillis(25))
-                                .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
-                )
+                .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getUserGroups response error {}", x.getResponseBodyAsString(), x);
                     return Mono.error(new PnInternalException("Errore lettura usergroups", ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR, x));

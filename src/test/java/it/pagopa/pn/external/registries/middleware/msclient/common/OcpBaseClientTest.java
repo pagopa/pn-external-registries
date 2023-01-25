@@ -10,13 +10,13 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BaseClientTest {
+class OcpBaseClientTest {
 
-    private BaseClient client;
+    private OcpBaseClient client;
 
     @BeforeAll
     public void setup() {
-        this.client = Mockito.mock(BaseClient.class, Mockito.CALLS_REAL_METHODS);
+        this.client = Mockito.mock(OcpBaseClient.class, Mockito.CALLS_REAL_METHODS);
     }
 
     @Test
