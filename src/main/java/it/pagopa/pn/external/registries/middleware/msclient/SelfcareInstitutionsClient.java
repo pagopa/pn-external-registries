@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
@@ -15,11 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import javax.annotation.PostConstruct;
-import java.net.ConnectException;
-import java.time.Duration;
 import java.util.UUID;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PAREADERROR;
@@ -51,10 +47,6 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
     public Mono<InstitutionDto> getInstitution(String institutionId) throws WebClientResponseException {
 
         return institutionsApi.getInstitution(UUID.fromString(institutionId), config.getSelfcareinstitutionsApiKey())
-                .retryWhen(
-                        Retry.backoff(2, Duration.ofMillis(25))
-                                .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
-                )
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getInstitution response error {}", x.getResponseBodyAsString(), x);
                     if (x.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -68,10 +60,6 @@ public class SelfcareInstitutionsClient extends OcpBaseClient {
     public Flux<InstitutionResourceDto> getInstitutions() throws WebClientResponseException {
 
         return institutionsApi.getInstitutionsUsingGET(config.getSelfcareinstitutionsPnProductId(), config.getSelfcareinstitutionsApiKey())
-                .retryWhen(
-                        Retry.backoff(2, Duration.ofMillis(25))
-                                .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
-                )
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getInstitutions response error {}", x.getResponseBodyAsString(), x);
                     return Mono.error(new PnInternalException("Errore recupero lista PA", ERROR_CODE_EXTERNALREGISTRIES_PAREADERROR));

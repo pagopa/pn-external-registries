@@ -28,7 +28,7 @@ public class CheckoutClient extends OcpBaseClient {
         apiClient.setBasePath( config.getCheckoutApiBaseUrl() );
         this.defaultApiClient = new DefaultApi( apiClient );
 
-        ApiClient apiClientCartCheckout = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder()).build() );
+        ApiClient apiClientCartCheckout = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder()) );
         apiClientCartCheckout.setBasePath(config.getCheckoutCartApiBaseUrl());
         this.defaultApiClientCartCheckout = new DefaultApi(apiClientCartCheckout);
     }
