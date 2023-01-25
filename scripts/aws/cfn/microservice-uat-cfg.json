@@ -4,7 +4,7 @@
     "CheckoutSiteUrl": "https://uat.checkout.pagopa.it",
     "CheckoutCartApiBaseUrl": "https://api.uat.platform.pagopa.it/checkout/ec/v1",
     "SelfcareUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/v1",
-    "PortalUrl": "https://portale-login.uat.pn.pagopa.it",
+    "PortalUrl": "https://portale.uat.pn.pagopa.it",
     "SelfcareUsergroupPnProductId": "prod-pn-uat",
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10"
   }
