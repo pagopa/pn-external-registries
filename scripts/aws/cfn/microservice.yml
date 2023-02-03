@@ -481,25 +481,26 @@ Resources:
         - !Sub "arn:aws:lambda:${AWS::Region}:339249233099:layer:LambdaInsightsExtension:13"
       Environment:
         Variables:
-          QUEUE_URL: !Ref KafkaBridgeOnboardingQueueURL
+          TABLE_NAME: !Ref OnboardInstitutionsTableName
       Code:
         ZipFile: |
           const AWS = require('aws-sdk');
           const dynamoDB = new AWS.DynamoDB.DocumentClient();
+          const TABLE_NAME = process.env.TABLE_NAME;
           
           exports.handler = async (event, context) => {
             //messages coming in from SQS are available on the 'Records' array property of the event object
             const { Records } = event;
             for (const record of Records) {
               try {
-                const body = JSON.parse(record.body);
+                const body = JSON.parse(record.body, (key, value) => {if(value !== null) return value});
   
                 //logging the incoming message body (view in cloudwatch):
                 console.log("Incoming message body from SQS :", body);
   
                 //configure params for writing data to dynamo DB:
                 const params = {
-                  TableName: 'pn-OnboardInstitutions',
+                  TableName: TABLE_NAME,
                   Item: body
                 };
 
