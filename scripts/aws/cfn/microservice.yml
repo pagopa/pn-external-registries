@@ -468,6 +468,14 @@ Resources:
       Enabled: true
       # Add an OnFailure destination on the event source mapping
 
+  PnExternalRegistriesInsertTriggerLambdaAlarms:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/lambda-alarms.yaml"
+      Parameters:
+        FunctionName: !Ref PnExternalRegistriesInsertTriggerLambda
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+
   PnExternalRegistriesInsertTriggerLambda:
     Type: 'AWS::Lambda::Function'
     Properties:
