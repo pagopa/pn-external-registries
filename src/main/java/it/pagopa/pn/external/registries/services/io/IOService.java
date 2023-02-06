@@ -18,6 +18,7 @@ import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessage
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
@@ -39,13 +40,17 @@ public class IOService {
     private final IOOptInClient optInClient;
 
     private final PnExternalRegistriesConfig cfg;
+    private final SendIOSentMessageService sendIOSentMessageService;
 
     private final OptInSentDao optInSentDao;
 
-    public IOService(IOCourtesyMessageClient courtesyMessageClient, IOOptInClient optInClient, PnExternalRegistriesConfig cfg, OptInSentDao optInSentDao) {
+    public IOService(IOCourtesyMessageClient courtesyMessageClient, IOOptInClient optInClient,
+                     PnExternalRegistriesConfig cfg, SendIOSentMessageService sendIOSentMessageService,
+                     OptInSentDao optInSentDao) {
         this.courtesyMessageClient = courtesyMessageClient;
         this.optInClient = optInClient;
         this.cfg = cfg;
+        this.sendIOSentMessageService = sendIOSentMessageService;
         this.optInSentDao = optInSentDao;
     }
 
@@ -111,7 +116,7 @@ public class IOService {
     }
 
     private Mono<SendMessageResponseDto> sendIOCourtesyMessage( SendMessageRequestDto sendMessageRequestDto, boolean localeIsIT ) {
-        log.info( "Submit message taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
+        log.info( "Submit message taxId={} iun={} internalId={} recIndex={} carbonCopy={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun(), sendMessageRequestDto.getRecipientInternalID(), sendMessageRequestDto.getRecipientIndex(), sendMessageRequestDto.getCarbonCopyToDeliveryPush());
         if (cfg.isEnableIoMessage()) {
             FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
             MessageContent content = new MessageContent();
@@ -145,6 +150,7 @@ public class IOService {
                    .summary( sendMessageRequestDto.getSubject() )
             );
 
+            assert content.getThirdPartyData() != null;
             log.info( "Proceeding with send message iun={}", content.getThirdPartyData().getId());
             NewMessage m = new NewMessage();
             m.setFeatureLevelType("ADVANCED");
@@ -157,17 +163,32 @@ public class IOService {
                     res.setResult(SendMessageResponseDto.ResultEnum.SENT_COURTESY);
                     res.setId(response.getId());
                     return res;
-                }).onErrorResume( exception ->{
-                        log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
-                        SendMessageResponseDto res = new SendMessageResponseDto();
-                        res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
-                        return Mono.just(res);
-                });
+                })
+                .flatMap(sendMessageResponseDto -> sendIOMessageSentEventToDeliveyPush(sendMessageRequestDto, sendMessageResponseDto))
+                .onErrorResume( exception ->{
+                    log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
+                    SendMessageResponseDto res = new SendMessageResponseDto();
+                    res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
+                    return Mono.just(res);
+            });
         } else {
             log.warn( "Send IO message is disabled!!!" );
             SendMessageResponseDto res = new SendMessageResponseDto();
             res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_COURTESY_DISABLED_BY_CONF);
             return Mono.just(res);
+        }
+    }
+
+    @NotNull
+    private Mono<SendMessageResponseDto> sendIOMessageSentEventToDeliveyPush(SendMessageRequestDto sendMessageRequestDto, SendMessageResponseDto sendMessageResponseDto) {
+        if (Boolean.TRUE.equals(sendMessageRequestDto.getCarbonCopyToDeliveryPush())) {
+            return sendIOSentMessageService.sendIOSentMessageNotification(sendMessageRequestDto.getIun(),
+                            sendMessageRequestDto.getRecipientIndex(), sendMessageRequestDto.getRecipientInternalID(), Instant.now())
+                    .thenReturn(sendMessageResponseDto);
+        }
+        else {
+            return Mono.just(sendMessageResponseDto)
+                    .doOnNext(res -> log.info("Send CC to delivery push not required"));
         }
     }
 
