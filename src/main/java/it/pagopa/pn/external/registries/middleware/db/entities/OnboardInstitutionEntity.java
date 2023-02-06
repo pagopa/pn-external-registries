@@ -13,7 +13,7 @@ import java.time.Instant;
 public class OnboardInstitutionEntity {
 
     public static final String STATUS_ACTIVE = "ACTIVE";
-    public static final String STATUS_SUSPENDED = "SUSPENDED";
+    public static final String STATUS_DELETED = "DELETED";
 
     public static final String GSI_INDEX_LASTUPDATE = "status-lastUpdate-gsi";
 

@@ -9,22 +9,15 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSu
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
-import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.ResourceUtils;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
 import java.io.*;
@@ -116,7 +109,7 @@ class OnboardInstitutionFulltextSearchHelperTest {
         // metto a suspended questa PA
         OnboardInstitutionEntity prev = testDao.get(((ArrayNode)records.get(6)).get(0).asText(), null); // ARNAS G. Brotzu
         prev.setLastUpdate(Instant.now());
-        prev.setStatus(OnboardInstitutionEntity.STATUS_SUSPENDED);
+        prev.setStatus(OnboardInstitutionEntity.STATUS_DELETED);
         testDao.put(prev);
 
         //WHEN
