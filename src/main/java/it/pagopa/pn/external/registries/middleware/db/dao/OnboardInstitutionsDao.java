@@ -48,12 +48,12 @@ public class OnboardInstitutionsDao extends BaseDao {
          QueryEnhancedRequest queryEnhancedRequestACTIVE = QueryEnhancedRequest.builder()
                  .queryConditional(QueryConditional.sortGreaterThan(getKeyBuild(OnboardInstitutionEntity.STATUS_ACTIVE, instant.toString())))
                  .build();
-         QueryEnhancedRequest queryEnhancedRequestSUSPENDED = QueryEnhancedRequest.builder()
-                 .queryConditional(QueryConditional.sortGreaterThan(getKeyBuild(OnboardInstitutionEntity.STATUS_SUSPENDED, instant.toString())))
+         QueryEnhancedRequest queryEnhancedRequestDELETED = QueryEnhancedRequest.builder()
+                 .queryConditional(QueryConditional.sortGreaterThan(getKeyBuild(OnboardInstitutionEntity.STATUS_DELETED, instant.toString())))
                  .build();
 
          return Flux.merge(
             Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestACTIVE).flatMapIterable(Page::items)),
-                 Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestSUSPENDED).flatMapIterable(Page::items)));
+                 Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestDELETED).flatMapIterable(Page::items)));
     }
 }
