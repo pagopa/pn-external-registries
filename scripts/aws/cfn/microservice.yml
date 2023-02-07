@@ -468,6 +468,67 @@ Resources:
       Enabled: true
       # Add an OnFailure destination on the event source mapping
 
+  PnExternalRegistriesInsertTriggerLambdaAlarms:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - PnDeliveryInsertTriggerLambdaLogGroup
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/lambda-alarms.yaml"
+      Parameters:
+        FunctionName: !Ref PnExternalRegistriesInsertTriggerLambda
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+
+  ### Subscription filters with Kinesis  https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html#DestinationKinesisExample
+  SubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - PnDeliveryInsertTriggerLambdaLogGroup
+    Condition: SendLogToKinesis
+    Properties:
+      RoleArn:
+        Fn::GetAtt:
+          - "SubscriptionFilterServiceRole"
+          - "Arn"
+      LogGroupName: !Sub "/aws/lambda/${PnExternalRegistriesInsertTriggerLambda}"
+      FilterPattern: !Ref LogsKinesisFilterPattern
+      DestinationArn: !Ref LogsKinesisSourceStreamArn
+  
+  PnDeliveryInsertTriggerLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${PnExternalRegistriesInsertTriggerLambda}"
+      RetentionInDays: 14
+
+  ### IAM Role used by Subscription filters to allow read logs from Cloudwatch and send logs to Kinesis Firehose
+  SubscriptionFilterServiceRole:
+    Type: AWS::IAM::Role
+    Condition: SendLogToKinesis
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: logs.amazonaws.com
+        Version: "2012-10-17"
+      Path: /
+      Policies:
+        -
+          PolicyName: !Sub '${ProjectName}-externa-registries-lambda-logs-subscription-role'
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - kinesis:PutRecord
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                - "kms:Encrypt"
+                - "kms:GenerateDataKey"
+                - "kms:Decrypt"
+                Effect: Allow
+                Resource: "*"
+
   PnExternalRegistriesInsertTriggerLambda:
     Type: 'AWS::Lambda::Function'
     Properties:
