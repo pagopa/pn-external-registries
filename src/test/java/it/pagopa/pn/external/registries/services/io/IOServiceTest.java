@@ -53,6 +53,9 @@ class IOServiceTest {
     @Mock
     PnExternalRegistriesConfig cfg;
 
+    @Mock
+    SendIOSentMessageService ioSentMessageService;
+
     @Configuration
     static class ContextConfiguration {
         @Primary
@@ -178,6 +181,8 @@ class IOServiceTest {
                 .senderDenomination("PaMilano")
                 .noticeNumber( "noticeNumber" )
                 .recipientTaxID( "recipientTaxId" )
+                .recipientInternalID("PF-123456")
+                .recipientIndex(0)
                 .creditorTaxId( "creditorTaxId" )
                 .subject( "subject" )
                 .requestAcceptedDate(OffsetDateTime.now());
@@ -205,6 +210,58 @@ class IOServiceTest {
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
+        Mockito.verify(ioSentMessageService, Mockito.never()).sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void sendIOMessageSuccess_withCC() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( true )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .amount( 2000 )
+                .creditorTaxId( "creditorTaxId" )
+                .dueDate( OffsetDateTime.ofInstant( Instant.now(), ZoneId.of( "UTC" ) ) )
+                .iun( "iun" )
+                .senderDenomination("PaMilano")
+                .noticeNumber( "noticeNumber" )
+                .recipientTaxID( "recipientTaxId" )
+                .creditorTaxId( "creditorTaxId" )
+                .recipientInternalID("PF-123456")
+                .recipientIndex(0)
+                .subject( "subject" )
+                .carbonCopyToDeliveryPush(true)
+                .requestAcceptedDate(OffsetDateTime.now());
+
+        //When
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+
+        Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioSentMessageService.sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(Mono.empty());
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+
+        ArgumentCaptor<NewMessage> newMessageCaptor = ArgumentCaptor.forClass(NewMessage.class);
+        Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
+        NewMessage newMessage = newMessageCaptor.getValue();
+        String ioSubject = messageRequestDto.getSubject();
+
+        Assertions.assertEquals(ioSubject, newMessage.getContent().getSubject());
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
+        Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
+        Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
+
+        Mockito.verify(ioSentMessageService).sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any());
     }
 
     @Test
@@ -224,6 +281,8 @@ class IOServiceTest {
                 .senderDenomination("PaMilano")
                 .noticeNumber( "noticeNumber" )
                 .recipientTaxID( "recipientTaxId" )
+                .recipientInternalID("PF-123456")
+                .recipientIndex(0)
                 .creditorTaxId( "creditorTaxId" )
                 .subject( 
                         "1111111111" +

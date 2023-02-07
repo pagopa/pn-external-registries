@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.external.registries.middleware.queue.io.producer.sqs.SqsIOSentMessageProducer;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,4 +20,8 @@ public class PnExternalRegistriesMiddlewareConfig {
         return new SqsNotificationPaidProducer( sqs, cfg.getTopics().getDeliveryPushInput(), objMapper);
     }
 
+    @Bean
+    public SqsIOSentMessageProducer sqsIOSentMessageProducer(SqsClient sqs, ObjectMapper objMapper) {
+        return new SqsIOSentMessageProducer( sqs, cfg.getTopics().getDeliveryPushInput(), objMapper);
+    }
 }
