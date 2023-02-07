@@ -50,5 +50,61 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  /ext-registry-private/privacynotice/{consentsType}/{portalType}:
+    get:
+      operationId: getPrivacyNoticeVersion
+      summary: Retrieve the version of TOS
+      description: >
+        Retrieve the version of a privacy notice, invoking one trust
+      tags:
+        - privacy-notice
+      parameters:
+        - name: consentsType
+          schema:
+            type: string
+          description: 'The type of consents. It can take the following values: TOS, DATAPRIVACY'
+          in: path
+          required: true
+          example: 'TOS'
+        - name: portalType
+          schema:
+            type: string
+          description: 'The type of portal. It can take the following values: PA, PG, PF'
+          in: path
+          required: true
+          example: 'PF'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivacyNoticeVersionResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
+components:
+  schemas:
+    PrivacyNoticeVersionResponse:
+      description: The response that contains the version of a privacy notice for a particular privacy notice id
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+          description: The version of the privacy notice retrieved from one trust
+
 
 
