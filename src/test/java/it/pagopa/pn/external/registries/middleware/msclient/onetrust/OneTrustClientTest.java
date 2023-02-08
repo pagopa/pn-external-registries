@@ -57,7 +57,7 @@ class OneTrustClientTest {
                 .when(request()
                         .withMethod("GET")
                         .withPath(PRIVACY_NOTICES_URL.replace("{privacyNoticeId}", "q0da531e-8370-4373-8bd2-61ddc89e7fa6"))
-                        .withQueryStringParameter("date", LocalDate.now().toString())
+                        .withQueryStringParameter("date", LocalDate.now().plusDays(1).toString())
                         .withHeader(HttpHeaders.AUTHORIZATION, "Bearer " + "token-12345"))
                 .respond(response()
                         .withBody(oneTrustResponse())
