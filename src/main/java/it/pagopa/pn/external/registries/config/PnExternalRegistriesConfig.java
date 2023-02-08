@@ -69,6 +69,9 @@ public class PnExternalRegistriesConfig {
 
     private int ioOptinMinDays;
 
+    private String onetrustToken;
+    private String onetrustBaseUrl;
+
     @Data
     public static class AppIoTemplate{
         private String markdownUpgradeAppIoENMessage;
