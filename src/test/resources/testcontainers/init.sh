@@ -26,7 +26,6 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
         ReadCapacityUnits=10,WriteCapacityUnits=5
 
 
-
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     dynamodb create-table \
     --table-name OnboardInstitutions  \
@@ -54,7 +53,9 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
         }
     ]"
 
+
 echo "### CREATE PARAMETER STORE ###"
+
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     ssm put-parameter \
     --name "MapPrivacyNotice" \
@@ -70,5 +71,6 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
                      \"portalType\": \"e5f044a0-093a-43a7-8b1b-b6dd40c6b6af\"
                  }
              ]"
+
 
 echo "Initialization terminated"
