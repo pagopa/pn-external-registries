@@ -53,7 +53,7 @@ public class OneTrustClient extends CommonBaseClient {
                 .retrieve()
                 .bodyToMono(PrivacyNoticeOneTrustResponse.class)
                 .doOnSuccess(response -> log.info("Response from OneTrust: {}", response))
-                .doOnError(throwable -> log.error("Error from OnTrust", throwable));
+                .doOnError(throwable -> log.error(String.format("Error from OnTrust with privacyNoticeId: %s", privacyNoticeId), throwable));
     }
 
 }

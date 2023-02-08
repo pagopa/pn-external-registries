@@ -30,6 +30,7 @@ public class PrivacyNoticeService {
 
 
     public Mono<PrivacyNoticeVersionResponseDto> findPrivacyNoticeVersion(String consentsType, String portalType) {
+        log.info("Checking Privacy Notice with consentsType: {} and portalType: {}", consentsType, portalType);
         Optional<PrivacyNoticeDTO[]> mapPrivacyNotices = parameterConsumer.getParameterValue(PRIVACY_NOTICE_PARAMETER_STORE, PrivacyNoticeDTO[].class);
         if (mapPrivacyNotices.isPresent()) {
             Optional<PrivacyNoticeDTO> privacyNotice = getPrivacyNoticeFromParameterStore(mapPrivacyNotices.get(), consentsType, portalType);
@@ -37,9 +38,11 @@ public class PrivacyNoticeService {
             return privacyNotice
                     .map(privacyNoticeDTO -> oneTrustClient
                             .getPrivacyNoticeVersionByPrivacyNoticeId(privacyNoticeDTO.privacyNoticeId())
+                            .doOnNext(oneTrustResponse -> log.debug("Privacy Notice retrieved from OneTrust with consentsType: {}, portalType: {}, privacyNoticeId: {}",
+                                    consentsType, portalType, privacyNoticeDTO.privacyNoticeId()))
                             .doOnNext(oneTrustResponse -> privacyNoticeCache.put(privacyNoticeDTO.privacyNoticeId(), oneTrustResponse.version().version()))
                             .map(response -> new PrivacyNoticeVersionResponseDto().version(response.version().version()))
-                            .onErrorResume(throwable -> getVersionFromCache(privacyNoticeDTO.privacyNoticeId()))
+                            .onErrorResume(throwable -> getVersionFromCache(consentsType, portalType, privacyNoticeDTO.privacyNoticeId()))
                     )
                     .orElseGet(() -> Mono.error(() -> new PnPrivacyNoticeNotFound(
                             String.format("Privacy Notice not found in PS, with consentsType: %s portalType: %s", consentsType, portalType))));
@@ -55,12 +58,18 @@ public class PrivacyNoticeService {
                 .findFirst();
     }
 
-    private Mono<PrivacyNoticeVersionResponseDto> getVersionFromCache(String privacyNoticeId) {
-        log.info("Retrieve privacyNotice from cache with privacyNoticeId: {}", privacyNoticeId);
+    private Mono<PrivacyNoticeVersionResponseDto> getVersionFromCache(String consentsType, String portalType,
+                                                                      String privacyNoticeId) {
+        log.debug("Retrieve privacyNotice from cache with privacyNoticeId: {}", privacyNoticeId);
         Integer versionInCache = privacyNoticeCache.get(privacyNoticeId);
-        if(versionInCache != null) return Mono.just(new PrivacyNoticeVersionResponseDto().version(versionInCache));
+        if(versionInCache != null) {
+            log.info("Privacy Notice found in cache with consentsType: {}, portalType: {}, privacyNoticeId: {}",
+                    consentsType, portalType, privacyNoticeId);
+            return Mono.just(new PrivacyNoticeVersionResponseDto().version(versionInCache));
+        }
         else return Mono.error(() -> new PnPrivacyNoticeNotFound(
-                String.format("Privacy Notice not found in cache, with privacyNoticeId: %s", privacyNoticeId)));
+                String.format("Privacy Notice not found in cache, with consentsType: %s, portalType: %s, privacyNoticeId: %s",
+                        consentsType, portalType, privacyNoticeId)));
     }
 
     // for testing
