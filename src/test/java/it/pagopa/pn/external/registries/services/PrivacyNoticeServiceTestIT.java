@@ -7,6 +7,8 @@ import it.pagopa.pn.external.registries.exceptions.PnPrivacyNoticeNotFound;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PrivacyNoticeVersionResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.onetrust.OneTrustClient;
 import it.pagopa.pn.external.registries.middleware.msclient.onetrust.PrivacyNoticeOneTrustResponse;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -23,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class PrivacyNoticeServiceTestIT {
 
     @MockBean
@@ -34,6 +34,12 @@ class PrivacyNoticeServiceTestIT {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @BeforeEach
+    @AfterEach
+    public void destroyCache() {
+        privacyNoticeService.getPrivacyNoticeCache().clear();
+    }
 
 
 
