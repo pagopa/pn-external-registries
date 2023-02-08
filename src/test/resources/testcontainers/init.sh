@@ -1,5 +1,7 @@
 echo "### CREATE QUEUES FIFO ###"
+
 queues_fifo="local-delivery-push-inputs.fifo"
+
 for qn in  $( echo $queues_fifo | tr " " "\n" ) ; do
 
     echo creating queue fifo $qn ...
@@ -54,7 +56,9 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     ]"
 
 
+
 echo "### CREATE PARAMETER STORE ###"
+
 
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     ssm put-parameter \
@@ -71,6 +75,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
                      \"portalType\": \"e5f044a0-093a-43a7-8b1b-b6dd40c6b6af\"
                  }
              ]"
+
 
 
 echo "Initialization terminated"
