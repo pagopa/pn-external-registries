@@ -12,6 +12,11 @@ info:
 servers:
   - url: http://internal-pn-in-appli-em20o634urpg-965454854.eu-central-1.elb.amazonaws.com:8080
     description: Generated server url
+tags:
+  - name: internal-only
+    description: Tag for internal API
+  - name: privacy-notice
+    description: Tag for Privacy Notices operations
 paths:
   '/ext-registry-private/pa/v1/groups-all':
     get:
@@ -52,8 +57,8 @@ paths:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
   /ext-registry-private/privacynotice/{consentsType}/{portalType}:
     get:
-      operationId: getPrivacyNoticeVersion
-      summary: Retrieve the version of TOS
+      operationId: findPrivacyNoticeVersion
+      summary: Retrieve the version of a Privacy Notice
       description: >
         Retrieve the version of a privacy notice, invoking one trust
       tags:
@@ -73,7 +78,6 @@ paths:
           in: path
           required: true
           example: 'PF'
-        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
       responses:
         '200':
           description: OK
@@ -104,6 +108,7 @@ components:
       properties:
         version:
           type: integer
+          format: int32
           description: The version of the privacy notice retrieved from one trust
 
 

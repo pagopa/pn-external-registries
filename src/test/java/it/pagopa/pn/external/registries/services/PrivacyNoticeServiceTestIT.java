@@ -53,7 +53,7 @@ class PrivacyNoticeServiceTestIT {
 
         var expectedResponse = new PrivacyNoticeVersionResponseDto().version(1); //recuperato da one trust
 
-        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.getPrivacyNoticeVersion("TOS", "PF");
+        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.findPrivacyNoticeVersion("TOS", "PF");
 
         StepVerifier.create(actualResponse)
                 .expectNext(expectedResponse)
@@ -82,7 +82,7 @@ class PrivacyNoticeServiceTestIT {
 
         var expectedResponse = new PrivacyNoticeVersionResponseDto().version(1); //recuperato da cache
 
-        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.getPrivacyNoticeVersion("TOS", "PF");
+        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.findPrivacyNoticeVersion("TOS", "PF");
 
         StepVerifier.create(actualResponse)
                 .expectNext(expectedResponse)
@@ -97,7 +97,7 @@ class PrivacyNoticeServiceTestIT {
     void getPrivacyNoticeVersionWithPnPrivacyNoticeNotFound() {
 
 
-        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.getPrivacyNoticeVersion("TOS", "PG");
+        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.findPrivacyNoticeVersion("TOS", "PG");
 
         StepVerifier.create(actualResponse)
                 .expectError(PnPrivacyNoticeNotFound.class)

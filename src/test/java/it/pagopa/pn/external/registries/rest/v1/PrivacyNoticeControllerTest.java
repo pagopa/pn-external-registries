@@ -35,13 +35,12 @@ class PrivacyNoticeControllerTest {
         PrivacyNoticeVersionResponseDto expected = new PrivacyNoticeVersionResponseDto().version(1);
 
         // When
-        Mockito.when( privacyNoticeService.getPrivacyNoticeVersion("TOS","PF"))
+        Mockito.when( privacyNoticeService.findPrivacyNoticeVersion("TOS","PF"))
                 .thenReturn( Mono.just( new PrivacyNoticeVersionResponseDto().version(1)) );
 
         // Then
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(URL).build("TOS", "PF"))
-                .header("x-pagopa-pn-cx-id", "PF-12345")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -53,13 +52,12 @@ class PrivacyNoticeControllerTest {
     void getPrivacyNoticeVersionKO() {
 
         // When
-        Mockito.when( privacyNoticeService.getPrivacyNoticeVersion("TOS","PF"))
+        Mockito.when( privacyNoticeService.findPrivacyNoticeVersion("TOS","PF"))
                 .thenReturn( Mono.error( new PnPrivacyNoticeNotFound("Not found")) );
 
         // Then
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(URL).build("TOS", "PF"))
-                .header("x-pagopa-pn-cx-id", "PF-12345")
                 .exchange()
                 .expectStatus()
                 .isNotFound();

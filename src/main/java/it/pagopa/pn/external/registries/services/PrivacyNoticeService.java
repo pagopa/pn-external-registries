@@ -29,7 +29,7 @@ public class PrivacyNoticeService {
     private final ConcurrentHashMap<String, Integer> privacyNoticeCache = new ConcurrentHashMap<>();
 
 
-    public Mono<PrivacyNoticeVersionResponseDto> getPrivacyNoticeVersion(String consentsType, String portalType) {
+    public Mono<PrivacyNoticeVersionResponseDto> findPrivacyNoticeVersion(String consentsType, String portalType) {
         Optional<PrivacyNoticeDTO[]> mapPrivacyNotices = parameterConsumer.getParameterValue(PRIVACY_NOTICE_PARAMETER_STORE, PrivacyNoticeDTO[].class);
         if (mapPrivacyNotices.isPresent()) {
             Optional<PrivacyNoticeDTO> privacyNotice = getPrivacyNoticeFromParameterStore(mapPrivacyNotices.get(), consentsType, portalType);

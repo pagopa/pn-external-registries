@@ -41,7 +41,7 @@ public class OneTrustClient extends CommonBaseClient {
      * Il query parameter date (required), passato a One Trust, specifica a quale data (versione) di pubblicazione
      * del Privacy Notice si vuole recuperare. Passando il giorno dopo, viene presa sempre l'ultima versione.
      *
-     * @param privacyNoticeId identificato del PrivacyNotice attivo da ricercare
+     * @param privacyNoticeId identificativo del PrivacyNotice attivo da ricercare
      * @return il Privacy Notice se trovato, altrimenti One Trust restituisce 500
      */
     public Mono<PrivacyNoticeOneTrustResponse> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {

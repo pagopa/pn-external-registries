@@ -18,9 +18,9 @@ public class PrivacyNoticeController implements PrivacyNoticeApi {
     private final PrivacyNoticeService privacyNoticeService;
 
     @Override
-    public Mono<ResponseEntity<PrivacyNoticeVersionResponseDto>> getPrivacyNoticeVersion(String consentsType, String portalType,
-                                                                                         String xPagopaPnCxId, final ServerWebExchange exchange) {
-        return privacyNoticeService.getPrivacyNoticeVersion(consentsType, portalType)
+    public Mono<ResponseEntity<PrivacyNoticeVersionResponseDto>> findPrivacyNoticeVersion(String consentsType, String portalType,
+                                                                                          final ServerWebExchange exchange) {
+        return privacyNoticeService.findPrivacyNoticeVersion(consentsType, portalType)
                 .map(ResponseEntity::ok);
     }
 
