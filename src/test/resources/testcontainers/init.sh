@@ -1,7 +1,22 @@
+echo "### CREATE PS ###"
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+    ssm put-parameter \
+    --name "MapPrivacyNotice" \
+    --type String \
+    --value "[
+                 {
+                     \"consentsType\": \"TOS\",
+                     \"portalType\": \"PF\",
+                     \"privacyNoticeId\": \"z0da531e-8370-4373-8bd2-61ddc89e7fa6\"
+                 },
+                 {
+                     \"consentsType\": \"DATAPRIVACY\",
+                     \"portalType\": \"e5f044a0-093a-43a7-8b1b-b6dd40c6b6af\"
+                 }
+             ]"
+
 echo "### CREATE QUEUES FIFO ###"
-
 queues_fifo="local-delivery-push-inputs.fifo"
-
 for qn in  $( echo $queues_fifo | tr " " "\n" ) ; do
 
     echo creating queue fifo $qn ...
@@ -26,6 +41,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
         AttributeName=pk,KeyType=HASH \
     --provisioned-throughput \
         ReadCapacityUnits=10,WriteCapacityUnits=5
+
 
 
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
@@ -57,25 +73,6 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
 
 
 
-echo "### CREATE PARAMETER STORE ###"
-
-
-aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
-    ssm put-parameter \
-    --name "MapPrivacyNotice" \
-    --type String \
-    --value "[
-                 {
-                     \"consentsType\": \"TOS\",
-                     \"portalType\": \"PF\",
-                     \"privacyNoticeId\": \"z0da531e-8370-4373-8bd2-61ddc89e7fa6\"
-                 },
-                 {
-                     \"consentsType\": \"DATAPRIVACY\",
-                     \"portalType\": \"e5f044a0-093a-43a7-8b1b-b6dd40c6b6af\"
-                 }
-             ]"
-
-
 
 echo "Initialization terminated"
+
