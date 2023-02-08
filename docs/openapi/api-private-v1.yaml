@@ -74,7 +74,7 @@ paths:
         - name: portalType
           schema:
             type: string
-          description: 'The type of portal. It can take the following values: PA, PG, PF'
+          description: 'The type of portal. It can take the following values: PA, PG, PF, Login, Landing'
           in: path
           required: true
           example: 'PF'
