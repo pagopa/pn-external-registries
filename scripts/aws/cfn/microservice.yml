@@ -550,6 +550,11 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref OnboardInstitutionsTableName
+      Tags:
+        - Key: pnInfraFeature
+          Value: pnLambdas
+        - Key: pnMicroservice
+          Value: PnExternalRegistriesInsertTriggerLambda
       Code:
         ZipFile: |
           const AWS = require('aws-sdk');
