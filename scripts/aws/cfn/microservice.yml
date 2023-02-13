@@ -143,6 +143,10 @@ Parameters:
     Type: String
     Description: 'Target queue URL for insert trigger'
 
+  OneTrustURL:
+    Type: String
+    Description: 'One Trust URL'
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -178,6 +182,7 @@ Resources:
         ContainerSecret4: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoWhiteList:AWSCURRENT:'
         ContainerSecret5: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoActApiKey:AWSCURRENT:'
         ContainerSecret6: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_TOKEN=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:OneTrustToken:AWSCURRENT:'
+        ContainerSecret7: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_BASE_URL=${OneTrustURL}'
         MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName

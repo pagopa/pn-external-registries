@@ -5,7 +5,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 public class PnPrivacyNoticeNotFound extends PnNotFoundException {
 
     public PnPrivacyNoticeNotFound(String message) {
-        super(message, "Non è stata trovata nessuna PA", ERROR_CODE_EXTERNALREGISTRIES_PRIVACY_NOTICE_NOT_FOUND);
+        super(message, "Non è stata trovata nessun Privacy Notice", ERROR_CODE_EXTERNALREGISTRIES_PRIVACY_NOTICE_NOT_FOUND);
     }
 
 }
