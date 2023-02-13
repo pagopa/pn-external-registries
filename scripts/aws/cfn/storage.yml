@@ -37,7 +37,12 @@ Resources:
           KeyType: "HASH"
       BillingMode: "PAY_PER_REQUEST"
       PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true      
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: pnInfraFeature
+          Value: pnStorage
+        - Key: pnMicroservice
+          Value: !Sub '${ProjectName}-OptInSent'
 
   OnboardInstitutionsTable:
     Type: AWS::DynamoDB::Table
@@ -63,6 +68,11 @@ Resources:
           Projection:
             ProjectionType: "ALL"
       BillingMode: "PAY_PER_REQUEST"
+      Tags:
+        - Key: pnInfraFeature
+          Value: pnStorage
+        - Key: pnMicroservice
+          Value: !Sub '${ProjectName}-OnboardInstitutions'
 
 
 Outputs:
@@ -81,6 +91,3 @@ Outputs:
   OnboardInstitutionsTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${OnboardInstitutionsTable.Arn}'
-
-
-
