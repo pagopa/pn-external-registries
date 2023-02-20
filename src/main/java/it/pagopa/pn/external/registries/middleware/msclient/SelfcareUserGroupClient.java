@@ -2,9 +2,9 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api.UserGroupApi;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.PageOfUserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.ApiClient;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.api.UserGroupApi;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class SelfcareUserGroupClient extends OcpBaseClient {
     }
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
-        return userGroupsApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, config.getSelfcareusergroupPnProductId(), null, null)
+        return userGroupsApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, null, null)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getUserGroups response error {}", x.getResponseBodyAsString(), x);
