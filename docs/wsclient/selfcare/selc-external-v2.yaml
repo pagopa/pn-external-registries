@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: External API service
   description: This service is the proxy for external services
-  version: v1
+  version: v2
 servers:
   - url: https://api.uat.selfcare.pagopa.it/external/v2
 paths:
