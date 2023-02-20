@@ -5,10 +5,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.DYNAMODB;
 
@@ -30,7 +32,8 @@ public class LocalStackTestConfig {
                             "/root/.aws/credentials", BindMode.READ_ONLY)
                     .withNetworkAliases("localstack")
                     .withNetwork(Network.builder().build())
-                    .waitingFor(Wait.forLogMessage(".*Initialization terminated.*", 1));
+                    .waitingFor(Wait.forLogMessage(".*Initialization terminated.*", 1)
+                            .withStartupTimeout(Duration.ofSeconds(180)));
 
     static {
         localStack.start();

@@ -175,6 +175,8 @@ components:
       required:
         - iun
         - recipientTaxID
+        - recipientInternalID
+        - recipientIndex
         - senderDenomination
       properties:
         subject:
@@ -209,6 +211,17 @@ components:
           type: string
           format: date-time
           example: '2022-06-16T00:00:00.000Z'
+        recipientInternalID:
+          type: string
+          description: internalId del destinatario
+        recipientIndex:
+          type: integer
+          example: 0
+          description: indice del destinatario
+        carbonCopyToDeliveryPush:
+          type: boolean
+          default: false
+          description: indica se a valle dell'invio a IO del messaggio, va aggiunto in coda verso pn-delivery-push per aggiungerlo in timeline
     SendMessageResponse:
       title: Send message response
       description: Send message response information
