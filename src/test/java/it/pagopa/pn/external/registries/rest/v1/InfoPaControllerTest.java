@@ -145,4 +145,34 @@ class InfoPaControllerTest {
                 .expectStatus().isOk().expectBodyList(PaGroupDto.class).hasSize(2);
     }
 
+    @Test
+    void getManyPa() {
+
+        // Given
+        String url = "/ext-registry-private/pa/v1/activated-on-pn?id={id1}&id={id2}"
+                .replace("{id1}", "123456789")
+                .replace("{id2}", "223456789");
+
+        List<PaSummaryDto> res = new ArrayList<>();
+        PaSummaryDto dto = new PaSummaryDto();
+        dto.setId("123456789");
+        dto.setName("pubblica amministrazione XXX");
+        res.add(dto);
+        dto = new PaSummaryDto();
+        dto.setId("223456789");
+        dto.setName("pubblica amministrazione XXX");
+        res.add(dto);
+
+
+        // When
+        Mockito.when(svcInst.listOnboardedPaByIds(Mockito.anyList()))
+                .thenReturn(Flux.fromIterable(res));
+
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .exchange()
+                .expectStatus().isOk().expectBodyList(PaSummaryDto.class).hasSize(2);
+    }
 }
