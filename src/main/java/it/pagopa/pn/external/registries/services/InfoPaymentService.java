@@ -6,8 +6,10 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.*;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentNoticeDto;
+import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPa;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
+import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
@@ -25,14 +28,13 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 public class InfoPaymentService {
     public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId={} noticeCode={}";
     private final CheckoutClient checkoutClient;
+    private final DeliveryClient deliveryClient;
     private final PnExternalRegistriesConfig config;
-    private final SendPaymentNotificationService sendPaymentNotificationService;
 
-    public InfoPaymentService(CheckoutClient checkoutClient, PnExternalRegistriesConfig config,
-                              SendPaymentNotificationService sendPaymentNotificationService) {
+    public InfoPaymentService(CheckoutClient checkoutClient, DeliveryClient deliveryClient, PnExternalRegistriesConfig config) {
         this.checkoutClient = checkoutClient;
+        this.deliveryClient = deliveryClient;
         this.config = config;
-        this.sendPaymentNotificationService = sendPaymentNotificationService;
     }
 
     public Mono<PaymentInfoDto> getPaymentInfo(String paTaxId, String noticeNumber) {
@@ -54,7 +56,12 @@ public class InfoPaymentService {
 
     private Mono<PaymentInfoDto> checkoutStatusManagement(String paTaxId, String noticeNumber, HttpStatus status, PaymentInfoDto paymentInfoDto) {
         if (HttpStatus.CONFLICT.equals(status) && DetailDto.PAYMENT_DUPLICATED.equals(paymentInfoDto.getDetail()) ) {
-            return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber).thenReturn(paymentInfoDto);
+            PaymentEventPagoPa paymentEventPagoPa = new PaymentEventPagoPa()
+                    .creditorTaxId( paTaxId )
+                    .noticeCode( noticeNumber )
+                    .paymentDate( Instant.now() )
+                    .amount( paymentInfoDto.getAmount() );
+            return deliveryClient.paymentEventPagoPaPrivate( paymentEventPagoPa ).thenReturn( paymentInfoDto );
         }
         if (HttpStatus.BAD_REQUEST.equals(status)) {
             throw new PnCheckoutBadRequestException(
@@ -113,11 +120,11 @@ public class InfoPaymentService {
     }
 
     private PaymentStatusDto getPaymentStatus(DetailDto detail) {
-        switch (detail) {
-            case PAYMENT_ONGOING: return PaymentStatusDto.IN_PROGRESS;
-            case PAYMENT_DUPLICATED: return PaymentStatusDto.SUCCEEDED;
-            default: return PaymentStatusDto.FAILURE;
-        }
+        return switch (detail) {
+            case PAYMENT_ONGOING -> PaymentStatusDto.IN_PROGRESS;
+            case PAYMENT_DUPLICATED -> PaymentStatusDto.SUCCEEDED;
+            default -> PaymentStatusDto.FAILURE;
+        };
     }
 
     public Mono<PaymentResponseDto> checkoutCart(PaymentRequestDto paymentRequestDto) {
