@@ -38,10 +38,6 @@ Parameters:
     Type: String
     Description: 'Checkout cart endpoint base url'
 
-  DeliveryBaseUrl:
-    Type: String
-    Description: 'Delivery endpoint base url'
-
   SelfcareUsergroupBaseUrl:
     Type: String
     Description: 'Selfcare endpoint base url'
