@@ -3,14 +3,10 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPa;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,22 +28,14 @@ import static org.mockserver.model.HttpResponse.response;
 })
 class DeliveryClientTest extends MockAWSObjectsTestConfig {
 
+    @Autowired
     private DeliveryClient deliveryClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Mock
-    private PnExternalRegistriesConfig cfg;
 
     private static ClientAndServer mockServer;
-
-    @BeforeEach
-    void setup() {
-        Mockito.when( cfg.getDeliveryBaseUrl() ).thenReturn( "http://localhost:9999" );
-        this.deliveryClient = new DeliveryClient( cfg );
-        this.deliveryClient.init();
-    }
 
     @BeforeAll
     public static void startMockServer() {
