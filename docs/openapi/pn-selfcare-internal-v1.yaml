@@ -130,6 +130,47 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry-b2b/pa/v1/groups':
+    get:
+      operationId: getGroupsB2B
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PA can use groups to better organize work in its organization.
+        Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
+      tags:
+        - InfoPA
+#      security:                                                                # ONLY EXTERNAL
+#        - ApiKeyAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                          # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                         # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'                     # NO EXTERNAL
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            type: PaGroupStatus
+            $ref: '#/components/schemas/PaGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
     PaNameFilter:
@@ -240,5 +281,7 @@ components:
 #      type: http                                        # ONLY EXTERNAL
 #      scheme: bearer                                    # ONLY EXTERNAL
 #      bearerFormat: JWT                                 # ONLY EXTERNAL
-#security:                                               # ONLY EXTERNAL
-# - bearerAuth: []                                       # ONLY EXTERNAL
+#    ApiKeyAuth:                                         # ONLY EXTERNAL
+#      type: apiKey                                      # ONLY EXTERNAL
+#      in: header                                        # ONLY EXTERNAL
+#      name: x-api-key                                   # ONLY EXTERNAL

@@ -78,4 +78,19 @@ public class InfoPaController implements InfoPaApi {
         log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
         return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareGroupsService.getGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)));
     }
+
+
+    /**
+     * GET /ext-registry-b2b/pa/v1/groups : Retrieve the groups defined in Self Care of the current user
+     * Used by the new notification page
+     *
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
+    @Override
+    public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroupsB2B(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
+        log.debug("getGroupsB2B - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
+        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareGroupsService.getGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)));
+    }
 }

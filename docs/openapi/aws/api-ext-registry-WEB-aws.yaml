@@ -1,0 +1,663 @@
+openapi: 3.0.1
+info:
+  title: >-
+    ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
+  version: '2023-02-28T13:17:50.634Z'
+servers:
+  - url: https://${stageVariables.DnsName}/{basePath}
+    variables:
+      basePath:
+        default: /${stageVariables.ServiceApiPath}
+    x-amazon-apigateway-endpoint-configuration:
+      disableExecuteApiEndpoint: true
+paths:
+  /pa/v1/activated-on-pn:
+    get:
+      operationId: listOnboardedPa
+      summary: List PA that use PN
+      description: >-
+        Use with API to implement PA choose in domicile and mandate creation
+        pages.
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_jwtAuthorizer: []
+      parameters:
+        - name: paNameFilter
+          description: Se valorizzato indica il prefisso della denominazione della PA
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaNameFilter'
+        - name: id
+          description: >-
+            Se valorizzato indica gli id delle PA di cui si vuole la
+            denominazione
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaSummariesList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/activated-on-pn
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.path.proxy: method.request.path.proxy
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pa/v1/activated-on-pn API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/activated-on-pn
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pa/v1/groups:
+    get:
+      operationId: getGroups
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PA can use groups to better organize work in its organization. Return
+        the PaGroupList of the current user, or if the user isn't in some group,
+        all the groups of the current PA
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_jwtAuthorizer: []
+      parameters:
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            type: PaGroupStatus
+            $ref: '#/components/schemas/PaGroupStatus'
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.path.proxy: method.request.path.proxy
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pa/v1/groups API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
+    get:
+      operationId: getPaymentInfo
+      summary: Retrieve payment information
+      description: >-
+        Use to enable payment button in notification detail page and display
+        amount
+      tags:
+        - PaymentInfo
+      security:
+        - pn-auth-fleet_jwtAuthorizer: []
+      parameters:
+        - name: paTaxId
+          description: Payment PA fiscal code
+          in: path
+          required: true
+          example: '77777777777'
+          schema:
+            $ref: '#/components/schemas/paTaxId'
+        - name: noticeNumber
+          description: Payment notice number  numero avviso
+          in: path
+          required: true
+          example: '302000100000019421'
+          schema:
+            $ref: '#/components/schemas/noticeCode'
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInfo'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.path.proxy: method.request.path.proxy
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber} API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pagopa/v1/checkout-cart:
+    post:
+      operationId: checkoutCart
+      summary: Make a payment
+      description: Make a payment by calling the Checkout API
+      tags:
+        - PaymentInfo
+      security:
+        - pn-auth-fleet_jwtAuthorizer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pagopa/v1/checkout-cart
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.path.proxy: method.request.path.proxy
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+    options:
+      operationId: Options for /pagopa/v1/checkout-cart API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pagopa/v1/checkout-cart
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /v3/api-docs:
+    x-amazon-apigateway-any-method:
+      operationId: Proxy to pn-delivery public api-docs
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/v3/api-docs
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+components:
+  parameters: {}
+  schemas:
+    PaNameFilter:
+      title: Admitted character for PA denomination field
+      type: string
+      minLength: 3
+      pattern: '[A-Za-z0-9 _]*'
+    PaSummary:
+      title: PA in short
+      description: PA with minimal information
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+    PaSummariesList:
+      title: Brief list of PAs
+      description: Contains a list of PA with minimal information
+      type: array
+      items:
+        type: PaSummary
+        $ref: '#/components/schemas/PaSummary'
+    PaInfo:
+      title: PA Info by IPA
+      description: Denomination, fiscal code, pec, email, tel, www site, ...
+      type: object
+      required:
+        - id
+        - name
+        - taxId
+        - generalContacts
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+          minLength: 1
+        taxId:
+          description: codice fiscale
+          type: string
+          minLength: 1
+        generalContacts:
+          description: General PA contact information
+          $ref: '#/components/schemas/PaContacts'
+    PaContacts:
+      title: Contact Information
+      description: pec, email, tel, www site, ...
+      type: object
+      properties:
+        pec:
+          type: string
+          format: email
+          minLength: 1
+        email:
+          type: string
+          format: email
+          minLength: 1
+        tel:
+          type: string
+          pattern: ^\\+?([0-9]|-)*
+          minLength: 1
+          maxLength: 20
+        web:
+          type: string
+          format: uri
+          pattern: http.*
+          minLength: 1
+    PaGroupList:
+      title: Groups defined in Self Care
+      description: Contains the list of groups defined in SelfCare
+      type: array
+      items:
+        type: PaGroup
+        $ref: '#/components/schemas/PaGroup'
+    PaGroup:
+      title: Group defined in Self Care
+      description: Contains tha name list of groups defined in SelfCare
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: PaGroupStatus
+          $ref: '#/components/schemas/PaGroupStatus'
+    PaGroupStatus:
+      title: Status of group defined in Self Care
+      description: Contains tha name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+    SelfCarePaId:
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
+      type: string
+      minLength: 1
+    ProblemError:
+      properties:
+        code:
+          description: Internal code of the error, in human-readable format
+          example: >-
+            PN_PARAMETER_TOO_LONG | PN_PARAMETER_TOO_SHORT | PN_DUPLICATE_ENTRY
+            | etc...
+          type: string
+        element:
+          description: Parameter or request body field name for validation error
+          example: body.order.item[2].quantity
+          type: string
+        detail:
+          description: >-
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Parameter not valid
+          maxLength: 1024
+          type: string
+      required:
+        - code
+    Problem:
+      properties:
+        type:
+          description: URI reference of type definition
+          type: string
+        status:
+          description: >-
+            The HTTP status code generated by the origin server for this
+            occurrence of the problem.
+          type: integer
+          format: int32
+          example: 503
+          maximum: 600
+          minimum: 100
+          exclusiveMaximum: true
+        title:
+          description: >-
+            A short, summary of the problem type. Written in english and
+            readable
+          example: Service Unavailable
+          maxLength: 64
+          pattern: ^[ -~]{0,64}$
+          type: string
+        detail:
+          description: A human readable explanation of the problem.
+          example: Request took too long to complete.
+          maxLength: 4096
+          pattern: ^.{0,4096}$
+          type: string
+        traceId:
+          description: Internal support identifier associated to error
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        timestamp:
+          description: date and time referred to UTC
+          example: '2022-07-27T12:22:33.444Z'
+          type: string
+          format: date-time
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ProblemError'
+      required:
+        - status
+        - errors
+    PaymentInfo:
+      title: Payment brief information
+      description: Payment minimal information
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        detail:
+          $ref: '#/components/schemas/Detail'
+        detail_v2:
+          $ref: '#/components/schemas/Detail_v2'
+        errorCode:
+          description: error code to show at the user
+          type: string
+          example: PPT_AUTORIZZAZIONE
+        amount:
+          description: Amount for required payment in eurocents
+          example: 1200
+          type: integer
+        url:
+          description: Checkout base url used for check payment info
+          example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+          type: string
+    PaymentStatus:
+      title: Payment status
+      example: REQUIRED
+      description: |
+        Payment status:
+          * `REQUIRED` - payment required
+          * `SUCCEEDED` - payment done
+          * `IN_PROGRESS` - waiting confirm
+          * `FAILURE` - error see errorType
+      type: string
+      enum:
+        - REQUIRED
+        - SUCCEEDED
+        - IN_PROGRESS
+        - FAILURE
+    Detail:
+      title: Error classification
+      description: |
+        Classification to help user address the issue
+          * `PAYMENT_UNAVAILABLE`: Technical Error.
+          * `PAYMENT_UNKNOWN`: Payment data error.
+          * `DOMAIN_UNKNOWN`: creditor institution error.
+          * `PAYMENT_ONGOING`: payment on going.
+          * `PAYMENT_EXPIRED`: payment expired.
+          * `PAYMENT_CANCELED`: payment cancelled.
+          * `PAYMENT_DUPLICATED`: payment duplicated.
+          * `GENERIC_ERROR`: generic error.
+      example: PAYMENT_UNAVAILABLE
+      type: string
+      enum:
+        - PAYMENT_UNAVAILABLE
+        - PAYMENT_UNKNOWN
+        - DOMAIN_UNKNOWN
+        - PAYMENT_ONGOING
+        - PAYMENT_EXPIRED
+        - PAYMENT_CANCELED
+        - PAYMENT_DUPLICATED
+        - GENERIC_ERROR
+    Detail_v2:
+      title: Error classification detail
+      description: |
+        Classification detail to help user address the issue
+      example: PPT_PSP_SCONOSCIUTO
+      type: string
+    PaymentRequest:
+      title: Request to make a payment on Checkout
+      type: object
+      required:
+        - paymentNotice
+        - returnUrl
+      properties:
+        paymentNotice:
+          $ref: '#/components/schemas/PaymentNotice'
+        returnUrl:
+          description: Checkout base url used to make payment
+          example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+          type: string
+    PaymentNotice:
+      title: Request for a Payment Notice
+      description: Information of a Payment Notice
+      type: object
+      required:
+        - noticeNumber
+        - fiscalCode
+        - amount
+        - companyName
+        - description
+      properties:
+        noticeNumber:
+          type: string
+          description: The payment notice number
+          minLength: 18
+          maxLength: 18
+        fiscalCode:
+          type: string
+          description: Public Administration tax code
+          minLength: 11
+          maxLength: 11
+        amount:
+          type: integer
+          description: Amount ( in euro cents ) of the payment notice
+          minimum: 1
+        companyName:
+          type: string
+          description: Public Administration company name
+          maxLength: 140
+        description:
+          type: string
+          description: Subject of payment
+          maxLength: 140
+    PaymentResponse:
+      title: Response containing the Checkout callback URL
+      type: object
+      required:
+        - checkoutUrl
+      properties:
+        checkoutUrl:
+          type: string
+          description: The Checkout callback URL
+    paTaxId:
+      description: Payment PA fiscal code
+      example: '77777777777'
+      type: string
+      maxLength: 11
+      minLength: 11
+      pattern: ^\d+$
+    noticeCode:
+      description: Payment notice number  numero avviso
+      example: '302000100000019421'
+      type: string
+      maxLength: 18
+      minLength: 18
+      pattern: ^\d+$
+  responses: {}
+  securitySchemes:
+    pn-auth-fleet_jwtAuthorizer:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        authorizerUri: >-
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${stageVariables.ProjectName}-jwtAuthorizerLambda/invocations
+        authorizerResultTtlInSeconds: 300
+        type: token
+tags:
+  - name: SelfCare
+    description: Integrazione verso portale selfcare
+  - name: PaymentInfo
+    description: Informazioni sullo stato del pagamento
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''

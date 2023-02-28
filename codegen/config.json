@@ -1,0 +1,19 @@
+{
+    "openapi": [
+        {
+            "intendedUsage": "B2B",
+            "openapiFiles": [
+                "pn-selfcare-internal-v1.yaml"
+            ],
+            "servicePath": "ext-registry-b2b"
+        },
+        {
+            "intendedUsage": "WEB",
+            "openapiFiles": [
+                "pn-selfcare-internal-v1.yaml",
+                "pn-payment-info-internal-v1.yaml"
+            ],
+            "servicePath": "ext-registry"
+        }
+    ]
+}
