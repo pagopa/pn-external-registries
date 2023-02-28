@@ -517,6 +517,9 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+        LogGroupsNames: !Join
+          - ','
+          - - !Sub '/ecs/${ProjectName}-external-registries'
 
   # Lambda function role - this lambda needs to be triggered from a SQS queue and writes to a DynamoDB table
   PnExternalRegistriesInsertTriggerLambdaRole:
