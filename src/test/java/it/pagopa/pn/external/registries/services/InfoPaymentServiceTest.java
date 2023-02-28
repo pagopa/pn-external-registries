@@ -86,6 +86,33 @@ class InfoPaymentServiceTest {
     }
 
     @Test
+    void getInfoPaymentConflictOnGoing() {
+
+        ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
+        responseBody.setCategory( "PAYMENT_ONGOING" );
+        responseBody.detailV2( "PPT_PAGAMENTO_IN_CORSO" );
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( ValidationFaultPaymentProblemJsonDto.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( responseBody );
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
+
+        Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
+
+        PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
+
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.IN_PROGRESS, result.getStatus() );
+    }
+
+    @Test
     void getInfoPaymentOk() {
         //Given
         PaymentRequestsGetResponseDto paymentResponse = new PaymentRequestsGetResponseDto();
@@ -163,14 +190,14 @@ class InfoPaymentServiceTest {
 
     @Test
     void checkoutCartOk() {
-        final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
-        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
+        final String RETURN_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETURN_URL);
         CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
 
         PaymentResponseDto expectedResponse = new PaymentResponseDto().checkoutUrl(paymentRequestDto.getReturnUrl());
 
         Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
-                .thenReturn(Mono.just(ResponseEntity.status(302).header(HttpHeaders.LOCATION, RETUNR_URL).build()));
+                .thenReturn(Mono.just(ResponseEntity.status(302).header(HttpHeaders.LOCATION, RETURN_URL).build()));
 
         Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
 
@@ -182,8 +209,8 @@ class InfoPaymentServiceTest {
 
     @Test
     void checkoutCartKoInternalServerError() {
-        final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
-        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
+        final String RETURN_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETURN_URL);
         CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
 
         Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
