@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @EnableAutoConfiguration(exclude = {SqsAutoConfiguration.class})
-public class MockAWSObjectsTest {
+public class MockAWSObjectsTestConfig {
 
     @MockBean
     private MomProducer<PnExtRegistryIOSentMessageEvent> iosentmessageProducer;

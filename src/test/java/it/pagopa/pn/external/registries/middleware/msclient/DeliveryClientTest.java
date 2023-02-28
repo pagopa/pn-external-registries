@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.external.registries.MockAWSObjectsTest;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPa;
 import org.junit.jupiter.api.AfterAll;
@@ -30,7 +30,7 @@ import static org.mockserver.model.HttpResponse.response;
 @TestPropertySource(properties = {
         "pn.external-registry.delivery-base-url=http://localhost:9999"
 })
-class DeliveryClientTest extends MockAWSObjectsTest {
+class DeliveryClientTest extends MockAWSObjectsTestConfig {
 
     private DeliveryClient deliveryClient;
 
