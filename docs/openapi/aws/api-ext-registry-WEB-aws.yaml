@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: '2023-02-28T13:17:50.634Z'
+  version: '2023-02-28T14:03:43.349Z'
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -511,7 +511,7 @@ components:
         detail:
           $ref: '#/components/schemas/Detail'
         detail_v2:
-          $ref: '#/components/schemas/Detail_v2'
+          $ref: '#/components/schemas/DetailV2'
         errorCode:
           description: error code to show at the user
           type: string
@@ -562,7 +562,7 @@ components:
         - PAYMENT_CANCELED
         - PAYMENT_DUPLICATED
         - GENERIC_ERROR
-    Detail_v2:
+    DetailV2:
       title: Error classification detail
       description: |
         Classification detail to help user address the issue
