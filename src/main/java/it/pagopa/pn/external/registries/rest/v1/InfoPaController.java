@@ -29,6 +29,12 @@ public class InfoPaController implements InfoPaApi {
         this.infoSelfcareInstitutionsService = infoSelfcareInstitutionsService;
     }
 
+    @Override
+    public Mono<ResponseEntity<Flux<PaSummaryDto>>> getManyPa(List<String> ids,  final ServerWebExchange exchange) {
+        log.debug("getManyPa - ids={}", ids);
+        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareInstitutionsService.listOnboardedPaByIds( ids)));
+    }
+
     /**
      * GET /ext-registry-private/pa/v1/activated-on-pn/{id} : Retrieve detailed information about one PA
      * Used by the Notification detail page
