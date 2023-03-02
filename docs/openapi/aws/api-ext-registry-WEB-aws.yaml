@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: '2023-03-01T10:17:35.286Z'
+  version: H/B55fpxCesTcF0Oe3Ed0Vm4Hw+Vn9JJ94+J/DJYUk8=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -21,7 +21,7 @@ paths:
       tags:
         - InfoPA
       security:
-        - pn-auth-fleet_jwtAuthorizer: []
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
       parameters:
         - name: paNameFilter
           description: Se valorizzato indica il prefisso della denominazione della PA
@@ -98,7 +98,7 @@ paths:
       tags:
         - InfoPA
       security:
-        - pn-auth-fleet_jwtAuthorizer: []
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
       parameters:
         - name: statusFilter
           description: Se valorizzato indica di tornare solo i gruppi nello stato passato
@@ -165,7 +165,7 @@ paths:
       tags:
         - PaymentInfo
       security:
-        - pn-auth-fleet_jwtAuthorizer: []
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
       parameters:
         - name: paTaxId
           description: Payment PA fiscal code
@@ -241,7 +241,7 @@ paths:
       tags:
         - PaymentInfo
       security:
-        - pn-auth-fleet_jwtAuthorizer: []
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
       requestBody:
         content:
           application/json:
@@ -295,18 +295,6 @@ paths:
         connectionId: ${stageVariables.NetworkLoadBalancerLink}
         httpMethod: ANY
         requestParameters: {}
-        passthroughBehavior: when_no_match
-        connectionType: VPC_LINK
-        timeoutInMillis: 29000
-        type: http_proxy
-  /v3/api-docs:
-    x-amazon-apigateway-any-method:
-      operationId: Proxy to pn-delivery public api-docs
-      x-amazon-apigateway-integration:
-        uri: >-
-          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/v3/api-docs
-        connectionId: ${stageVariables.NetworkLoadBalancerLink}
-        httpMethod: ANY
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -623,7 +611,7 @@ components:
       pattern: ^\d+$
   responses: {}
   securitySchemes:
-    pn-auth-fleet_jwtAuthorizer:
+    pn-auth-fleet_jwtAuthorizer_openapi:
       type: apiKey
       name: Authorization
       in: header

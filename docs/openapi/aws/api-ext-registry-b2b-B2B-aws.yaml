@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: '2023-03-01T10:17:33.732Z'
+  version: Ie9Q3P4etQKWlwjxEZ4V2mb5PSvyPS0tie0sS+SMjGo=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -22,8 +22,8 @@ paths:
       tags:
         - InfoPA
       security:
-        - pn-auth-fleet_ApiKeyAuthorizerV2: []
-        - api_key: []
+        - pn-auth-fleet_ApiKeyAuthorizerV2_openapi: []
+        - api_key_openapi: []
       parameters:
         - name: statusFilter
           description: Se valorizzato indica di tornare solo i gruppi nello stato passato
@@ -76,18 +76,6 @@ paths:
         connectionId: ${stageVariables.NetworkLoadBalancerLink}
         httpMethod: ANY
         requestParameters: {}
-        passthroughBehavior: when_no_match
-        connectionType: VPC_LINK
-        timeoutInMillis: 29000
-        type: http_proxy
-  /v3/api-docs:
-    x-amazon-apigateway-any-method:
-      operationId: Proxy to pn-delivery public api-docs
-      x-amazon-apigateway-integration:
-        uri: >-
-          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/v3/api-docs
-        connectionId: ${stageVariables.NetworkLoadBalancerLink}
-        httpMethod: ANY
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -266,11 +254,11 @@ components:
         - errors
   responses: {}
   securitySchemes:
-    api_key:
+    api_key_openapi:
       type: apiKey
       name: x-api-key
       in: header
-    pn-auth-fleet_ApiKeyAuthorizerV2:
+    pn-auth-fleet_ApiKeyAuthorizerV2_openapi:
       type: apiKey
       name: x-api-key
       in: header
