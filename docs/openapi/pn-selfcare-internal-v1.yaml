@@ -1,11 +1,17 @@
 openapi: 3.0.1
 info:
+  x-api-id: api-internal-selfcare-b2b-pa # NO EXTERNAL
+#  x-api-id: api-external-selfcare-b2b-pa # ONLY EXTERNAL
+  x-summary: API B2B per recuperare i gruppi delle Pubbliche Amministrazioni
   title: API di integrazione con self care
-  version: v1
+  version: '1.0.0'
   description: Api di integrazione al sistema Self Care
+  contact:
+    email: pn-supporto-enti@pagopa.it
   license:
-    name: PagoPA PN license
-    url: http://pn.pagopa.it
+    name: Licenza di PN
+    url: 'https://notifichedigitali.pagopa.it/pubbliche-amministrazioni/index.html'
+  termsOfService: https://notifichedigitali.pagopa.it/pubbliche-amministrazioni/index.html
 servers:
   - url: https://placeholder
     description: placeholder
@@ -13,6 +19,18 @@ tags:
   - name: SelfCare
     description: Integrazione verso portale selfcare
 paths:
+  /status:
+    get:
+      summary: healthCheck path
+      description: health check path per verificare lo stato del micro servizio
+      tags:
+        - HealthCheck
+      operationId: status
+      responses:
+        '200':
+          description: Ok
+        '500':
+          description: Internal Server Error
   '/ext-registry/pa/v1/activated-on-pn':
     get:
       operationId: listOnboardedPa
@@ -145,7 +163,6 @@ paths:
           in: query
           required: false
           schema:
-            type: PaGroupStatus
             $ref: '#/components/schemas/PaGroupStatus'
       responses:
         '200':
@@ -186,7 +203,6 @@ paths:
           in: query
           required: false
           schema:
-            type: PaGroupStatus
             $ref: '#/components/schemas/PaGroupStatus'
       responses:
         '200':
@@ -231,7 +247,6 @@ components:
       description: Contains a list of PA with minimal information
       type: array
       items:
-        type: PaSummary
         $ref: '#/components/schemas/PaSummary'
     PaInfo:
       title: PA Info by IPA
@@ -253,7 +268,6 @@ components:
           type: string
           minLength: 1
         generalContacts:
-          description: General PA contact information
           $ref: '#/components/schemas/PaContacts'
     PaContacts:
       title: Contact Information
@@ -283,7 +297,6 @@ components:
       description: Contains the list of groups defined in SelfCare
       type: array
       items:
-        type: PaGroup
         $ref: '#/components/schemas/PaGroup'
     PaGroup:
       title: Group defined in Self Care
@@ -297,7 +310,6 @@ components:
         description:
           type: string
         status:
-          type: PaGroupStatus
           $ref: '#/components/schemas/PaGroupStatus'
     PaGroupStatus:
       title: Status of group defined in Self Care

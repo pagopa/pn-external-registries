@@ -5,7 +5,8 @@
             "openapiFiles": [
                 "pn-selfcare-internal-v1.yaml"
             ],
-            "servicePath": "ext-registry-b2b"
+            "servicePath": "ext-registry-b2b",
+            "generateBundle": true
         },
         {
             "intendedUsage": "WEB",
@@ -15,5 +16,8 @@
             ],
             "servicePath": "ext-registry"
         }
+    ],
+    "openapiBundlePresenceCheck": [
+        "pn-selfcare-external-v1-bundle.yaml"
     ]
 }
