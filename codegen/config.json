@@ -1,0 +1,24 @@
+{
+    "openapi": [
+        {
+            "intendedUsage": "B2B",
+            "openapiFiles": [
+                "pn-selfcare-internal-v1.yaml"
+            ],
+            "servicePath": "ext-registry-b2b",
+            "generateBundle": true,
+            "bundlePathPrefixes": ["ext-registry-b2b", "status"]
+        },
+        {
+            "intendedUsage": "WEB",
+            "openapiFiles": [
+                "pn-selfcare-internal-v1.yaml",
+                "pn-payment-info-internal-v1.yaml"
+            ],
+            "servicePath": "ext-registry"
+        }
+    ],
+    "openapiBundlePresenceCheck": [
+        "pn-selfcare-external-v1-bundle.yaml"
+    ]
+}

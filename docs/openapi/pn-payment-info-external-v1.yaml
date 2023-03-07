@@ -106,7 +106,7 @@ components:
         detail:
           $ref: '#/components/schemas/Detail'
         detail_v2:
-          $ref: '#/components/schemas/Detail_v2'
+          $ref: '#/components/schemas/DetailV2'
         errorCode:
           description: error code to show at the user
           type: string
@@ -157,7 +157,7 @@ components:
         - PAYMENT_CANCELED
         - PAYMENT_DUPLICATED
         - GENERIC_ERROR
-    Detail_v2:
+    DetailV2:
       title: Error classification detail
       description: >
         Classification detail to help user address the issue
