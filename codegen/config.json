@@ -6,7 +6,8 @@
                 "pn-selfcare-internal-v1.yaml"
             ],
             "servicePath": "ext-registry-b2b",
-            "generateBundle": true
+            "generateBundle": true,
+            "bundlePathPrefixes": ["ext-registry-b2b", "status"]
         },
         {
             "intendedUsage": "WEB",

@@ -18,97 +18,6 @@ tags:
   - name: SelfCare
     description: Integrazione verso portale selfcare
 paths:
-  /status:
-    get:
-      summary: healthCheck path
-      description: health check path per verificare lo stato del micro servizio
-      tags:
-        - HealthCheck
-      operationId: status
-      responses:
-        '200':
-          description: Ok
-        '500':
-          description: Internal Server Error
-  /ext-registry/pa/v1/activated-on-pn:
-    get:
-      operationId: listOnboardedPa
-      summary: List PA that use PN
-      description: Use with API to implement PA choose in domicile and mandate creation pages.
-      tags:
-        - InfoPA
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: paNameFilter
-          description: Se valorizzato indica il prefisso della denominazione della PA
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/PaNameFilter'
-        - name: id
-          description: Se valorizzato indica gli id delle PA di cui si vuole la denominazione
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/SelfCarePaId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaSummariesList'
-        '400':
-          description: Invalid input
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        '500':
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /ext-registry/pa/v1/groups:
-    get:
-      operationId: getGroups
-      summary: Retrieve group of current user defined in Self Care
-      description: |
-        PA can use groups to better organize work in its organization. Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
-      tags:
-        - InfoPA
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: statusFilter
-          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/PaGroupStatus'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaGroupList'
-        '400':
-          description: Invalid input
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        '500':
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
   /ext-registry-b2b/pa/v1/groups:
     get:
       operationId: getGroupsB2B
@@ -145,6 +54,18 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /status:
+    get:
+      summary: healthCheck path
+      description: health check path per verificare lo stato del micro servizio
+      tags:
+        - HealthCheck
+      operationId: status
+      responses:
+        '200':
+          description: Ok
+        '500':
+          description: Internal Server Error
 components:
   schemas:
     PaNameFilter:
