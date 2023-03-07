@@ -7,11 +7,13 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
                  {
                      \"consentsType\": \"TOS\",
                      \"portalType\": \"PF\",
-                     \"privacyNoticeId\": \"z0da531e-8370-4373-8bd2-61ddc89e7fa6\"
+                     \"privacyNoticeId\": \"z0da531e-8370-4373-8bd2-61ddc89e7fa6\",
+                     \"defaultVersion\": 1
                  },
                  {
                      \"consentsType\": \"DATAPRIVACY\",
-                     \"portalType\": \"e5f044a0-093a-43a7-8b1b-b6dd40c6b6af\"
+                     \"portalType\": \"e5f044a0-093a-43a7-8b1b-b6dd40c6b6af\",
+                     \"defaultVersion\": 1
                  }
              ]"
 
