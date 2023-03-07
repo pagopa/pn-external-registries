@@ -106,6 +106,21 @@ class PrivacyNoticeServiceTestIT {
 
     }
 
+    @Test
+    void getPrivacyNoticeVersionDefaultVersion() {
+        Mockito.when(oneTrustClient.getPrivacyNoticeVersionByPrivacyNoticeId("z0da531e-8370-4373-8bd2-61ddc89e7fa6"))
+                .thenReturn(Mono.error(WebClientResponseException.create(500, "Error", new HttpHeaders(), null, null)));
+
+        Mono<PrivacyNoticeVersionResponseDto> actualResponse = privacyNoticeService.findPrivacyNoticeVersion("TOS", "PF");
+
+        int defaultVersion = 1;
+        var expectedResponse = new PrivacyNoticeVersionResponseDto().version(defaultVersion);
+
+        StepVerifier.create(actualResponse)
+                .expectNext(expectedResponse)
+                .verifyComplete();
+    }
+
     private String oneTrustResponse() {
         return """
                 {

@@ -42,7 +42,7 @@ public class PrivacyNoticeService {
                                     consentsType, portalType, privacyNoticeDTO.privacyNoticeId()))
                             .doOnNext(oneTrustResponse -> privacyNoticeCache.put(privacyNoticeDTO.privacyNoticeId(), oneTrustResponse.version().version()))
                             .map(response -> new PrivacyNoticeVersionResponseDto().version(response.version().version()))
-                            .onErrorResume(throwable -> getVersionFromCache(consentsType, portalType, privacyNoticeDTO.privacyNoticeId()))
+                            .onErrorResume(throwable -> getVersionFromCache(consentsType, portalType, privacyNoticeDTO.privacyNoticeId(), privacyNoticeDTO.defaultVersion()))
                     )
                     .orElseGet(() -> Mono.error(() -> new PnPrivacyNoticeNotFound(
                             String.format("Privacy Notice not found in PS, with consentsType: %s portalType: %s", consentsType, portalType))));
@@ -59,7 +59,7 @@ public class PrivacyNoticeService {
     }
 
     private Mono<PrivacyNoticeVersionResponseDto> getVersionFromCache(String consentsType, String portalType,
-                                                                      String privacyNoticeId) {
+                                                                      String privacyNoticeId, Integer defaultVersion) {
         log.debug("Retrieve privacyNotice from cache with privacyNoticeId: {}", privacyNoticeId);
         Integer versionInCache = privacyNoticeCache.get(privacyNoticeId);
         if(versionInCache != null) {
@@ -67,9 +67,10 @@ public class PrivacyNoticeService {
                     consentsType, portalType, privacyNoticeId);
             return Mono.just(new PrivacyNoticeVersionResponseDto().version(versionInCache));
         }
-        else return Mono.error(() -> new PnPrivacyNoticeNotFound(
-                String.format("Privacy Notice not found in cache, with consentsType: %s, portalType: %s, privacyNoticeId: %s",
-                        consentsType, portalType, privacyNoticeId)));
+        else {
+            log.info("Privacy Notice not found in cache use default version: {}", defaultVersion);
+            return Mono.just( new PrivacyNoticeVersionResponseDto().version( defaultVersion ) );
+        }
     }
 
     // for testing
