@@ -13,6 +13,13 @@
     <version>2.0.0-SNAPSHOT</version>
     <name>pn-external-registries</name>
     <description>TODO</description>
+    <!--
+        // decomment to override the pn-codegen version to use, the default version is read from parent pom.xml  
+    <properties>
+        <pagopa.codegen.version>v01.00.00</pagopa.codegen.version>
+    </properties> 
+    -->
+
     <scm>
         <connection>${git.conn}</connection>
         <developerConnection>${git.devConn}</developerConnection>

@@ -14,7 +14,7 @@ usage() {
 
     [-h]                      : this help message
     [-v]                      : verbose mode
-    -t <tag>                  : pn-codegen tag, default to "main"
+    -t <tag>                  : pn-codegen tag, default to pom.xml "pagopa.codegen.version" value
     
 EOF
   exit 1
@@ -22,7 +22,7 @@ EOF
 
 parse_params() {
   # default values of variables set from params
-  tag="main"
+  tag=""
 
   while :; do
     case "${1-}" in
@@ -40,6 +40,18 @@ parse_params() {
 
   args=("$@")
 
+  if [[ -z "${tag-}" ]]; then
+    tag=$(./mvnw help:evaluate -Dexpression=pagopa.codegen.version -q -DforceStdout)
+
+    if [[ "$tag" == "null object or invalid expression" ]]; then
+      echo "    pagopa.codegen.version not found in pom.xml: ${tag}"
+      echo ""
+      echo ""
+      echo ""
+      tag=""
+    fi
+  fi
+
   # check required params and arguments
   [[ -z "${tag-}" ]] && usage 
   return 0
@@ -55,11 +67,12 @@ dump_params(){
 
 # START SCRIPT
 
+current_dir=$(dirname ${BASH_SOURCE[0]})
+cd ${current_dir}
+cd ../..
+
+
 parse_params "$@"
 dump_params
 
-current_dir=$(dirname ${BASH_SOURCE[0]})
-echo ${current_dir}
-cd ${current_dir}
-cd ../..
 docker run --rm -it -v ${PWD}:/usr/local/app/microsvc --name=pn-codegen ghcr.io/pagopa/pn-codegen:${tag}
