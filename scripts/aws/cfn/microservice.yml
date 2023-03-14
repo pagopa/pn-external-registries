@@ -40,7 +40,7 @@ Parameters:
 
   IoOptInMinDays:
     Type: String
-    Description: 'Numero di giorni cuscinetto per evitare di inviare troppi optin all'utente
+    Description: 'Numero di giorni cuscinetto per evitare di inviare troppi optin all utente'
 
   SelfcareUsergroupBaseUrl:
     Type: String
