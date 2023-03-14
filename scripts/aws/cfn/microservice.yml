@@ -38,6 +38,10 @@ Parameters:
     Type: String
     Description: 'Checkout cart endpoint base url'
 
+  IoOptInMinDays:
+    Type: String
+    Description: 'Numero di giorni cuscinetto per evitare di inviare troppi optin all'utente
+
   SelfcareUsergroupBaseUrl:
     Type: String
     Description: 'Selfcare endpoint base url'
@@ -276,6 +280,7 @@ Resources:
         ContainerEnvEntry19: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
         ContainerEnvEntry20: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_BASE_URL=${OneTrustURL}'
         ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry22: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
