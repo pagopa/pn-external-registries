@@ -7,6 +7,7 @@
     "PortalUrl": "https://portale.dev.pn.pagopa.it",
     "SelfcareUsergroupPnProductId": "prod-pn-dev",
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
-    "OneTrustURL": "https://app-de.onetrust.com"
+    "OneTrustURL": "https://app-de.onetrust.com",
+    "IoOptInMinDays": "0"
   }
 }
