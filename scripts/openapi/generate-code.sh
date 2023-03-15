@@ -1,4 +1,7 @@
 #! /bin/bash -e
+
+echo "Per maggiori informazioni vedere: https://github.com/pagopa/pn-codegen"
+
 tag=$(mvn help:evaluate -Dexpression=pagopa.codegen.version -q -DforceStdout)
 echo "Tag from pom.xml: ${tag}"
 if [[ ! -z $1 ]]; then
