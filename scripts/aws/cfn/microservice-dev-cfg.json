@@ -8,6 +8,7 @@
     "SelfcareUsergroupPnProductId": "prod-pn-dev",
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
     "OneTrustURL": "https://app-de.onetrust.com",
-    "IoOptInMinDays": "0"
+    "IoOptInMinDays": "0",
+    "MaxTasksNumber": "1"
   }
 }
