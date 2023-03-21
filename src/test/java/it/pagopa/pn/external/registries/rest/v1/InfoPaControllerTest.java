@@ -91,7 +91,7 @@ class InfoPaControllerTest {
     void listOnboardedPaFilter() {
 
         // Given
-        String url = "/ext-registry/pa/v1/activated-on-pn?id={}"
+        String url = "/ext-registry/pa/v1/activated-on-pn?id={id}"
                 .replace("{id}", "123456789");
 
         List<PaSummaryDto> res = new ArrayList<>();
@@ -131,7 +131,7 @@ class InfoPaControllerTest {
         res.add(dto);
 
         // When
-        Mockito.when(svc.getGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(svc.getPaGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Flux.fromIterable(res));
 
 
