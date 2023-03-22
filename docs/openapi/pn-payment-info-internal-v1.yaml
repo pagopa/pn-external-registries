@@ -176,6 +176,8 @@ components:
           description: Checkout base url used to make payment
           example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
           type: string
+          maxLength: 2048
+          pattern: ^[ -~ ]*$
     PaymentNotice:
       title: Request for a Payment Notice
       description: Information of a Payment Notice
@@ -192,11 +194,13 @@ components:
           description: The payment notice number
           minLength: 18
           maxLength: 18
+          pattern: '^\d+$'
         fiscalCode:
           type: string
           description: Public Administration tax code
           minLength: 11
           maxLength: 11
+          pattern: '^\d+$'
         amount:
           type: integer
           description: Amount ( in euro cents ) of the payment notice
@@ -205,10 +209,12 @@ components:
           type: string
           description: Public Administration company name
           maxLength: 140
+          pattern: ^([\x20-\xFF]{1,140})$
         description:
           type: string
           description: Subject of payment
           maxLength: 140
+          pattern: ^([\x20-\xFF]{1,140})$
     PaymentResponse:
       title: Response containing the Checkout callback URL
       type: object
