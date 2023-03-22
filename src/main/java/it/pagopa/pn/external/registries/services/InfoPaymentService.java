@@ -11,6 +11,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
@@ -59,7 +62,7 @@ public class InfoPaymentService {
             PaymentEventPagoPa paymentEventPagoPa = new PaymentEventPagoPa()
                     .creditorTaxId( paTaxId )
                     .noticeCode( noticeNumber )
-                    .paymentDate( Instant.now() )
+                    .paymentDate( formatInstantToString( Instant.now() ) )
                     .amount( paymentInfoDto.getAmount() );
             return deliveryClient.paymentEventPagoPaPrivate( paymentEventPagoPa ).thenReturn( paymentInfoDto );
         }
@@ -171,6 +174,12 @@ public class InfoPaymentService {
     private PaymentResponseDto buildPaymentResponseDto(URI uri) {
         assert (uri != null );
         return new PaymentResponseDto().checkoutUrl(uri.toString());
+    }
+
+    @NotNull
+    private String formatInstantToString(Instant instantToFormat) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+        return formatter.format(instantToFormat);
     }
 
 }

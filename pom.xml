@@ -494,7 +494,7 @@
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/d5810dd53ad49630c6ea8518dec39626b3211a39/docs/openapi/api-private.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/c7b38c92f05d74f50d66159881a18b39bbf5cf31/docs/openapi/api-private.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <generateApiTests>false</generateApiTests>
