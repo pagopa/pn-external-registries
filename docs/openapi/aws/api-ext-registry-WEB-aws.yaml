@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: iYloGvLtYD1pFEE6ron9QmbPr275XsfsVjVP4mq6rG8=
+  version: cE0o91OZQbheFCQ2xD9utAdOftn/j9nslCQiNhwAyeg=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -305,8 +305,8 @@ components:
       title: Admitted character for PA denomination field
       type: string
       minLength: 3
-      maxLength: 80
-      pattern: ^([\x20-\xFF]{1,80})$
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
     PaSummary:
       title: PA in short
       description: PA with minimal information
@@ -582,13 +582,13 @@ components:
         companyName:
           type: string
           description: Public Administration company name
-          maxLength: 140
-          pattern: ^([\x20-\xFF]{1,140})$
+          maxLength: 250
+          pattern: ^([\x20-\xFF]{1,250})$
         description:
           type: string
           description: Subject of payment
-          maxLength: 140
-          pattern: ^([\x20-\xFF]{1,140})$
+          maxLength: 250
+          pattern: ^([\x20-\xFF]{1,250})$
     PaymentResponse:
       title: Response containing the Checkout callback URL
       type: object
