@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: a4xFJZyDhhx07UEbRwVzU03PtVvbSkpRYWrlOSclXjU=
+  version: TZmnnSKuxR5NZ51nQP19bOL+NK91It6cFPFccEcM6Uk=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -86,7 +86,8 @@ components:
       title: Admitted character for PA denomination field
       type: string
       minLength: 3
-      pattern: '[A-Za-z0-9 _]*'
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
     PaSummary:
       title: PA in short
       description: PA with minimal information
@@ -180,6 +181,8 @@ components:
       description: An unique ID that identify a Public Administration
       type: string
       minLength: 1
+      maxLength: 50
+      pattern: ^[ -~ ]*$
     ProblemError:
       properties:
         code:

@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: 5v1HIm+a1PGqAJdhmLuFe/cXMEimG2gfLNftzcyhphU=
+  version: cE0o91OZQbheFCQ2xD9utAdOftn/j9nslCQiNhwAyeg=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -305,7 +305,8 @@ components:
       title: Admitted character for PA denomination field
       type: string
       minLength: 3
-      pattern: '[A-Za-z0-9 _]*'
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
     PaSummary:
       title: PA in short
       description: PA with minimal information
@@ -399,6 +400,8 @@ components:
       description: An unique ID that identify a Public Administration
       type: string
       minLength: 1
+      maxLength: 50
+      pattern: ^[ -~ ]*$
     ProblemError:
       properties:
         code:
@@ -547,6 +550,8 @@ components:
           description: Checkout base url used to make payment
           example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
           type: string
+          maxLength: 2048
+          pattern: ^[ -~ ]*$
     PaymentNotice:
       title: Request for a Payment Notice
       description: Information of a Payment Notice
@@ -563,11 +568,13 @@ components:
           description: The payment notice number
           minLength: 18
           maxLength: 18
+          pattern: ^\d+$
         fiscalCode:
           type: string
           description: Public Administration tax code
           minLength: 11
           maxLength: 11
+          pattern: ^\d+$
         amount:
           type: number
           description: Amount ( in euro cents ) of the payment notice
@@ -575,11 +582,13 @@ components:
         companyName:
           type: string
           description: Public Administration company name
-          maxLength: 140
+          maxLength: 250
+          pattern: ^([\x20-\xFF]{1,250})$
         description:
           type: string
           description: Subject of payment
-          maxLength: 140
+          maxLength: 250
+          pattern: ^([\x20-\xFF]{1,250})$
     PaymentResponse:
       title: Response containing the Checkout callback URL
       type: object

@@ -1,4 +1,5 @@
 echo "### CREATE PS ###"
+
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     ssm put-parameter \
     --name "MapPrivacyNotice" \
@@ -18,7 +19,9 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
              ]"
 
 echo "### CREATE QUEUES FIFO ###"
+
 queues_fifo="local-delivery-push-inputs.fifo"
+
 for qn in  $( echo $queues_fifo | tr " " "\n" ) ; do
 
     echo creating queue fifo $qn ...
@@ -77,4 +80,6 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
 
 
 echo "Initialization terminated"
+
+
 
