@@ -9,8 +9,7 @@ paths:
   /user-groups:
     get:
       tags:
-        - pa-user-group
-        - pg-user-group
+        - user-group
       summary: getUserGroups
       description: Service that allows to get a list of UserGroup entities
       operationId: getUserGroupsUsingGET

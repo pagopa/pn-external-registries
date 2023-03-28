@@ -3,7 +3,7 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.api.PgUserGroupApi;
+import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.api.UserGroupApi;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class SelfcarePgUserGroupClient extends OcpBaseClient {
     private static final String HEADER_SELFCARE_UID = "x-selfcare-uid";
     private static final int MAX_PAGE_SIZE = 1000;
 
-    private PgUserGroupApi userGroupApi;
+    private UserGroupApi userGroupApi;
     private final PnExternalRegistriesConfig config;
 
     public SelfcarePgUserGroupClient(PnExternalRegistriesConfig config) {
@@ -34,7 +34,7 @@ public class SelfcarePgUserGroupClient extends OcpBaseClient {
     public void init() {
         ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
         apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
-        userGroupApi = new PgUserGroupApi(apiClient);
+        userGroupApi = new UserGroupApi(apiClient);
     }
 
     @Override
