@@ -162,6 +162,15 @@ Parameters:
     Type: String
     Description: 'One Trust URL'
 
+  # Log group parameters
+  EcsLogGroup:
+    Type: String
+    Description: 'Ecs log group name'
+
+  PnExternalRegistriesTriggerLambdaName:
+    Type: String
+    Description: 'PnExternalRegistriesTriggerLambdaName'
+    
   # Heath Check parameters
   HealthCheckInterval:
     Description: Seconds between two health check
@@ -249,7 +258,7 @@ Resources:
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/ecs-service.yaml"
       Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
         CpuValue: !Ref CpuValue
         MemoryAmount: !Ref MemoryAmount
         HealthCheckTimeout: !Ref HealthCheckTimeout
@@ -297,6 +306,7 @@ Resources:
         LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
+        EcsLogGroup: !Ref EcsLogGroup
 
 
   ExternalRegistryMicroserviceTaskManagedPolicy:
@@ -399,13 +409,13 @@ Resources:
       AliasName: !Sub 'alias/${ProjectName}-PdndAnpr-authentication-token-key'
       TargetKeyId: !Ref PdndAnprSessionTokenSigningKey
 
-  # Expose PN-ExternalRegistry microservice public API with API-GW for WEB usage
+  # Expose PN-external-registries microservice public API with API-GW for WEB usage
   ExternalRegistryMicroservicePublicWebAPI:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
       Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
         IntendedUsage: WEB
         DnsName: !Ref WebApiDnsName
         ProjectName: !Ref ProjectName
@@ -422,17 +432,17 @@ Resources:
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
       Parameters:
-        WAFName: !Sub '${ProjectName}-ExternalRegistry-web'
+        WAFName: !Sub '${ProjectName}-external-registries-web'
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
 
-  # Expose PN-ExternalRegistry microservice public API with API-GW for B2B usage
+  # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
       Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
         IntendedUsage: B2B
         DnsName: !Ref ApiDnsName
         ProjectName: !Ref ProjectName
@@ -449,7 +459,7 @@ Resources:
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
       Parameters:
-        WAFName: !Sub '${ProjectName}-ExternalRegistry-b2b'
+        WAFName: !Sub '${ProjectName}-external-registries-b2b'
         IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
 
@@ -484,7 +494,7 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
         LogGroupsNames: !Join
           - ','
-          - - !Sub '/ecs/${ProjectName}-external-registries'
+          - - !Sub '/aws/ecs/${ProjectName}-external-registries'
 
   # Lambda function role - this lambda needs to be triggered from a SQS queue and writes to a DynamoDB table
   PnExternalRegistriesInsertTriggerLambdaRole:
@@ -544,70 +554,18 @@ Resources:
 
   PnExternalRegistriesInsertTriggerLambdaAlarms:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - PnDeliveryInsertTriggerLambdaLogGroup
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/lambda-alarms.yaml"
       Parameters:
         FunctionName: !Ref PnExternalRegistriesInsertTriggerLambda
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
 
-  ### Subscription filters with Kinesis  https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html#DestinationKinesisExample
-  SubscriptionFilter:
-    Type: AWS::Logs::SubscriptionFilter
-    DependsOn:
-      - PnDeliveryInsertTriggerLambdaLogGroup
-    Condition: SendLogToKinesis
-    Properties:
-      RoleArn:
-        Fn::GetAtt:
-          - "SubscriptionFilterServiceRole"
-          - "Arn"
-      LogGroupName: !Sub "/aws/lambda/${PnExternalRegistriesInsertTriggerLambda}"
-      FilterPattern: !Ref LogsKinesisFilterPattern
-      DestinationArn: !Ref LogsKinesisSourceStreamArn
-  
-  PnDeliveryInsertTriggerLambdaLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/${PnExternalRegistriesInsertTriggerLambda}"
-      RetentionInDays: 14
-
-  ### IAM Role used by Subscription filters to allow read logs from Cloudwatch and send logs to Kinesis Firehose
-  SubscriptionFilterServiceRole:
-    Type: AWS::IAM::Role
-    Condition: SendLogToKinesis
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: logs.amazonaws.com
-        Version: "2012-10-17"
-      Path: /
-      Policies:
-        -
-          PolicyName: !Sub '${ProjectName}-externa-registries-lambda-logs-subscription-role'
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Action:
-                  - kinesis:PutRecord
-                Effect: Allow
-                Resource: "*"
-              - Action:
-                - "kms:Encrypt"
-                - "kms:GenerateDataKey"
-                - "kms:Decrypt"
-                Effect: Allow
-                Resource: "*"
-
   PnExternalRegistriesInsertTriggerLambda:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.handler
       Runtime: nodejs16.x
+      FunctionName: !Ref PnExternalRegistriesTriggerLambdaName
       Description: 'It triggers the onboarding institutes written of sqs'
       MemorySize: 128
       Timeout: 10
@@ -650,7 +608,6 @@ Resources:
               }
             }
           }
-
 
 Outputs:
   Version:
