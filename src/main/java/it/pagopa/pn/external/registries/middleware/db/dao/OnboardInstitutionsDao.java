@@ -49,7 +49,7 @@ public class OnboardInstitutionsDao extends BaseDao {
                  .queryConditional(QueryConditional.sortGreaterThan(getKeyBuild(OnboardInstitutionEntity.STATUS_ACTIVE, instant.toString())))
                  .build();
          QueryEnhancedRequest queryEnhancedRequestDELETED = QueryEnhancedRequest.builder()
-                 .queryConditional(QueryConditional.sortGreaterThan(getKeyBuild(OnboardInstitutionEntity.STATUS_DELETED, instant.toString())))
+                 .queryConditional(QueryConditional.sortGreaterThan(getKeyBuild(OnboardInstitutionEntity.STATUS_CLOSED, instant.toString())))
                  .build();
 
          return Flux.merge(

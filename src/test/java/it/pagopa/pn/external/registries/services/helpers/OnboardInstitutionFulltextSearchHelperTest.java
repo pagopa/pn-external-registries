@@ -109,7 +109,7 @@ class OnboardInstitutionFulltextSearchHelperTest {
         // metto a suspended questa PA
         OnboardInstitutionEntity prev = testDao.get(((ArrayNode)records.get(6)).get(0).asText(), null); // ARNAS G. Brotzu
         prev.setLastUpdate(Instant.now());
-        prev.setStatus(OnboardInstitutionEntity.STATUS_DELETED);
+        prev.setStatus(OnboardInstitutionEntity.STATUS_CLOSED);
         testDao.put(prev);
 
         //WHEN
