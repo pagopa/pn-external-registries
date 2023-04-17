@@ -28,6 +28,8 @@ public class OnboardInstitutionEntity {
     private static final String COL_EXTERNALID = "externalId";
     private static final String COL_TAXCODE = "taxCode";
     private static final String COL_ZIPCODE = "zipCode";
+    private static final String COL_IPACODE = "ipaCode";
+    private static final String COL_SDICODE = "sdiCode";
 
 
     @DynamoDbIgnore
@@ -51,4 +53,6 @@ public class OnboardInstitutionEntity {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ZIPCODE)}))  private String zipCode;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_EXTERNALID)}))  private String externalId;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_DIGITALADDRESS)}))  private String digitalAddress;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_IPACODE)}))  private String ipaCode;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SDICODE)}))  private String sdiCode;
 }
