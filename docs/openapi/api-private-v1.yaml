@@ -55,6 +55,42 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry-private/pg/v1/groups-all':
+    get:
+      operationId: getAllPgGroupsPrivate
+      summary: Retrieve all groups of the current PG defined in Self Care
+      description: >
+        PG can use groups to better organize work in its organization.
+        Return all the groups of the current PG
+      tags:
+        - internal-only
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
   /ext-registry-private/privacynotice/{consentsType}/{portalType}:
     get:
       operationId: findPrivacyNoticeVersion

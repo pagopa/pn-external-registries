@@ -1,20 +1,20 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupStatusDto;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareUserGroupClient;
-import lombok.extern.slf4j.Slf4j;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaUserGroupClient;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePgUserGroupClient;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -23,11 +23,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Import(LocalStackTestConfig.class)
-@Slf4j
-@ActiveProfiles("test")
+@ContextConfiguration(classes = {InfoSelfcareGroupsService.class})
+@ExtendWith(SpringExtension.class)
 class InfoSelfcareGroupsServiceTest {
 
     private final Duration d = Duration.ofMillis(3000);
@@ -39,7 +38,10 @@ class InfoSelfcareGroupsServiceTest {
     private SelfcareInstitutionsClient selfcareInstitutionsClient;
 
     @MockBean
-    private SelfcareUserGroupClient selfcareUserGroupClient;
+    private SelfcarePaUserGroupClient selfcarePaUserGroupClient;
+
+    @MockBean
+    private SelfcarePgUserGroupClient selfcarePgUserGroupClient;
 
     @Test
     void getGroups() {
@@ -57,10 +59,10 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePaUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,null, null).collectList().block(d);
+        List<PaGroupDto> res = service.getPaGroups(id, id, null, null).collectList().block(d);
 
 
         //THEN
@@ -80,7 +82,7 @@ class InfoSelfcareGroupsServiceTest {
         list.add(inst1);
 
         UserGroupResourceDto inst2 = new UserGroupResourceDto();
-        inst2.setId(id+"2");
+        inst2.setId(id + "2");
         inst2.setName("gruppo2");
         inst2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst2);
@@ -88,18 +90,16 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePaUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id), null).collectList().block(d);
-
+        List<PaGroupDto> res = service.getPaGroups(id, id, List.of(id), null).collectList().block(d);
 
         //THEN
         assertNotNull(res);
         assertEquals(1, res.size());
         assertEquals(inst1.getName(), res.get(0).getName());
     }
-
 
     @Test
     void getGroupsFilteredActive() {
@@ -113,13 +113,13 @@ class InfoSelfcareGroupsServiceTest {
         list.add(inst1);
 
         UserGroupResourceDto inst2 = new UserGroupResourceDto();
-        inst2.setId(id+"2");
+        inst2.setId(id + "2");
         inst2.setName("gruppo2");
         inst2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
         list.add(inst2);
 
         UserGroupResourceDto inst3 = new UserGroupResourceDto();
-        inst3.setId(id+"3");
+        inst3.setId(id + "3");
         inst3.setName("gruppo3");
         inst3.setStatus(UserGroupResourceDto.StatusEnum.SUSPENDED);
         list.add(inst3);
@@ -127,15 +127,100 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        Mockito.when(selfcareUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePaUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
 
         // WHEN
-        List<PaGroupDto> res = service.getGroups(id,id,List.of(id, id+"3"), PaGroupStatusDto.ACTIVE).collectList().block(d);
+        List<PaGroupDto> res = service.getPaGroups(id, id, List.of(id, id + "3"), PaGroupStatusDto.ACTIVE).collectList().block(d);
 
 
         //THEN
         assertNotNull(res);
         assertEquals(1, res.size());
         assertEquals(inst1.getName(), res.get(0).getName());
+    }
+
+    @Test
+    void getPgGroups() {
+        // Given
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        UserGroupResourceDto groupDto = new UserGroupResourceDto();
+        groupDto.setId(id);
+        groupDto.setName("gruppo1");
+        groupDto.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(List.of(groupDto));
+
+        when(selfcarePgUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgGroups(id, id, null, null).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertEquals(groupDto.getName(), res.get(0).getName());
+    }
+
+    @Test
+    void getPgGroupsFiltered() {
+        // Given
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+
+        UserGroupResourceDto groupDto1 = new UserGroupResourceDto();
+        groupDto1.setId(id);
+        groupDto1.setName("gruppo1");
+        groupDto1.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        UserGroupResourceDto groupDto2 = new UserGroupResourceDto();
+        groupDto2.setId(id + "2");
+        groupDto2.setName("gruppo2");
+        groupDto2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(List.of(groupDto1, groupDto2));
+
+        when(selfcarePgUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgGroups(id, id, List.of(id), null).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertEquals(1, res.size());
+        assertEquals(groupDto1.getName(), res.get(0).getName());
+    }
+
+    @Test
+    void getPgGroupsFilteredActive() {
+        // Given
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+
+        UserGroupResourceDto groupDto1 = new UserGroupResourceDto();
+        groupDto1.setId(id);
+        groupDto1.setName("gruppo1");
+        groupDto1.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        UserGroupResourceDto groupDto2 = new UserGroupResourceDto();
+        groupDto2.setId(id + "2");
+        groupDto2.setName("gruppo2");
+        groupDto2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        UserGroupResourceDto groupDto3 = new UserGroupResourceDto();
+        groupDto3.setId(id + "3");
+        groupDto3.setName("gruppo3");
+        groupDto3.setStatus(UserGroupResourceDto.StatusEnum.SUSPENDED);
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(List.of(groupDto1, groupDto2, groupDto3));
+
+        when(selfcarePgUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgGroups(id, id, List.of(id, id + "3"), PgGroupStatusDto.ACTIVE).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertEquals(1, res.size());
+        assertEquals(groupDto1.getName(), res.get(0).getName());
     }
 }

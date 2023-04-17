@@ -16,28 +16,30 @@ import javax.annotation.PostConstruct;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR;
 
-@Component
 @Slf4j
-public class SelfcareUserGroupClient extends OcpBaseClient {
+@Component
+public class SelfcarePaUserGroupClient extends OcpBaseClient {
 
     private static final String HEADER_SELFCARE_UID = "x-selfcare-uid";
 
     private UserGroupApi userGroupsApi;
     private final PnExternalRegistriesConfig config;
 
-    public SelfcareUserGroupClient(PnExternalRegistriesConfig config) { this.config = config; }
+    public SelfcarePaUserGroupClient(PnExternalRegistriesConfig config) {
+        this.config = config;
+    }
 
     @PostConstruct
     public void init() {
         ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
         apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
-        this.userGroupsApi = new UserGroupApi( apiClient );
+        userGroupsApi = new UserGroupApi(apiClient);
     }
 
     @Override
-    protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey){
+    protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey) {
         return super.initWebClient(builder, apiKey)
-                .defaultHeader(HEADER_SELFCARE_UID,config.getSelfcareusergroupUid());
+                .defaultHeader(HEADER_SELFCARE_UID, config.getSelfcareusergroupUid());
     }
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
