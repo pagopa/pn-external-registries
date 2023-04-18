@@ -3,7 +3,7 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPa;
+import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPaPrivate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,8 +49,9 @@ class DeliveryClientTest extends MockAWSObjectsTestConfig {
     @Test
     void paymentEventPagoPaPrivate() throws JsonProcessingException {
 
-        PaymentEventPagoPa paymentEventPagoPa = new PaymentEventPagoPa();
+        PaymentEventPagoPaPrivate paymentEventPagoPa = new PaymentEventPagoPaPrivate();
         paymentEventPagoPa.setPaymentDate( "2023-02-27T12:54:12.012Z" );
+        paymentEventPagoPa.setUncertainPaymentDate( true );
         paymentEventPagoPa.setAmount( 1200 );
         paymentEventPagoPa.setCreditorTaxId( "77777777777" );
         paymentEventPagoPa.setNoticeCode( "302012387654312384" );
