@@ -19,10 +19,10 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {InfoSelfcareGroupsService.class})
@@ -159,6 +159,24 @@ class InfoSelfcareGroupsServiceTest {
         // Then
         assertNotNull(res);
         assertEquals(groupDto.getName(), res.get(0).getName());
+    }
+
+    @Test
+    void testPgGroupsCxIdPrefix() {
+        // Given
+        String id = "PG-d0d28367-1695-4c50-a260-6fda526e9aab";
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(Collections.emptyList());
+
+        when(selfcarePgUserGroupClient.getUserGroups(id.replace("PG-", ""))).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgGroups(id, id, null, null).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertTrue(res.isEmpty());
     }
 
     @Test
