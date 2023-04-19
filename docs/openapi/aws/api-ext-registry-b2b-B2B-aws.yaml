@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: TZmnnSKuxR5NZ51nQP19bOL+NK91It6cFPFccEcM6Uk=
+  version: LjMx26Lpv6SVpGofVt89SF4APMeH10iuClAzIMGpdYE=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -125,6 +125,19 @@ components:
           description: codice fiscale
           type: string
           minLength: 1
+        ipaCode:
+          description: codice IPA
+          type: string
+          minLength: 1
+        sdiCode:
+          description: codice SDI
+          type: string
+          minLength: 1
+        agreementDate:
+          description: data sottoscrizione accordo
+          example: '2022-07-27T12:22:33.444Z'
+          type: string
+          format: date-time
         generalContacts:
           $ref: '#/components/schemas/PaContacts'
     PaContacts:
@@ -149,6 +162,10 @@ components:
           type: string
           format: uri
           pattern: http.*
+          minLength: 1
+        registeredOffice:
+          type: string
+          description: sede legale
           minLength: 1
     PaGroupList:
       title: Groups defined in Self Care

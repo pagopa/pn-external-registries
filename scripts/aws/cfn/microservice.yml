@@ -616,6 +616,7 @@ Resources:
               } catch (error) {
                 //error handling
                 console.error('Error in executing lambda handler for SQS', error);
+                throw error;
               }
             }
           }
