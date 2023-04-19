@@ -6,7 +6,7 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.*;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentNoticeDto;
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPa;
+import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPaPrivate;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
@@ -59,10 +59,11 @@ public class InfoPaymentService {
 
     private Mono<PaymentInfoDto> checkoutStatusManagement(String paTaxId, String noticeNumber, HttpStatus status, PaymentInfoDto paymentInfoDto) {
         if (HttpStatus.CONFLICT.equals(status) && DetailDto.PAYMENT_DUPLICATED.equals(paymentInfoDto.getDetail()) ) {
-            PaymentEventPagoPa paymentEventPagoPa = new PaymentEventPagoPa()
+            PaymentEventPagoPaPrivate paymentEventPagoPa = new PaymentEventPagoPaPrivate()
                     .creditorTaxId( paTaxId )
                     .noticeCode( noticeNumber )
                     .paymentDate( formatInstantToString( Instant.now() ) )
+                    .uncertainPaymentDate( true )
                     .amount( paymentInfoDto.getAmount() );
             return deliveryClient.paymentEventPagoPaPrivate( paymentEventPagoPa ).thenReturn( paymentInfoDto );
         }

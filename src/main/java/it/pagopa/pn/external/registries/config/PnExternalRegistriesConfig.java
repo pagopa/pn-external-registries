@@ -50,6 +50,11 @@ public class PnExternalRegistriesConfig {
     private String selfcareusergroupPnProductId;
     private String selfcareusergroupUid;
 
+    private String selfcarepgusergroupApiKey;
+    private String selfcarepgusergroupBaseUrl;
+    private String selfcarepgusergroupPnProductId;
+    private String selfcarepgusergroupUid;
+
     private String selfcareinstitutionsApiKey;
     private String selfcareinstitutionsBaseUrl;
     private String selfcareinstitutionsPnProductId;
@@ -99,7 +104,7 @@ public class PnExternalRegistriesConfig {
 
     private String fetchMessage(String filename){
         try( InputStream in = getInputStreamFromResource(filename)) {
-            return IOUtils.toString(in, StandardCharsets.UTF_8.name());
+            return IOUtils.toString(in, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("cannot load message from resources", e);
             throw new PnInternalException("cannot load template ", ERROR_CODE_BADCONFIGURATION_MISSING_TEMPLATE);

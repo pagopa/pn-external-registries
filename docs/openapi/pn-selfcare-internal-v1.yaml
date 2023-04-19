@@ -223,6 +223,46 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry/pg/v1/groups':
+    get:
+      operationId: getPgGroups
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PG can use groups to better organize work in its organization.
+        Return the PgGroupList of the current user, or if the user isn't in some group, all the groups of the current PG
+      tags:
+        - InfoPG
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                          # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                         # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'                     # NO EXTERNAL
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
     PaNameFilter:
@@ -318,7 +358,7 @@ components:
         $ref: '#/components/schemas/PaGroup'
     PaGroup:
       title: Group defined in Self Care
-      description: Contains tha name list of groups defined in SelfCare
+      description: Contains the name list of groups defined in SelfCare
       type: object
       properties:
         id:
@@ -331,7 +371,33 @@ components:
           $ref: '#/components/schemas/PaGroupStatus'
     PaGroupStatus:
       title: Status of group defined in Self Care
-      description: Contains tha name list of groups defined in SelfCare
+      description: Contains the name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+    PgGroupList:
+      title: Groups defined in Self Care PG (Notifiche digitali)
+      description: Contains the list of groups defined in SelfCare PG (Notifiche digitali)
+      type: array
+      items:
+        $ref: '#/components/schemas/PgGroup'
+    PgGroup:
+      title: Group defined in Self Care PG (Notifiche digitali)
+      description: Contains the name list of groups defined in SelfCare PG (Notifiche digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PgGroupStatus'
+    PgGroupStatus:
+      title: Status of group defined in Self Care PG (Notifiche digitali)
+      description: Contains the status of groups defined in SelfCare PG (Notifiche digitali)
       type: string
       enum:
         - ACTIVE

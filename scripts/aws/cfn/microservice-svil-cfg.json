@@ -4,8 +4,10 @@
     "CheckoutSiteUrl": "https://uat.checkout.pagopa.it",
     "CheckoutCartApiBaseUrl": "https://api.uat.platform.pagopa.it/checkout/ec/v1",
     "SelfcareUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/v2",
-    "PortalUrl": "https://portale.svil.pn.pagopa.it",
     "SelfcareUsergroupPnProductId": "prod-pn-svil",
+    "SelfcarePgUsergroupBaseUrl": "",
+    "SelfcarePgUsergroupPnProductId": "prod-pn-svil",
+    "PortalUrl": "https://portale.svil.pn.pagopa.it",
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
     "OneTrustURL": "http://pn-ex-Appli-1TF83JFIR9AF3-439926467.eu-south-1.elb.amazonaws.com:8080/onetrust",
     "IoOptInMinDays": "0"
