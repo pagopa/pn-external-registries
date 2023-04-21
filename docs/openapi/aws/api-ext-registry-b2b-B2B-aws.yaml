@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: LjMx26Lpv6SVpGofVt89SF4APMeH10iuClAzIMGpdYE=
+  version: O3E6Bp0MashCrAaBMxyWSzhxRTvh1byHtH0DE+1PSLM=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -175,7 +175,7 @@ components:
         $ref: '#/components/schemas/PaGroup'
     PaGroup:
       title: Group defined in Self Care
-      description: Contains tha name list of groups defined in SelfCare
+      description: Contains the name list of groups defined in SelfCare
       type: object
       properties:
         id:
@@ -188,7 +188,37 @@ components:
           $ref: '#/components/schemas/PaGroupStatus'
     PaGroupStatus:
       title: Status of group defined in Self Care
-      description: Contains tha name list of groups defined in SelfCare
+      description: Contains the name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+    PgGroupList:
+      title: Groups defined in Self Care PG (Notifiche digitali)
+      description: Contains the list of groups defined in SelfCare PG (Notifiche digitali)
+      type: array
+      items:
+        $ref: '#/components/schemas/PgGroup'
+    PgGroup:
+      title: Group defined in Self Care PG (Notifiche digitali)
+      description: >-
+        Contains the name list of groups defined in SelfCare PG (Notifiche
+        digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PgGroupStatus'
+    PgGroupStatus:
+      title: Status of group defined in Self Care PG (Notifiche digitali)
+      description: >-
+        Contains the status of groups defined in SelfCare PG (Notifiche
+        digitali)
       type: string
       enum:
         - ACTIVE
