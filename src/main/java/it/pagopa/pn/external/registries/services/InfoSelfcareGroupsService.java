@@ -49,7 +49,11 @@ public class InfoSelfcareGroupsService {
                                         PgGroupStatusDto statusFilter) {
         log.info("getPgGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}",
                 xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
-        return selfcarePgUserGroupClient.getUserGroups(xPagopaPnCxId)
+        String institutionId = xPagopaPnCxId;
+        if (xPagopaPnCxId.startsWith("PG-")) {
+            institutionId = xPagopaPnCxId.replaceFirst("PG-", "");
+        }
+        return selfcarePgUserGroupClient.getUserGroups(institutionId)
                 .map(PageOfUserGroupResourceDto::getContent)
                 .flatMapMany(Flux::fromIterable)
                 .filter(g -> statusFilter == null || statusFilter.getValue().equals(g.getStatus().getValue()))
