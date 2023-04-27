@@ -1,0 +1,234 @@
+openapi: 3.0.1
+info:
+  title: >-
+    ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
+  version: 4TkXzvvLkFVZScQKklGfodlDPqeq1BUPC/8mbqQ2Tq8=
+servers:
+  - url: https://${stageVariables.DnsName}/{basePath}
+    variables:
+      basePath:
+        default: /${stageVariables.ServiceApiPath}
+    x-amazon-apigateway-endpoint-configuration:
+      disableExecuteApiEndpoint: true
+paths: {}
+components:
+  parameters:
+    cxTaxIdAuthFleet:
+      name: x-pagopa-cx-taxid
+      in: header
+      description: Customer taxId, used in B2B AppIO.
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 16
+        pattern: >-
+          ^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}
+  schemas:
+    SendMessageRequest:
+      title: Send message request
+      description: Send message request information
+      type: object
+      required:
+        - iun
+        - recipientTaxID
+        - recipientInternalID
+        - recipientIndex
+        - senderDenomination
+      properties:
+        subject:
+          type: string
+          description: titolo della notifica
+        noticeNumber:
+          type: string
+          description: >-
+            Numero Avviso di pagamento del sistema pagoPA, usato per pagamento
+            online
+        creditorTaxId:
+          type: string
+          description: Codice fiscale dell'ente a cui fa riferimento il "numero avviso".
+        iun:
+          type: string
+          description: L'Identificativo Univoco Notifica assegnato da PN
+        amount:
+          description: costo di pagamento richiesto in eurocents
+          example: 1200
+          type: number
+        due_date:
+          description: data di scadenza del pagamento
+          type: string
+          format: date-time
+          example: '2022-06-16T00:00:00.000Z'
+        senderDenomination:
+          description: Denominazione dell'ente mittente
+          type: string
+        recipientTaxID:
+          type: string
+          description: Codice Fiscale del destinatario
+        requestAcceptedDate:
+          description: data perfezionamento notifica per il mittente
+          type: string
+          format: date-time
+          example: '2022-06-16T00:00:00.000Z'
+        recipientInternalID:
+          type: string
+          description: internalId del destinatario
+        recipientIndex:
+          type: number
+          example: 0
+          description: indice del destinatario
+        carbonCopyToDeliveryPush:
+          type: boolean
+          default: false
+          description: >-
+            indica se a valle dell'invio a IO del messaggio, va aggiunto in coda
+            verso pn-delivery-push per aggiungerlo in timeline
+    SendMessageResponse:
+      title: Send message response
+      description: Send message response information
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+            - NOT_SENT_APPIO_UNAVAILABLE
+            - NOT_SENT_OPTIN_ALREADY_SENT
+            - NOT_SENT_OPTIN_DISABLED_BY_CONF
+            - NOT_SENT_COURTESY_DISABLED_BY_CONF
+            - SENT_COURTESY
+            - SENT_OPTIN
+            - ERROR_USER_STATUS
+            - ERROR_COURTESY
+            - ERROR_OPTIN
+        id:
+          type: string
+          description: identifier of the created message.
+    ActivationStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - PENDING
+    Activation:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: '#/components/schemas/FiscalCode'
+        status:
+          $ref: '#/components/schemas/ActivationStatus'
+        version:
+          type: number
+          minimum: 0
+      required:
+        - fiscal_code
+        - status
+        - version
+    ActivationPayload:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: '#/components/schemas/FiscalCode'
+        status:
+          $ref: '#/components/schemas/ActivationStatus'
+      required:
+        - fiscal_code
+        - status
+    FiscalCodePayload:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: '#/components/schemas/FiscalCode'
+      required:
+        - fiscal_code
+    FiscalCode:
+      type: string
+      description: User's fiscal code.
+      format: FiscalCode
+      example: SPNDNL80R13C555X
+    UserStatusRequest:
+      title: UserStatusRequest
+      description: Request for get user status
+      type: object
+      required:
+        - taxId
+      properties:
+        taxId:
+          type: string
+          minLength: 16
+          maxLength: 16
+          pattern: >-
+            ^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$
+    UserStatusResponse:
+      type: object
+      required:
+        - taxId
+        - valid
+      properties:
+        taxId:
+          type: string
+        status:
+          type: string
+          description: >
+            AppIo message activation status for user: * APPIO_NOT_ACTIVE: AppIo
+            isn't active for the user. * APPIO_ACTIVE_PN_NOT_ACTIVE: Appio is
+            active for the user, but messages from Piattaforma Notifiche is not
+            active. * APPIO_ACTIVE_PN_ACTIVE: Appio is active for the user and
+            messages from Piattaforma Notifiche is active. * ERROR: Error in
+            call appIo WebService.
+          enum:
+            - APPIO_NOT_ACTIVE
+            - PN_NOT_ACTIVE
+            - PN_ACTIVE
+            - ERROR
+            - null
+  responses: {}
+  securitySchemes:
+    api_key_openapi:
+      type: apiKey
+      name: x-api-key
+      in: header
+    pn-auth-fleet_ApiKeyAuthorizerV2_openapi:
+      type: apiKey
+      name: x-api-key
+      in: header
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        authorizerUri: >-
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:pn-ApiKeyAuthorizerV2Lambda/invocations
+        authorizerResultTtlInSeconds: 300
+        identitySource: method.request.header.x-api-key
+        type: request
+tags:
+  - name: IO
+    description: Integrazione con IO
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+  BAD_REQUEST_PARAMETERS:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+    responseTemplates:
+      application/json: >-
+        {"status": 400, "title": "VALIDATION ERROR", "traceId":
+        "$context.xrayTraceId", "errors": [ { "code": "PN_INVALID_PARAMETERS",
+        "detail": "Validation errors: $context.error.validationErrorString" } ]}
+  BAD_REQUEST_BODY:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+    responseTemplates:
+      application/json: >-
+        {"status": 400, "title": "VALIDATION ERROR", "traceId":
+        "$context.xrayTraceId", "errors": [ { "code": "PN_INVALID_BODY",
+        "detail": "Validation errors: $context.error.validationErrorString" } ]}
+x-amazon-apigateway-request-validators:
+  basic:
+    validateRequestBody: true
+    validateRequestParameters: true
+  params-only:
+    validateRequestBody: false
+    validateRequestParameters: true
+x-amazon-apigateway-request-validator: basic
