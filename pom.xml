@@ -277,6 +277,43 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>pn-external-registries-from-io-b2b</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/pn-from-io-b2b-internal-v1.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <basePackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1
+                                </basePackage>
+                                <modelPackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto
+                                </modelPackage>
+                                <apiPackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api
+                                </apiPackage>
+                                <configPackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.config
+                                </configPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <reactive>true</reactive>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>pn-external-registries-valid-mvp-user-server</id>
                         <goals>
                             <goal>generate</goal>

@@ -8,12 +8,9 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Fisca
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
@@ -27,6 +24,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -36,6 +35,8 @@ import java.util.List;
 public class IOService {
 
     private static final String IO_LOCALE_IT_IT = "it_IT";
+    private static final String DUE_DATE_PREFIX = "SENT";
+    private static final String DELIMITER = "##";
     private final IOCourtesyMessageClient courtesyMessageClient;
     private final IOOptInClient optInClient;
 
@@ -165,6 +166,7 @@ public class IOService {
                     return res;
                 })
                 .flatMap(sendMessageResponseDto -> sendIOMessageSentEventToDeliveyPush(sendMessageRequestDto, sendMessageResponseDto))
+                .flatMap(sendMessageResponseDto -> saveRecordDueDate(sendMessageRequestDto).thenReturn(sendMessageResponseDto))
                 .onErrorResume( exception ->{
                     log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
                     SendMessageResponseDto res = new SendMessageResponseDto();
@@ -270,6 +272,13 @@ public class IOService {
                                 .status( UserStatusResponseDto.StatusEnum.fromValue(userStatusResponseInternal.getStatus().getValue())));
     }
 
+    public Mono<NotificationDisclaimerResponseDto> notificationDisclaimer(String recipientInternalId, String iun) {
+        String pk = buildPkDueDate(iun, recipientInternalId);
+        return optInSentDao.get(pk)
+                .doOnNext(optInSentEntity -> log.info("Retrieved DueDateIOEntity: {}", optInSentEntity))
+                .thenReturn(new NotificationDisclaimerResponseDto().messageId("messageId"));
+    }
+
     private String composeFinalMarkdown(String markdown)
     {
         // per ora si fa una semplice sostituzione cablata sui nomi delle variabili
@@ -281,5 +290,19 @@ public class IOService {
     private boolean isPreferredLanguageIT(List<String> preferredLanguages)
     {
         return CollectionUtils.isEmpty(preferredLanguages) || preferredLanguages.contains(IO_LOCALE_IT_IT);
+    }
+
+    private Mono<Void> saveRecordDueDate(SendMessageRequestDto sendMessageRequestDto) {
+        String recipientInternalID = sendMessageRequestDto.getRecipientInternalID();
+        String iun = sendMessageRequestDto.getIun();
+        OptInSentEntity optInSentEntity = new OptInSentEntity();
+        optInSentEntity.setPk(buildPkDueDate(iun, recipientInternalID));
+        optInSentEntity.setRequestAcceptedDate(sendMessageRequestDto.getRequestAcceptedDate().toInstant());
+        optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getDueDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
+        return optInSentDao.save(optInSentEntity);
+    }
+
+    private String buildPkDueDate(String iun, String recipientInternalId) {
+        return DUE_DATE_PREFIX + DELIMITER + iun + DELIMITER + recipientInternalId;
     }
 }

@@ -35,6 +35,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 class IOServiceTest {
 
@@ -194,6 +196,7 @@ class IOServiceTest {
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( optInSentDao.save(Mockito.any(OptInSentEntity.class)) ).thenReturn(Mono.empty());
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
@@ -211,6 +214,13 @@ class IOServiceTest {
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
         Mockito.verify(ioSentMessageService, Mockito.never()).sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any());
+
+        ArgumentCaptor<OptInSentEntity> dueDateEntityCaptor = ArgumentCaptor.forClass(OptInSentEntity.class);
+        Mockito.verify(optInSentDao, Mockito.times(1)).save(dueDateEntityCaptor.capture());
+
+        // verifico che è stato inserito il record per il dueDate
+        assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
+        assertThat(dueDateEntityCaptor.getValue().getRequestAcceptedDate()).isEqualTo(messageRequestDto.getDueDate().toInstant());
     }
 
     @Test
@@ -245,6 +255,7 @@ class IOServiceTest {
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( ioSentMessageService.sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(Mono.empty());
+        Mockito.when(optInSentDao.save(Mockito.any(OptInSentEntity.class))).thenReturn(Mono.empty());
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
@@ -262,6 +273,13 @@ class IOServiceTest {
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
         Mockito.verify(ioSentMessageService).sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any());
+
+        ArgumentCaptor<OptInSentEntity> dueDateEntityCaptor = ArgumentCaptor.forClass(OptInSentEntity.class);
+        Mockito.verify(optInSentDao, Mockito.times(1)).save(dueDateEntityCaptor.capture());
+
+        // verifico che è stato inserito il record per il dueDate
+        assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
+        assertThat(dueDateEntityCaptor.getValue().getRequestAcceptedDate()).isEqualTo(messageRequestDto.getDueDate().toInstant());
     }
 
     @Test
@@ -309,6 +327,7 @@ class IOServiceTest {
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when(optInSentDao.save(Mockito.any(OptInSentEntity.class))).thenReturn(Mono.empty());
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
@@ -325,6 +344,13 @@ class IOServiceTest {
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
+
+        ArgumentCaptor<OptInSentEntity> dueDateEntityCaptor = ArgumentCaptor.forClass(OptInSentEntity.class);
+        Mockito.verify(optInSentDao, Mockito.times(1)).save(dueDateEntityCaptor.capture());
+
+        // verifico che è stato inserito il record per il dueDate
+        assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
+        assertThat(dueDateEntityCaptor.getValue().getRequestAcceptedDate()).isEqualTo(messageRequestDto.getDueDate().toInstant());
     }
 
     @Test

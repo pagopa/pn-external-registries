@@ -1,0 +1,55 @@
+openapi: 3.0.1
+info:
+  title: API chiamate da IO
+  version: v1
+  description: API chiamate da IO
+  license:
+    name: PagoPA PN license
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: IO
+    description: API chiamate da IO
+paths:
+  /ext-registry-private/io/v1/notification-disclaimer/{iun}:
+    get:
+      operationId: notificationDisclaimer
+      summary: Returns the AppIo user activation status
+      description: Returns the AppIo user activation status
+      tags:
+        - FromIOMessage
+      parameters:
+        - $ref: '#/components/parameters/uidAuthFleet'                                             # NO EXTERNAL
+#        - $ref: '#/components/parameters/cxTaxIdAuthFleet'                                       # ONLY EXTERNAL
+        - name: iun
+          in: path
+          required: true
+          schema:
+            type: string
+            description: L'Identificativo Univoco Notifica assegnato da PN
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDisclaimerResponse'
+
+components:
+  schemas:
+    NotificationDisclaimerResponse:
+      type: object
+      required:
+        - messageId
+        - valid
+      properties:
+        messageId:
+          type: string
+
+  parameters:
+    uidAuthFleet: # NO EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'               # NO EXTERNAL
+    cxTaxIdAuthFleet:
+      $ref: 'remote-refs.yaml#/components/parameters/cxTaxIdAuthFleet'
