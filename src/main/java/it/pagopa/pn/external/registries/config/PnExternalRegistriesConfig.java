@@ -85,6 +85,8 @@ public class PnExternalRegistriesConfig {
         private String markdownUpgradeAppIoITMessage;
         private String markdownActivationAppIoMessage;
         private String subjectActivationAppIoMessage;
+        private String markdownDisclaimerAfterDateAppIoMessage;
+        private String markdownDisclaimerBeforeDateAppIoMessage;
 
     }
 
@@ -100,6 +102,8 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate.markdownUpgradeAppIoENMessage = fetchMessage("markdown_upgrade_app_io_message_EN.md");
         this.appIoTemplate.markdownActivationAppIoMessage = fetchMessage("markdown_activation_app_io_message.md");
         this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerAfterDateAppIoMessage = fetchMessage("markdown_disclaimer_after_date_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerBeforeDateAppIoMessage = fetchMessage("markdown_disclaimer_before_date_app_io_message.md");
     }
 
     private String fetchMessage(String filename){

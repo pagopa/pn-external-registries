@@ -220,7 +220,7 @@ class IOServiceTest {
 
         // verifico che è stato inserito il record per il dueDate
         assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
-        assertThat(dueDateEntityCaptor.getValue().getRequestAcceptedDate()).isEqualTo(messageRequestDto.getRequestAcceptedDate().toInstant());
+        assertThat(dueDateEntityCaptor.getValue().getSchedulingAnalogDate()).isNotNull();
     }
 
     @Test
@@ -279,7 +279,7 @@ class IOServiceTest {
 
         // verifico che è stato inserito il record per il dueDate
         assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
-        assertThat(dueDateEntityCaptor.getValue().getRequestAcceptedDate()).isEqualTo(messageRequestDto.getRequestAcceptedDate().toInstant());
+        assertThat(dueDateEntityCaptor.getValue().getSchedulingAnalogDate()).isNotNull();
     }
 
     @Test
@@ -350,7 +350,7 @@ class IOServiceTest {
 
         // verifico che è stato inserito il record per il dueDate
         assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
-        assertThat(dueDateEntityCaptor.getValue().getRequestAcceptedDate()).isEqualTo(messageRequestDto.getRequestAcceptedDate().toInstant());
+        assertThat(dueDateEntityCaptor.getValue().getSchedulingAnalogDate()).isNotNull();
     }
 
     @Test

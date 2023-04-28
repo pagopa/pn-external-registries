@@ -37,6 +37,8 @@ public class IOService {
     private static final String IO_LOCALE_IT_IT = "it_IT";
     private static final String DUE_DATE_PREFIX = "SENT";
     private static final String DELIMITER = "##";
+    private static final DateTimeFormatter CUSTOM_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private static final String SCHEDULING_DATE_PLACEHOLDER = "<schedulingDate>";
     private final IOCourtesyMessageClient courtesyMessageClient;
     private final IOOptInClient optInClient;
 
@@ -276,7 +278,24 @@ public class IOService {
         String pk = buildPkDueDate(iun, recipientInternalId);
         return optInSentDao.get(pk)
                 .doOnNext(optInSentEntity -> log.info("Retrieved DueDateIOEntity: {}", optInSentEntity))
-                .thenReturn(new NotificationDisclaimerResponseDto().messageId("messageId"));
+                .map(this::mapToNotificationDisclaimer);
+    }
+
+    private NotificationDisclaimerResponseDto mapToNotificationDisclaimer(OptInSentEntity optInSentEntity) {
+        NotificationDisclaimerResponseDto responseDto = new NotificationDisclaimerResponseDto();
+        if(Instant.now().isBefore(optInSentEntity.getSchedulingAnalogDate())) {
+            responseDto.setMessageId("");
+            responseDto.setTitle("");
+            responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage());
+        }
+        else {
+            LocalDateTime schedulingDate = LocalDateTime.from(optInSentEntity.getSchedulingAnalogDate());
+            String dateFormatted = schedulingDate.format(CUSTOM_FORMATTER);
+            responseDto.setMessageId("");
+            responseDto.setTitle("");
+            responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage().replace(SCHEDULING_DATE_PLACEHOLDER, dateFormatted));
+        }
+        return responseDto;
     }
 
     private String composeFinalMarkdown(String markdown)
@@ -297,8 +316,8 @@ public class IOService {
         String iun = sendMessageRequestDto.getIun();
         OptInSentEntity optInSentEntity = new OptInSentEntity();
         optInSentEntity.setPk(buildPkDueDate(iun, recipientInternalID));
-        optInSentEntity.setRequestAcceptedDate(sendMessageRequestDto.getRequestAcceptedDate().toInstant());
-        optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getDueDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
+        optInSentEntity.setSchedulingAnalogDate(Instant.now().plus(5, ChronoUnit.DAYS));
+        optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
         return optInSentDao.save(optInSentEntity);
     }
 

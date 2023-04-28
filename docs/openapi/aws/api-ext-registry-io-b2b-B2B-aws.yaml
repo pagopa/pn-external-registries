@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: vFYL9HRp+z4mpzLyCljgQ+4jssOsYbPDiA57iK8emUM=
+  version: i5SRFJODjfXak+y9gXCVmAUIYssXInktat9txXcejE4=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -32,6 +32,10 @@ components:
         - valid
       properties:
         messageId:
+          type: string
+        title:
+          type: string
+        markdown:
           type: string
   responses: {}
   securitySchemes:

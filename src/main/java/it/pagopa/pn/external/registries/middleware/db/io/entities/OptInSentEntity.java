@@ -15,7 +15,7 @@ public class OptInSentEntity {
     public static final String COL_PK = "pk";
     private static final String COL_CREATED = "created";
     private static final String COL_LAST_MODIFIED = "lastModified";
-    private static final String COL_REQUEST_ACCEPTED_DATE = "requestAcceptedDate";
+    private static final String COL_SCHEDULING_ANALOG_DATE = "schedulingAnalogDate";
     public static final String COL_I_TTL = "i_ttl";
 
     public OptInSentEntity(String hashedTaxId){
@@ -35,6 +35,6 @@ public class OptInSentEntity {
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_CREATED), @DynamoDbUpdateBehavior(UpdateBehavior.WRITE_IF_NOT_EXISTS)}))  private Instant created;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_LAST_MODIFIED)}))  private Instant lastModified;
-    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_REQUEST_ACCEPTED_DATE)}))  private Instant requestAcceptedDate;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SCHEDULING_ANALOG_DATE)}))  private Instant schedulingAnalogDate;
     @Getter(onMethod=@__({@DynamoDbAttribute(COL_I_TTL)}))  private Long ttl;
 }

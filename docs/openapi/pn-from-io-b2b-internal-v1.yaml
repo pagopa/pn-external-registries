@@ -47,6 +47,10 @@ components:
       properties:
         messageId:
           type: string
+        title:
+          type: string
+        markdown:
+          type: string
 
   parameters:
     uidAuthFleet: # NO EXTERNAL

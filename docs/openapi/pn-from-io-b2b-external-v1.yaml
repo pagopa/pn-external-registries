@@ -46,6 +46,10 @@ components:
       properties:
         messageId:
           type: string
+        title:
+          type: string
+        markdown:
+          type: string
 
   parameters:
     cxTaxIdAuthFleet:

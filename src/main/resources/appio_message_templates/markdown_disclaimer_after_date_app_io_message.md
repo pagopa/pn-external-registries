@@ -1,0 +1,1 @@
+Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il messaggio entro il <schedulingDate>, non riceverai la notifica tramite raccomandata cartacea.
