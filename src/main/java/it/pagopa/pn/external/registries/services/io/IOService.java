@@ -316,7 +316,8 @@ public class IOService {
         String iun = sendMessageRequestDto.getIun();
         OptInSentEntity optInSentEntity = new OptInSentEntity();
         optInSentEntity.setPk(buildPkDueDate(iun, recipientInternalID));
-        optInSentEntity.setSchedulingAnalogDate(Instant.now().plus(5, ChronoUnit.DAYS));
+        optInSentEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate() != null ?
+                sendMessageRequestDto.getSchedulingAnalogDate().toInstant() : null);
         optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
         return optInSentDao.save(optInSentEntity);
     }

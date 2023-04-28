@@ -222,6 +222,11 @@ components:
           type: boolean
           default: false
           description: indica se a valle dell'invio a IO del messaggio, va aggiunto in coda verso pn-delivery-push per aggiungerlo in timeline
+        schedulingAnalogDate:
+          description: data di probabile invio del flusso analogico
+          type: string
+          format: date-time
+          example: '2022-06-16T00:00:00.000Z'
     SendMessageResponse:
       title: Send message response
       description: Send message response information
