@@ -5,7 +5,7 @@
     "CheckoutCartApiBaseUrl": "https://api.uat.platform.pagopa.it/checkout/ec/v1",
     "SelfcareUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/v2",
     "SelfcareUsergroupPnProductId": "prod-pn-dev",
-    "SelfcarePgUsergroupBaseUrl": "https://api.dev.selfcare.pagopa.it/external/pn-pg/v2",
+    "SelfcarePgUsergroupBaseUrl": "https://api.uat.selfcare.pagopa.it/external/pn-pg/v2",
     "SelfcarePgUsergroupPnProductId": "prod-pn-dev",
     "PortalUrl": "https://portale.dev.pn.pagopa.it",
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
