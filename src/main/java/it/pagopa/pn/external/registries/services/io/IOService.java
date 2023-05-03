@@ -29,16 +29,18 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+
+import static it.pagopa.pn.external.registries.util.IOUtils.*;
 
 @Service
 @Slf4j
 public class IOService {
 
     private static final String IO_LOCALE_IT_IT = "it_IT";
-    private static final String DUE_DATE_PREFIX = "SENT";
+    private static final String PROBABLE_SCHEDULING_ANALOG_DATE_PREFIX = "SENT";
     private static final String DELIMITER = "##";
     private static final DateTimeFormatter CUSTOM_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-    private static final String SCHEDULING_DATE_PLACEHOLDER = "<schedulingDate>";
     private final IOCourtesyMessageClient courtesyMessageClient;
     private final IOOptInClient optInClient;
 
@@ -168,7 +170,7 @@ public class IOService {
                     return res;
                 })
                 .flatMap(sendMessageResponseDto -> sendIOMessageSentEventToDeliveyPush(sendMessageRequestDto, sendMessageResponseDto))
-                .flatMap(sendMessageResponseDto -> saveRecordDueDate(sendMessageRequestDto).thenReturn(sendMessageResponseDto))
+                .flatMap(sendMessageResponseDto -> saveProbableSchedulingAnalogDateIfPresent(sendMessageRequestDto).thenReturn(sendMessageResponseDto))
                 .onErrorResume( exception ->{
                     log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
                     SendMessageResponseDto res = new SendMessageResponseDto();
@@ -274,28 +276,40 @@ public class IOService {
                                 .status( UserStatusResponseDto.StatusEnum.fromValue(userStatusResponseInternal.getStatus().getValue())));
     }
 
-    public Mono<NotificationDisclaimerResponseDto> notificationDisclaimer(String recipientInternalId, String iun) {
-        String pk = buildPkDueDate(iun, recipientInternalId);
+    public Mono<PreconditionContentDto> notificationDisclaimer(String recipientInternalId, String iun) {
+        String pk = buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
         return optInSentDao.get(pk)
                 .doOnNext(optInSentEntity -> log.info("Retrieved DueDateIOEntity: {}", optInSentEntity))
-                .map(this::mapToNotificationDisclaimer);
+                .map(this::mapToNotificationDisclaimer)
+                .switchIfEmpty(Mono.just(createPreConditionAfterSchedulingDate()));
     }
 
-    private NotificationDisclaimerResponseDto mapToNotificationDisclaimer(OptInSentEntity optInSentEntity) {
-        NotificationDisclaimerResponseDto responseDto = new NotificationDisclaimerResponseDto();
+    private PreconditionContentDto mapToNotificationDisclaimer(OptInSentEntity optInSentEntity) {
+        PreconditionContentDto responseDto = new PreconditionContentDto();
         if(Instant.now().isBefore(optInSentEntity.getSchedulingAnalogDate())) {
-            responseDto.setMessageId("");
-            responseDto.setTitle("");
+            String localDateTime = LocalDateTime.from(optInSentEntity.getSchedulingAnalogDate()).format(CUSTOM_FORMATTER);
+            String[] schedulingDateWithHour = localDateTime.split(" ");
+            responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
+            responseDto.setTitle(PRE_ANALOG_TITLE);
             responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage());
+            responseDto.setMessageParams(
+                    Map.of(
+                            DATE_MESSAGE_PARAM, schedulingDateWithHour[0],
+                            TIME_MESSAGE_PARAM, schedulingDateWithHour[1]
+                    )
+            );
         }
         else {
-            LocalDateTime schedulingDate = LocalDateTime.from(optInSentEntity.getSchedulingAnalogDate());
-            String dateFormatted = schedulingDate.format(CUSTOM_FORMATTER);
-            responseDto.setMessageId("");
-            responseDto.setTitle("");
-            responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage().replace(SCHEDULING_DATE_PLACEHOLDER, dateFormatted));
+            return createPreConditionAfterSchedulingDate();
         }
         return responseDto;
+    }
+
+    private PreconditionContentDto createPreConditionAfterSchedulingDate() {
+        return new PreconditionContentDto()
+                .messageCode(POST_ANALOG_MESSAGE_CODE)
+                .title(POST_ANALOG_TITLE)
+                .markdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage());
     }
 
     private String composeFinalMarkdown(String markdown)
@@ -311,18 +325,24 @@ public class IOService {
         return CollectionUtils.isEmpty(preferredLanguages) || preferredLanguages.contains(IO_LOCALE_IT_IT);
     }
 
-    private Mono<Void> saveRecordDueDate(SendMessageRequestDto sendMessageRequestDto) {
-        String recipientInternalID = sendMessageRequestDto.getRecipientInternalID();
-        String iun = sendMessageRequestDto.getIun();
-        OptInSentEntity optInSentEntity = new OptInSentEntity();
-        optInSentEntity.setPk(buildPkDueDate(iun, recipientInternalID));
-        optInSentEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate() != null ?
-                sendMessageRequestDto.getSchedulingAnalogDate().toInstant() : null);
-        optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
-        return optInSentDao.save(optInSentEntity);
+    private Mono<Void> saveProbableSchedulingAnalogDateIfPresent(SendMessageRequestDto sendMessageRequestDto) {
+        if(sendMessageRequestDto.getSchedulingAnalogDate() != null) {
+            String recipientInternalID = sendMessageRequestDto.getRecipientInternalID();
+            String iun = sendMessageRequestDto.getIun();
+            OptInSentEntity optInSentEntity = new OptInSentEntity();
+            optInSentEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
+            optInSentEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate() != null ?
+                    sendMessageRequestDto.getSchedulingAnalogDate().toInstant() : null);
+            optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
+            return optInSentDao.save(optInSentEntity);
+        }
+        else {
+            return Mono.empty();
+        }
+
     }
 
-    private String buildPkDueDate(String iun, String recipientInternalId) {
-        return DUE_DATE_PREFIX + DELIMITER + iun + DELIMITER + recipientInternalId;
+    private String buildPkProbableSchedulingAnalogDate(String iun, String recipientInternalId) {
+        return PROBABLE_SCHEDULING_ANALOG_DATE_PREFIX + DELIMITER + iun + DELIMITER + recipientInternalId;
     }
 }

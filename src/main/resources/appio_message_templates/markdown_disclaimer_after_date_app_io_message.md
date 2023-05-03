@@ -1,1 +1,2 @@
-Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il messaggio entro il <schedulingDate>, non riceverai la notifica tramite raccomandata cartacea.
+Premendo “Continua”, la notifica risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata
+cartacea da più di 10 giorni.

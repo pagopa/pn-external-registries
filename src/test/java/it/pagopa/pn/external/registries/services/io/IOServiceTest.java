@@ -347,12 +347,9 @@ class IOServiceTest {
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
-        ArgumentCaptor<OptInSentEntity> dueDateEntityCaptor = ArgumentCaptor.forClass(OptInSentEntity.class);
-        Mockito.verify(optInSentDao, Mockito.times(1)).save(dueDateEntityCaptor.capture());
+        // verifico che NON è stato inserito il record per il probableSchedulingAnalogDate perché il sendMessageRequest non ha valorizzato quel campo
+        Mockito.verify(optInSentDao, Mockito.times(0)).save(Mockito.any());
 
-        // verifico che è stato inserito il record per il dueDate
-        assertThat(dueDateEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
-        assertThat(dueDateEntityCaptor.getValue().getSchedulingAnalogDate()).isNull();
     }
 
     @Test

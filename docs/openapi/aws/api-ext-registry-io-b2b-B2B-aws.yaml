@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: i5SRFJODjfXak+y9gXCVmAUIYssXInktat9txXcejE4=
+  version: sR78uJMbjScauc3zoJSzliScrV+5pR26hAkqoQfg5cA=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -25,18 +25,62 @@ components:
         pattern: >-
           ^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}
   schemas:
-    NotificationDisclaimerResponse:
+    PreconditionContent:
       type: object
-      required:
-        - messageId
-        - valid
+      additionalProperties: false
       properties:
-        messageId:
+        messageCode:
+          example: BOTTOM_PRE_ANALOG_WORKFLOW
+          description: >
+            Il codice di uno dei messaggi censiti dal servizio, per pn: 
+
+
+            - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo
+            messaggio contiene una 
+              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
+              risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
+              {{ora}}, non riceverai la notifica tramite raccomandata cartacea."
+
+            - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo
+            messaggio contiene una 
+              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
+              risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata 
+              cartacea da più di 10 giorni."
           type: string
+        messageParams:
+          description: >
+            Coppie chiave valore degli elementi da sostituire nei template del
+            messaggio. Per PN
+
+            sarà presente al più due camp: data, con formattazione DD-MM-YYYY e
+            ora con formattazione hh:mm
+          example:
+            data: 28-04-2023
+            ora: '08:41'
+          type: object
+          additionalProperties:
+            type: string
         title:
           type: string
+          description: The title to be rendered in App
+          example: Questo messaggio contiene una comunicazione a valore legale
+          minLength: 1
         markdown:
           type: string
+          description: The markdown content to be rendered in App
+          example: >
+            Premendo “Continua”, la notifica risulterà legalmente recapitata a
+            te. Se apri il 
+
+            messaggio entro il 28-04-2023 alle 08:41, non riceverai la notifica
+            tramite 
+
+            raccomandata cartacea.
+
+            minlength: 1
+      required:
+        - messageCode
+        - messageParams
   responses: {}
   securitySchemes:
     api_key_openapi:
