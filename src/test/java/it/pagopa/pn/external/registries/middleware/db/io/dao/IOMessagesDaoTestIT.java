@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.middleware.db.io.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
+import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
-class OptInSentDaoTestIT {
+class IOMessagesDaoTestIT {
 
     private final Duration d = Duration.ofMillis(3000);
 
     @Autowired
-    private OptInSentDao consentDao;
+    private IOMessagesDao consentDao;
 
     @Autowired
     DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient;
@@ -35,7 +35,7 @@ class OptInSentDaoTestIT {
     @Autowired
     PnExternalRegistriesConfig pnExternalRegistriesConfig;
 
-    TestDao<OptInSentEntity> testDao;
+    TestDao<IOMessagesEntity> testDao;
 
     @MockBean
     private SqsNotificationPaidProducer producer;
@@ -43,13 +43,13 @@ class OptInSentDaoTestIT {
 
     @BeforeEach
     void setup() {
-        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOptIn(), OptInSentEntity.class);
+        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOptIn(), IOMessagesEntity.class);
     }
 
     @Test
     void save() {
         //Given
-        OptInSentEntity entity = newOptin();
+        IOMessagesEntity entity = newOptin();
 
         try {
             testDao.delete(entity.getPk(), null);
@@ -62,7 +62,7 @@ class OptInSentDaoTestIT {
 
         //Then
         try {
-            OptInSentEntity elementFromDb = testDao.get(entity.getPk(), null);
+            IOMessagesEntity elementFromDb = testDao.get(entity.getPk(), null);
 
             Assertions.assertNotNull(elementFromDb);
             Assertions.assertEquals(entity, elementFromDb);
@@ -81,7 +81,7 @@ class OptInSentDaoTestIT {
     void get() {
 
         //Given
-        OptInSentEntity entity = newOptin();
+        IOMessagesEntity entity = newOptin();
 
 
         try {
@@ -92,7 +92,7 @@ class OptInSentDaoTestIT {
         }
 
         //When
-        OptInSentEntity result = consentDao.get(entity.getHashedTaxId()).block(d);
+        IOMessagesEntity result = consentDao.get(entity.getHashedTaxId()).block(d);
 
         //Then
 
@@ -111,8 +111,8 @@ class OptInSentDaoTestIT {
         }
     }
 
-    private OptInSentEntity newOptin() {
-        OptInSentEntity res = new OptInSentEntity("123123123");
+    private IOMessagesEntity newOptin() {
+        IOMessagesEntity res = new IOMessagesEntity("123123123");
         return res;
     }
 }

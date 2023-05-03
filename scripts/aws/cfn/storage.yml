@@ -34,7 +34,7 @@ Resources:
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain    
     Properties:
-      TableName: !Sub '${ProjectName}-OptInSent'
+      TableName: !Sub '${ProjectName}-IOMessages'
       AttributeDefinitions:
         - AttributeName: "pk"
           AttributeType: "S"

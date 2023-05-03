@@ -9,8 +9,8 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Messa
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
-import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
+import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
+import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
@@ -44,16 +44,16 @@ public class IOService {
     private final PnExternalRegistriesConfig cfg;
     private final SendIOSentMessageService sendIOSentMessageService;
 
-    private final OptInSentDao optInSentDao;
+    private final IOMessagesDao ioMessagesDao;
 
     public IOService(IOCourtesyMessageClient courtesyMessageClient, IOOptInClient optInClient,
                      PnExternalRegistriesConfig cfg, SendIOSentMessageService sendIOSentMessageService,
-                     OptInSentDao optInSentDao) {
+                     IOMessagesDao ioMessagesDao) {
         this.courtesyMessageClient = courtesyMessageClient;
         this.optInClient = optInClient;
         this.cfg = cfg;
         this.sendIOSentMessageService = sendIOSentMessageService;
-        this.optInSentDao = optInSentDao;
+        this.ioMessagesDao = ioMessagesDao;
     }
 
     public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDtoMono )
@@ -99,13 +99,13 @@ public class IOService {
     private Mono<SendMessageResponseDto> manageOptIn(SendMessageRequestDto sendMessageRequestDto) {
         String hashedTaxId = DigestUtils.sha256Hex(sendMessageRequestDto.getRecipientTaxID());
         log.info("Managing send optin message taxId={} hashedTaxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), hashedTaxId, sendMessageRequestDto.getIun());
-        return this.optInSentDao.get(hashedTaxId)
-                .map(OptInSentEntity::getLastModified)
+        return this.ioMessagesDao.get(hashedTaxId)
+                .map(IOMessagesEntity::getLastModified)
                 .defaultIfEmpty(Instant.EPOCH)
                 .flatMap(lastSendDate -> {
                     if (lastSendDate.isBefore(Instant.now().minus(cfg.getIoOptinMinDays(), ChronoUnit.DAYS)))
                         return sendIOOptInMessage(sendMessageRequestDto)
-                                .zipWhen(r -> optInSentDao.save(new OptInSentEntity(hashedTaxId)).thenReturn(new Object()),
+                                .zipWhen(r -> ioMessagesDao.save(new IOMessagesEntity(hashedTaxId)).thenReturn(new Object()),
                                         (resp, nd) -> resp);
                     else
                     {
@@ -275,16 +275,16 @@ public class IOService {
 
     public Mono<PreconditionContentDto> notificationDisclaimer(String recipientInternalId, String iun) {
         String pk = buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
-        return optInSentDao.get(pk)
-                .doOnNext(optInSentEntity -> log.info("Retrieved DueDateIOEntity: {}", optInSentEntity))
+        return ioMessagesDao.get(pk)
+                .doOnNext(ioMessagesEntity -> log.info("Retrieved IOMessagesEntity: {}", ioMessagesEntity))
                 .map(this::mapToNotificationDisclaimer)
                 .switchIfEmpty(Mono.just(createPreConditionAfterSchedulingDate()));
     }
 
-    private PreconditionContentDto mapToNotificationDisclaimer(OptInSentEntity optInSentEntity) {
+    private PreconditionContentDto mapToNotificationDisclaimer(IOMessagesEntity ioMessagesEntity) {
         PreconditionContentDto responseDto = new PreconditionContentDto();
-        if(Instant.now().isBefore(optInSentEntity.getSchedulingAnalogDate())) {
-            String localDateTime = LocalDateTime.from(optInSentEntity.getSchedulingAnalogDate()).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
+        if(Instant.now().isBefore(ioMessagesEntity.getSchedulingAnalogDate())) {
+            String localDateTime = LocalDateTime.from(ioMessagesEntity.getSchedulingAnalogDate()).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
             String[] schedulingDateWithHour = localDateTime.split(" ");
             responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
             responseDto.setTitle(PRE_ANALOG_TITLE);
@@ -326,12 +326,12 @@ public class IOService {
         if(sendMessageRequestDto.getSchedulingAnalogDate() != null) {
             String recipientInternalID = sendMessageRequestDto.getRecipientInternalID();
             String iun = sendMessageRequestDto.getIun();
-            OptInSentEntity optInSentEntity = new OptInSentEntity();
-            optInSentEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
-            optInSentEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate() != null ?
+            IOMessagesEntity ioMessagesEntity = new IOMessagesEntity();
+            ioMessagesEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
+            ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate() != null ?
                     sendMessageRequestDto.getSchedulingAnalogDate().toInstant() : null);
-            optInSentEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
-            return optInSentDao.save(optInSentEntity);
+            ioMessagesEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
+            return ioMessagesDao.save(ioMessagesEntity);
         }
         else {
             return Mono.empty();
