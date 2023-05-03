@@ -4,15 +4,13 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import it.pagopa.pn.external.registries.util.AppIOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.nio.charset.Charset;
 import java.time.Instant;
@@ -34,7 +33,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Map;
 
+import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -660,6 +661,101 @@ class IOServiceTest {
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_DISABLED_BY_CONF, responseDto.getResult());
 
+
+    }
+
+    @Test
+    void notificationDisclaimerBeforeSchedulingAnalogDateTest() {
+        final String recipientInternalId = "internalId";
+        final String iun = "iun";
+
+        String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        IOMessagesEntity expectedEntity = new IOMessagesEntity();
+        expectedEntity.setPk(expectedPk);
+        expectedEntity.setSchedulingAnalogDate(Instant.parse("2050-05-03T13:51:00Z"));
+
+        //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
+        PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
+        pnExternalRegistriesConfig.init();
+
+        PreconditionContentDto expectedResponse = new PreconditionContentDto()
+                .messageCode(PRE_ANALOG_MESSAGE_CODE)
+                        .title(PRE_ANALOG_TITLE)
+                                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
+                .messageParams(Map.of(
+                        DATE_MESSAGE_PARAM, "03-05-2050",
+                        TIME_MESSAGE_PARAM, "13:51"
+                ));
+
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
+        Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
+
+        Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
+
+        StepVerifier.create(actualMonoResponse)
+                .expectNext(expectedResponse)
+                .verifyComplete();
+
+    }
+
+    @Test
+    void notificationDisclaimerAfterSchedulingAnalogDateTest() {
+        final String recipientInternalId = "internalId";
+        final String iun = "iun";
+
+        String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        IOMessagesEntity expectedEntity = new IOMessagesEntity();
+        expectedEntity.setPk(expectedPk);
+        expectedEntity.setSchedulingAnalogDate(Instant.parse("2023-05-02T13:51:00Z"));
+
+        //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
+        PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
+        pnExternalRegistriesConfig.init();
+
+        PreconditionContentDto expectedResponse = new PreconditionContentDto()
+                .messageCode(POST_ANALOG_MESSAGE_CODE)
+                .title(POST_ANALOG_TITLE)
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                .messageParams(Map.of());
+
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
+        Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
+
+        Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
+
+        StepVerifier.create(actualMonoResponse)
+                .expectNext(expectedResponse)
+                .verifyComplete();
+
+    }
+
+    @Test
+    void notificationDisclaimerWithoutSchedulingAnalogDateTest() {
+        final String recipientInternalId = "internalId";
+        final String iun = "iun";
+
+        String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
+        PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
+        pnExternalRegistriesConfig.init();
+
+        PreconditionContentDto expectedResponse = new PreconditionContentDto()
+                .messageCode(POST_ANALOG_MESSAGE_CODE)
+                .title(POST_ANALOG_TITLE)
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                .messageParams(Map.of());
+
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+        Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
+
+        Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
+
+        StepVerifier.create(actualMonoResponse)
+                .expectNext(expectedResponse)
+                .verifyComplete();
 
     }
 

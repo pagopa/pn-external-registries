@@ -26,12 +26,13 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
-import static it.pagopa.pn.external.registries.util.IOUtils.*;
+import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
 
 @Service
 @Slf4j
@@ -276,15 +277,21 @@ public class IOService {
     public Mono<PreconditionContentDto> notificationDisclaimer(String recipientInternalId, String iun) {
         String pk = buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
         return ioMessagesDao.get(pk)
-                .doOnNext(ioMessagesEntity -> log.info("Retrieved IOMessagesEntity: {}", ioMessagesEntity))
-                .map(this::mapToNotificationDisclaimer)
-                .switchIfEmpty(Mono.just(createPreConditionAfterSchedulingDate()));
+                .doOnNext(ioMessagesEntity -> log.info("[{}] [{}] Retrieved IOMessagesEntity: {}", iun, recipientInternalId, ioMessagesEntity))
+                .map(ioMessagesEntity -> mapToNotificationDisclaimer(ioMessagesEntity, iun, recipientInternalId))
+                .switchIfEmpty(Mono.fromSupplier(() -> {
+                    log.info("[{}] [{}] IOMessagesEntity not found", iun, recipientInternalId);
+                    return createPreConditionAfterSchedulingDate();
+                }))
+                .doOnNext(preconditionContentDto -> log.info("[{}] [{}] PreconditionContentDto response: {}", iun, recipientInternalId, preconditionContentDto));
     }
 
-    private PreconditionContentDto mapToNotificationDisclaimer(IOMessagesEntity ioMessagesEntity) {
+    private PreconditionContentDto mapToNotificationDisclaimer(IOMessagesEntity ioMessagesEntity, String iun, String recipientInternalId) {
         PreconditionContentDto responseDto = new PreconditionContentDto();
-        if(Instant.now().isBefore(ioMessagesEntity.getSchedulingAnalogDate())) {
-            String localDateTime = LocalDateTime.from(ioMessagesEntity.getSchedulingAnalogDate()).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
+        Instant schedulingAnalogDate = ioMessagesEntity.getSchedulingAnalogDate();
+        if(Instant.now().isBefore(schedulingAnalogDate)) {
+            log.debug("The date of now is before of probable scheduling analog date for iun: {}, recipient: {}, probableSchedulingAnalogDate: {}", iun, recipientInternalId, schedulingAnalogDate);
+            String localDateTime = LocalDateTime.ofInstant(ioMessagesEntity.getSchedulingAnalogDate(), ZoneOffset.UTC).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
             String[] schedulingDateWithHour = localDateTime.split(" ");
             responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
             responseDto.setTitle(PRE_ANALOG_TITLE);
@@ -297,6 +304,7 @@ public class IOService {
             );
         }
         else {
+            log.debug("The date of now is after of probable scheduling analog date for iun: {}, recipient: {}, probableSchedulingAnalogDate: {}", iun, recipientInternalId, schedulingAnalogDate);
             return createPreConditionAfterSchedulingDate();
         }
         return responseDto;
@@ -306,7 +314,8 @@ public class IOService {
         return new PreconditionContentDto()
                 .messageCode(POST_ANALOG_MESSAGE_CODE)
                 .title(POST_ANALOG_TITLE)
-                .markdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage());
+                .markdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                .messageParams(Map.of());
     }
 
     private String composeFinalMarkdown(String markdown)
@@ -339,9 +348,4 @@ public class IOService {
 
     }
 
-    //SENT##iun##internalId
-    private String buildPkProbableSchedulingAnalogDate(String iun, String recipientInternalId) {
-        return PROBABLE_SCHEDULING_ANALOG_DATE_PK_PREFIX + PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK + iun +
-                PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK + recipientInternalId;
-    }
 }
