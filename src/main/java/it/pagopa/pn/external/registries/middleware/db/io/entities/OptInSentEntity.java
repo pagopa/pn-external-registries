@@ -36,5 +36,5 @@ public class OptInSentEntity {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_CREATED), @DynamoDbUpdateBehavior(UpdateBehavior.WRITE_IF_NOT_EXISTS)}))  private Instant created;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_LAST_MODIFIED)}))  private Instant lastModified;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SCHEDULING_ANALOG_DATE)}))  private Instant schedulingAnalogDate;
-    @Getter(onMethod=@__({@DynamoDbAttribute(COL_I_TTL)}))  private Long ttl;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_I_TTL)}))  private Long ttl;
 }

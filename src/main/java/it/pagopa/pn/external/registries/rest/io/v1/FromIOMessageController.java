@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class FromIOMessageController implements FromIoMessageApi {
 
-    private  final IOService service;
+    private final IOService service;
 
     @Override
     public Mono<ResponseEntity<PreconditionContentDto>> notificationDisclaimer(String xPagopaPnUid, String iun, final ServerWebExchange exchange) {
