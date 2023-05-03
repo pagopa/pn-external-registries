@@ -38,9 +38,6 @@ import static it.pagopa.pn.external.registries.util.IOUtils.*;
 public class IOService {
 
     private static final String IO_LOCALE_IT_IT = "it_IT";
-    private static final String PROBABLE_SCHEDULING_ANALOG_DATE_PREFIX = "SENT";
-    private static final String DELIMITER = "##";
-    private static final DateTimeFormatter CUSTOM_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     private final IOCourtesyMessageClient courtesyMessageClient;
     private final IOOptInClient optInClient;
 
@@ -287,7 +284,7 @@ public class IOService {
     private PreconditionContentDto mapToNotificationDisclaimer(OptInSentEntity optInSentEntity) {
         PreconditionContentDto responseDto = new PreconditionContentDto();
         if(Instant.now().isBefore(optInSentEntity.getSchedulingAnalogDate())) {
-            String localDateTime = LocalDateTime.from(optInSentEntity.getSchedulingAnalogDate()).format(CUSTOM_FORMATTER);
+            String localDateTime = LocalDateTime.from(optInSentEntity.getSchedulingAnalogDate()).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
             String[] schedulingDateWithHour = localDateTime.split(" ");
             responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
             responseDto.setTitle(PRE_ANALOG_TITLE);
@@ -342,7 +339,9 @@ public class IOService {
 
     }
 
+    //SENT##iun##internalId
     private String buildPkProbableSchedulingAnalogDate(String iun, String recipientInternalId) {
-        return PROBABLE_SCHEDULING_ANALOG_DATE_PREFIX + DELIMITER + iun + DELIMITER + recipientInternalId;
+        return PROBABLE_SCHEDULING_ANALOG_DATE_PK_PREFIX + PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK + iun +
+                PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK + recipientInternalId;
     }
 }
