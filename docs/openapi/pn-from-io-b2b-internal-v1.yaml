@@ -21,7 +21,7 @@ paths:
       tags:
         - FromIOMessage
       parameters:
-        - $ref: '#/components/parameters/uidAuthFleet'                                             # NO EXTERNAL
+        - $ref: '#/components/parameters/cxIdAuthFleet'                                             # NO EXTERNAL
 #        - $ref: '#/components/parameters/cxTaxIdAuthFleet'                                       # ONLY EXTERNAL
         - name: iun
           in: path
@@ -96,7 +96,7 @@ components:
         - messageParams
 
   parameters:
-    uidAuthFleet: # NO EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'               # NO EXTERNAL
+    cxIdAuthFleet:                                                  # NO EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet' # NO EXTERNAL
     cxTaxIdAuthFleet:
       $ref: 'remote-refs.yaml#/components/parameters/cxTaxIdAuthFleet'

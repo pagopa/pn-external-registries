@@ -30,7 +30,7 @@ class FromIOMessageControllerTest {
     @Test
     void notificationDisclaimerSuccess() throws JsonProcessingException {
         //Given
-        final String xPagopaPnUid = "recipientInternalId";
+        final String xPagopaPnCxId = "recipientInternalId";
         final String iun = "iun";
 
         String url = "/ext-registry-private/io/v1/notification-disclaimer/{iun}";
@@ -41,18 +41,18 @@ class FromIOMessageControllerTest {
                 .title(POST_ANALOG_TITLE)
                 .markdown("markdown");
 
-        Mockito.when(service.notificationDisclaimer(xPagopaPnUid, iun)).thenReturn(Mono.just(response));
+        Mockito.when(service.notificationDisclaimer(xPagopaPnCxId, iun)).thenReturn(Mono.just(response));
 
         //Then
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(url).build(iun))
-                .header("x-pagopa-pn-uid", xPagopaPnUid)
+                .header("x-pagopa-pn-cx-id", xPagopaPnCxId)
                 .exchange()
                 .expectStatus().isOk().expectBody().json(objectMapper.writeValueAsString(response));
     }
 
     @Test
-    void notificationDisclaimerBadRequest() throws JsonProcessingException {
+    void notificationDisclaimerBadRequest() {
         //Given
         final String xPagopaPnUid = "recipientInternalId";
         final String iun = "iun";

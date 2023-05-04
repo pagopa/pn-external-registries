@@ -304,6 +304,7 @@ Resources:
         ContainerEnvEntry22: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
         ContainerEnvEntry23: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_BASE_URL=${SelfcarePgUsergroupBaseUrl}'
         ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_PN_PRODUCT_ID=${SelfcarePgUsergroupPnProductId}'
+        ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_PUSH_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'

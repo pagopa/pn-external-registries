@@ -16,8 +16,8 @@ public class FromIOMessageController implements FromIoMessageApi {
     private final IOService service;
 
     @Override
-    public Mono<ResponseEntity<PreconditionContentDto>> notificationDisclaimer(String xPagopaPnUid, String iun, final ServerWebExchange exchange) {
-        return service.notificationDisclaimer(xPagopaPnUid, iun)
+    public Mono<ResponseEntity<PreconditionContentDto>> notificationDisclaimer(String xPagopaPnCxId, String iun, final ServerWebExchange exchange) {
+        return service.notificationDisclaimer(xPagopaPnCxId, iun)
                 .map(ResponseEntity::ok);
     }
 }
