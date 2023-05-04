@@ -100,7 +100,7 @@ Outputs:
     Value: !Ref IOMessagesTable
   IOMessagesTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
-    Value: !Sub '${IOMessages.Arn}'
+    Value: !Sub '${IOMessagesTable.Arn}'
 
   OnboardInstitutionsTableName:
     Description: Dynamo Name used by application to access the key-value store
