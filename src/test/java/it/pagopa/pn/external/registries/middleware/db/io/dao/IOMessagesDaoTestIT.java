@@ -43,7 +43,7 @@ class IOMessagesDaoTestIT {
 
     @BeforeEach
     void setup() {
-        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOptIn(), IOMessagesEntity.class);
+        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameIOMessages(), IOMessagesEntity.class);
     }
 
     @Test

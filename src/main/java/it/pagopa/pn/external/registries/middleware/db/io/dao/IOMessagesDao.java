@@ -17,7 +17,7 @@ public class IOMessagesDao extends BaseDao {
 
     public IOMessagesDao(DynamoDbEnhancedAsyncClient dynamoDbAsyncClient,
                          PnExternalRegistriesConfig pnExternalRegistriesConfig) {
-        this.ioMessagesTable = dynamoDbAsyncClient.table(pnExternalRegistriesConfig.getDynamodbTableNameOptIn(), TableSchema.fromBean(IOMessagesEntity.class));
+        this.ioMessagesTable = dynamoDbAsyncClient.table(pnExternalRegistriesConfig.getDynamodbTableNameIOMessages(), TableSchema.fromBean(IOMessagesEntity.class));
     }
 
     /**

@@ -29,7 +29,7 @@ Conditions:
 
 
 Resources:
-  OptInSentTable:
+  IOMessagesTable:
     Type: AWS::DynamoDB::Table
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain    
@@ -95,12 +95,12 @@ Resources:
 Outputs:
 
   # Table parameters
-  OptInSentTableName:
+  IOMessagesTableName:
     Description: Dynamo Name used by application to access the key-value store
-    Value: !Ref OptInSentTable
-  OptInSentTableArn:
+    Value: !Ref IOMessagesTable
+  IOMessagesTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
-    Value: !Sub '${OptInSentTable.Arn}'
+    Value: !Sub '${IOMessages.Arn}'
 
   OnboardInstitutionsTableName:
     Description: Dynamo Name used by application to access the key-value store

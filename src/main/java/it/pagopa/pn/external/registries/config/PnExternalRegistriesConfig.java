@@ -63,7 +63,7 @@ public class PnExternalRegistriesConfig {
 
     private String mockDataResources;
 
-    private String dynamodbTableNameOptIn;
+    private String dynamodbTableNameIOMessages;
     private String dynamodbTableNameOnboardInstitutions;
 
     private String piattaformanotificheurlTos;
