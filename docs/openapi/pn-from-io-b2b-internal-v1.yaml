@@ -1,0 +1,102 @@
+openapi: 3.0.1
+info:
+  title: API chiamate da IO
+  version: v1
+  description: API chiamate da IO
+  license:
+    name: PagoPA PN license
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: IO
+    description: API chiamate da IO
+paths:
+  /ext-registry-private/io/v1/notification-disclaimer/{iun}:
+    get:
+      operationId: notificationDisclaimer
+      summary: Returns the AppIo user activation status
+      description: Returns the AppIo user activation status
+      tags:
+        - FromIOMessage
+      parameters:
+        - $ref: '#/components/parameters/cxIdAuthFleet'                                             # NO EXTERNAL
+#        - $ref: '#/components/parameters/cxTaxIdAuthFleet'                                       # ONLY EXTERNAL
+        - name: iun
+          in: path
+          required: true
+          schema:
+            type: string
+            description: L'Identificativo Univoco Notifica assegnato da PN
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreconditionContent'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
+components:
+  schemas:
+    PreconditionContent:
+      type: object
+      additionalProperties: false
+      properties:
+        messageCode:
+          example: BOTTOM_PRE_ANALOG_WORKFLOW
+          description: |
+            Il codice di uno dei messaggi censiti dal servizio, per pn: 
+            
+            - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
+              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
+              risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
+              {{ora}}, non riceverai la notifica tramite raccomandata cartacea."
+            
+            - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
+              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
+              risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata 
+              cartacea da più di 10 giorni."
+          type: string
+        messageParams:
+          description: |
+            Coppie chiave valore degli elementi da sostituire nei template del messaggio. Per PN
+            sarà presente al più due camp: data, con formattazione DD-MM-YYYY e ora con formattazione hh:mm
+          example: { "data": "28-04-2023", "ora": "08:41" }
+          type: object
+          additionalProperties:
+            type: string
+        title:
+          type: string
+          description: The title to be rendered in App
+          example: Questo messaggio contiene una comunicazione a valore legale
+          minLength: 1
+        markdown:
+          type: string
+          description: The markdown content to be rendered in App
+          example: |
+            Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il 
+            messaggio entro il 28-04-2023 alle 08:41, non riceverai la notifica tramite 
+            raccomandata cartacea.
+            minlength: 1
+      required:
+        - messageCode
+        - messageParams
+
+  parameters:
+    cxIdAuthFleet:                                                  # NO EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet' # NO EXTERNAL
+    cxTaxIdAuthFleet:
+      $ref: 'remote-refs.yaml#/components/parameters/cxTaxIdAuthFleet'

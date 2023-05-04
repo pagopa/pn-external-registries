@@ -6,17 +6,27 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
 import java.time.Instant;
 
+// Questa entità logica contiene sia i record per gestire i messaggi di optIn, sia i record che contengono
+// la data probabile di inizio del workflow cartaceo.
+
+// Per i record che contengo le informazioni sul messaggio di OptIn, la PK è una stringa contenente
+// il codice fiscale crittografato.
+
+// Per i record che contengo l'informazione della probabile data di inizio del workflow cartaceo, la PK
+// ha il seguente formato: SENT##iun##recipientInternalId
 @DynamoDbBean
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class OptInSentEntity {
+public class IOMessagesEntity {
 
     public static final String COL_PK = "pk";
     private static final String COL_CREATED = "created";
     private static final String COL_LAST_MODIFIED = "lastModified";
+    private static final String COL_SCHEDULING_ANALOG_DATE = "schedulingAnalogDate";
+    public static final String COL_I_TTL = "i_ttl";
 
-    public OptInSentEntity(String hashedTaxId){
+    public IOMessagesEntity(String hashedTaxId){
         this.pk = hashedTaxId;
         this.setCreated(Instant.now());
         this.setLastModified(this.getCreated());
@@ -33,4 +43,6 @@ public class OptInSentEntity {
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_CREATED), @DynamoDbUpdateBehavior(UpdateBehavior.WRITE_IF_NOT_EXISTS)}))  private Instant created;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_LAST_MODIFIED)}))  private Instant lastModified;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SCHEDULING_ANALOG_DATE)}))  private Instant schedulingAnalogDate;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_I_TTL)}))  private Long ttl;
 }

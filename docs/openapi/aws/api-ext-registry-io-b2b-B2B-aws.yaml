@@ -1,0 +1,134 @@
+openapi: 3.0.1
+info:
+  title: >-
+    ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
+  version: sR78uJMbjScauc3zoJSzliScrV+5pR26hAkqoQfg5cA=
+servers:
+  - url: https://${stageVariables.DnsName}/{basePath}
+    variables:
+      basePath:
+        default: /${stageVariables.ServiceApiPath}
+    x-amazon-apigateway-endpoint-configuration:
+      disableExecuteApiEndpoint: true
+paths: {}
+components:
+  parameters:
+    cxTaxIdAuthFleet:
+      name: x-pagopa-cx-taxid
+      in: header
+      description: Customer taxId, used in B2B AppIO.
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 16
+        pattern: >-
+          ^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}
+  schemas:
+    PreconditionContent:
+      type: object
+      additionalProperties: false
+      properties:
+        messageCode:
+          example: BOTTOM_PRE_ANALOG_WORKFLOW
+          description: >
+            Il codice di uno dei messaggi censiti dal servizio, per pn: 
+
+
+            - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo
+            messaggio contiene una 
+              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
+              risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
+              {{ora}}, non riceverai la notifica tramite raccomandata cartacea."
+
+            - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo
+            messaggio contiene una 
+              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
+              risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata 
+              cartacea da più di 10 giorni."
+          type: string
+        messageParams:
+          description: >
+            Coppie chiave valore degli elementi da sostituire nei template del
+            messaggio. Per PN
+
+            sarà presente al più due camp: data, con formattazione DD-MM-YYYY e
+            ora con formattazione hh:mm
+          example:
+            data: 28-04-2023
+            ora: '08:41'
+          type: object
+          additionalProperties:
+            type: string
+        title:
+          type: string
+          description: The title to be rendered in App
+          example: Questo messaggio contiene una comunicazione a valore legale
+          minLength: 1
+        markdown:
+          type: string
+          description: The markdown content to be rendered in App
+          example: >
+            Premendo “Continua”, la notifica risulterà legalmente recapitata a
+            te. Se apri il 
+
+            messaggio entro il 28-04-2023 alle 08:41, non riceverai la notifica
+            tramite 
+
+            raccomandata cartacea.
+
+            minlength: 1
+      required:
+        - messageCode
+        - messageParams
+  responses: {}
+  securitySchemes:
+    api_key_openapi:
+      type: apiKey
+      name: x-api-key
+      in: header
+    pn-auth-fleet_ApiKeyAuthorizerV2_openapi:
+      type: apiKey
+      name: x-api-key
+      in: header
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        authorizerUri: >-
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:pn-ApiKeyAuthorizerV2Lambda/invocations
+        authorizerResultTtlInSeconds: 300
+        identitySource: method.request.header.x-api-key
+        type: request
+tags:
+  - name: IO
+    description: API chiamate da IO
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+  BAD_REQUEST_PARAMETERS:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+    responseTemplates:
+      application/json: >-
+        {"status": 400, "title": "VALIDATION ERROR", "traceId":
+        "$context.xrayTraceId", "errors": [ { "code": "PN_INVALID_PARAMETERS",
+        "detail": "Validation errors: $context.error.validationErrorString" } ]}
+  BAD_REQUEST_BODY:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+    responseTemplates:
+      application/json: >-
+        {"status": 400, "title": "VALIDATION ERROR", "traceId":
+        "$context.xrayTraceId", "errors": [ { "code": "PN_INVALID_BODY",
+        "detail": "Validation errors: $context.error.validationErrorString" } ]}
+x-amazon-apigateway-request-validators:
+  basic:
+    validateRequestBody: true
+    validateRequestParameters: true
+  params-only:
+    validateRequestBody: false
+    validateRequestParameters: true
+x-amazon-apigateway-request-validator: basic

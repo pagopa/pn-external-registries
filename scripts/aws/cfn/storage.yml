@@ -29,12 +29,12 @@ Conditions:
 
 
 Resources:
-  OptInSentTable:
+  IOMessagesTable:
     Type: AWS::DynamoDB::Table
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain    
     Properties:
-      TableName: !Sub '${ProjectName}-OptInSent'
+      TableName: !Sub '${ProjectName}-IOMessages'
       AttributeDefinitions:
         - AttributeName: "pk"
           AttributeType: "S"
@@ -95,12 +95,12 @@ Resources:
 Outputs:
 
   # Table parameters
-  OptInSentTableName:
+  IOMessagesTableName:
     Description: Dynamo Name used by application to access the key-value store
-    Value: !Ref OptInSentTable
-  OptInSentTableArn:
+    Value: !Ref IOMessagesTable
+  IOMessagesTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
-    Value: !Sub '${OptInSentTable.Arn}'
+    Value: !Sub '${IOMessagesTable.Arn}'
 
   OnboardInstitutionsTableName:
     Description: Dynamo Name used by application to access the key-value store

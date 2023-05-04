@@ -39,7 +39,7 @@ echo " - Create pn-opt-in TABLES"
 
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     dynamodb create-table \
-    --table-name OptInSent  \
+    --table-name IOMessages  \
     --attribute-definitions \
         AttributeName=pk,AttributeType=S \
     --key-schema \

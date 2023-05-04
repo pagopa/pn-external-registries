@@ -16,6 +16,13 @@
                 "pn-payment-info-internal-v1.yaml"
             ],
             "servicePath": "ext-registry"
+        },
+        {
+            "intendedUsage": "B2B",
+            "openapiFiles": [
+                "pn-from-io-b2b-internal-v1.yaml"
+            ],
+            "servicePath": "ext-registry-io-b2b"
         }
     ],
     "openapiBundlePresenceCheck": [

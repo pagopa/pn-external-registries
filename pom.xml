@@ -277,6 +277,43 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>pn-external-registries-from-io-b2b</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/pn-from-io-b2b-internal-v1.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <basePackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1
+                                </basePackage>
+                                <modelPackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto
+                                </modelPackage>
+                                <apiPackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api
+                                </apiPackage>
+                                <configPackage>
+                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.config
+                                </configPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <reactive>true</reactive>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>pn-external-registries-valid-mvp-user-server</id>
                         <goals>
                             <goal>generate</goal>
@@ -539,6 +576,36 @@
                                 <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <reactive>true</reactive>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pn-external-registries-pn-delivery-push-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery-push/2d7dca0413e137ff0835b7d07e05f7c910638ff9/docs/openapi/api-private.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>webclient</library>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <typeMappings>
+                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
+                            </typeMappings>
+                            <configOptions>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.api</apiPackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto</modelPackage>
+                                <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
                                 <annotationLibrary>none</annotationLibrary>
