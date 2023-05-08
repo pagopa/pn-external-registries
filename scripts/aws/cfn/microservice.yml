@@ -292,7 +292,7 @@ Resources:
         ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_SITE_URL=${CheckoutSiteUrl}'
         ContainerEnvEntry8: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList}}'
         ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
-        ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_IO_MESSAGES=${IOMessagesTableName}'
+        ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_I_O_MESSAGES=${IOMessagesTableName}'
         ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/termini-di-servizio'
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/informativa-privacy'
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
