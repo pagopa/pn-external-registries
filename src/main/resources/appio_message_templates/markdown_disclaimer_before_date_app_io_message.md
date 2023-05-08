@@ -1,2 +1,1 @@
-Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} 
-alle {{ora}}, non riceverai la notifica tramite raccomandata cartacea.
+Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle {{ora}}, non riceverai la notifica tramite raccomandata cartacea.
