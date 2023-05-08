@@ -13,6 +13,9 @@ public class AppIOUtils {
     public static final String DATE_MESSAGE_PARAM = "data";
     public static final String TIME_MESSAGE_PARAM = "ora";
 
+    public static final String DATE_PLACEHOLDER = "{{data}}";
+    public static final String TIME_PLACEHOLDER = "{{ora}}";
+
     public static final String PROBABLE_SCHEDULING_ANALOG_DATE_PK_PREFIX = "SENT";
     public static final String PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK = "##";
     public static final DateTimeFormatter PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");

@@ -310,7 +310,9 @@ public class IOService {
         String[] schedulingDateWithHour = localDateTime.split(" ");
         responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
         responseDto.setTitle(PRE_ANALOG_TITLE);
-        responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage());
+        responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
+                .replace(DATE_PLACEHOLDER, schedulingDateWithHour[0])
+                .replace(TIME_PLACEHOLDER, schedulingDateWithHour[1]));
         responseDto.setMessageParams(
                 Map.of(
                         DATE_MESSAGE_PARAM, schedulingDateWithHour[0],
@@ -348,9 +350,8 @@ public class IOService {
             String iun = sendMessageRequestDto.getIun();
             IOMessagesEntity ioMessagesEntity = new IOMessagesEntity();
             ioMessagesEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
-            ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate() != null ?
-                    sendMessageRequestDto.getSchedulingAnalogDate().toInstant() : null);
-            ioMessagesEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getRequestAcceptedDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
+            ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate().toInstant());
+            ioMessagesEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getSchedulingAnalogDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
             return ioMessagesDao.save(ioMessagesEntity);
         }
         else {

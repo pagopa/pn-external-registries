@@ -219,6 +219,7 @@ class IOServiceTest {
         // verifico che è stato inserito il record per il ioMessagesEntity (probableSchedulingAnalogDate)
         assertThat(ioMessagesEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
         assertThat(ioMessagesEntityCaptor.getValue().getSchedulingAnalogDate()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant());
+        assertThat(ioMessagesEntityCaptor.getValue().getTtl()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant().plus(2, ChronoUnit.DAYS).getEpochSecond());
     }
 
     @Test
@@ -279,6 +280,7 @@ class IOServiceTest {
         // verifico che è stato inserito il record per il ioMessagesEntity (probableSchedulingAnalogDate)
         assertThat(ioMessagesEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
         assertThat(ioMessagesEntityCaptor.getValue().getSchedulingAnalogDate()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant());
+        assertThat(ioMessagesEntityCaptor.getValue().getTtl()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant().plus(2, ChronoUnit.DAYS).getEpochSecond());
     }
 
     @Test
@@ -678,7 +680,9 @@ class IOServiceTest {
         PreconditionContentDto expectedResponse = new PreconditionContentDto()
                 .messageCode(PRE_ANALOG_MESSAGE_CODE)
                         .title(PRE_ANALOG_TITLE)
-                                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
+                                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
+                                        .replace(DATE_PLACEHOLDER, "03-05-2050")
+                                        .replace(TIME_PLACEHOLDER, "13:51"))
                 .messageParams(Map.of(
                         DATE_MESSAGE_PARAM, "03-05-2050",
                         TIME_MESSAGE_PARAM, "13:51"
@@ -778,7 +782,9 @@ class IOServiceTest {
         PreconditionContentDto expectedResponse = new PreconditionContentDto()
                 .messageCode(PRE_ANALOG_MESSAGE_CODE)
                 .title(PRE_ANALOG_TITLE)
-                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
+                        .replace(DATE_PLACEHOLDER, "03-05-2050")
+                        .replace(TIME_PLACEHOLDER, "13:51"))
                 .messageParams(Map.of(
                         DATE_MESSAGE_PARAM, "03-05-2050",
                         TIME_MESSAGE_PARAM, "13:51"
