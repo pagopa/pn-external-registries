@@ -282,15 +282,17 @@ public class IOService {
 
     private Mono<PreconditionContentDto> manageRecordIsNotInDB(String recipientInternalId, String iun) {
         return deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)
-                .map(response -> {
-                    log.info("[{}] [{}] Delivery Push getSchedulingAnalogDate response: {}", iun, recipientInternalId, response);
-                    if(response.getStatusCode().is2xxSuccessful()) {
-                        return mapToNotificationDisclaimer(response.getBody().getSchedulingAnalogDate(), iun, recipientInternalId);
-                    }
+                .doOnNext(response -> log.info("[{}] [{}] Delivery Push getSchedulingAnalogDate response: {}", iun, recipientInternalId, response))
+                .map(response -> mapToNotificationDisclaimer(response.getBody().getSchedulingAnalogDate(), iun, recipientInternalId))
+                .doOnError(throwable -> {
+                    if(throwable instanceof WebClientResponseException.NotFound)
+                        log.debug("[{}] [{}] Delivery Push getSchedulingAnalogDate not found, get default AFTER template : ", iun, recipientInternalId);
+
                     else {
-                        return createPreConditionAfterSchedulingDate();
+                        log.error(String.format("[%s] [%s] Delivery Push getSchedulingAnalogDate error response: ", iun, recipientInternalId), throwable);
                     }
-                });
+                })
+                .onErrorReturn(WebClientResponseException.NotFound.class, createPreConditionAfterSchedulingDate());
     }
 
     private PreconditionContentDto mapToNotificationDisclaimer(Instant schedulingAnalogDate, String iun, String recipientInternalId) {

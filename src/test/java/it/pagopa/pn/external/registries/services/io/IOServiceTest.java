@@ -752,13 +752,44 @@ class IOServiceTest {
 
         Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
-        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(ResponseEntity.notFound().build()));
+        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.error(WebClientResponseException.create(404, "Not Found", new HttpHeaders(), null, Charset.defaultCharset())));
 
         Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
 
         StepVerifier.create(actualMonoResponse)
                 .expectNext(expectedResponse)
                 .verifyComplete();
+
+        Mockito.verify(deliveryPushClient, Mockito.times(1)).getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId);
+
+    }
+
+    @Test
+    void notificationDisclaimerWithoutSchedulingAnalogDateAndDeliveryPush400Test() {
+        final String recipientInternalId = "internalId";
+        final String iun = "iun";
+
+        String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
+        PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
+        pnExternalRegistriesConfig.init();
+
+        PreconditionContentDto expectedResponse = new PreconditionContentDto()
+                .messageCode(POST_ANALOG_MESSAGE_CODE)
+                .title(POST_ANALOG_TITLE)
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                .messageParams(Map.of());
+
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+        Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
+        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.error(WebClientResponseException.create(400, "Bad Request", new HttpHeaders(), null, Charset.defaultCharset())));
+
+        Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
+
+        StepVerifier.create(actualMonoResponse)
+                .expectError()
+                .verify();
 
         Mockito.verify(deliveryPushClient, Mockito.times(1)).getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId);
 
