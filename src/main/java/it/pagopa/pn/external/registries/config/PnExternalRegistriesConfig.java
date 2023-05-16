@@ -48,18 +48,11 @@ public class PnExternalRegistriesConfig {
 
     private String selfcareusergroupApiKey;
     private String selfcareusergroupBaseUrl;
-    private String selfcareusergroupPnProductId;
     private String selfcareusergroupUid;
 
     private String selfcarepgusergroupApiKey;
     private String selfcarepgusergroupBaseUrl;
-    private String selfcarepgusergroupPnProductId;
     private String selfcarepgusergroupUid;
-
-    private String selfcareinstitutionsApiKey;
-    private String selfcareinstitutionsBaseUrl;
-    private String selfcareinstitutionsPnProductId;
-    private String selfcareinstitutionsUid;
 
     private String mockDataResources;
 

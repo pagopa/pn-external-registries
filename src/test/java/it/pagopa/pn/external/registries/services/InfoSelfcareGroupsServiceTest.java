@@ -6,7 +6,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGr
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupStatusDto;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcareInstitutionsClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaUserGroupClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePgUserGroupClient;
 import org.junit.jupiter.api.Test;
@@ -33,9 +32,6 @@ class InfoSelfcareGroupsServiceTest {
 
     @Autowired
     private InfoSelfcareGroupsService service;
-
-    @MockBean
-    private SelfcareInstitutionsClient selfcareInstitutionsClient;
 
     @MockBean
     private SelfcarePaUserGroupClient selfcarePaUserGroupClient;
