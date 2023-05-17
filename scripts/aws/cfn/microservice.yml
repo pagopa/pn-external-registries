@@ -46,17 +46,9 @@ Parameters:
     Type: String
     Description: 'Selfcare endpoint base url'
 
-  SelfcareUsergroupPnProductId:
-    Type: String
-    Description: 'Selfcare product id'
-
   SelfcarePgUsergroupBaseUrl:
     Type: String
     Description: 'Selfcare PG endpoint base url'
-
-  SelfcarePgUsergroupPnProductId:
-    Type: String
-    Description: 'Selfcare PG product id'
 
   ContainerImageUri:
     Type: String
@@ -295,7 +287,6 @@ Resources:
         ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_I_O_MESSAGES=${IOMessagesTableName}'
         ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/termini-di-servizio'
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/informativa-privacy'
-        ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
         ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
         ContainerEnvEntry18: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
         ContainerEnvEntry19: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
@@ -303,7 +294,6 @@ Resources:
         ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry22: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
         ContainerEnvEntry23: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_BASE_URL=${SelfcarePgUsergroupBaseUrl}'
-        ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_PN_PRODUCT_ID=${SelfcarePgUsergroupPnProductId}'
         ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_PUSH_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
