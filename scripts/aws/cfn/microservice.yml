@@ -249,7 +249,11 @@ Parameters:
   MaxTasksNumber:
     Default: 6
     Type: Number
-    Description: maximum autoscaling number of tasks 
+    Description: maximum autoscaling number of tasks
+
+  IoApiDnsName:
+    Type: String
+    Description: 'The DNS name used for IO rest API.'
     
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
@@ -468,6 +472,24 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-b2b'
         IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+
+  # Expose PN-Delivery microservice public API with API-GW for IO Backend usage
+  ExternalRegistryMicroservicePublicIoAPI:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
+      Parameters:
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
+        IntendedUsage: IO
+        DnsName: !Ref IoApiDnsName
+        ProjectName: !Ref ProjectName
+        ServiceApiPath: 'ext-registry-private'
+        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
+        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn
+        OpenApiBucketName: !Ref MicroserviceBucketName
+        OpenApiBucketKey: !Sub ${MicroserviceBucketBaseKey}/docs/openapi/aws/api-ext-registry-private-IO-aws.yaml
 
   ## Dashboard
   ExternalRegistriesMicroserviceCloudWatchDashboard:
