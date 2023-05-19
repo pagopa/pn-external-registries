@@ -18,11 +18,11 @@
             "servicePath": "ext-registry"
         },
         {
-            "intendedUsage": "B2B",
+            "intendedUsage": "IO",
             "openapiFiles": [
                 "pn-from-io-b2b-internal-v1.yaml"
             ],
-            "servicePath": "ext-registry-io-b2b"
+            "servicePath": "ext-registry-private"
         }
     ],
     "openapiBundlePresenceCheck": [
