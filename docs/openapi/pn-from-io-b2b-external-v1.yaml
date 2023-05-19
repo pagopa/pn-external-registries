@@ -32,7 +32,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            application/io+json:
               schema:
                 $ref: '#/components/schemas/PreconditionContent'
         '400':

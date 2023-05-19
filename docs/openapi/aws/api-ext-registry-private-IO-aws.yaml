@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: kHaufl1n2YGjmIJHCaauSrqbogGnF5xVGmKfPRGGwls=
+  version: O/K92Z4TWASOPxrXa5FiBVXnTVuXz0El+0HeG19maHM=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -30,7 +30,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            application/io+json:
               schema:
                 $ref: '#/components/schemas/PreconditionContent'
         '400':
