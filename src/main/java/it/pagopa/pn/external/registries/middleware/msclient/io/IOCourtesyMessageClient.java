@@ -5,13 +5,13 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 
 @Component
-@Slf4j
+@CustomLog
 public class IOCourtesyMessageClient extends IOClient {
 
     public static final String IO_STATUS_ACTIVE = "ACTIVE";
@@ -34,6 +34,7 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> upsertServiceActivation(String taxId, boolean activated)
     {
+        log.logInvokingExternalService("IO", "upsertServiceActivation");
         log.info("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
 
         if (!checkWhitelist(taxId))
@@ -70,6 +71,7 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> getServiceActivation(String taxId)
     {
+        log.logInvokingExternalService("IO", "getServiceActivation");
         log.info("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
 
         if (!checkWhitelist(taxId))

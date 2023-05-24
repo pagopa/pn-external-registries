@@ -6,7 +6,7 @@ import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.clie
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.api.UserGroupApi;
 import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR;
 
-@Slf4j
+@CustomLog
 @Component
 public class SelfcarePaUserGroupClient extends OcpBaseClient {
 
@@ -43,6 +43,7 @@ public class SelfcarePaUserGroupClient extends OcpBaseClient {
     }
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
+        log.logInvokingExternalService("Selfcare PA", "getUserGroups");
         return userGroupsApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, null, null)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientResponseException.class, x -> {

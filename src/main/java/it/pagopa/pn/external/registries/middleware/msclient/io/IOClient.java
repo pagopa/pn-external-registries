@@ -9,6 +9,7 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Fisca
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
+import lombok.CustomLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
@@ -18,7 +19,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
 import java.util.UUID;
 
-@Slf4j
+@CustomLog
 class IOClient extends OcpBaseClient {
 
     protected DefaultApi ioApi;
@@ -42,6 +43,7 @@ class IOClient extends OcpBaseClient {
     }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
+        log.logInvokingExternalService("IO", "submitMessageforUserWithFiscalCodeInBody");
         log.info("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
@@ -60,6 +62,7 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
+        log.logInvokingExternalService("IO", "getProfileByPOST");
         log.info("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))

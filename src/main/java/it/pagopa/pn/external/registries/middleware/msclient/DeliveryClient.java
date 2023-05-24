@@ -5,12 +5,14 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.api.InternalOnlyApi;
 import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPaPrivate;
+import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
 @Component
+@CustomLog
 public class DeliveryClient extends CommonBaseClient {
 
     private InternalOnlyApi pnDeliveryApi;
@@ -27,6 +29,7 @@ public class DeliveryClient extends CommonBaseClient {
     }
 
     public Mono<Void> paymentEventPagoPaPrivate(PaymentEventPagoPaPrivate paymentEventPagoPaPrivate) {
+        log.logInvokingExternalService("Delivery", "paymentEventPagoPaPrivate");
         return pnDeliveryApi.paymentEventPagoPaPrivate( paymentEventPagoPaPrivate );
     }
 }

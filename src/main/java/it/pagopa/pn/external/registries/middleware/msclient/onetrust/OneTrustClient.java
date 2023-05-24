@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.onetrust;
 
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 
 @Component
-@Slf4j
+@CustomLog
 public class OneTrustClient extends CommonBaseClient {
 
     protected static final String PRIVACY_NOTICES_URL = "/api/privacynotice/v2/privacynotices/{privacyNoticeId}";
@@ -45,6 +45,7 @@ public class OneTrustClient extends CommonBaseClient {
      * @return il Privacy Notice se trovato, altrimenti One Trust restituisce 500
      */
     public Mono<PrivacyNoticeOneTrustResponse> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {
+        log.logInvokingExternalService("OneTrust", "getPrivacyNoticeVersionByPrivacyNoticeId");
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(PRIVACY_NOTICES_URL)
