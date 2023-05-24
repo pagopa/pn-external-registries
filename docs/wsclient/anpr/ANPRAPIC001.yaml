@@ -175,6 +175,7 @@ components:
       properties:
         numero:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         dataRilascio:
           type: string
           format: YYYY-MM-DD
@@ -262,6 +263,7 @@ components:
       properties:
         codFiscale:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         validitaCF:
           type: string
         dataAttribuzioneValidita:
@@ -649,12 +651,15 @@ components:
       properties:
         codiceFiscale:
           $ref: '#/components/schemas/TipoCodiceFiscale'
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         cognome:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         senzaCognome:
           type: string
         nome:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         senzaNome:
           type: string
         sesso:
@@ -714,6 +719,7 @@ components:
       properties:
         cap:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         comune:
           $ref: '#/components/schemas/TipoComune'
         frazione:
@@ -727,6 +733,7 @@ components:
       properties:
         cap:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         localita:
           $ref: '#/components/schemas/TipoDatoLocalitaEstera'
         toponimo:

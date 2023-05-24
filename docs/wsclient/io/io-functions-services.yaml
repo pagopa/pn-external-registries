@@ -1065,6 +1065,7 @@ definitions:
     format: FiscalCode
     x-import: '@pagopa/ts-commons/lib/strings'
     example: SPNDNL80R13C555X
+    x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
   LimitedProfile:
     description: |-
       Describes the citizen's profile, mostly interesting for preferences
@@ -1149,6 +1150,7 @@ definitions:
     format: FiscalCode
     x-import: '@pagopa/ts-commons/lib/strings'
     example: TCNZRO80R13C555Y
+    x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
   MessageContentBase:
     type: object
     properties:
@@ -1634,6 +1636,7 @@ parameters:
     pattern: >-
       [A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]
     x-example: SPNDNL80R13C555X
+    x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
   DateUTC:
     name: date
     in: path

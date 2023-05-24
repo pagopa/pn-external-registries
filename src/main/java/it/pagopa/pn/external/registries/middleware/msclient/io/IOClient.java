@@ -2,7 +2,6 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
@@ -10,37 +9,26 @@ import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Limit
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.CustomLog;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.util.UUID;
 
 @CustomLog
 class IOClient extends OcpBaseClient {
 
-    protected DefaultApi ioApi;
-    private final String apiKey;
+    protected final DefaultApi ioApi;
     private final PnExternalRegistriesConfig config;
     String ioMode;
 
-    public IOClient(PnExternalRegistriesConfig config, String apiKey, String ioMode) {
+    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode) {
         this.config = config;
-        this.apiKey = apiKey;
+        this.ioApi = ioApi;
         this.ioMode = ioMode;
     }
 
-    @PostConstruct
-    public void init() {
-
-        ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), apiKey).build());
-        apiClient.setBasePath( config.getIoBaseUrl() );
-
-        this.ioApi = new DefaultApi( apiClient );
-    }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
         log.logInvokingExternalService("IO", "submitMessageforUserWithFiscalCodeInBody");

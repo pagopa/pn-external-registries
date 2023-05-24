@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +9,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class IOOptInClient extends IOClient {
 
-    public IOOptInClient(PnExternalRegistriesConfig config)
+    //inject by name
+    public IOOptInClient(PnExternalRegistriesConfig config, DefaultApi ioActApi)
     {
-        super(config, config.getIoactApiKey(), "OptIn");
+        super(config, ioActApi, "OptIn");
     }
 }

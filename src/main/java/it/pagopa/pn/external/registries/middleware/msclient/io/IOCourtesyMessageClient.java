@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
@@ -17,10 +18,10 @@ public class IOCourtesyMessageClient extends IOClient {
     public static final String IO_STATUS_ACTIVE = "ACTIVE";
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
-
-    public IOCourtesyMessageClient(PnExternalRegistriesConfig config)
+    //inject by name
+    public IOCourtesyMessageClient(PnExternalRegistriesConfig config, DefaultApi ioApi)
     {
-        super(config, config.getIoApiKey(), "Courtesy");
+        super(config, ioApi, "Courtesy");
     }
 
 

@@ -2,24 +2,19 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
-import it.pagopa.pn.external.registries.middleware.msclient.io.IOClient;
-import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
-import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Collections;
 
@@ -27,38 +22,19 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest(classes = {IOOptInClient.class, PnExternalRegistriesConfig.class})
+@SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
         "pn.external-registry.io-api-key=fake_api_key",
         "pn.external-registry.ioact-api-key=fake_api_key_activation"
 })
-class IOOptInTest {
+class IOOptInTest extends MockAWSObjectsTestConfig {
 
+    @Autowired
     private IOOptInClient client;
 
-    @Mock
-    private PnExternalRegistriesConfig cfg;
-
     private static ClientAndServer mockServer;
-
-    @Configuration
-    static class ContextConfiguration {
-        @Primary
-        @Bean
-        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
-            return Mockito.mock( SqsNotificationPaidProducer.class);
-        }
-    }
-
-    @BeforeEach
-    void setup() {
-        Mockito.when( cfg.getIoBaseUrl()).thenReturn( "http://localhost:9999" );
-        Mockito.when( cfg.getIoactApiKey() ).thenReturn( "fake_api_key_activation" );
-        this.client = new IOOptInClient(cfg);
-        this.client.init();
-    }
 
     @BeforeAll
     public static void startMockServer() {
