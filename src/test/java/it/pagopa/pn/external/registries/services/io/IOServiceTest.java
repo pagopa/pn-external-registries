@@ -682,10 +682,10 @@ class IOServiceTest {
                         .title(PRE_ANALOG_TITLE)
                                 .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
                                         .replace(DATE_PLACEHOLDER, "03-05-2050")
-                                        .replace(TIME_PLACEHOLDER, "13:51"))
+                                        .replace(TIME_PLACEHOLDER, "15:51")) //Europe/Rome
                 .messageParams(Map.of(
                         DATE_MESSAGE_PARAM, "03-05-2050",
-                        TIME_MESSAGE_PARAM, "13:51"
+                        TIME_MESSAGE_PARAM, "13:51" //UTC
                 ));
 
         Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
@@ -815,10 +815,10 @@ class IOServiceTest {
                 .title(PRE_ANALOG_TITLE)
                 .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
                         .replace(DATE_PLACEHOLDER, "03-05-2050")
-                        .replace(TIME_PLACEHOLDER, "13:51"))
+                        .replace(TIME_PLACEHOLDER, "15:51")) //Europe/ROme
                 .messageParams(Map.of(
                         DATE_MESSAGE_PARAM, "03-05-2050",
-                        TIME_MESSAGE_PARAM, "13:51"
+                        TIME_MESSAGE_PARAM, "13:51" //UTC
                 ));
 
         ProbableSchedulingAnalogDateResponse deliveryPushResponse = new ProbableSchedulingAnalogDateResponse()
