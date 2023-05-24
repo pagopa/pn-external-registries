@@ -308,17 +308,19 @@ public class IOService {
 
     private PreconditionContentDto createPreConditionBeforeSchedulingDate(Instant schedulingAnalogDate) {
         PreconditionContentDto responseDto = new PreconditionContentDto();
-        String localDateTime = LocalDateTime.ofInstant(schedulingAnalogDate, ZoneOffset.UTC).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
-        String[] schedulingDateWithHour = localDateTime.split(" ");
+        String localDateTimeUTC = LocalDateTime.ofInstant(schedulingAnalogDate, ZoneOffset.UTC).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
+        String localDateTimeItaly = LocalDateTime.ofInstant(schedulingAnalogDate, ZoneId.of("Europe/Rome")).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
+        String[] schedulingDateWithHourUTC = localDateTimeUTC.split(" ");
+        String[] schedulingDateWithHourItaly = localDateTimeItaly.split(" ");
         responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
         responseDto.setTitle(PRE_ANALOG_TITLE);
         responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
-                .replace(DATE_PLACEHOLDER, schedulingDateWithHour[0])
-                .replace(TIME_PLACEHOLDER, schedulingDateWithHour[1]));
+                .replace(DATE_PLACEHOLDER, schedulingDateWithHourItaly[0])
+                .replace(TIME_PLACEHOLDER, schedulingDateWithHourItaly[1]));
         responseDto.setMessageParams(
                 Map.of(
-                        DATE_MESSAGE_PARAM, schedulingDateWithHour[0],
-                        TIME_MESSAGE_PARAM, schedulingDateWithHour[1]
+                        DATE_MESSAGE_PARAM, schedulingDateWithHourUTC[0],
+                        TIME_MESSAGE_PARAM, schedulingDateWithHourUTC[1]
                 )
         );
 
