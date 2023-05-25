@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto.PageOfUserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupDto;

@@ -26,6 +26,6 @@ components:
     ###                     PARAMETRI DI AUTENTICAZIONE E AUTORIZZAZIONE                     ###
     ############################################################################################
     paTaxId:
-      $ref: 'https://raw.githubusercontent.com/pagopa/pn-delivery/f1845e78c4d93f164d79f841ab92cd980c2c3125/docs/openapi/schemas-pn-notification-v1.yaml#/components/schemas/paTaxId'
+      $ref: 'https://raw.githubusercontent.com/pagopa/pn-delivery/53f77f4c3e2127518678815c213be472a8f84cae/docs/openapi/schemas-pn-notification.yaml#/components/schemas/paTaxId'
     noticeCode:
-      $ref: 'https://raw.githubusercontent.com/pagopa/pn-delivery/f1845e78c4d93f164d79f841ab92cd980c2c3125/docs/openapi/schemas-pn-notification-v1.yaml#/components/schemas/noticeCode'
+      $ref: 'https://raw.githubusercontent.com/pagopa/pn-delivery/53f77f4c3e2127518678815c213be472a8f84cae/docs/openapi/schemas-pn-notification.yaml#/components/schemas/noticeCode'

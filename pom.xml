@@ -31,12 +31,12 @@
         <dependency>
             <groupId>it.pagopa.pn</groupId>
             <artifactId>pn-commons</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>it.pagopa.pn</groupId>
             <artifactId>pn-model</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.swagger/swagger-annotations -->
@@ -128,12 +128,31 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>pn-commons</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/dependency-resources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>6.0.0</version>
                 <executions>
                     <execution>
                         <id>pn-external-registries-ipa-server</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -144,6 +163,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
                                 <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1
                                 </basePackage>
@@ -167,6 +187,7 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-recipients-server</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -177,6 +198,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
                                 <basePackage>
                                     it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1
@@ -204,6 +226,7 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-payment-server</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -214,6 +237,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
                                 <basePackage>
                                     it.pagopa.pn.external.registries.generated.openapi.server.payment.v1
@@ -241,6 +265,7 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-io-message-server</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -251,6 +276,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
                                 <basePackage>
                                     it.pagopa.pn.external.registries.generated.openapi.server.io.v1
@@ -278,6 +304,7 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-from-io-b2b</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -288,6 +315,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
                                 <basePackage>
                                     it.pagopa.pn.external.registries.generated.openapi.server.io.v1
@@ -315,6 +343,7 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-valid-mvp-user-server</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -325,6 +354,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
                                 <basePackage>
                                     it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1
@@ -352,27 +382,29 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-pdnd-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
                             <inputSpec>${project.basedir}/docs/wsclient/pdnd/pdnd-v1.yaml</inputSpec>
                             <generatorName>java</generatorName>
-                            <library>webclient</library>
+                            <library>native</library>
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <configOptions>
+                                <asyncNative>true</asyncNative>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -381,10 +413,10 @@
                     </execution>
                     <execution>
                         <id>pn-external-registires-anpr-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
                             <inputSpec>${project.basedir}/docs/wsclient/anpr/ANPRAPIC001.yaml</inputSpec>
                             <generatorName>java</generatorName>
@@ -393,15 +425,16 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -410,10 +443,10 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-checkout-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
                             <inputSpec>${project.basedir}/docs/wsclient/checkout/pagopa-u-checkout-payment-activations-auth-api-v2.yaml</inputSpec>
                             <generatorName>java</generatorName>
@@ -422,15 +455,16 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -439,10 +473,10 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-selfcare-external-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
                             <inputSpec>${project.basedir}/docs/wsclient/selfcare/selc-external-v1.yaml</inputSpec>
                             <generatorName>java</generatorName>
@@ -451,15 +485,16 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -468,10 +503,10 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-selfcare-external-client-v2</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
                             <inputSpec>${project.basedir}/docs/wsclient/selfcare/selc-external-v2.yaml</inputSpec>
                             <generatorName>java</generatorName>
@@ -480,15 +515,16 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -497,10 +533,10 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-io-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
                             <inputSpec>${project.basedir}/docs/wsclient/io/io-functions-services.yaml</inputSpec>
                             <generatorName>java</generatorName>
@@ -509,15 +545,16 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)</additionalModelTypeAnnotations>
@@ -526,22 +563,23 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-pn-delivery-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/90675f0e3c0a4142b64f233bf532d4b3c03711cb/docs/openapi/api-private.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/53f77f4c3e2127518678815c213be472a8f84cae/docs/openapi/api-private.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <typeMappings>
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
                             <configOptions>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.api</apiPackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto</modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.api</apiPackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto</modelPackage>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -556,6 +594,7 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-private</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -566,6 +605,7 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <configOptions>
                                 <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1
                                 </basePackage>
@@ -589,22 +629,23 @@
                     </execution>
                     <execution>
                         <id>pn-external-registries-pn-delivery-push-client</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery-push/2d7dca0413e137ff0835b7d07e05f7c910638ff9/docs/openapi/api-private.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery-push/0007dd145b23d6ac34c49dd090de1c96beeb1de6/docs/openapi/api-private.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0</templateDirectory>
                             <typeMappings>
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
                             <configOptions>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.api</apiPackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto</modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api</apiPackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto</modelPackage>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>

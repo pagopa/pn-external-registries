@@ -2,12 +2,13 @@ package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.LogUtils;
+import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.MessageContent;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ThirdPartyData;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
@@ -18,6 +19,7 @@ import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseIntern
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
@@ -56,40 +58,45 @@ public class IOService {
     public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDtoMono )
     {
         return sendMessageRequestDtoMono
-                .map(sendMessageRequestDto -> {
-                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
-                    return sendMessageRequestDto;
-                })
-                .zipWhen(sendMessageRequestDto -> {
-                            UserStatusRequestDto requestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
-                            return this.getUserStatusInternal( Mono.just(requestDto) );
-                        },
-                    (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
-                        public final UserStatusResponseInternal responseStatusDto = responseStatusDto0;
-                        public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
-                    })
-                .flatMap(res -> {
-                    UserStatusResponseInternal.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+                .flatMap(requestDto -> {
+                    MDC.put(MDCUtils.MDC_PN_IUN_KEY, requestDto.getIun());
+                    MDC.put(MDCUtils.MDC_CX_ID_KEY, requestDto.getRecipientInternalID());
+                    if(requestDto.getRecipientIndex() != null) MDC.put(MDCUtils.MDC_PN_CTX_RECIPIENT_INDEX, requestDto.getRecipientIndex().toString());
+                    MDC.put(MDCUtils.MDC_PN_CTX_TOPIC, "sendIOMessage");
 
-                    switch (ioStatus){
-                        case APPIO_NOT_ACTIVE:
-                            log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
-                            SendMessageResponseDto resAppIoUnavailable = new SendMessageResponseDto();
-                            resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
-                            return Mono.just(resAppIoUnavailable);
-                        case PN_ACTIVE:
-                            return sendIOCourtesyMessage(res.sendMessageRequestDto, isPreferredLanguageIT(res.responseStatusDto.getPreferredLanguages()));
-                        case PN_NOT_ACTIVE:
-                            return manageOptIn(res.sendMessageRequestDto);
-                        case ERROR:
-                            log.info("Error in get user status, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
-                            SendMessageResponseDto resErrorUserStatus = new SendMessageResponseDto();
-                            resErrorUserStatus.setResult(SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS);
-                            return Mono.just(resErrorUserStatus);
-                        default:
-                            log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
-                            return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_IOINVALIDSTATUS));
-                    }
+                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(requestDto.getRecipientTaxID()), requestDto.getIun());
+                    return MDCUtils.addMDCToContextAndExecute(Mono.just(requestDto)
+                            .zipWhen(sendMessageRequestDto -> {
+                                        UserStatusRequestDto userStatusRequestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
+                                        return this.getUserStatusInternal( Mono.just(userStatusRequestDto) );
+                                    },
+                                    (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
+                                        public final UserStatusResponseInternal responseStatusDto = responseStatusDto0;
+                                        public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
+                                    })
+                            .flatMap(res -> {
+                                UserStatusResponseInternal.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+
+                                switch (ioStatus){
+                                    case APPIO_NOT_ACTIVE:
+                                        log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                                        SendMessageResponseDto resAppIoUnavailable = new SendMessageResponseDto();
+                                        resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
+                                        return Mono.just(resAppIoUnavailable);
+                                    case PN_ACTIVE:
+                                        return sendIOCourtesyMessage(res.sendMessageRequestDto, isPreferredLanguageIT(res.responseStatusDto.getPreferredLanguages()));
+                                    case PN_NOT_ACTIVE:
+                                        return manageOptIn(res.sendMessageRequestDto);
+                                    case ERROR:
+                                        log.info("Error in get user status, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                                        SendMessageResponseDto resErrorUserStatus = new SendMessageResponseDto();
+                                        resErrorUserStatus.setResult(SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS);
+                                        return Mono.just(resErrorUserStatus);
+                                    default:
+                                        log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
+                                        return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_IOINVALIDSTATUS));
+                                }
+                            }));
                 });
     }
     

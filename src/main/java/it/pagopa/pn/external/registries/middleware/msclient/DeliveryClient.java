@@ -1,32 +1,24 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import it.pagopa.pn.commons.pnclients.CommonBaseClient;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.api.InternalOnlyApi;
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPaPrivate;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.api.InternalOnlyApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.PaymentEventPagoPaPrivate;
+import lombok.CustomLog;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.PN_DELIVERY;
 
 @Component
-public class DeliveryClient extends CommonBaseClient {
+@CustomLog
+@RequiredArgsConstructor
+public class DeliveryClient  {
 
-    private InternalOnlyApi pnDeliveryApi;
+    private final InternalOnlyApi pnDeliveryApi;
 
-    private final PnExternalRegistriesConfig config;
-
-    public DeliveryClient(PnExternalRegistriesConfig config) { this.config = config; }
-
-    @PostConstruct
-    public void init() {
-        ApiClient apiClient = new ApiClient( initWebClient( ApiClient.buildWebClientBuilder() ) );
-        apiClient.setBasePath( config.getDeliveryBaseUrl() );
-        this.pnDeliveryApi = new InternalOnlyApi( apiClient );
-    }
 
     public Mono<Void> paymentEventPagoPaPrivate(PaymentEventPagoPaPrivate paymentEventPagoPaPrivate) {
+        log.logInvokingExternalService(PN_DELIVERY, "paymentEventPagoPaPrivate");
         return pnDeliveryApi.paymentEventPagoPaPrivate( paymentEventPagoPaPrivate );
     }
 }
