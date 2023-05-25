@@ -32,7 +32,9 @@ public class InfoPaController implements InfoPaApi {
     @Override
     public Mono<ResponseEntity<Flux<PaSummaryDto>>> getManyPa(List<String> ids,  final ServerWebExchange exchange) {
         log.debug("getManyPa - ids={}", ids);
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareInstitutionsService.listOnboardedPaByIds( ids)));
+        return infoSelfcareInstitutionsService.listOnboardedPaByIds( ids)
+                .collectList()
+                .map(paSummaryDtos -> ResponseEntity.ok(Flux.fromIterable(paSummaryDtos)));
     }
 
     /**
@@ -64,10 +66,14 @@ public class InfoPaController implements InfoPaApi {
     public Mono<ResponseEntity<Flux<PaSummaryDto>>> listOnboardedPa(String paNameFilter, List<String> ids, ServerWebExchange exchange) {
         log.debug("listOnboardedPa - paNameFilter={} ids={}", paNameFilter, ids);
         if( ids == null || ids.isEmpty() ) {
-            return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareInstitutionsService.listOnboardedPaByName(paNameFilter)));
+            return infoSelfcareInstitutionsService.listOnboardedPaByName(paNameFilter)
+                    .collectList()
+                    .map(paSummaryDtos -> ResponseEntity.ok(Flux.fromIterable(paSummaryDtos)));
         }
         else {
-            return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareInstitutionsService.listOnboardedPaByIds( ids)));
+            return infoSelfcareInstitutionsService.listOnboardedPaByIds( ids)
+                    .collectList()
+                    .map(paSummaryDtos -> ResponseEntity.ok(Flux.fromIterable(paSummaryDtos)));
         }
     }
 
@@ -82,7 +88,9 @@ public class InfoPaController implements InfoPaApi {
     @Override
     public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroups(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
         log.debug("getGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareGroupsService.getPaGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)));
+        return infoSelfcareGroupsService.getPaGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)
+                .collectList()
+                .map(paGroupDtos -> ResponseEntity.ok(Flux.fromIterable(paGroupDtos)));
     }
 
 
@@ -97,6 +105,9 @@ public class InfoPaController implements InfoPaApi {
     @Override
     public Mono<ResponseEntity<Flux<PaGroupDto>>> getGroupsB2B(String xPagopaPnUid, String xPagopaPnCxId, List<String> xPagopaPnCxGroups, PaGroupStatusDto statusFilter, ServerWebExchange exchange) {
         log.debug("getGroupsB2B - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareGroupsService.getPaGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)));
+
+        return infoSelfcareGroupsService.getPaGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)
+                .collectList()
+                .map(paGroupDtos -> ResponseEntity.ok(Flux.fromIterable(paGroupDtos)));
     }
 }

@@ -42,6 +42,9 @@ public class InfoPgController implements InfoPgApi {
                                                               PgGroupStatusDto statusFilter,
                                                               ServerWebExchange exchange) {
         log.debug("getPgGroups - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnCxGroups={} statusFilter={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter);
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareGroupsService.getPgGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)));
+
+        return infoSelfcareGroupsService.getPgGroups(xPagopaPnUid, xPagopaPnCxId, xPagopaPnCxGroups, statusFilter)
+                .collectList()
+                .map(pgGroupDtos -> ResponseEntity.ok(Flux.fromIterable(pgGroupDtos)));
     }
 }
