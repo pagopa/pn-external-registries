@@ -3,7 +3,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

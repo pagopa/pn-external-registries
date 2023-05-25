@@ -2,11 +2,11 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.CreatedMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;

@@ -1,10 +1,10 @@
 package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto.ProbableSchedulingAnalogDateResponse;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.CreatedMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;

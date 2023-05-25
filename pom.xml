@@ -399,12 +399,12 @@
                                 <asyncNative>true</asyncNative>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.pdnd.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -429,12 +429,12 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.anpr.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -459,12 +459,12 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -489,12 +489,12 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -519,12 +519,12 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v2.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
@@ -549,12 +549,12 @@
                             <configOptions>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1</basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto
                                 </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api
                                 </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.io.client.v1.config
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)</additionalModelTypeAnnotations>
@@ -578,8 +578,8 @@
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
                             <configOptions>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.api</apiPackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto</modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.api</apiPackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto</modelPackage>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -644,8 +644,8 @@
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
                             <configOptions>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.api</apiPackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto</modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api</apiPackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto</modelPackage>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>

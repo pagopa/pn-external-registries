@@ -1,8 +1,8 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.CartRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.PaymentRequestsGetResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.CustomLog;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;

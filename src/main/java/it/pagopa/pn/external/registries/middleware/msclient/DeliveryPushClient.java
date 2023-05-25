@@ -1,8 +1,8 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
-import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.api.TimelineAndStatusApi;
-import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto.ProbableSchedulingAnalogDateResponse;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

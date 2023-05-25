@@ -2,10 +2,10 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ActivationPayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

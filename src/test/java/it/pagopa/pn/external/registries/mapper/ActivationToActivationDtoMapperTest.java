@@ -1,7 +1,6 @@
 package it.pagopa.pn.external.registries.mapper;
 
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.InstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationDto;
 import org.junit.jupiter.api.Test;
 

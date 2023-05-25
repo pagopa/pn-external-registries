@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.api.InternalOnlyApi;
-import it.pagopa.pn.external.registries.generated.openapi.delivery.client.v1.dto.PaymentEventPagoPaPrivate;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.api.InternalOnlyApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.PaymentEventPagoPaPrivate;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
