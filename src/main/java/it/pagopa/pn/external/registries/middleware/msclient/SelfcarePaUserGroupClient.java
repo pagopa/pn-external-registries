@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.SELFCARE_PA;
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR;
 
 @CustomLog
@@ -22,7 +23,7 @@ public class SelfcarePaUserGroupClient {
 
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
-        log.logInvokingExternalService("Selfcare PA", "getUserGroups");
+        log.logInvokingExternalService(SELFCARE_PA, "getUserGroups");
         return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, null, null)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientResponseException.class, x -> {

@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.ONE_TRUST;
+
 @Component
 @CustomLog
 public class OneTrustClient extends CommonBaseClient {
@@ -45,7 +47,7 @@ public class OneTrustClient extends CommonBaseClient {
      * @return il Privacy Notice se trovato, altrimenti One Trust restituisce 500
      */
     public Mono<PrivacyNoticeOneTrustResponse> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {
-        log.logInvokingExternalService("OneTrust", "getPrivacyNoticeVersionByPrivacyNoticeId");
+        log.logInvokingExternalService(ONE_TRUST, "getPrivacyNoticeVersionByPrivacyNoticeId");
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(PRIVACY_NOTICES_URL)

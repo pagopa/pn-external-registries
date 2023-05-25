@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.CHECKOUT;
+
 @Component
 @CustomLog
 public class CheckoutClient extends OcpBaseClient {
@@ -24,12 +26,12 @@ public class CheckoutClient extends OcpBaseClient {
     }
 
     public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptIdFromString) throws WebClientResponseException {
-        log.logInvokingExternalService("Checkout", "getPaymentInfo");
+        log.logInvokingExternalService(CHECKOUT, "getPaymentInfo");
         return defaultApiClient.getPaymentInfo( rptIdFromString );
     }
 
     public Mono<ResponseEntity<Void>> checkoutCart(CartRequestDto cartRequestDto) throws WebClientResponseException {
-        log.logInvokingExternalService("Checkout", "checkoutCart");
+        log.logInvokingExternalService(CHECKOUT, "checkoutCart");
         return defaultApiClientCartCheckout.postCartsWithHttpInfo( cartRequestDto );
     }
 

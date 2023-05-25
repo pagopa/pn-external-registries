@@ -24,7 +24,7 @@ public class SendIOMessageController implements SendIoMessageApi {
 
     @Override
     public Mono<ResponseEntity<SendMessageResponseDto>> sendIOMessage(Mono<SendMessageRequestDto> sendMessageRequestDto, ServerWebExchange exchange) {
-        log.info( "[enter] send IO message" );
+        log.debug( "[enter] send IO message" );
         return service.sendIOMessage( sendMessageRequestDto )
                 .map( body -> {
                     log.debug( "[exit]" );
@@ -35,7 +35,7 @@ public class SendIOMessageController implements SendIoMessageApi {
 
     @Override
     public Mono<ResponseEntity<UserStatusResponseDto>> userStatus(Mono<UserStatusRequestDto> userStatusRequestDto, final ServerWebExchange exchange) {
-        log.info( "[enter] userStatus" );
+        log.debug( "[enter] userStatus" );
         return service.getUserStatus( userStatusRequestDto )
                 .map( b -> {
                     log.debug( "[exit]" );

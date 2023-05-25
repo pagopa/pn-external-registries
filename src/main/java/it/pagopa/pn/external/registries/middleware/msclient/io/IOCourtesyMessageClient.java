@@ -10,6 +10,8 @@ import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.IO;
+
 
 @Component
 @CustomLog
@@ -35,8 +37,8 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> upsertServiceActivation(String taxId, boolean activated)
     {
-        log.logInvokingExternalService("IO", "upsertServiceActivation");
-        log.info("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
+        log.logInvokingExternalService(IO, "upsertServiceActivation");
+        log.debug("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
 
         if (!checkWhitelist(taxId))
         {
@@ -72,8 +74,8 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> getServiceActivation(String taxId)
     {
-        log.logInvokingExternalService("IO", "getServiceActivation");
-        log.info("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
+        log.logInvokingExternalService(IO, "getServiceActivation");
+        log.debug("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
 
         if (!checkWhitelist(taxId))
         {

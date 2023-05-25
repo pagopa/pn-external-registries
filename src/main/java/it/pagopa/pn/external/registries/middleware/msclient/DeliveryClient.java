@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.PN_DELIVERY;
+
 @Component
 @CustomLog
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class DeliveryClient  {
 
 
     public Mono<Void> paymentEventPagoPaPrivate(PaymentEventPagoPaPrivate paymentEventPagoPaPrivate) {
-        log.logInvokingExternalService("Delivery", "paymentEventPagoPaPrivate");
+        log.logInvokingExternalService(PN_DELIVERY, "paymentEventPagoPaPrivate");
         return pnDeliveryApi.paymentEventPagoPaPrivate( paymentEventPagoPaPrivate );
     }
 }

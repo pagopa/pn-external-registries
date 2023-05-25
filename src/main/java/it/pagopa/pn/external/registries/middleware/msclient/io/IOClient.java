@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.IO;
+
 @CustomLog
 class IOClient extends OcpBaseClient {
 
@@ -31,8 +33,8 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        log.logInvokingExternalService("IO", "submitMessageforUserWithFiscalCodeInBody");
-        log.info("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
+        log.logInvokingExternalService(IO, "submitMessageforUserWithFiscalCodeInBody");
+        log.debug("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
         {
@@ -50,8 +52,8 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        log.logInvokingExternalService("IO", "getProfileByPOST");
-        log.info("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
+        log.logInvokingExternalService(IO, "getProfileByPOST");
+        log.debug("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))
         {
