@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.api.TimelineAndStatusApi;
 import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto.ProbableSchedulingAnalogDateResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -27,7 +26,7 @@ public class DeliveryPushClient extends CommonBaseClient {
         this.pnDeliveryPushApi = new TimelineAndStatusApi( apiClient );
     }
 
-    public Mono<ResponseEntity<ProbableSchedulingAnalogDateResponse>> getSchedulingAnalogDateWithHttpInfo(String iun, String recipientId) {
-        return pnDeliveryPushApi.getSchedulingAnalogDateWithHttpInfo(iun, recipientId);
+    public Mono<ProbableSchedulingAnalogDateResponse> getSchedulingAnalogDateWithHttpInfo(String iun, String recipientId) {
+        return pnDeliveryPushApi.getSchedulingAnalogDate(iun, recipientId);
     }
 }

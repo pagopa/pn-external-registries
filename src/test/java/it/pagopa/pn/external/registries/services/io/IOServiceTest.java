@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto.ProbableSchedulingAnalogDateResponse;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -346,8 +346,7 @@ class IOServiceTest {
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
-        // verifico che NON è stato inserito il record per il probableSchedulingAnalogDate perché il sendMessageRequest non ha valorizzato quel campo
-        Mockito.verify(ioMessagesDao, Mockito.times(0)).save(Mockito.any());
+        Mockito.verify(ioMessagesDao, Mockito.times(1)).save(Mockito.any());
 
     }
 
@@ -666,12 +665,17 @@ class IOServiceTest {
     void notificationDisclaimerBeforeSchedulingAnalogDateTest() {
         final String recipientInternalId = "internalId";
         final String iun = "iun";
+        final String senderDenomination = "Comune di Milano";
+        final String subject = "Oggetto del Messaggio";
 
         String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
 
         IOMessagesEntity expectedEntity = new IOMessagesEntity();
         expectedEntity.setPk(expectedPk);
         expectedEntity.setSchedulingAnalogDate(Instant.parse("2050-05-03T13:51:00Z"));
+        expectedEntity.setIun(iun);
+        expectedEntity.setSenderDenomination(senderDenomination);
+        expectedEntity.setSubject(subject);
 
         //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
         PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
@@ -682,21 +686,30 @@ class IOServiceTest {
                         .title(PRE_ANALOG_TITLE)
                                 .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
                                         .replace(DATE_PLACEHOLDER, "03-05-2050")
-                                        .replace(TIME_PLACEHOLDER, "15:51")) //Europe/Rome
+                                        .replace(TIME_PLACEHOLDER, "15:51") //Europe/Rome
+                                        .replace(IUN_PLACEHOLDER, iun)
+                                        .replace(SENDER_DENOMINATION_PLACEHOLDER, senderDenomination)
+                                        .replace(SUBJECT_PLACEHOLDER, subject)
+                                )
                 .messageParams(Map.of(
                         DATE_MESSAGE_PARAM, "03-05-2050",
-                        TIME_MESSAGE_PARAM, "13:51" //UTC
+                        TIME_MESSAGE_PARAM, "13:51", //UTC
+                        IUN_PARAM, iun,
+                        SENDER_DENOMINATION_PARAM, senderDenomination,
+                        SUBJECT_PARAM, subject
                 ));
 
         Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
-        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(ResponseEntity.notFound().build()));
 
         Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
 
         StepVerifier.create(actualMonoResponse)
                 .expectNext(expectedResponse)
                 .verifyComplete();
+
+        Mockito.verify(deliveryPushClient, Mockito.times(0)).getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId);
+
 
     }
 
@@ -704,12 +717,17 @@ class IOServiceTest {
     void notificationDisclaimerAfterSchedulingAnalogDateTest() {
         final String recipientInternalId = "internalId";
         final String iun = "iun";
+        final String senderDenomination = "Comune di Milano";
+        final String subject = "Oggetto del Messaggio";
 
         String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
 
         IOMessagesEntity expectedEntity = new IOMessagesEntity();
         expectedEntity.setPk(expectedPk);
         expectedEntity.setSchedulingAnalogDate(Instant.parse("2023-05-02T13:51:00Z"));
+        expectedEntity.setIun(iun);
+        expectedEntity.setSenderDenomination(senderDenomination);
+        expectedEntity.setSubject(subject);
 
         //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
         PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
@@ -718,12 +736,19 @@ class IOServiceTest {
         PreconditionContentDto expectedResponse = new PreconditionContentDto()
                 .messageCode(POST_ANALOG_MESSAGE_CODE)
                 .title(POST_ANALOG_TITLE)
-                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
-                .messageParams(Map.of());
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
+                        .replace(IUN_PLACEHOLDER, iun)
+                        .replace(SENDER_DENOMINATION_PLACEHOLDER, senderDenomination)
+                        .replace(SUBJECT_PLACEHOLDER, subject)
+                )
+                .messageParams(Map.of(
+                        IUN_PARAM, iun,
+                        SENDER_DENOMINATION_PARAM, senderDenomination,
+                        SUBJECT_PARAM, subject
+                ));
 
         Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
-        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(ResponseEntity.notFound().build()));
 
         Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -731,14 +756,25 @@ class IOServiceTest {
                 .expectNext(expectedResponse)
                 .verifyComplete();
 
+        Mockito.verify(deliveryPushClient, Mockito.times(0)).getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId);
+
     }
 
     @Test
     void notificationDisclaimerWithoutSchedulingAnalogDateAndDeliveryPush404Test() {
         final String recipientInternalId = "internalId";
         final String iun = "iun";
+        final String senderDenomination = "Comune di Milano";
+        final String subject = "Oggetto del Messaggio";
 
         String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        IOMessagesEntity expectedEntity = new IOMessagesEntity();
+        expectedEntity.setPk(expectedPk);
+        expectedEntity.setSchedulingAnalogDate(null);
+        expectedEntity.setIun(iun);
+        expectedEntity.setSenderDenomination(senderDenomination);
+        expectedEntity.setSubject(subject);
 
         //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
         PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
@@ -747,10 +783,18 @@ class IOServiceTest {
         PreconditionContentDto expectedResponse = new PreconditionContentDto()
                 .messageCode(POST_ANALOG_MESSAGE_CODE)
                 .title(POST_ANALOG_TITLE)
-                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
-                .messageParams(Map.of());
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
+                        .replace(IUN_PLACEHOLDER, iun)
+                        .replace(SENDER_DENOMINATION_PLACEHOLDER, senderDenomination)
+                        .replace(SUBJECT_PLACEHOLDER, subject)
+                )
+                .messageParams(Map.of(
+                        IUN_PARAM, iun,
+                        SENDER_DENOMINATION_PARAM, senderDenomination,
+                        SUBJECT_PARAM, subject
+                ));
 
-        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
         Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.error(WebClientResponseException.create(404, "Not Found", new HttpHeaders(), null, Charset.defaultCharset())));
 
@@ -768,20 +812,24 @@ class IOServiceTest {
     void notificationDisclaimerWithoutSchedulingAnalogDateAndDeliveryPush400Test() {
         final String recipientInternalId = "internalId";
         final String iun = "iun";
+        final String senderDenomination = "Comune di Milano";
+        final String subject = "Oggetto del Messaggio";
 
         String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        IOMessagesEntity expectedEntity = new IOMessagesEntity();
+        expectedEntity.setPk(expectedPk);
+        expectedEntity.setSchedulingAnalogDate(null);
+        expectedEntity.setIun(iun);
+        expectedEntity.setSenderDenomination(senderDenomination);
+        expectedEntity.setSubject(subject);
 
         //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
         PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
         pnExternalRegistriesConfig.init();
 
-        PreconditionContentDto expectedResponse = new PreconditionContentDto()
-                .messageCode(POST_ANALOG_MESSAGE_CODE)
-                .title(POST_ANALOG_TITLE)
-                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
-                .messageParams(Map.of());
 
-        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
         Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.error(WebClientResponseException.create(400, "Bad Request", new HttpHeaders(), null, Charset.defaultCharset())));
 
@@ -799,12 +847,17 @@ class IOServiceTest {
     void notificationDisclaimerWithoutSchedulingAnalogDateAndDeliveryPush200WithBeforeFlowTest() {
         final String recipientInternalId = "internalId";
         final String iun = "iun";
+        final String senderDenomination = "Comune di Milano";
+        final String subject = "Oggetto del Messaggio";
 
         String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
 
         IOMessagesEntity expectedEntity = new IOMessagesEntity();
         expectedEntity.setPk(expectedPk);
-        expectedEntity.setSchedulingAnalogDate(Instant.parse("2050-05-03T13:51:00Z"));
+        expectedEntity.setSchedulingAnalogDate(null);
+        expectedEntity.setIun(iun);
+        expectedEntity.setSenderDenomination(senderDenomination);
+        expectedEntity.setSubject(subject);
 
         //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
         PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
@@ -815,20 +868,27 @@ class IOServiceTest {
                 .title(PRE_ANALOG_TITLE)
                 .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
                         .replace(DATE_PLACEHOLDER, "03-05-2050")
-                        .replace(TIME_PLACEHOLDER, "15:51")) //Europe/ROme
+                        .replace(TIME_PLACEHOLDER, "15:51") //Europe/ROme
+                        .replace(IUN_PLACEHOLDER, iun)
+                        .replace(SENDER_DENOMINATION_PLACEHOLDER, senderDenomination)
+                        .replace(SUBJECT_PLACEHOLDER, subject)
+                )
                 .messageParams(Map.of(
                         DATE_MESSAGE_PARAM, "03-05-2050",
-                        TIME_MESSAGE_PARAM, "13:51" //UTC
+                        TIME_MESSAGE_PARAM, "13:51", //UTC
+                        IUN_PARAM, iun,
+                        SENDER_DENOMINATION_PARAM, senderDenomination,
+                        SUBJECT_PARAM, subject
                 ));
 
         ProbableSchedulingAnalogDateResponse deliveryPushResponse = new ProbableSchedulingAnalogDateResponse()
                 .iun(iun)
                 .recIndex(0)
-                .schedulingAnalogDate(expectedEntity.getSchedulingAnalogDate());
+                .schedulingAnalogDate(Instant.parse("2050-05-03T13:51:00Z"));
 
-        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
-        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(ResponseEntity.ok(deliveryPushResponse)));
+        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(deliveryPushResponse));
 
         Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -844,8 +904,17 @@ class IOServiceTest {
     void notificationDisclaimerWithoutSchedulingAnalogDateAndDeliveryPush200WithAfterFlowTest() {
         final String recipientInternalId = "internalId";
         final String iun = "iun";
+        final String senderDenomination = "Comune di Milano";
+        final String subject = "Oggetto del Messaggio";
 
         String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        IOMessagesEntity expectedEntity = new IOMessagesEntity();
+        expectedEntity.setPk(expectedPk);
+        expectedEntity.setSchedulingAnalogDate(null);
+        expectedEntity.setIun(iun);
+        expectedEntity.setSenderDenomination(senderDenomination);
+        expectedEntity.setSubject(subject);
 
         //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
         PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
@@ -854,17 +923,25 @@ class IOServiceTest {
         PreconditionContentDto expectedResponse = new PreconditionContentDto()
                 .messageCode(POST_ANALOG_MESSAGE_CODE)
                 .title(POST_ANALOG_TITLE)
-                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
-                .messageParams(Map.of());
+                .markdown(pnExternalRegistriesConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
+                        .replace(IUN_PLACEHOLDER, iun)
+                        .replace(SENDER_DENOMINATION_PLACEHOLDER, senderDenomination)
+                        .replace(SUBJECT_PLACEHOLDER, subject)
+                )
+                .messageParams(Map.of(
+                        IUN_PARAM, iun,
+                        SENDER_DENOMINATION_PARAM, senderDenomination,
+                        SUBJECT_PARAM, subject
+                ));
 
         ProbableSchedulingAnalogDateResponse deliveryPushResponse = new ProbableSchedulingAnalogDateResponse()
                 .iun(iun)
                 .recIndex(0)
                 .schedulingAnalogDate(Instant.parse("1999-05-05T10:00:00Z"));
 
-        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.just(expectedEntity));
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnExternalRegistriesConfig.getAppIoTemplate());
-        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(ResponseEntity.ok(deliveryPushResponse)));
+        Mockito.when(deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)).thenReturn(Mono.just(deliveryPushResponse));
 
         Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -876,4 +953,25 @@ class IOServiceTest {
 
     }
 
+    @Test
+    void notificationDisclaimerWithoutRecordInDBTest() {
+        final String recipientInternalId = "internalId";
+        final String iun = "iun";
+
+        String expectedPk = AppIOUtils.buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+
+        //voglio che il mock di PnExternalRegistriesConfig si comporti come la classe reale
+        PnExternalRegistriesConfig pnExternalRegistriesConfig = new PnExternalRegistriesConfig();
+        pnExternalRegistriesConfig.init();
+
+        Mockito.when(ioMessagesDao.get(expectedPk)).thenReturn(Mono.empty());
+
+        Mono<PreconditionContentDto> actualMonoResponse = service.notificationDisclaimer(recipientInternalId, iun);
+
+        StepVerifier.create(actualMonoResponse)
+                .expectError(PnNotFoundException.class)
+                .verify();
+
+
+    }
 }

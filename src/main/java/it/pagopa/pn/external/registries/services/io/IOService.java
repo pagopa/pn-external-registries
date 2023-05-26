@@ -4,6 +4,7 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes;
+import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto.ProbableSchedulingAnalogDateResponse;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
@@ -32,9 +33,10 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_SCHEDULING_ANALOG_DATE_NOT_FOUND;
 import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
 
 @Service
@@ -275,16 +277,23 @@ public class IOService {
     public Mono<PreconditionContentDto> notificationDisclaimer(String recipientInternalId, String iun) {
         String pk = buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
         return ioMessagesDao.get(pk)
+                .switchIfEmpty(Mono.error(() -> new PnNotFoundException("Not Found", String.format("Record not found in DB for getSchedulingAnalogDate: iun=%s, recipientInternalId=%s", iun, recipientInternalId), ERROR_CODE_EXTERNALREGISTRIES_SCHEDULING_ANALOG_DATE_NOT_FOUND)))
                 .doOnNext(ioMessagesEntity -> log.info("[{}] [{}] Retrieved IOMessagesEntity: {}", iun, recipientInternalId, ioMessagesEntity))
-                .map(ioMessagesEntity -> mapToNotificationDisclaimer(ioMessagesEntity.getSchedulingAnalogDate(), iun, recipientInternalId, ioMessagesEntity.getSenderDenomination(), ioMessagesEntity.getSubject()))
-                .flatMap(preconditionContentDto ->  manageRecordIsNotInDB(recipientInternalId, iun, preconditionContentDto))
+                .map(ioMessagesEntity -> mapToPreconditionContent(ioMessagesEntity.getSchedulingAnalogDate(), iun, recipientInternalId, ioMessagesEntity.getSenderDenomination(), ioMessagesEntity.getSubject()))
+                .flatMap(preconditionContentDto ->  checkAndManageIfSchedulingAnalogDateIsNull(recipientInternalId, iun, preconditionContentDto))
                 .doOnNext(preconditionContentDto -> log.info("[{}] [{}] PreconditionContentDto response: {}", iun, recipientInternalId, preconditionContentDto));
     }
 
-    private Mono<PreconditionContentDto> manageRecordIsNotInDB(String recipientInternalId, String iun, PreconditionContentDto preconditionContentDto) {
+    private Mono<PreconditionContentDto> checkAndManageIfSchedulingAnalogDateIsNull(String recipientInternalId, String iun, PreconditionContentDto preconditionContentDto) {
+        if(preconditionContentDto.getMarkdown() != null) {
+            //significa che ho già gestito il flusso di enrichWithSchedulingAnalogDate
+            return Mono.just(preconditionContentDto);
+        }
+
+        log.debug("[{}] [{}] SchedulingAnalogDate is not present in Record, call, DeliveryPush", iun, recipientInternalId);
         return deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)
                 .doOnNext(response -> log.info("[{}] [{}] Delivery Push getSchedulingAnalogDate response: {}", iun, recipientInternalId, response))
-                .map(response -> enrichWithSchedulingAnalogDate(preconditionContentDto, response.getBody(), iun, recipientInternalId))
+                .map(response -> enrichWithSchedulingAnalogDate(preconditionContentDto, response, iun, recipientInternalId))
                 .doOnError(throwable -> {
                     if(throwable instanceof WebClientResponseException.NotFound)
                         log.debug("[{}] [{}] Delivery Push getSchedulingAnalogDate not found, get default AFTER template : ", iun, recipientInternalId);
@@ -294,12 +303,13 @@ public class IOService {
                     }
                 })
                 .onErrorResume(WebClientResponseException.NotFound.class, notFound -> {
+                    // se lo schedulingAnalogDate non è ancora presente in delivery push, restituisco il templated di "after"
                     enrichPreConditionForAfterSchedulingDate(preconditionContentDto);
                     return Mono.just(preconditionContentDto);
                 });
     }
 
-    private PreconditionContentDto mapToNotificationDisclaimer(Instant schedulingAnalogDate, String iun, String recipientInternalId, String senderDenomination, String subject) {
+    private PreconditionContentDto mapToPreconditionContent(Instant schedulingAnalogDate, String iun, String recipientInternalId, String senderDenomination, String subject) {
         var preconditionContentDto = createPreconditionContentDto(iun, senderDenomination, subject);
         if(schedulingAnalogDate != null) {
             enrichWithSchedulingAnalogDate(preconditionContentDto, schedulingAnalogDate, iun, recipientInternalId);
@@ -309,12 +319,7 @@ public class IOService {
     }
 
     private PreconditionContentDto enrichWithSchedulingAnalogDate(PreconditionContentDto preconditionContentDto, ProbableSchedulingAnalogDateResponse responseDeliveryPush, String iun, String recipientInternalId) {
-        if(responseDeliveryPush == null || responseDeliveryPush.getSchedulingAnalogDate() == null) {
-            enrichPreConditionForAfterSchedulingDate(preconditionContentDto);
-        }
-        else {
-            enrichWithSchedulingAnalogDate(preconditionContentDto, responseDeliveryPush.getSchedulingAnalogDate(), iun, recipientInternalId);
-        }
+        enrichWithSchedulingAnalogDate(preconditionContentDto, responseDeliveryPush.getSchedulingAnalogDate(), iun, recipientInternalId);
         return preconditionContentDto;
     }
 
@@ -330,10 +335,12 @@ public class IOService {
     }
 
     private PreconditionContentDto createPreconditionContentDto(String iun, String senderDenomination, String subject) {
-        return new PreconditionContentDto()
-                .messageParams(Map.of(
-                        IUN_PLACEHOLDER, iun
-                ));
+        var messageParams = new HashMap<String, String>();
+        messageParams.put(IUN_PARAM, iun);
+        messageParams.put(SENDER_DENOMINATION_PARAM, senderDenomination);
+        messageParams.put(SUBJECT_PARAM, subject);
+
+        return new PreconditionContentDto().messageParams(messageParams);
     }
 
     private void enrichPreConditionForBeforeSchedulingDate(Instant schedulingAnalogDate, PreconditionContentDto responseDto) {
@@ -347,7 +354,9 @@ public class IOService {
         responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
                 .replace(DATE_PLACEHOLDER, schedulingDateWithHourItaly[0])
                 .replace(TIME_PLACEHOLDER, schedulingDateWithHourItaly[1])
-                .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM)));
+                .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM))
+                .replace(SENDER_DENOMINATION_PLACEHOLDER, responseDto.getMessageParams().get(SENDER_DENOMINATION_PARAM))
+                .replace(SUBJECT_PLACEHOLDER, responseDto.getMessageParams().get(SUBJECT_PARAM)));
 
         responseDto.getMessageParams().put(DATE_MESSAGE_PARAM, schedulingDateWithHourUTC[0]);
         responseDto.getMessageParams().put(TIME_MESSAGE_PARAM, schedulingDateWithHourUTC[1]);
@@ -358,7 +367,9 @@ public class IOService {
         responseDto.setTitle(POST_ANALOG_TITLE);
 
         responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
-                .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM)));
+                .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM))
+                .replace(SENDER_DENOMINATION_PLACEHOLDER, responseDto.getMessageParams().get(SENDER_DENOMINATION_PARAM))
+                .replace(SUBJECT_PLACEHOLDER, responseDto.getMessageParams().get(SUBJECT_PARAM)));
     }
 
     private String composeFinalMarkdown(String markdown)
@@ -379,11 +390,11 @@ public class IOService {
         String iun = sendMessageRequestDto.getIun();
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity();
         ioMessagesEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
-        ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate().toInstant());
         ioMessagesEntity.setSenderDenomination(sendMessageRequestDto.getSenderDenomination());
         ioMessagesEntity.setIun(sendMessageRequestDto.getIun());
         ioMessagesEntity.setSubject(sendMessageRequestDto.getSubject());
         if(sendMessageRequestDto.getSchedulingAnalogDate() != null) {
+            ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate().toInstant());
             ioMessagesEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getSchedulingAnalogDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
         }
         return ioMessagesDao.save(ioMessagesEntity);
