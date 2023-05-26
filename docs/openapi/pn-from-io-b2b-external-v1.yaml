@@ -74,8 +74,7 @@ components:
             Coppie chiave valore degli elementi da sostituire nei template del messaggio. Per PN
             sarà presente al più cinque campi: data, con formattazione DD-MM-YYYY (in UTC), ora con formattazione hh:mm,
             iun, senderDenomination e subject (oggetto della notifica)
-          example: |
-            { "data": "28-04-2023", "ora": "08:41", "iun": "aIun", "senderDenomination": "Comune di Milano", "subject": "Oggetto notifica" }
+          example: { "data": "28-04-2023", "ora": "08:41", "iun": "aIun", "senderDenomination": "Comune di Milano", "subject": "Oggetto notifica" }
           type: object
           additionalProperties:
             type: string

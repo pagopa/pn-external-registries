@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: Gp2T4jqtt85/zH708NQn1mILzqIYXz5KMBtt+y/hueo=
+  version: CAJ+h/xUA6ggJUPNQ1XElfkuonZNqeJsfXIo4ZZ8BKU=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -124,10 +124,12 @@ components:
             DD-MM-YYYY (in UTC), ora con formattazione hh:mm,
 
             iun, senderDenomination e subject (oggetto della notifica)
-          example: >
-            { "data": "28-04-2023", "ora": "08:41", "iun": "aIun",
-            "senderDenomination": "Comune di Milano", "subject": "Oggetto
-            notifica" }
+          example:
+            data: 28-04-2023
+            ora: '08:41'
+            iun: aIun
+            senderDenomination: Comune di Milano
+            subject: Oggetto notifica
           type: object
           additionalProperties:
             type: string
