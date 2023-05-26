@@ -16,8 +16,8 @@ paths:
   /ext-registry-private/io/v1/notification-disclaimer/{iun}:
     get:
       operationId: notificationDisclaimer
-      summary: Returns the AppIo user activation status
-      description: Returns the AppIo user activation status
+      summary: Servizio invocato da IO per valorizzare il bottom sheet di PN
+      description: Servizio invocato da IO per valorizzare il bottom sheet di PN
       tags:
         - FromIOMessage
       parameters:
@@ -72,8 +72,10 @@ components:
         messageParams:
           description: |
             Coppie chiave valore degli elementi da sostituire nei template del messaggio. Per PN
-            sarà presente al più due camp: data, con formattazione DD-MM-YYYY e ora con formattazione hh:mm
-          example: { "data": "28-04-2023", "ora": "08:41" }
+            sarà presente al più cinque campi: data, con formattazione DD-MM-YYYY (in UTC), ora con formattazione hh:mm,
+            iun, senderDenomination e subject (oggetto della notifica)
+          example: |
+            { "data": "28-04-2023", "ora": "08:41", "iun": "aIun", "senderDenomination": "Comune di Milano", "subject": "Oggetto notifica" }
           type: object
           additionalProperties:
             type: string
