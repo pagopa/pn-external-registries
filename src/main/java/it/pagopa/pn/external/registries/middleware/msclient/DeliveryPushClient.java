@@ -1,32 +1,25 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.api.TimelineAndStatusApi;
-import it.pagopa.pn.external.registries.generated.openapi.deliverypush.client.v1.dto.ProbableSchedulingAnalogDateResponse;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
+import lombok.CustomLog;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.PN_DELIVERY_PUSH;
 
 @Component
+@CustomLog
+@RequiredArgsConstructor
 public class DeliveryPushClient extends CommonBaseClient {
 
-    private TimelineAndStatusApi pnDeliveryPushApi;
-
-    private final PnExternalRegistriesConfig config;
-
-    public DeliveryPushClient(PnExternalRegistriesConfig config) { this.config = config; }
-
-    @PostConstruct
-    public void init() {
-        ApiClient apiClient = new ApiClient( initWebClient( ApiClient.buildWebClientBuilder() ) );
-        apiClient.setBasePath( config.getDeliveryPushBaseUrl() );
-        this.pnDeliveryPushApi = new TimelineAndStatusApi( apiClient );
-    }
+    private final TimelineAndStatusApi pnDeliveryPushApi;
 
     public Mono<ProbableSchedulingAnalogDateResponse> getSchedulingAnalogDateWithHttpInfo(String iun, String recipientId) {
+        log.logInvokingExternalService(PN_DELIVERY_PUSH, "getSchedulingAnalogDate");
         return pnDeliveryPushApi.getSchedulingAnalogDate(iun, recipientId);
     }
 }

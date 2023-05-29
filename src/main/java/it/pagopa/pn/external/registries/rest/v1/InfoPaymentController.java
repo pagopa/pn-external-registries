@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,7 +29,7 @@ public class InfoPaymentController implements PaymentInfoApi {
                     log.debug("[exit]");
                     return ResponseEntity.ok(body);
                 })
-                .switchIfEmpty(Mono.just(ResponseEntity.<Flux<PaymentInfoDto>>notFound().build()));
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @Override

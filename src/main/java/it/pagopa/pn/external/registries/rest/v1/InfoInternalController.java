@@ -36,7 +36,9 @@ public class InfoInternalController implements InternalOnlyApi {
         log.debug("getAllGroups institutionId={}", institutionId);
         // first argument is the id of the current user logged in -> because we need the all groups independently from the user, it is passed as null
         // second argument is the id of the current PA
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getPaGroups(null, institutionId, null, statusFilter)));
+        return infoSelfcareService.getPaGroups(null, institutionId, null, statusFilter)
+                .collectList()
+                .map(paGroupDtos ->  ResponseEntity.ok(Flux.fromIterable(paGroupDtos)));
     }
 
     /**
@@ -52,6 +54,8 @@ public class InfoInternalController implements InternalOnlyApi {
     @Override
     public Mono<ResponseEntity<Flux<PgGroupDto>>> getAllPgGroupsPrivate(String xPagopaPnCxId, PgGroupStatusDto statusFilter, ServerWebExchange exchange) {
         log.debug("getAllPgGroups institutionId={}", xPagopaPnCxId);
-        return Mono.fromSupplier(() -> ResponseEntity.ok(infoSelfcareService.getPgGroups(null, xPagopaPnCxId, null, statusFilter)));
+        return infoSelfcareService.getPgGroups(null, xPagopaPnCxId, null, statusFilter)
+                .collectList()
+                .map(pgGroupDtos -> ResponseEntity.ok(Flux.fromIterable(pgGroupDtos)));
     }
 }
