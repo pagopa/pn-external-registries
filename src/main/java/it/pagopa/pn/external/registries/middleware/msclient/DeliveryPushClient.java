@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.
 import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
