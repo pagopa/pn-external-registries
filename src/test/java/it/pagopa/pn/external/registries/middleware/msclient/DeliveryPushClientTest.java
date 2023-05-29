@@ -12,8 +12,6 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -69,11 +67,9 @@ class DeliveryPushClientTest extends MockAWSObjectsTestConfig {
                         .withBody(objectMapper.writeValueAsString(expectedBodyResponse), MediaType.APPLICATION_JSON)
                 );
 
-        ResponseEntity<ProbableSchedulingAnalogDateResponse> response = client.getSchedulingAnalogDateWithHttpInfo(iun, recipientId).block();
+        ProbableSchedulingAnalogDateResponse response = client.getSchedulingAnalogDateWithHttpInfo(iun, recipientId).block();
         System.out.println(response);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(expectedBodyResponse);
+        assertThat(response).isEqualTo(expectedBodyResponse);
 
     }
 }
