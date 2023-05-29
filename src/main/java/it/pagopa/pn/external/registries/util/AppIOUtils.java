@@ -12,9 +12,15 @@ public class AppIOUtils {
 
     public static final String DATE_MESSAGE_PARAM = "data";
     public static final String TIME_MESSAGE_PARAM = "ora";
+    public static final String SENDER_DENOMINATION_PARAM = "senderDenomination";
+    public static final String IUN_PARAM = "iun";
+    public static final String SUBJECT_PARAM = "subject";
 
     public static final String DATE_PLACEHOLDER = "{{data}}";
     public static final String TIME_PLACEHOLDER = "{{ora}}";
+    public static final String SENDER_DENOMINATION_PLACEHOLDER = "{{senderDenomination}}";
+    public static final String IUN_PLACEHOLDER = "{{iun}}";
+    public static final String SUBJECT_PLACEHOLDER = "{{subject}}";
 
     public static final String PROBABLE_SCHEDULING_ANALOG_DATE_PK_PREFIX = "SENT";
     public static final String PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK = "##";

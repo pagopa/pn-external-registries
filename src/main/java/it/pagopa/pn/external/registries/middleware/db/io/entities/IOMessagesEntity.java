@@ -24,6 +24,9 @@ public class IOMessagesEntity {
     private static final String COL_CREATED = "created";
     private static final String COL_LAST_MODIFIED = "lastModified";
     private static final String COL_SCHEDULING_ANALOG_DATE = "schedulingAnalogDate";
+    private static final String COL_SENDER_DENOMINATION = "senderDenomination";
+    private static final String COL_IUN = "iun";
+    private static final String COL_SUBJECT = "subject";
     public static final String COL_I_TTL = "i_ttl";
 
     public IOMessagesEntity(String hashedTaxId){
@@ -44,5 +47,8 @@ public class IOMessagesEntity {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_CREATED), @DynamoDbUpdateBehavior(UpdateBehavior.WRITE_IF_NOT_EXISTS)}))  private Instant created;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_LAST_MODIFIED)}))  private Instant lastModified;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SCHEDULING_ANALOG_DATE)}))  private Instant schedulingAnalogDate;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SENDER_DENOMINATION)}))  private String senderDenomination;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_IUN)}))  private String iun;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SUBJECT)}))  private String subject;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_I_TTL)}))  private Long ttl;
 }

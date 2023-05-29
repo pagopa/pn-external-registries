@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.
 import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -18,8 +17,8 @@ public class DeliveryPushClient extends CommonBaseClient {
 
     private final TimelineAndStatusApi pnDeliveryPushApi;
 
-    public Mono<ResponseEntity<ProbableSchedulingAnalogDateResponse>> getSchedulingAnalogDateWithHttpInfo(String iun, String recipientId) {
+    public Mono<ProbableSchedulingAnalogDateResponse> getSchedulingAnalogDateWithHttpInfo(String iun, String recipientId) {
         log.logInvokingExternalService(PN_DELIVERY_PUSH, "getSchedulingAnalogDate");
-        return pnDeliveryPushApi.getSchedulingAnalogDateWithHttpInfo(iun, recipientId);
+        return pnDeliveryPushApi.getSchedulingAnalogDate(iun, recipientId);
     }
 }
