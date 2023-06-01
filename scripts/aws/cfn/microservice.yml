@@ -255,6 +255,10 @@ Parameters:
     Type: String
     Description: 'The DNS name used for IO rest API.'
     
+  LogAlarmStrategy:
+    Type: String
+    Default: 'FATAL'
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -317,6 +321,8 @@ Resources:
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsLogGroup
+        LogAlarmStrategyV1: !Ref LogAlarmStrategy
+
 
 
   ExternalRegistryMicroserviceTaskManagedPolicy:
