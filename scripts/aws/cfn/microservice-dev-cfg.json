@@ -9,6 +9,11 @@
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
     "OneTrustURL": "http://pn-ex-Appli-1TF83JFIR9AF3-439926467.eu-south-1.elb.amazonaws.com:8080/onetrust",
     "IoOptInMinDays": "0",
-    "MaxTasksNumber": "1"
+    "MaxTasksNumber": "1",
+    "IsLollipopActive": "false",
+    "LollipopExpectedLcOriginalUrl": "https://localhost:8087/ext-registry-private/io/v1/notification-disclaimer/*",
+    "LollipopEnableConsumerLogging": "true",
+    "LollipopAssertionRestUri": "http://localhost:3000",
+    "LollipopIdpClientBaseUri": "http://localhost:3001"
   }
 }
