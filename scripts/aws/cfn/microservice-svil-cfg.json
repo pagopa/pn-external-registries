@@ -11,8 +11,6 @@
     "IoOptInMinDays": "0",
     "IsLollipopActive": "false",
     "LollipopExpectedLcOriginalUrl": "https://localhost:8087/ext-registry-private/io/v1/notification-disclaimer/*",
-    "LollipopEnableConsumerLogging": "true",
-    "LollipopAssertionRestUri": "http://localhost:3000",
-    "LollipopIdpClientBaseUri": "http://localhost:3001"
+    "LollipopEnableConsumerLogging": "true"
   }
 }

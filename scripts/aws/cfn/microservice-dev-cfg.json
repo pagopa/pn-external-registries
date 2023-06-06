@@ -11,9 +11,7 @@
     "IoOptInMinDays": "0",
     "MaxTasksNumber": "1",
     "IsLollipopActive": "false",
-    "LollipopExpectedLcOriginalUrl": "https://localhost:8087/ext-registry-private/io/v1/notification-disclaimer/*",
-    "LollipopEnableConsumerLogging": "true",
-    "LollipopAssertionRestUri": "http://localhost:3000",
-    "LollipopIdpClientBaseUri": "http://localhost:3001"
+    "LollipopExpectedLcOriginalUrl": "^https://api-app.io.pagopa.it/api/v1/third-party-messages/[a-zA-Z0-9]{26}/precondition$",
+    "LollipopEnableConsumerLogging": "true"
   }
 }

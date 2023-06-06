@@ -56,14 +56,6 @@ Parameters:
     Type: String
     Description: 'enable lollipop consumer logging'
 
-  LollipopAssertionRestUri:
-    Type: String
-    Description: 'assertion rest uri'
-
-  LollipopIdpClientBaseUri:
-    Type: String
-    Description: 'idp client base uri'
-
   SelfcareUsergroupBaseUrl:
     Type: String
     Description: 'Selfcare endpoint base url'
@@ -328,8 +320,6 @@ Resources:
         ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
         ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
         ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
-        ContainerEnvEntry21: !Sub 'LOLLIPOP_ASSERTION_REST_URI=${LollipopAssertionRestUri}'
-        ContainerEnvEntry22: !Sub 'LOLLIPOP_IDP_CLIENT_BASE_URI=${LollipopIdpClientBaseUri}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
