@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: rG/XAzXEhWRq3wdsLB3UhN4J5pCeJpk0bo1qwlwmed0=
+  version: 32i10Oqf9CA+c0eeTaGNOtijReKW3mf/60+LEmGvDpQ=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -193,6 +193,7 @@ components:
       enum:
         - ACTIVE
         - SUSPENDED
+        - DELETED
     PgGroupList:
       title: Groups defined in Self Care PG (Notifiche digitali)
       description: Contains the list of groups defined in SelfCare PG (Notifiche digitali)
@@ -223,6 +224,7 @@ components:
       enum:
         - ACTIVE
         - SUSPENDED
+        - DELETED
     SelfCarePaId:
       title: The PA id used by self care
       description: An unique ID that identify a Public Administration

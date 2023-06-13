@@ -51,6 +51,7 @@ paths:
             enum:
               - ACTIVE
               - SUSPENDED
+              - DELETED
             type: string
         - name: x-selfcare-uid
           in: header
@@ -243,6 +244,7 @@ components:
           enum:
             - ACTIVE
             - SUSPENDED
+            - DELETED
           type: string
           description: Users group's status
   securitySchemes:
