@@ -1,5 +1,5 @@
-Premendo “Continua”, la notifica risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata 
-cartacea da più di 10 giorni.
+Se premi “Continua” la notifica risulterà legalmente recapitata, a meno che ciò non sia già avvenuto su IO, 
+tramite altri canali digitali o tramite raccomandata.
 
 <br />
 <br />
