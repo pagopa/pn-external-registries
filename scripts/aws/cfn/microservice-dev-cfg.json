@@ -9,7 +9,9 @@
     "PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize": "10",
     "OneTrustURL": "http://pn-ex-Appli-1TF83JFIR9AF3-439926467.eu-south-1.elb.amazonaws.com:8080/onetrust",
     "IoOptInMinDays": "0",
-    "MaxTasksNumber": "1",
+    "MinTasksNumber": "2",
+    "MaxTasksNumber": "7",
+    "AutoscalingThreshold": "2207",
     "IsLollipopActive": "false",
     "LollipopExpectedLcOriginalUrl": "^https://api-app.io.pagopa.it/api/v1/third-party-messages/[a-zA-Z0-9]{26}/precondition$",
     "LollipopEnableConsumerLogging": "true"
