@@ -11,7 +11,7 @@
     "IoOptInMinDays": "0",
     "MinTasksNumber": "2",
     "MaxTasksNumber": "7",
-    "AutoscalingThreshold": "2160",
+    "AutoscalingThreshold": "2207",
     "IsLollipopActive": "false",
     "LollipopExpectedLcOriginalUrl": "^https://api-app.io.pagopa.it/api/v1/third-party-messages/[a-zA-Z0-9]{26}/precondition$",
     "LollipopEnableConsumerLogging": "true"
