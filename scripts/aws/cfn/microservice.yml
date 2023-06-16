@@ -468,6 +468,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-web'
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
+        Limit: 600000
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -495,6 +496,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-b2b'
         IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+        Limit: 600000
 
   # Expose PN-Delivery microservice public API with API-GW for IO Backend usage
   ExternalRegistryMicroservicePublicIoAPI:
