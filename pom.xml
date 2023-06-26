@@ -381,6 +381,41 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>pn-external-registries-private</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/api-private-v1.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
+                            <configOptions>
+                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1
+                                </basePackage>
+                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto
+                                </modelPackage>
+                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api
+                                </apiPackage>
+                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.config
+                                </configPackage>
+                                <dateLibrary>java11</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <reactive>true</reactive>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>pn-external-registries-pdnd-client</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -581,41 +616,6 @@
                                 <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.api</apiPackage>
                                 <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto</modelPackage>
                                 <dateLibrary>java8</dateLibrary>
-                                <delegatePattern>true</delegatePattern>
-                                <interfaceOnly>true</interfaceOnly>
-                                <annotationLibrary>none</annotationLibrary>
-                                <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <reactive>true</reactive>
-                                <skipDefaultInterface>false</skipDefaultInterface>
-                                <useTags>true</useTags>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>pn-external-registries-private</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/docs/openapi/api-private-v1.yaml</inputSpec>
-                            <generatorName>spring</generatorName>
-                            <library>spring-boot</library>
-                            <modelNameSuffix>Dto</modelNameSuffix>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
-                            <configOptions>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1
-                                </basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.config
-                                </configPackage>
-                                <dateLibrary>java11</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
                                 <annotationLibrary>none</annotationLibrary>
