@@ -38,7 +38,7 @@ class IOClient extends OcpBaseClient {
 
         if (!checkWhitelist(message.getFiscalCode()))
         {
-            log.warn("submitMessageforUserWithFiscalCodeInBody taxId is not in whitelist, mocking IO response");
+            log.warn("submitMessageforUserWithFiscalCodeInBody taxId {} is not in whitelist, mocking IO response", LogUtils.maskTaxId(message.getFiscalCode()));
             CreatedMessage res = new CreatedMessage();
             res.setId(UUID.randomUUID().toString());
             return Mono.just(res);
@@ -57,7 +57,7 @@ class IOClient extends OcpBaseClient {
 
         if (!checkWhitelist(payload.getFiscalCode()))
         {
-            log.warn("getProfileByPOST taxId is not in whitelist, mocking IO response");
+            log.warn("getProfileByPOST taxId {} is not in whitelist, mocking IO response", LogUtils.maskTaxId(payload.getFiscalCode()));
             WebClientResponseException res = WebClientResponseException.create(404, "not found (mocked)", HttpHeaders.EMPTY, new byte[0], null);
             return Mono.error(res);
         }
