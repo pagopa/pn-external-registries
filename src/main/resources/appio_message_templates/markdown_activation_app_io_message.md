@@ -37,6 +37,3 @@ inviato da questo servizio entro 5 giorni (120 ore) dal suo invio, non riceverai
 
 Premendo "Attiva il servizio" dichiari di avere letto e compreso i
 [Termini e condizioni d'uso](${piattaformaNotificheURLTOS} ) e [l'Informativa privacy](${piattaformaNotificheURLPrivacy}).
-
-Se non vedi il pulsante "Attiva il servizio", vai allo store del tuo dispositivo e verifica di aver scaricato l'ultima
-versione dell'app IO.
