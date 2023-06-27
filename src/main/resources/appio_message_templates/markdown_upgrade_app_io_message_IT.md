@@ -1,1 +1,1 @@
-Questo messaggio contiene una notifica, ovvero una **comunicazione a valore legale**, indirizzata a te.
+Questo messaggio contiene una notifica, ovvero una **comunicazione a valore legale**.
