@@ -22,7 +22,7 @@ public class IOActivationController implements IoActivationApi {
 
     @Override
     public Mono<ResponseEntity<ActivationDto>> getServiceActivationByPOST(Mono<FiscalCodePayloadDto> fiscalCodePayloadDto, final ServerWebExchange exchange) {
-        log.info( "[enter] getServiceActivationByPOST");
+        log.debug( "[enter] getServiceActivationByPOST");
         return service.getServiceActivation( fiscalCodePayloadDto )
                 .map( body -> {
                     log.debug( "[exit] getServiceActivationByPOST");
@@ -34,7 +34,7 @@ public class IOActivationController implements IoActivationApi {
 
     @Override
     public Mono<ResponseEntity<ActivationDto>> upsertServiceActivation(Mono<ActivationPayloadDto> activationPayloadDto, final ServerWebExchange exchange) {
-        log.info( "[enter] upsertServiceActivation");
+        log.debug( "[enter] upsertServiceActivation");
         return service.upsertServiceActivation( activationPayloadDto )
                 .map( body -> {
                     log.debug( "[exit] upsertServiceActivation");

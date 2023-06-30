@@ -4,16 +4,25 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.*;
-import it.pagopa.pn.external.registries.generated.openapi.checkout.client.v1.dto.*;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.DetailDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentStatusDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentNoticeDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.PaymentEventPagoPaPrivate;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
+import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
 
@@ -22,14 +31,13 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 public class InfoPaymentService {
     public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId={} noticeCode={}";
     private final CheckoutClient checkoutClient;
+    private final DeliveryClient deliveryClient;
     private final PnExternalRegistriesConfig config;
-    private final SendPaymentNotificationService sendPaymentNotificationService;
 
-    public InfoPaymentService(CheckoutClient checkoutClient, PnExternalRegistriesConfig config,
-                              SendPaymentNotificationService sendPaymentNotificationService) {
+    public InfoPaymentService(CheckoutClient checkoutClient, DeliveryClient deliveryClient, PnExternalRegistriesConfig config) {
         this.checkoutClient = checkoutClient;
+        this.deliveryClient = deliveryClient;
         this.config = config;
-        this.sendPaymentNotificationService = sendPaymentNotificationService;
     }
 
     public Mono<PaymentInfoDto> getPaymentInfo(String paTaxId, String noticeNumber) {
@@ -51,7 +59,13 @@ public class InfoPaymentService {
 
     private Mono<PaymentInfoDto> checkoutStatusManagement(String paTaxId, String noticeNumber, HttpStatus status, PaymentInfoDto paymentInfoDto) {
         if (HttpStatus.CONFLICT.equals(status) && DetailDto.PAYMENT_DUPLICATED.equals(paymentInfoDto.getDetail()) ) {
-            return sendPaymentNotificationService.sendPaymentNotification(paTaxId, noticeNumber).thenReturn(paymentInfoDto);
+            PaymentEventPagoPaPrivate paymentEventPagoPa = new PaymentEventPagoPaPrivate()
+                    .creditorTaxId( paTaxId )
+                    .noticeCode( noticeNumber )
+                    .paymentDate( formatInstantToString( Instant.now() ) )
+                    .uncertainPaymentDate( true )
+                    .amount( paymentInfoDto.getAmount() );
+            return deliveryClient.paymentEventPagoPaPrivate( paymentEventPagoPa ).thenReturn( paymentInfoDto );
         }
         if (HttpStatus.BAD_REQUEST.equals(status)) {
             throw new PnCheckoutBadRequestException(
@@ -110,10 +124,63 @@ public class InfoPaymentService {
     }
 
     private PaymentStatusDto getPaymentStatus(DetailDto detail) {
-        switch (detail) {
-            case PAYMENT_ONGOING: return PaymentStatusDto.IN_PROGRESS;
-            case PAYMENT_DUPLICATED: return PaymentStatusDto.SUCCEEDED;
-            default: return PaymentStatusDto.FAILURE;
-        }
+        return switch (detail) {
+            case PAYMENT_ONGOING -> PaymentStatusDto.IN_PROGRESS;
+            case PAYMENT_DUPLICATED -> PaymentStatusDto.SUCCEEDED;
+            default -> PaymentStatusDto.FAILURE;
+        };
     }
+
+    public Mono<PaymentResponseDto> checkoutCart(PaymentRequestDto paymentRequestDto) {
+
+        log.info( "checkoutCart info paymentId={}", paymentRequestDto );
+        CartRequestDto cartRequestDto = toCartRequestDto(paymentRequestDto);
+
+        return checkoutClient.checkoutCart(cartRequestDto)
+                .doOnNext(voidResponseEntity -> log.info("Response Status from checkout for noticeNumber {}: {}",
+                        paymentRequestDto.getPaymentNotice().getNoticeNumber(), voidResponseEntity.getStatusCode()))
+                .map( this::manageCheckoutResponse)
+                .doOnError(throwable -> log.error(String.format("Error in checkoutCart with noticeNumber %s",
+                        paymentRequestDto.getPaymentNotice().getNoticeNumber()), throwable));
+    }
+
+    private PaymentResponseDto manageCheckoutResponse(ResponseEntity<Void> httpResponse) {
+        if(httpResponse.getStatusCode().value() == 302) {
+            return buildPaymentResponseDto(httpResponse.getHeaders().getLocation());
+        }
+
+        if(httpResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
+        }
+        throw new PnNotFoundException("Checkout postPayment status response " + httpResponse.getStatusCode(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
+    }
+
+    protected CartRequestDto toCartRequestDto(PaymentRequestDto paymentRequestDto) {
+        PaymentNoticeDto paymentNoticeDto = new PaymentNoticeDto()
+                .noticeNumber(paymentRequestDto.getPaymentNotice().getNoticeNumber())
+                .companyName(paymentRequestDto.getPaymentNotice().getCompanyName())
+                .fiscalCode(paymentRequestDto.getPaymentNotice().getFiscalCode())
+                .amount(paymentRequestDto.getPaymentNotice().getAmount())
+                .description(paymentRequestDto.getPaymentNotice().getDescription());
+
+        return new CartRequestDto()
+                .paymentNotices(List.of(paymentNoticeDto))
+                .returnUrls(new CartRequestReturnUrlsDto()
+                        .returnOkUrl(URI.create(paymentRequestDto.getReturnUrl()))
+                        .returnCancelUrl(URI.create(paymentRequestDto.getReturnUrl()))
+                        .returnErrorUrl(URI.create(paymentRequestDto.getReturnUrl()))
+                );
+    }
+
+    private PaymentResponseDto buildPaymentResponseDto(URI uri) {
+        assert (uri != null );
+        return new PaymentResponseDto().checkoutUrl(uri.toString());
+    }
+
+    @NotNull
+    private String formatInstantToString(Instant instantToFormat) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+        return formatter.format(instantToFormat);
+    }
+
 }

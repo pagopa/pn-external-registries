@@ -1,0 +1,214 @@
+{
+  "pn-OnboardInstitutions": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "918692a6-dc2e-4f61-a36b-a8f003202f86"
+          },
+          "description": {
+            "S": "Ag.Naz.Attrazione Investimenti Sviluppo Impresa Spa"
+          },
+          "taxCode": {
+            "S": "05678721001"
+          },
+          "digitalAddress": {
+            "S": "invitalia@pec.invitalia.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Calabria, 46"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "17266053-8238-4330-b597-c838871ba272"
+          },
+          "description": {
+            "S": "Comune di Gattinara"
+          },
+          "taxCode": {
+            "S": "00270230022"
+          },
+          "digitalAddress": {
+            "S": "protocollo.gattinara@pec.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Corso Valsesia N. 119"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "7ac8d531-9c46-48eb-965a-25c12fa1fd81"
+          },
+          "description": {
+            "S": "Istituto Nazionale Previdenza Sociale - INPS"
+          },
+          "taxCode": {
+            "S": "80078750587"
+          },
+          "digitalAddress": {
+            "S": "ufficiosegreteria.direttoregenerale@postacert.inps.gov.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Ciro Il Grande, 21"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "5b994d4a-0fa8-47ac-9c7b-354f1d44a1ce"
+          },
+          "description": {
+            "S": "Comune di Palermo"
+          },
+          "taxCode": {
+            "S": "80016350821"
+          },
+          "digitalAddress": {
+            "S": "protocollo@cert.comune.palermo.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Pretoria, 1 - Palazzo Delle Aquile"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "530f588c-af6d-40ae-9948-5837a080499c"
+          },
+          "description": {
+            "S": "Comune di Sperlonga"
+          },
+          "taxCode": {
+            "S": "81003790599"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comune.sperlonga.lt.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Europa"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "8a0469f3-02f1-40b0-89e8-78518d67d1b0"
+          },
+          "description": {
+            "S": "Comune di Lecce"
+          },
+          "taxCode": {
+            "S": "80008510754"
+          },
+          "digitalAddress": {
+            "S": "protocollo@pec.comune.lecce.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Via Rubichi, 16"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "026e8c72-7944-4dcd-8668-f596447fec6d"
+          },
+          "description": {
+            "S": "Comune di Milano"
+          },
+          "taxCode": {
+            "S": "01199250158"
+          },
+          "digitalAddress": {
+            "S": "protocollo@postacert.comune.milano.it"
+          },
+          "status": {
+            "S": "ACTIVE"
+          },
+          "created": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "lastUpdate": {
+            "S": "2022-12-12T11:51:43.777996900Z"
+          },
+          "address": {
+            "S": "Piazza Della Scala, 2"
+          }
+        }
+      }
+    }
+  ]
+}

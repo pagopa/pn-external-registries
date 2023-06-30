@@ -34,13 +34,35 @@ Parameters:
    Type: String
    Description: 'Checkout site url'
 
+  CheckoutCartApiBaseUrl:
+    Type: String
+    Description: 'Checkout cart endpoint base url'
+
+  IoOptInMinDays:
+    Type: String
+    Description: 'Numero di giorni cuscinetto per evitare di inviare troppi optin all utente'
+
+  IsLollipopActive:
+    Type: String
+    Description: 'lollipop authorization activation flag'
+    AllowedValues: [ true, false ]
+    Default: "false"
+
+  LollipopExpectedLcOriginalUrl:
+    Type: String
+    Description: 'expected lollipop consumer original url'
+
+  LollipopEnableConsumerLogging:
+    Type: String
+    Description: 'enable lollipop consumer logging'
+
   SelfcareUsergroupBaseUrl:
     Type: String
     Description: 'Selfcare endpoint base url'
 
-  SelfcareUsergroupPnProductId:
+  SelfcarePgUsergroupBaseUrl:
     Type: String
-    Description: 'Selfcare product id'
+    Description: 'Selfcare PG endpoint base url'
 
   ContainerImageUri:
     Type: String
@@ -86,13 +108,21 @@ Parameters:
     Type: String
     Description: 'keep track of used projects commitIds'
 
-  OptInSentTableName:
+  IOMessagesTableName:
     Type: String
-    Description: 'Name of dynamodb table containing OptInSent information'
+    Description: 'Name of dynamodb table containing OptInSent or Scheduling Analog Date information'
 
-  OptInSentTableArn:
+  IOMessagesTableArn:
     Type: String
-    Description: 'ARN of dynamodb table containing OptInSent information'
+    Description: 'ARN of dynamodb table containing OptInSent or Scheduling Analog Date information'
+
+  OnboardInstitutionsTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing OnboardInstitutionsTable information'
+
+  OnboardInstitutionsTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing OnboardInstitutionsTable information'
 
   PortalUrl:
     Type: String
@@ -110,6 +140,142 @@ Parameters:
     Type: String
     Description: 'Kinesis stream to send logs to'
     
+  AlbSecurityGroup:
+    Type: String
+    Description: 'Application load balancer security group'
+
+  VpcEgressSubnetsIds:
+    Type: String
+    Description: subnets where to install PN-CORE
+
+  # OpenApi Bucket params
+  MicroserviceBucketName:
+    Type: String
+    Default: ''
+    Description: 'Name of the bucket where the microservice files are copied during deploy'
+
+  MicroserviceBucketBaseKey:
+    Type: String
+    Default: ''
+    Description: 'Base key of the microservice in the s3 bucket'
+
+  PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize:
+    Type: String
+    Description: 'BatchSize stream mapping'
+
+  LogsKinesisFilterPattern:
+    Type: String
+    Default: ""
+    Description: 'Log kinesis filter pattern'
+
+  KafkaBridgeOnboardingQueueARN:
+    Type: String
+    Description: 'Target queue ARN for insert trigger'
+
+  KafkaBridgeOnboardingQueueURL:
+    Type: String
+    Description: 'Target queue URL for insert trigger'
+
+  OneTrustURL:
+    Type: String
+    Description: 'One Trust URL'
+
+  # Log group parameters
+  EcsLogGroup:
+    Type: String
+    Description: 'Ecs log group name'
+
+  PnExternalRegistriesTriggerLambdaName:
+    Type: String
+    Description: 'PnExternalRegistriesTriggerLambdaName'
+    
+  # Heath Check parameters
+  HealthCheckInterval:
+    Description: Seconds between two health check
+    Type: Number
+    Default: 60
+
+  HealthCheckTimeout:
+    Description: health check timeout seconds
+    Type: Number
+    Default: 5
+  
+  HealthyThresholdCount:
+    Description: |
+      The number of consecutive health checks successes required before considering 
+      an unhealthy target healthy. 
+    Type: Number
+    Default: 5
+  
+  UnhealthyThresholdCount:
+    Description: |
+      The number of consecutive health check failures required before considering a target unhealthy. 
+    Type: Number
+    Default: 2
+
+  # Instance parameters
+  # 256 (.25 vCPU) - Available memory values: 0.5GB, 1GB, 2GB
+  # 512 (.5 vCPU) - Available memory values: 1GB, 2GB, 3GB, 4GB
+  # 1024 (1 vCPU) - Available memory values: 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB
+  # 2048 (2 vCPU) - Available memory values: Between 4GB and 16GB in 1GB increments
+  # 4096 (4 vCPU) - Available memory values: Between 8GB and 30GB in 1GB increments
+  CpuValue:
+    Type: Number
+    Default: 1024
+    Description: Fargate virtual CPU quantity 1024 equals one vCPU
+
+  # 0.5GB, 1GB, 2GB - Available cpu values: 256 (.25 vCPU)
+  # 1GB, 2GB, 3GB, 4GB - Available cpu values: 512 (.5 vCPU)
+  # 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB - Available cpu values: 1024 (1 vCPU)
+  # Between 4GB and 16GB in 1GB increments - Available cpu values: 2048 (2 vCPU)
+  # Between 8GB and 30GB in 1GB increments - Available cpu values: 4096 (4 vCPU)
+  MemoryAmount:
+    Type: String
+    Default: 2GB
+    Description: memory amount reserved to the task pod.
+    AllowedValues: [ 2GB, 4GB, 6GB, 8GB ]
+
+  # Autoscaling parameters
+  AutoscalingCheckPeriod:
+    Default: 60
+    Type: Number
+    Description: minimum autoscaling number of tasks\
+
+  AutoscalingDataPointN:
+    Default: 1
+    Type: Number
+    Description: activate when N datapoint on M
+
+  AutoscalingDataPointM:
+    Default: 1
+    Type: Number
+    Description: activate when N datapoint on M
+
+  AutoscalingThreshold:
+    Default: 70
+    Type: String
+  
+  MinTasksNumber:
+    Default: 1
+    Type: Number
+    Description: minimum autoscaling number of tasks
+
+  MaxTasksNumber:
+    Default: 6
+    Type: Number
+    Description: maximum autoscaling number of tasks
+
+  IoApiDnsName:
+    Type: String
+    Description: 'The DNS name used for IO rest API.'
+    
+  LogAlarmStrategy:
+    Type: String
+    Default: 'FATAL'
+
+Conditions:
+  SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
+
 Resources:
 
   # PN-External-Registry microservice
@@ -118,43 +284,68 @@ Resources:
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/ecs-service.yaml"
       Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
-        CpuValue: 1024
-        MemoryAmount: 2GB
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
+        CpuValue: !Ref CpuValue
+        MemoryAmount: !Ref MemoryAmount
+        HealthCheckTimeout: !Ref HealthCheckTimeout
+        HealthCheckInterval: !Ref HealthCheckInterval
+        HealthyThresholdCount: !Ref HealthyThresholdCount
+        UnhealthyThresholdCount: !Ref UnhealthyThresholdCount
+        AutoscalingStrategy: REST-API
+        AutoscalingThreshold: !Ref AutoscalingThreshold
+        AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
+        MinTasksNumber: !Ref MinTasksNumber
+        MaxTasksNumber: !Ref MaxTasksNumber
+        AutoscalingDataPointN: !Ref AutoscalingDataPointN
+        AutoscalingDataPointM: !Ref AutoscalingDataPointM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
         ContainerEnvEntry2: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
         ContainerEnvEntry3: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_BASE_URL=${CheckoutApiBaseUrl}'
         ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_SITE_URL=${CheckoutSiteUrl}'
-        ContainerEnvEntry5: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:CheckoutApiKey}}'
-        ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoApiKey}}'
-        ContainerEnvEntry7: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoActApiKey}}'
-        ContainerEnvEntry8: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList}}'
-        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
-        ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:SelfCareApiKey}}'
-        ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_OPT_IN=${OptInSentTableName}'
-        ContainerEnvEntry13: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST={{resolve:secretsmanager:${ProjectName}-ExternalRegistries-Secrets:SecretString:IoWhiteList}}'
-        ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/faq.html'
-        ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/privacy.html'
-        ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_PN_PRODUCT_ID=${SelfcareUsergroupPnProductId}'
-        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
+        ContainerEnvEntry5: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList}}'
+        ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
+        ContainerEnvEntry7: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_I_O_MESSAGES=${IOMessagesTableName}'
+        ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/termini-di-servizio'
+        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/informativa-privacy'
+        ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
+        ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
+        ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
+        ContainerEnvEntry13: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_BASE_URL=${OneTrustURL}'
+        ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
+        ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_BASE_URL=${SelfcarePgUsergroupBaseUrl}'
+        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_PUSH_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
+        ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
+        ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
+        ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
+        ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
+        ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
+        ContainerSecret4: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoWhiteList:AWSCURRENT:'
+        ContainerSecret5: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoActApiKey:AWSCURRENT:'
+        ContainerSecret6: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_TOKEN=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:OneTrustToken:AWSCURRENT:'
+        ContainerSecret7: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCarePgApiKey:AWSCURRENT:'
+        ContainerSecret8: !Sub 'ASSERTION_REST_SUBSCRIPTION_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:AssertionRestSubscriptionKey:AWSCURRENT:'
+        MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
-        Subnets: !Ref SubnetsIds
+        Subnets: !Ref VpcEgressSubnetsIds
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
         LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
+        AlbSecurityGroup: !Ref AlbSecurityGroup
+        EcsLogGroup: !Ref EcsLogGroup
+        LogAlarmStrategyV1: !Ref LogAlarmStrategy
+
 
 
   ExternalRegistryMicroserviceTaskManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      #PolicyName: !Sub '${ProjectName}-ExternalRegistry-CustomTaskPolicy'
-      #Roles:
-      #  - !GetAtt ExternalRegistryMicroservice.Outputs.TaskRoleName
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -171,7 +362,9 @@ Resources:
               - dynamodb:TransactWriteItems
               - dynamodb:UpdateItem
             Resource:
-              - !Ref OptInSentTableArn
+              - !Ref IOMessagesTableArn
+              - !Sub "${OnboardInstitutionsTableArn}"
+              - !Sub "${OnboardInstitutionsTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -185,6 +378,12 @@ Resources:
               - sqs:SendMessageBatch
             Resource:
               - !Ref DeliveryPushInputsQueueARN
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+            Resource:
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPrivacyNotice'
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND    ###
   ###   La chiave viene impiegata per firmare il client assertion che serve          ###
@@ -244,13 +443,13 @@ Resources:
       AliasName: !Sub 'alias/${ProjectName}-PdndAnpr-authentication-token-key'
       TargetKeyId: !Ref PdndAnprSessionTokenSigningKey
 
-  # Expose PN-ExternalRegistry microservice public API with API-GW for WEB usage
+  # Expose PN-external-registries microservice public API with API-GW for WEB usage
   ExternalRegistryMicroservicePublicWebAPI:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service.yaml"
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
       Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
         IntendedUsage: WEB
         DnsName: !Ref WebApiDnsName
         ProjectName: !Ref ProjectName
@@ -258,22 +457,27 @@ Resources:
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
-        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn        
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn
+        OpenApiBucketName: !Ref MicroserviceBucketName
+        OpenApiBucketKey: !Sub ${MicroserviceBucketBaseKey}/docs/openapi/aws/api-ext-registry-WEB-aws.yaml
+
   ExternalRegistryMicroservicePublicWebApiWaf:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
       Parameters:
-        WAFName: !Sub '${ProjectName}-ExternalRegistry-web'
+        WAFName: !Sub '${ProjectName}-external-registries-web'
+        IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
+        Limit: 600000
 
-  # Expose PN-ExternalRegistry microservice public API with API-GW for B2B usage
+  # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service.yaml"
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
       Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-ExternalRegistry'
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
         IntendedUsage: B2B
         DnsName: !Ref ApiDnsName
         ProjectName: !Ref ProjectName
@@ -281,67 +485,37 @@ Resources:
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
         ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
-        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn        
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn
+        OpenApiBucketName: !Ref MicroserviceBucketName
+        OpenApiBucketKey: !Sub ${MicroserviceBucketBaseKey}/docs/openapi/aws/api-ext-registry-b2b-B2B-aws.yaml
+
   ExternalRegistryMicroservicePublicB2BApiWaf:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
       Parameters:
-        WAFName: !Sub '${ProjectName}-ExternalRegistry-b2b'
+        WAFName: !Sub '${ProjectName}-external-registries-b2b'
+        IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
+        Limit: 600000
 
-  # PN-External-Registry public api
-  ExternalRegistryPublicB2BPaResource:
-    Type: AWS::ApiGateway::Resource
+  # Expose PN-Delivery microservice public API with API-GW for IO Backend usage
+  ExternalRegistryMicroservicePublicIoAPI:
+    Type: AWS::CloudFormation::Stack
     Properties:
-      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
-      ParentId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RootResourceId
-      PathPart: pa
-  ExternalRegistryPublicB2BV1Resource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
-      ParentId: !Ref ExternalRegistryPublicB2BPaResource
-      PathPart: v1
-  ExternalRegistryPublicB2BGroupsResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
-      ParentId: !Ref ExternalRegistryPublicB2BV1Resource
-      PathPart: groups
-
-  ExternalRegistryPublicB2BGroupsMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      OperationName: !Sub 'Proxy to ${ProjectName}-ExternalRegistry public groups API'
-      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
-      ResourceId: !Ref ExternalRegistryPublicB2BGroupsResource
-      HttpMethod: GET
-      ApiKeyRequired: true
-      AuthorizationType: CUSTOM
-      AuthorizerId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.AuthorizerARN
-      Integration:
-        ConnectionType: VPC_LINK
-        ConnectionId: !Ref NetworkLoadBalancerLink
-        IntegrationHttpMethod: GET
-        Type: HTTP_PROXY
-        Uri: !Sub 'http://${ApplicationLoadBalancerDomain}:8080/ext-registry/pa/v1/groups'
-        RequestParameters:
-          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
-          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
-          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
-          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
-          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
-        PassthroughBehavior: "WHEN_NO_MATCH"
-        TimeoutInMillis: 29000
-
-  # PN-External-Registry public api deployment
-  ExternalRegistryPublicB2BDeploymentPnPlaceholderEpochSeconds:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-      - ExternalRegistryPublicB2BGroupsMethod
-    Properties:
-      RestApiId: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiId
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
+      Parameters:
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
+        IntendedUsage: IO
+        DnsName: !Ref IoApiDnsName
+        ProjectName: !Ref ProjectName
+        ServiceApiPath: 'ext-registry-private'
+        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
+        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn
+        OpenApiBucketName: !Ref MicroserviceBucketName
+        OpenApiBucketKey: !Sub ${MicroserviceBucketBaseKey}/docs/openapi/aws/api-ext-registry-private-IO-aws.yaml
 
   ## Dashboard
   ExternalRegistriesMicroserviceCloudWatchDashboard:
@@ -352,7 +526,8 @@ Resources:
         DashboardName: !Sub "${ProjectName}-external-registries"
         DynamoDBTableNames: !Join 
           - ',' 
-          - - !Ref OptInSentTableName 
+          - - !Ref IOMessagesTableName
+            - !Ref OnboardInstitutionsTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
@@ -361,13 +536,133 @@ Resources:
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiName
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
+        LambdaArns: !Join
+          - ','
+          - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
         AlarmArns: !Join
           - ','
-          - - !GetAtt ExternalRegistryMicroservice.Outputs.AutoScalingAlarmArn
-            - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
+          - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
+            - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
+            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+        LogGroupsNames: !Join
+          - ','
+          - - !Sub '/aws/ecs/${ProjectName}-external-registries'
 
+  # Lambda function role - this lambda needs to be triggered from a SQS queue and writes to a DynamoDB table
+  PnExternalRegistriesInsertTriggerLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-PnExternalRegistriesInsertTriggerLambdaRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub ${ProjectName}-PnExternalRegistriesInsertTriggerLambdaRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: allowSqs
+                Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ChangeMessageVisibility
+                Resource:
+                  - !Ref KafkaBridgeOnboardingQueueARN
+              - Sid: writeOnDynamoDB
+                Effect: Allow
+                Action:
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !Ref OnboardInstitutionsTableArn
+              - Sid: CanWriteLogs
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+  PnExternalRegistriesInsertTriggerLambdaEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !Ref KafkaBridgeOnboardingQueueARN
+      BatchSize: !Sub ${PnExternalRegistriesInsertTriggerLambdaEventSourceMappingBatchSize}
+      FunctionName: !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+      Enabled: true
+      # Add an OnFailure destination on the event source mapping
+
+  PnExternalRegistriesInsertTriggerLambdaAlarms:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/lambda-alarms.yaml"
+      Parameters:
+        FunctionName: !Ref PnExternalRegistriesInsertTriggerLambda
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+
+  PnExternalRegistriesInsertTriggerLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      FunctionName: !Ref PnExternalRegistriesTriggerLambdaName
+      Description: 'It triggers the onboarding institutes written of sqs'
+      MemorySize: 128
+      Timeout: 10
+      Role: !GetAtt PnExternalRegistriesInsertTriggerLambdaRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:339249233099:layer:LambdaInsightsExtension:13"
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OnboardInstitutionsTableName
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          const dynamoDB = new AWS.DynamoDB.DocumentClient();
+          const TABLE_NAME = process.env.TABLE_NAME;
+          
+          exports.handler = async (event, context) => {
+            //messages coming in from SQS are available on the 'Records' array property of the event object
+            const { Records } = event;
+            for (const record of Records) {
+              try {
+                const body = JSON.parse(record.body, (key, value) => {if(value !== null) return value});
+  
+                //logging the incoming message body (view in cloudwatch):
+                console.log("Incoming message body from SQS :", body);
+  
+                //configure params for writing data to dynamo DB:
+                const params = {
+                  TableName: TABLE_NAME,
+                  Item: body
+                };
+
+                //write data to dynamo DB:
+                await dynamoDB.put(params).promise();
+
+                //success logging to cloudwatch:
+                console.log('Successfully written to DynamoDB with id', body.id);
+              } catch (error) {
+                //error handling
+                console.error('Error in executing lambda handler for SQS', error);
+                throw error;
+              }
+            }
+          }
 
 Outputs:
   Version:

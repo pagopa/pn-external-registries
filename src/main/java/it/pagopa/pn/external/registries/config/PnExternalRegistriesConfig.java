@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +22,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 
 
 @Configuration
+@EnableScheduling
 @ConfigurationProperties(prefix = "pn.external-registry")
 @Slf4j
 @Data
@@ -31,6 +33,10 @@ public class PnExternalRegistriesConfig {
     private String checkoutApiKey;
     private String checkoutApiBaseUrl;
     private String checkoutSiteUrl;
+    private String checkoutCartApiBaseUrl;
+
+    private String deliveryBaseUrl;
+    private String deliveryPushBaseUrl;
 
     private String ioApiKey;
     private String ioactApiKey;
@@ -42,25 +48,30 @@ public class PnExternalRegistriesConfig {
 
     private String selfcareusergroupApiKey;
     private String selfcareusergroupBaseUrl;
-    private String selfcareusergroupPnProductId;
     private String selfcareusergroupUid;
 
-    private String selfcareinstitutionsApiKey;
-    private String selfcareinstitutionsBaseUrl;
-    private String selfcareinstitutionsPnProductId;
-    private String selfcareinstitutionsUid;
+    private String selfcarepgusergroupApiKey;
+    private String selfcarepgusergroupBaseUrl;
+    private String selfcarepgusergroupUid;
 
     private String mockDataResources;
 
-    private String dynamodbTableNameOptIn;
+    private String dynamodbTableNameIOMessages;
+    private String dynamodbTableNameOnboardInstitutions;
 
     private String piattaformanotificheurlTos;
     private String piattaformanotificheurlPrivacy;
+
+    private int fulltextsearchMaxResults;
+    private String fulltextsearchUpdateCronExpression; // usato direttamente come @value
 
     private AppIoTemplate appIoTemplate;
     private Topics topics;
 
     private int ioOptinMinDays;
+
+    private String onetrustToken;
+    private String onetrustBaseUrl;
 
     @Data
     public static class AppIoTemplate{
@@ -68,6 +79,8 @@ public class PnExternalRegistriesConfig {
         private String markdownUpgradeAppIoITMessage;
         private String markdownActivationAppIoMessage;
         private String subjectActivationAppIoMessage;
+        private String markdownDisclaimerAfterDateAppIoMessage;
+        private String markdownDisclaimerBeforeDateAppIoMessage;
 
     }
 
@@ -83,11 +96,13 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate.markdownUpgradeAppIoENMessage = fetchMessage("markdown_upgrade_app_io_message_EN.md");
         this.appIoTemplate.markdownActivationAppIoMessage = fetchMessage("markdown_activation_app_io_message.md");
         this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerAfterDateAppIoMessage = fetchMessage("markdown_disclaimer_after_date_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerBeforeDateAppIoMessage = fetchMessage("markdown_disclaimer_before_date_app_io_message.md");
     }
 
     private String fetchMessage(String filename){
         try( InputStream in = getInputStreamFromResource(filename)) {
-            return IOUtils.toString(in, StandardCharsets.UTF_8.name());
+            return IOUtils.toString(in, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("cannot load message from resources", e);
             throw new PnInternalException("cannot load template ", ERROR_CODE_BADCONFIGURATION_MISSING_TEMPLATE);

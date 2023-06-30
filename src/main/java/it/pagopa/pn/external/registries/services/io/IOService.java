@@ -1,23 +1,30 @@
 package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.log.PnAuditLogBuilder;
+import it.pagopa.pn.commons.log.PnAuditLogEvent;
+import it.pagopa.pn.commons.log.PnAuditLogEventType;
 import it.pagopa.pn.commons.utils.LogUtils;
+import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.MessageContent;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ThirdPartyData;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.SendMessageResponseDto;
-import it.pagopa.pn.external.registries.middleware.db.io.dao.OptInSentDao;
-import it.pagopa.pn.external.registries.middleware.db.io.entities.OptInSentEntity;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.UserStatusResponseDto;
+import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.MessageContent;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ThirdPartyData;
+import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
+import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
+import it.pagopa.pn.external.registries.middleware.msclient.DeliveryPushClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
@@ -26,12 +33,20 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_SCHEDULING_ANALOG_DATE_NOT_FOUND;
+import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class IOService {
 
     private static final String IO_LOCALE_IT_IT = "it_IT";
@@ -39,66 +54,68 @@ public class IOService {
     private final IOOptInClient optInClient;
 
     private final PnExternalRegistriesConfig cfg;
+    private final SendIOSentMessageService sendIOSentMessageService;
 
-    private final OptInSentDao optInSentDao;
+    private final IOMessagesDao ioMessagesDao;
 
-    public IOService(IOCourtesyMessageClient courtesyMessageClient, IOOptInClient optInClient, PnExternalRegistriesConfig cfg, OptInSentDao optInSentDao) {
-        this.courtesyMessageClient = courtesyMessageClient;
-        this.optInClient = optInClient;
-        this.cfg = cfg;
-        this.optInSentDao = optInSentDao;
-    }
+    private final DeliveryPushClient deliveryPushClient;
+
 
     public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDtoMono )
     {
         return sendMessageRequestDtoMono
-                .map(sendMessageRequestDto -> {
-                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
-                    return sendMessageRequestDto;
-                })
-                .zipWhen(sendMessageRequestDto -> {
-                            UserStatusRequestDto requestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
-                            return this.getUserStatusInternal( Mono.just(requestDto) );
-                        },
-                    (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
-                        public final UserStatusResponseInternal responseStatusDto = responseStatusDto0;
-                        public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
-                    })
-                .flatMap(res -> {
-                    UserStatusResponseInternal.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+                .flatMap(requestDto -> {
+                    MDC.put(MDCUtils.MDC_PN_IUN_KEY, requestDto.getIun());
+                    MDC.put(MDCUtils.MDC_CX_ID_KEY, requestDto.getRecipientInternalID());
+                    if(requestDto.getRecipientIndex() != null) MDC.put(MDCUtils.MDC_PN_CTX_RECIPIENT_INDEX, requestDto.getRecipientIndex().toString());
+                    MDC.put(MDCUtils.MDC_PN_CTX_TOPIC, "sendIOMessage");
 
-                    switch (ioStatus){
-                        case APPIO_NOT_ACTIVE:
-                            log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
-                            SendMessageResponseDto resAppIoUnavailable = new SendMessageResponseDto();
-                            resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
-                            return Mono.just(resAppIoUnavailable);
-                        case PN_ACTIVE:
-                            return sendIOCourtesyMessage(res.sendMessageRequestDto, isPreferredLanguageIT(res.responseStatusDto.getPreferredLanguages()));
-                        case PN_NOT_ACTIVE:
-                            return manageOptIn(res.sendMessageRequestDto);
-                        case ERROR:
-                            log.info("Error in get user status, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
-                            SendMessageResponseDto resErrorUserStatus = new SendMessageResponseDto();
-                            resErrorUserStatus.setResult(SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS);
-                            return Mono.just(resErrorUserStatus);
-                        default:
-                            log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
-                            return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_IOINVALIDSTATUS));
-                    }
+                    log.info("[enter] sendIoMessage taxId={} iun={}", LogUtils.maskTaxId(requestDto.getRecipientTaxID()), requestDto.getIun());
+                    return MDCUtils.addMDCToContextAndExecute(Mono.just(requestDto)
+                            .zipWhen(sendMessageRequestDto -> {
+                                        UserStatusRequestDto userStatusRequestDto = new UserStatusRequestDto().taxId(sendMessageRequestDto.getRecipientTaxID());
+                                        return this.getUserStatusInternal( Mono.just(userStatusRequestDto) );
+                                    },
+                                    (sendMessageRequestDto0, responseStatusDto0) -> new Object(){
+                                        public final UserStatusResponseInternal responseStatusDto = responseStatusDto0;
+                                        public final SendMessageRequestDto sendMessageRequestDto = sendMessageRequestDto0;
+                                    })
+                            .flatMap(res -> {
+                                UserStatusResponseInternal.StatusEnum ioStatus = res.responseStatusDto.getStatus();
+
+                                switch (ioStatus){
+                                    case APPIO_NOT_ACTIVE:
+                                        log.info("IO is not available for user, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                                        SendMessageResponseDto resAppIoUnavailable = new SendMessageResponseDto();
+                                        resAppIoUnavailable.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE);
+                                        return Mono.just(resAppIoUnavailable);
+                                    case PN_ACTIVE:
+                                        return sendIOCourtesyMessage(res.sendMessageRequestDto, isPreferredLanguageIT(res.responseStatusDto.getPreferredLanguages()));
+                                    case PN_NOT_ACTIVE:
+                                        return manageOptIn(res.sendMessageRequestDto);
+                                    case ERROR:
+                                        log.info("Error in get user status, not sending message taxId={} iun={}", LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), res.sendMessageRequestDto.getIun());
+                                        SendMessageResponseDto resErrorUserStatus = new SendMessageResponseDto();
+                                        resErrorUserStatus.setResult(SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS);
+                                        return Mono.just(resErrorUserStatus);
+                                    default:
+                                        log.error(" ioStatus={} is not handled - iun={} taxId={}", ioStatus,  res.sendMessageRequestDto.getIun(), LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()));
+                                        return Mono.error(new PnInternalException("ioStatus="+ioStatus+" is not handled - iun="+res.sendMessageRequestDto.getIun()+" taxId="+LogUtils.maskTaxId(res.sendMessageRequestDto.getRecipientTaxID()), PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_IOINVALIDSTATUS));
+                                }
+                            }));
                 });
     }
     
     private Mono<SendMessageResponseDto> manageOptIn(SendMessageRequestDto sendMessageRequestDto) {
         String hashedTaxId = DigestUtils.sha256Hex(sendMessageRequestDto.getRecipientTaxID());
         log.info("Managing send optin message taxId={} hashedTaxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), hashedTaxId, sendMessageRequestDto.getIun());
-        return this.optInSentDao.get(hashedTaxId)
-                .map(OptInSentEntity::getLastModified)
+        return this.ioMessagesDao.get(hashedTaxId)
+                .map(IOMessagesEntity::getLastModified)
                 .defaultIfEmpty(Instant.EPOCH)
                 .flatMap(lastSendDate -> {
                     if (lastSendDate.isBefore(Instant.now().minus(cfg.getIoOptinMinDays(), ChronoUnit.DAYS)))
                         return sendIOOptInMessage(sendMessageRequestDto)
-                                .zipWhen(r -> optInSentDao.save(new OptInSentEntity(hashedTaxId)).thenReturn(new Object()),
+                                .zipWhen(r -> ioMessagesDao.save(new IOMessagesEntity(hashedTaxId)).thenReturn(new Object()),
                                         (resp, nd) -> resp);
                     else
                     {
@@ -107,11 +124,12 @@ public class IOService {
                         res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_ALREADY_SENT);
                         return Mono.just(res);
                     }
-                });
+                })
+                .flatMap(sendMessageResponseDto -> saveProbableSchedulingAnalogDateIfPresent(sendMessageRequestDto).thenReturn(sendMessageResponseDto));
     }
 
     private Mono<SendMessageResponseDto> sendIOCourtesyMessage( SendMessageRequestDto sendMessageRequestDto, boolean localeIsIT ) {
-        log.info( "Submit message taxId={} iun={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun());
+        log.info( "Submit message taxId={} iun={} internalId={} recIndex={} carbonCopy={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()), sendMessageRequestDto.getIun(), sendMessageRequestDto.getRecipientInternalID(), sendMessageRequestDto.getRecipientIndex(), sendMessageRequestDto.getCarbonCopyToDeliveryPush());
         if (cfg.isEnableIoMessage()) {
             FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
             MessageContent content = new MessageContent();
@@ -145,6 +163,7 @@ public class IOService {
                    .summary( sendMessageRequestDto.getSubject() )
             );
 
+            assert content.getThirdPartyData() != null;
             log.info( "Proceeding with send message iun={}", content.getThirdPartyData().getId());
             NewMessage m = new NewMessage();
             m.setFeatureLevelType("ADVANCED");
@@ -157,17 +176,33 @@ public class IOService {
                     res.setResult(SendMessageResponseDto.ResultEnum.SENT_COURTESY);
                     res.setId(response.getId());
                     return res;
-                }).onErrorResume( exception ->{
-                        log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
-                        SendMessageResponseDto res = new SendMessageResponseDto();
-                        res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
-                        return Mono.just(res);
-                });
+                })
+                .flatMap(sendMessageResponseDto -> sendIOMessageSentEventToDeliveyPush(sendMessageRequestDto, sendMessageResponseDto))
+                .flatMap(sendMessageResponseDto -> saveProbableSchedulingAnalogDateIfPresent(sendMessageRequestDto).thenReturn(sendMessageResponseDto))
+                .onErrorResume( exception ->{
+                    log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
+                    SendMessageResponseDto res = new SendMessageResponseDto();
+                    res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
+                    return Mono.just(res);
+            });
         } else {
             log.warn( "Send IO message is disabled!!!" );
             SendMessageResponseDto res = new SendMessageResponseDto();
             res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_COURTESY_DISABLED_BY_CONF);
             return Mono.just(res);
+        }
+    }
+
+    @NotNull
+    private Mono<SendMessageResponseDto> sendIOMessageSentEventToDeliveyPush(SendMessageRequestDto sendMessageRequestDto, SendMessageResponseDto sendMessageResponseDto) {
+        if (Boolean.TRUE.equals(sendMessageRequestDto.getCarbonCopyToDeliveryPush())) {
+            return sendIOSentMessageService.sendIOSentMessageNotification(sendMessageRequestDto.getIun(),
+                            sendMessageRequestDto.getRecipientIndex(), sendMessageRequestDto.getRecipientInternalID(), Instant.now())
+                    .thenReturn(sendMessageResponseDto);
+        }
+        else {
+            return Mono.just(sendMessageResponseDto)
+                    .doOnNext(res -> log.info("Send CC to delivery push not required"));
         }
     }
 
@@ -249,6 +284,111 @@ public class IOService {
                                 .status( UserStatusResponseDto.StatusEnum.fromValue(userStatusResponseInternal.getStatus().getValue())));
     }
 
+    public Mono<PreconditionContentDto> notificationDisclaimer(String recipientInternalId, String iun) {
+        String logMsg = String.format("notification disclaimer recipientInternalId=%s iun=%s", recipientInternalId, iun);
+        PnAuditLogEvent logEvent = new PnAuditLogBuilder()
+                .before(PnAuditLogEventType.AUD_NT_IO_DISCLAIM, logMsg )
+                .build();
+        String pk = buildPkProbableSchedulingAnalogDate(iun, recipientInternalId);
+        logEvent.log();
+        return ioMessagesDao.get(pk)
+                .switchIfEmpty(Mono.error(() -> new PnNotFoundException("Not Found", String.format("Record not found in DB for getSchedulingAnalogDate: iun=%s, recipientInternalId=%s", iun, recipientInternalId), ERROR_CODE_EXTERNALREGISTRIES_SCHEDULING_ANALOG_DATE_NOT_FOUND)))
+                .doOnNext(ioMessagesEntity -> log.info("[{}] [{}] Retrieved IOMessagesEntity: {}", iun, recipientInternalId, ioMessagesEntity))
+                .map(ioMessagesEntity -> mapToPreconditionContent(ioMessagesEntity.getSchedulingAnalogDate(), iun, recipientInternalId, ioMessagesEntity.getSenderDenomination(), ioMessagesEntity.getSubject()))
+                .flatMap(preconditionContentDto ->  checkAndManageIfSchedulingAnalogDateIsNull(recipientInternalId, iun, preconditionContentDto))
+                .doOnNext(preconditionContentDto -> log.info("[{}] [{}] PreconditionContentDto response: {}", iun, recipientInternalId, preconditionContentDto))
+                .doOnNext(preconditionContentDto -> logEvent.generateSuccess().log())
+                .doOnError( throwable -> logEvent.generateFailure("FAILURE {}", throwable.getMessage()).log() );
+    }
+
+    private Mono<PreconditionContentDto> checkAndManageIfSchedulingAnalogDateIsNull(String recipientInternalId, String iun, PreconditionContentDto preconditionContentDto) {
+        if(preconditionContentDto.getMarkdown() != null) {
+            //significa che ho già gestito il flusso di enrichWithSchedulingAnalogDate
+            return Mono.just(preconditionContentDto);
+        }
+
+        log.debug("[{}] [{}] SchedulingAnalogDate is not present in Record, call, DeliveryPush", iun, recipientInternalId);
+        return deliveryPushClient.getSchedulingAnalogDateWithHttpInfo(iun, recipientInternalId)
+                .doOnNext(response -> log.info("[{}] [{}] Delivery Push getSchedulingAnalogDate response: {}", iun, recipientInternalId, response))
+                .map(response -> enrichWithSchedulingAnalogDate(preconditionContentDto, response, iun, recipientInternalId))
+                .doOnError(throwable -> {
+                    if(throwable instanceof WebClientResponseException.NotFound)
+                        log.debug("[{}] [{}] Delivery Push getSchedulingAnalogDate not found, get default AFTER template : ", iun, recipientInternalId);
+
+                    else {
+                        log.error(String.format("[%s] [%s] Delivery Push getSchedulingAnalogDate error response: ", iun, recipientInternalId), throwable);
+                    }
+                })
+                .onErrorResume(WebClientResponseException.NotFound.class, notFound -> {
+                    // se lo schedulingAnalogDate non è ancora presente in delivery push, restituisco il templated di "after"
+                    enrichPreConditionForAfterSchedulingDate(preconditionContentDto);
+                    return Mono.just(preconditionContentDto);
+                });
+    }
+
+    private PreconditionContentDto mapToPreconditionContent(Instant schedulingAnalogDate, String iun, String recipientInternalId, String senderDenomination, String subject) {
+        var preconditionContentDto = createPreconditionContentDto(iun, senderDenomination, subject);
+        if(schedulingAnalogDate != null) {
+            enrichWithSchedulingAnalogDate(preconditionContentDto, schedulingAnalogDate, iun, recipientInternalId);
+        }
+        return preconditionContentDto;
+
+    }
+
+    private PreconditionContentDto enrichWithSchedulingAnalogDate(PreconditionContentDto preconditionContentDto, ProbableSchedulingAnalogDateResponse responseDeliveryPush, String iun, String recipientInternalId) {
+        enrichWithSchedulingAnalogDate(preconditionContentDto, responseDeliveryPush.getSchedulingAnalogDate(), iun, recipientInternalId);
+        return preconditionContentDto;
+    }
+
+    private void enrichWithSchedulingAnalogDate(PreconditionContentDto preconditionContentDto, Instant schedulingAnalogDate, String iun, String recipientInternalId) {
+        if(Instant.now().isBefore(schedulingAnalogDate)) {
+            log.debug("The date of now is before of probable scheduling analog date for iun: {}, recipient: {}, probableSchedulingAnalogDate: {}", iun, recipientInternalId, schedulingAnalogDate);
+            enrichPreConditionForBeforeSchedulingDate(schedulingAnalogDate, preconditionContentDto);
+        }
+        else {
+            log.debug("The date of now is after of probable scheduling analog date for iun: {}, recipient: {}, probableSchedulingAnalogDate: {}", iun, recipientInternalId, schedulingAnalogDate);
+            enrichPreConditionForAfterSchedulingDate(preconditionContentDto);
+        }
+    }
+
+    private PreconditionContentDto createPreconditionContentDto(String iun, String senderDenomination, String subject) {
+        var messageParams = new HashMap<String, String>();
+        messageParams.put(IUN_PARAM, iun);
+        messageParams.put(SENDER_DENOMINATION_PARAM, senderDenomination);
+        messageParams.put(SUBJECT_PARAM, subject);
+
+        return new PreconditionContentDto().messageParams(messageParams);
+    }
+
+    private void enrichPreConditionForBeforeSchedulingDate(Instant schedulingAnalogDate, PreconditionContentDto responseDto) {
+        String localDateTimeUTC = LocalDateTime.ofInstant(schedulingAnalogDate, ZoneOffset.UTC).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
+        String localDateTimeItaly = LocalDateTime.ofInstant(schedulingAnalogDate, ZoneId.of("Europe/Rome")).format(PROBABLE_SCHEDULING_ANALOG_DATE_DATE_FORMATTER);
+        String[] schedulingDateWithHourUTC = localDateTimeUTC.split(" ");
+        String[] schedulingDateWithHourItaly = localDateTimeItaly.split(" ");
+        responseDto.setMessageCode(PRE_ANALOG_MESSAGE_CODE);
+        responseDto.setTitle(PRE_ANALOG_TITLE);
+
+        responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
+                .replace(DATE_PLACEHOLDER, schedulingDateWithHourItaly[0])
+                .replace(TIME_PLACEHOLDER, schedulingDateWithHourItaly[1])
+                .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM))
+                .replace(SENDER_DENOMINATION_PLACEHOLDER, responseDto.getMessageParams().get(SENDER_DENOMINATION_PARAM))
+                .replace(SUBJECT_PLACEHOLDER, responseDto.getMessageParams().get(SUBJECT_PARAM)));
+
+        responseDto.getMessageParams().put(DATE_MESSAGE_PARAM, schedulingDateWithHourUTC[0]);
+        responseDto.getMessageParams().put(TIME_MESSAGE_PARAM, schedulingDateWithHourUTC[1]);
+    }
+
+    private void enrichPreConditionForAfterSchedulingDate(PreconditionContentDto responseDto) {
+        responseDto.setMessageCode(POST_ANALOG_MESSAGE_CODE);
+        responseDto.setTitle(POST_ANALOG_TITLE);
+
+        responseDto.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
+                .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM))
+                .replace(SENDER_DENOMINATION_PLACEHOLDER, responseDto.getMessageParams().get(SENDER_DENOMINATION_PARAM))
+                .replace(SUBJECT_PLACEHOLDER, responseDto.getMessageParams().get(SUBJECT_PARAM)));
+    }
+
     private String composeFinalMarkdown(String markdown)
     {
         // per ora si fa una semplice sostituzione cablata sui nomi delle variabili
@@ -261,4 +401,21 @@ public class IOService {
     {
         return CollectionUtils.isEmpty(preferredLanguages) || preferredLanguages.contains(IO_LOCALE_IT_IT);
     }
+
+    private Mono<Void> saveProbableSchedulingAnalogDateIfPresent(SendMessageRequestDto sendMessageRequestDto) {
+        String recipientInternalID = sendMessageRequestDto.getRecipientInternalID();
+        String iun = sendMessageRequestDto.getIun();
+        IOMessagesEntity ioMessagesEntity = new IOMessagesEntity();
+        ioMessagesEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
+        ioMessagesEntity.setSenderDenomination(sendMessageRequestDto.getSenderDenomination());
+        ioMessagesEntity.setIun(sendMessageRequestDto.getIun());
+        ioMessagesEntity.setSubject(sendMessageRequestDto.getSubject());
+        if(sendMessageRequestDto.getSchedulingAnalogDate() != null) {
+            ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate().toInstant());
+            ioMessagesEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getSchedulingAnalogDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
+        }
+        return ioMessagesDao.save(ioMessagesEntity);
+
+    }
+
 }

@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.mapper;
 
-import it.pagopa.pn.external.registries.generated.openapi.selfcare.external.client.v1.dto.UserGroupResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import org.junit.jupiter.api.Test;
 
@@ -8,23 +8,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UserGroupToPaGroupDtoMapperTest {
+
     @Test
     void toDto() {
-        //GIVEN
+        // Given
         UserGroupResourceDto userGroupResourceDto = new UserGroupResourceDto();
         userGroupResourceDto.setId("mocked-id");
         userGroupResourceDto.setName("mocked-name");
         userGroupResourceDto.setDescription("mocked-description");
         userGroupResourceDto.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
 
-        // WHEN
+        // When
         PaGroupDto res = UserGroupToPaGroupDtoMapper.toDto(userGroupResourceDto);
 
-        //THEN
+        // Then
         assertNotNull(res);
-        assertEquals(res.getId(),userGroupResourceDto.getId());
-        assertEquals(res.getName(),userGroupResourceDto.getName());
-        assertEquals(res.getDescription(),userGroupResourceDto.getDescription());
-        assertEquals(res.getStatus().getValue(),userGroupResourceDto.getStatus().getValue());
+        assertEquals(userGroupResourceDto.getId(), res.getId());
+        assertEquals(userGroupResourceDto.getName(), res.getName());
+        assertEquals(userGroupResourceDto.getDescription(), res.getDescription());
+        assertEquals(userGroupResourceDto.getStatus().getValue(), res.getStatus().getValue());
     }
 }

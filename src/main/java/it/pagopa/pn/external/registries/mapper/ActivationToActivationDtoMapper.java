@@ -1,6 +1,6 @@
 package it.pagopa.pn.external.registries.mapper;
 
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationStatusDto;
 import org.springframework.stereotype.Component;

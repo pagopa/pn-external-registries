@@ -20,15 +20,25 @@ Parameters:
     Type: String
     Description: 'keep track of used projects commitIds'
 
+  LogsKinesisSourceStreamArn:
+    Type: String
+    Description: 'Where to send Logs'
+
+  LogRetention:
+    Type: Number
+    Default: 14
+
 Conditions:
   Never: !Equals [ 'true', 'false' ]
 
 
 Resources:
-  OptInSentTable:
+  IOMessagesTable:
     Type: AWS::DynamoDB::Table
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain    
     Properties:
-      TableName: !Sub '${ProjectName}-OptInSent'
+      TableName: !Sub '${ProjectName}-IOMessages'
       AttributeDefinitions:
         - AttributeName: "pk"
           AttributeType: "S"
@@ -36,15 +46,78 @@ Resources:
         - AttributeName: "pk"
           KeyType: "HASH"
       BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true      
+
+  OnboardInstitutionsTable:
+    Type: AWS::DynamoDB::Table
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain    
+    Properties:
+      TableName: !Sub '${ProjectName}-OnboardInstitutions'
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        - AttributeName: "status"
+          AttributeType: "S"
+        - AttributeName: "lastUpdate"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      GlobalSecondaryIndexes:
+        - IndexName: "status-lastUpdate-gsi"
+          KeySchema:
+            - AttributeName: "status"
+              KeyType: "HASH"
+            - AttributeName: "lastUpdate"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+      BillingMode: "PAY_PER_REQUEST"
+
+  PnExternalRegistriesLogGroup:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain    
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/log-group.yaml"
+      Parameters:
+        LogGroupName: !Sub '${ProjectName}-external-registries'
+        LogGroupRetention: !Ref LogRetention
+        LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
+
+  PnExternalRegistriesInsertTriggerLogGroup:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain    
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/log-group.yaml"
+      Parameters:
+        LogGroupName: !Sub "${ProjectName}-external-registries-trigger-lambda"
+        LogGroupRetention: !Ref LogRetention
+        LogGroupPrefix: '/aws/lambda'
 
 Outputs:
 
   # Table parameters
-  OptInSentTableName:
+  IOMessagesTableName:
     Description: Dynamo Name used by application to access the key-value store
-    Value: !Ref OptInSentTable
-  OptInSentTableArn:
+    Value: !Ref IOMessagesTable
+  IOMessagesTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
-    Value: !Sub '${OptInSentTable.Arn}'
+    Value: !Sub '${IOMessagesTable.Arn}'
 
+  OnboardInstitutionsTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref OnboardInstitutionsTable
+  OnboardInstitutionsTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${OnboardInstitutionsTable.Arn}'
+
+  # Log group exports
+  EcsLogGroup:
+    Value: !GetAtt PnExternalRegistriesLogGroup.Outputs.LogGroupName
+  PnExternalRegistriesTriggerLambdaName:
+    Value: !Sub "${ProjectName}-external-registries-trigger-lambda"
 

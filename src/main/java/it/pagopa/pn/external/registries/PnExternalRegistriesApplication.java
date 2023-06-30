@@ -16,7 +16,6 @@ public class PnExternalRegistriesApplication {
     }
 
 
-
     @RestController
     @RequestMapping("/")
     public static class RootController {

@@ -175,6 +175,8 @@ components:
       required:
         - iun
         - recipientTaxID
+        - recipientInternalID
+        - recipientIndex
         - senderDenomination
       properties:
         subject:
@@ -204,8 +206,25 @@ components:
         recipientTaxID:
           type: string
           description: Codice Fiscale del destinatario
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         requestAcceptedDate:
           description: data perfezionamento notifica per il mittente
+          type: string
+          format: date-time
+          example: '2022-06-16T00:00:00.000Z'
+        recipientInternalID:
+          type: string
+          description: internalId del destinatario
+        recipientIndex:
+          type: integer
+          example: 0
+          description: indice del destinatario
+        carbonCopyToDeliveryPush:
+          type: boolean
+          default: false
+          description: indica se a valle dell'invio a IO del messaggio, va aggiunto in coda verso pn-delivery-push per aggiungerlo in timeline
+        schedulingAnalogDate:
+          description: data di probabile invio del flusso analogico
           type: string
           format: date-time
           example: '2022-06-16T00:00:00.000Z'
@@ -271,6 +290,7 @@ components:
       description: User's fiscal code.
       format: FiscalCode
       example: SPNDNL80R13C555X
+      x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
     UserStatusRequest:
       title:  UserStatusRequest
       description: Request for get user status
@@ -283,6 +303,7 @@ components:
           minLength: 16
           maxLength: 16
           pattern: "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$"
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
     UserStatusResponse:
       type: object
       required:
@@ -291,6 +312,7 @@ components:
       properties:
         taxId:
           type: string
+          x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
         status:
           type: string
           description: >

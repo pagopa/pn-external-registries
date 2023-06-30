@@ -2,24 +2,19 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ActivationPayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -27,37 +22,21 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@SpringBootTest(classes = {IOCourtesyMessageClient.class, PnExternalRegistriesConfig.class})
+@SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "pn.external-registry.io-base-url=http://localhost:9999",
         "pn.external-registry.io-api-key=fake_api_key"
 })
-class IOCourtesyMessageClientTest {
+class IOCourtesyMessageClientTest extends MockAWSObjectsTestConfig {
 
-
+    @Autowired
     private IOCourtesyMessageClient client;
-
-    @Mock
-    private PnExternalRegistriesConfig cfg;
 
     private ClientAndServer mockServer;
 
-    @Configuration
-    static class ContextConfiguration {
-        @Primary
-        @Bean
-        public SqsNotificationPaidProducer sqsNotificationPaidProducer() {
-            return Mockito.mock( SqsNotificationPaidProducer.class);
-        }
-    }
-
     @BeforeEach
     public void startMockServer() {
-        Mockito.when( cfg.getIoBaseUrl() ).thenReturn( "http://localhost:9999" );
-        Mockito.when( cfg.getIoApiKey() ).thenReturn( "fake_api_key" );
-        this.client = new IOCourtesyMessageClient(cfg);
-        this.client.init();
         mockServer = startClientAndServer(9999);
     }
 

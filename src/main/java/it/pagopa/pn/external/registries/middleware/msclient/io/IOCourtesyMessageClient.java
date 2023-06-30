@@ -1,31 +1,29 @@
 package it.pagopa.pn.external.registries.middleware.msclient.io;
 
-import io.netty.handler.timeout.TimeoutException;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.Activation;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.ActivationPayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import lombok.extern.slf4j.Slf4j;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ActivationPayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
+import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.net.ConnectException;
-import java.time.Duration;
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.IO;
+
 
 @Component
-@Slf4j
+@CustomLog
 public class IOCourtesyMessageClient extends IOClient {
 
     public static final String IO_STATUS_ACTIVE = "ACTIVE";
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
-
-    public IOCourtesyMessageClient(PnExternalRegistriesConfig config)
+    //inject by name
+    public IOCourtesyMessageClient(PnExternalRegistriesConfig config, DefaultApi ioApi)
     {
-        super(config, config.getIoApiKey(), "Courtesy");
+        super(config, ioApi, "Courtesy");
     }
 
 
@@ -39,7 +37,8 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> upsertServiceActivation(String taxId, boolean activated)
     {
-        log.info("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
+        log.logInvokingExternalService(IO, "upsertServiceActivation");
+        log.debug("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
 
         if (!checkWhitelist(taxId))
         {
@@ -56,10 +55,6 @@ public class IOCourtesyMessageClient extends IOClient {
         dto.setStatus(activated? IO_STATUS_ACTIVE : IO_STATUS_INACTIVE);
 
         return ioApi.upsertServiceActivation(dto)
-                .retryWhen(
-                        Retry.backoff(2, Duration.ofMillis(25))
-                                .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
-                )
                 .onErrorResume(throwable -> {
                     log.error("error upserting service activation message={}", elabExceptionMessage(throwable) , throwable);
                     return getServiceActivation(taxId);
@@ -79,7 +74,8 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> getServiceActivation(String taxId)
     {
-        log.info("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
+        log.logInvokingExternalService(IO, "getServiceActivation");
+        log.debug("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
 
         if (!checkWhitelist(taxId))
         {
@@ -95,10 +91,6 @@ public class IOCourtesyMessageClient extends IOClient {
         dto.setFiscalCode(taxId);
 
         return ioApi.getServiceActivationByPOST(dto)
-                .retryWhen(
-                        Retry.backoff(2, Duration.ofMillis(25))
-                                .filter(throwable -> throwable instanceof TimeoutException || throwable instanceof ConnectException)
-                )
                 .map(x -> {
                     log.info("getServiceActivation response taxid={} status={} serviceId={} version={}", LogUtils.maskTaxId(x.getFiscalCode()), x.getStatus(), x.getServiceId(), x.getVersion());
                     return x;

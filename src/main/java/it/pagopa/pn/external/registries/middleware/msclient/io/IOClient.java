@@ -2,51 +2,43 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.ApiClient;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.api.DefaultApi;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.CreatedMessage;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.LimitedProfile;
-import it.pagopa.pn.external.registries.generated.openapi.io.client.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.CreatedMessage;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.util.UUID;
 
-@Slf4j
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.IO;
+
+@CustomLog
 class IOClient extends OcpBaseClient {
 
-    protected DefaultApi ioApi;
-    private final String apiKey;
+    protected final DefaultApi ioApi;
     private final PnExternalRegistriesConfig config;
     String ioMode;
 
-    public IOClient(PnExternalRegistriesConfig config, String apiKey, String ioMode) {
+    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode) {
         this.config = config;
-        this.apiKey = apiKey;
+        this.ioApi = ioApi;
         this.ioMode = ioMode;
     }
 
-    @PostConstruct
-    public void init() {
-
-        ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), apiKey).build());
-        apiClient.setBasePath( config.getIoBaseUrl() );
-
-        this.ioApi = new DefaultApi( apiClient );
-    }
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        log.info("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
+        log.logInvokingExternalService(IO, "submitMessageforUserWithFiscalCodeInBody");
+        log.debug("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
         {
-            log.warn("submitMessageforUserWithFiscalCodeInBody taxId is not in whitelist, mocking IO response");
+            log.warn("submitMessageforUserWithFiscalCodeInBody taxId {} is not in whitelist, mocking IO response", LogUtils.maskTaxId(message.getFiscalCode()));
             CreatedMessage res = new CreatedMessage();
             res.setId(UUID.randomUUID().toString());
             return Mono.just(res);
@@ -60,11 +52,12 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        log.info("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
+        log.logInvokingExternalService(IO, "getProfileByPOST");
+        log.debug("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))
         {
-            log.warn("getProfileByPOST taxId is not in whitelist, mocking IO response");
+            log.warn("getProfileByPOST taxId {} is not in whitelist, mocking IO response", LogUtils.maskTaxId(payload.getFiscalCode()));
             WebClientResponseException res = WebClientResponseException.create(404, "not found (mocked)", HttpHeaders.EMPTY, new byte[0], null);
             return Mono.error(res);
         }

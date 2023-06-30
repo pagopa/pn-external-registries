@@ -8,8 +8,7 @@ en:
         text: "Activate the service"
         action: "ioit://services/service-detail?serviceId=01G40DWQGKY5GRWSNM4303VNRP&activate=true"
 ---
-Ciao, <br/>
-da oggi potrai ricevere direttamente in app le raccomandate che di solito ti vengono inviate in cartaceo!
+Da oggi, potrai ricevere direttamente in app le raccomandate che di solito ti vengono inviate in cartaceo!
 
 ### Quali sono i vantaggi?
 
@@ -25,17 +24,16 @@ da oggi potrai ricevere direttamente in app le raccomandate che di solito ti ven
 
 ### Cos'è una notifica?
 Una notifica è una **comunicazione a valore legale**, emessa in via ufficiale da un'amministrazione.
-Aprire su IO un messaggio inviato dal servizio "Notifiche digitali" di Piattaforma Notifiche equivale a firmare la ricevuta di ritorno di una
+Aprire su IO un messaggio inviato dal servizio "Notifiche digitali" di SEND equivale a firmare la ricevuta di ritorno di una
 raccomandata tradizionale.
 
 ### Perché dovrei attivare il servizio?
-Perché IO è integrata a Piattaforma Notifiche e, tramite il servizio "Notifiche digitali" di Piattaforma Notifiche,
+Perché IO è integrata a SEND e, tramite il servizio "Notifiche digitali",
 ti invierà un messaggio ogni volta che ricevi una notifica.
 Potrai leggerla, visualizzare gli allegati e pagare eventuali spese direttamente in app.
-Se la leggi subito, inoltre, non riceverai a casa la raccomandata cartacea e risparmierai sui costi di spedizione.
+
+Se non hai una PEC nei registri pubblici o non l’hai fornita su SEND e apri su IO un messaggio 
+inviato da questo servizio entro 5 giorni (120 ore) dal suo invio, non riceverai la notifica tramite raccomandata.
 
 Premendo "Attiva il servizio" dichiari di avere letto e compreso i
 [Termini e condizioni d'uso](${piattaformaNotificheURLTOS} ) e [l'Informativa privacy](${piattaformaNotificheURLPrivacy}).
-
-Se non vedi il pulsante "Attiva il servizio", vai allo store del tuo dispositivo e verifica di aver scaricato l'ultima
-versione dell'app IO.

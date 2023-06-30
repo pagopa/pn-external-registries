@@ -56,6 +56,42 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  /ext-registry/pagopa/v1/checkout-cart:
+    post:
+      operationId: checkoutCart
+      summary: Make a payment
+      description: Make a payment by calling the Checkout API
+      tags:
+        - PaymentInfo
+      security:                                                                # ONLY EXTERNAL
+        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
     PaymentInfo:
@@ -70,7 +106,7 @@ components:
         detail:
           $ref: '#/components/schemas/Detail'
         detail_v2:
-          $ref: '#/components/schemas/Detail_v2'
+          $ref: '#/components/schemas/DetailV2'
         errorCode:
           description: error code to show at the user
           type: string
@@ -121,12 +157,74 @@ components:
         - PAYMENT_CANCELED
         - PAYMENT_DUPLICATED
         - GENERIC_ERROR
-    Detail_v2:
+    DetailV2:
       title: Error classification detail
       description: >
         Classification detail to help user address the issue
       example: PPT_PSP_SCONOSCIUTO
       type: string
+    PaymentRequest:
+      title: Request to make a payment on Checkout
+      type: object
+      required:
+        - paymentNotice
+        - returnUrl
+      properties:
+        paymentNotice:
+          $ref: '#/components/schemas/PaymentNotice'
+        returnUrl:
+          description: Checkout base url used to make payment
+          example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+          type: string
+          maxLength: 2048
+          pattern: ^[ -~ ]*$
+    PaymentNotice:
+      title: Request for a Payment Notice
+      description: Information of a Payment Notice
+      type: object
+      required:
+        - noticeNumber
+        - fiscalCode
+        - amount
+        - companyName
+        - description
+      properties:
+        noticeNumber:
+          type: string
+          description: The payment notice number
+          minLength: 18
+          maxLength: 18
+          pattern: '^\d+$'
+        fiscalCode:
+          type: string
+          description: Public Administration tax code
+          minLength: 11
+          maxLength: 11
+          pattern: '^\d+$'
+        amount:
+          type: integer
+          description: Amount ( in euro cents ) of the payment notice
+          minimum: 1
+        companyName:
+          type: string
+          description: Public Administration company name
+          maxLength: 250
+          pattern: ^([\x20-\xFF]{1,250})$
+        description:
+          type: string
+          description: Subject of payment
+          maxLength: 250
+          pattern: ^([\x20-\xFF]{1,250})$
+    PaymentResponse:
+      title: Response containing the Checkout callback URL
+      type: object
+      required:
+        - checkoutUrl
+      properties:
+        checkoutUrl:
+          type: string
+          description: The Checkout callback URL
+
 
   securitySchemes:                                      # ONLY EXTERNAL
     bearerAuth:                                         # ONLY EXTERNAL

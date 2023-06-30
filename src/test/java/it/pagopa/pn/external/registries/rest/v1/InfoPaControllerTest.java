@@ -3,7 +3,8 @@ package it.pagopa.pn.external.registries.rest.v1;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.services.InfoSelfcareServiceMock;
+import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
+import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ class InfoPaControllerTest {
     WebTestClient webTestClient;
 
     @MockBean
-    private InfoSelfcareServiceMock svc;
+    private InfoSelfcareGroupsService svc;
+
+    @MockBean
+    private InfoSelfcareInstitutionsService svcInst;
 
     @Test
     void getOnePa() {
@@ -44,7 +48,7 @@ class InfoPaControllerTest {
         dto.setTaxId("123456789");
 
         // When
-        Mockito.when(svc.getOnePa(Mockito.anyString()))
+        Mockito.when(svcInst.getOnePa(Mockito.anyString()))
                 .thenReturn(Mono.just(dto));
 
 
@@ -72,7 +76,7 @@ class InfoPaControllerTest {
         res.add(dto);
 
         // When
-        Mockito.when(svc.listOnboardedPaByName(Mockito.any()))
+        Mockito.when(svcInst.listOnboardedPaByName(Mockito.any()))
                 .thenReturn(Flux.fromIterable(res));
 
 
@@ -87,7 +91,7 @@ class InfoPaControllerTest {
     void listOnboardedPaFilter() {
 
         // Given
-        String url = "/ext-registry/pa/v1/activated-on-pn?id={}"
+        String url = "/ext-registry/pa/v1/activated-on-pn?id={id}"
                 .replace("{id}", "123456789");
 
         List<PaSummaryDto> res = new ArrayList<>();
@@ -98,7 +102,7 @@ class InfoPaControllerTest {
 
 
         // When
-        Mockito.when(svc.listOnboardedPaByIds(Mockito.anyList()))
+        Mockito.when(svcInst.listOnboardedPaByIds(Mockito.anyList()))
                 .thenReturn(Flux.fromIterable(res));
 
 
@@ -127,7 +131,7 @@ class InfoPaControllerTest {
         res.add(dto);
 
         // When
-        Mockito.when(svc.getGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(svc.getPaGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Flux.fromIterable(res));
 
 
@@ -141,4 +145,34 @@ class InfoPaControllerTest {
                 .expectStatus().isOk().expectBodyList(PaGroupDto.class).hasSize(2);
     }
 
+    @Test
+    void getManyPa() {
+
+        // Given
+        String url = "/ext-registry-private/pa/v1/activated-on-pn?id={id1}&id={id2}"
+                .replace("{id1}", "123456789")
+                .replace("{id2}", "223456789");
+
+        List<PaSummaryDto> res = new ArrayList<>();
+        PaSummaryDto dto = new PaSummaryDto();
+        dto.setId("123456789");
+        dto.setName("pubblica amministrazione XXX");
+        res.add(dto);
+        dto = new PaSummaryDto();
+        dto.setId("223456789");
+        dto.setName("pubblica amministrazione XXX");
+        res.add(dto);
+
+
+        // When
+        Mockito.when(svcInst.listOnboardedPaByIds(Mockito.anyList()))
+                .thenReturn(Flux.fromIterable(res));
+
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .exchange()
+                .expectStatus().isOk().expectBodyList(PaSummaryDto.class).hasSize(2);
+    }
 }
