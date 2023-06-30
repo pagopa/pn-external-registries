@@ -14,10 +14,10 @@
     <name>pn-external-registries</name>
     <description>TODO</description>
     <!--
-        // decomment to override the pn-codegen version to use, the default version is read from parent pom.xml  
+        // decomment to override the pn-codegen version to use, the default version is read from parent pom.xml
     <properties>
         <pagopa.codegen.version>v01.00.00</pagopa.codegen.version>
-    </properties> 
+    </properties>
     -->
 
     <scm>
