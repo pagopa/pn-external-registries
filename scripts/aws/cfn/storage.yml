@@ -75,6 +75,8 @@ Resources:
           Projection:
             ProjectionType: "ALL"
       BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true      
 
   PnExternalRegistriesLogGroup:
     Type: AWS::CloudFormation::Stack
