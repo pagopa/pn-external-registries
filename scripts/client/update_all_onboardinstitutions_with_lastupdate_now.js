@@ -20,7 +20,6 @@ process.env.AWS_SDK_LOAD_CONFIG=1
 if(awsProfile.indexOf('sso_')>=0){ // sso profile
   credentials = new AWS.SsoCredentials({profile:awsProfile});
   AWS.config.credentials = credentials;
-  AWS.config.endpoint = new AWS.Endpoint('http://localstack:4566');
 } else { // IAM profile
   credentials = new AWS.SharedIniFileCredentials({profile: awsProfile});
   AWS.config.credentials = credentials;
