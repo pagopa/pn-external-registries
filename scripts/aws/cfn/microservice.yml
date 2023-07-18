@@ -273,6 +273,10 @@ Parameters:
     Type: String
     Default: 'FATAL'
 
+  IOBackendCidrs:
+    Type: String
+    Default: ''
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -525,6 +529,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-io'
         IntendedUsage: IO
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicIoAPI.Outputs.APIGatewayARN
+        AllowedCidrs: !Ref IOBackendCidrs
 
   ## Dashboard
   ExternalRegistriesMicroserviceCloudWatchDashboard:
