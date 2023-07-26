@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_BADCONFIGURATION_MISSING_TEMPLATE;
@@ -72,6 +73,10 @@ public class PnExternalRegistriesConfig {
 
     private String onetrustToken;
     private String onetrustBaseUrl;
+
+    private Duration usergroupsResponseTimeout;
+
+    private Duration usergroupsConnectionTimeout;
 
     @Data
     public static class AppIoTemplate{

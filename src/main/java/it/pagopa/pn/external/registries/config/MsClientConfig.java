@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.config;
 
+import io.netty.channel.ChannelOption;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
@@ -12,7 +13,11 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MsClientConfig {
@@ -53,7 +58,12 @@ public class MsClientConfig {
 
         @Bean
         UserGroupApi userGroupPaApi() {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
+            WebClient.Builder webClientBuilder = initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey());
+            webClientBuilder = webClientBuilder.clientConnector(new ReactorClientHttpConnector(HttpClient.create()
+                    .responseTimeout(config.getUsergroupsResponseTimeout())
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,  Long.valueOf(config.getUsergroupsConnectionTimeout().toMillis()).intValue())));
+
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(webClientBuilder.build());
             apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
             return new UserGroupApi(apiClient);
         }
