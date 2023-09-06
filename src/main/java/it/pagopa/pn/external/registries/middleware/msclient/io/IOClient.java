@@ -7,6 +7,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Cre
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
+import it.pagopa.pn.external.registries.middleware.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;
@@ -24,11 +25,14 @@ class IOClient extends OcpBaseClient {
     protected final DefaultApi ioApi;
     private final PnExternalRegistriesConfig config;
     String ioMode;
+    private final CloudWatchMetricHandler cloudWatchMetricJob;
 
-    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode) {
+
+    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode, CloudWatchMetricHandler cloudWatchMetricHandler) {
         this.config = config;
         this.ioApi = ioApi;
         this.ioMode = ioMode;
+        this.cloudWatchMetricJob = cloudWatchMetricHandler;
     }
 
 
@@ -44,9 +48,15 @@ class IOClient extends OcpBaseClient {
             return Mono.just(res);
         }
 
-        return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
-            log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
-            return Mono.error(throwable);
+        return ioApi.submitMessageforUserWithFiscalCodeInBody( message )
+                .map((response)-> {
+                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, CloudWatchMetricHandler.IO_SENT_SUCCESSFULLY, 1);
+                    return response;
+                })
+                .onErrorResume(throwable -> {
+                    log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
+                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, CloudWatchMetricHandler.IO_SENT_FAILURE, 1);
+                    return Mono.error(throwable);
         });
     }
 
@@ -69,4 +79,6 @@ class IOClient extends OcpBaseClient {
     {
         return  (CollectionUtils.isEmpty(config.getIoWhitelist()) || config.getIoWhitelist().get(0).equals("*") || config.getIoWhitelist().contains(taxId));
     }
+
+
 }
