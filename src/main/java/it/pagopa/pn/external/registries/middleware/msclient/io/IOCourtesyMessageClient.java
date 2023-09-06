@@ -6,7 +6,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.Def
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ActivationPayload;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.job.CloudWatchMetricHandler;
+import it.pagopa.pn.external.registries.middleware.cloudwatch.CloudWatchMetricHandler;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
