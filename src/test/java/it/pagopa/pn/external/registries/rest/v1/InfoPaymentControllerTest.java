@@ -47,7 +47,7 @@ class InfoPaymentControllerTest {
         paymentInfoList.add(PaymentInfoV21InnerDto);
 
 
-        String url = "/ext-registry/pagopa/v2/paymentinfo";
+        String url = "/ext-registry/pagopa/v2.1/paymentinfo";
 
 
         // Mock the service
