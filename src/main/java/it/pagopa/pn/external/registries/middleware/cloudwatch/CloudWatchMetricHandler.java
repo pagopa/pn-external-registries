@@ -30,26 +30,22 @@ public class CloudWatchMetricHandler {
         log.info("Namespace for CloudWatchMetricHandler Activation: {}", NAMESPACE_CW_IO);
     }
 
-    public void sendMetric(String namespace, String metricName, double value) {
+    public void sendMetric(String namespace, Dimension dimension, String metricName, double value) {
 
         log.trace("Sending information to namespace=[{}] metricname=[{}]", namespace, metricName);
 
-        PutMetricDataRequest metricDataRequest = createMetricDataRequest(metricName, namespace, value);
+        PutMetricDataRequest metricDataRequest = createMetricDataRequest(metricName, dimension, namespace, value);
 
         Mono.fromFuture(cloudWatchAsyncClient.putMetricData(metricDataRequest))
                 .subscribe(putMetricDataResponse -> log.trace("[{}] PutMetricDataResponse: {}", namespace, putMetricDataResponse),
                         throwable -> log.warn(String.format("[%s] Error sending metric", namespace), throwable));
     }
 
-    private PutMetricDataRequest createMetricDataRequest(String metricName, String namespace, double value){
-        String dimensionValue = namespace.equals(NAMESPACE_CW_IO) ? "courtesy-messages" : "no-known";
+    private PutMetricDataRequest createMetricDataRequest(String metricName, Dimension dimension, String namespace, double value){
         MetricDatum metricDatum = MetricDatum.builder()
                 .metricName(metricName)
                 .value(value)
-                .dimensions(Collections.singletonList(Dimension.builder()
-                        .name("events")
-                        .value(dimensionValue)
-                        .build()))
+                .dimensions(dimension)
                 .unit(StandardUnit.COUNT)
                 .timestamp(Instant.now())
                 .build();

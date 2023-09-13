@@ -14,7 +14,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 
+import java.awt.*;
 import java.util.UUID;
 
 import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.IO;
@@ -47,15 +49,18 @@ class IOClient extends OcpBaseClient {
             res.setId(UUID.randomUUID().toString());
             return Mono.just(res);
         }
-
+        Dimension dimension = Dimension.builder()
+                .name("events")
+                .value("courtesy-messages")
+                .build();
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message )
                 .map((response)-> {
-                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, CloudWatchMetricHandler.IO_SENT_SUCCESSFULLY, 1);
+                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, dimension, CloudWatchMetricHandler.IO_SENT_SUCCESSFULLY, 1);
                     return response;
                 })
                 .onErrorResume(throwable -> {
                     log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
-                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, CloudWatchMetricHandler.IO_SENT_FAILURE, 1);
+                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, dimension, CloudWatchMetricHandler.IO_SENT_FAILURE, 1);
                     return Mono.error(throwable);
         });
     }

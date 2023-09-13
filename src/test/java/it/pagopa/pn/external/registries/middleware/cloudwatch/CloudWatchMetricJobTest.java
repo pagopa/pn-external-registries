@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataResponse;
 
@@ -28,7 +29,10 @@ class CloudWatchMetricJobTest {
     void testSendMetricToCloudWatch() {
         PutMetricDataResponse putMetricDataResponse = PutMetricDataResponse.builder().build();
         when(cloudWatchAsyncClient.putMetricData(any(PutMetricDataRequest.class))).thenReturn(CompletableFuture.completedFuture(putMetricDataResponse));
-
-        Assertions.assertDoesNotThrow(() -> cloudWatchMetricHandler.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, "NumberOfIOMessageSentSuccessfully", 1));
+        Dimension dimension = Dimension.builder()
+                .name("events")
+                .value("courtesy-messages")
+                .build();
+        Assertions.assertDoesNotThrow(() -> cloudWatchMetricHandler.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, dimension,"NumberOfIOMessageSentSuccessfully", 1));
     }
 }
