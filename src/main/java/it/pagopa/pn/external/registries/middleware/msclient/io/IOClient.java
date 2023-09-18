@@ -1,14 +1,16 @@
 package it.pagopa.pn.external.registries.middleware.msclient.io;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import it.pagopa.pn.commons.utils.LogUtils;
+import it.pagopa.pn.commons.utils.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
-import it.pagopa.pn.external.registries.middleware.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
+import it.pagopa.pn.external.registries.springbootcfg.SpringAnalyzerActivation;
 import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
@@ -27,14 +29,14 @@ class IOClient extends OcpBaseClient {
     protected final DefaultApi ioApi;
     private final PnExternalRegistriesConfig config;
     String ioMode;
-    private final CloudWatchMetricHandler cloudWatchMetricJob;
+    private final MeterRegistry meterRegistry;
 
 
-    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode, CloudWatchMetricHandler cloudWatchMetricHandler) {
+    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode, MeterRegistry meterRegistry) {
         this.config = config;
         this.ioApi = ioApi;
         this.ioMode = ioMode;
-        this.cloudWatchMetricJob = cloudWatchMetricHandler;
+        this.meterRegistry = meterRegistry;
     }
 
 
@@ -49,18 +51,15 @@ class IOClient extends OcpBaseClient {
             res.setId(UUID.randomUUID().toString());
             return Mono.just(res);
         }
-        Dimension dimension = Dimension.builder()
-                .name("events")
-                .value("courtesy-messages")
-                .build();
+
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message )
                 .map((response)-> {
-                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, dimension, CloudWatchMetricHandler.IO_SENT_SUCCESSFULLY, 1);
+                    this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_SUCCESSFULLY).counter().increment();
                     return response;
                 })
                 .onErrorResume(throwable -> {
                     log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
-                    this.cloudWatchMetricJob.sendMetric(CloudWatchMetricHandler.NAMESPACE_CW_IO, dimension, CloudWatchMetricHandler.IO_SENT_FAILURE, 1);
+                    this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_FAILURE).counter().increment();
                     return Mono.error(throwable);
         });
     }

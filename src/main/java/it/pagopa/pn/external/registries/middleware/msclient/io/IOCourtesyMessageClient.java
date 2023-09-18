@@ -1,12 +1,12 @@
 package it.pagopa.pn.external.registries.middleware.msclient.io;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.ActivationPayload;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
-import it.pagopa.pn.external.registries.middleware.cloudwatch.CloudWatchMetricHandler;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -22,9 +22,9 @@ public class IOCourtesyMessageClient extends IOClient {
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
     //inject by name
-    public IOCourtesyMessageClient(PnExternalRegistriesConfig config, DefaultApi ioApi, CloudWatchMetricHandler cloudWatchMetricJob)
+    public IOCourtesyMessageClient(PnExternalRegistriesConfig config, DefaultApi ioApi, MeterRegistry meterRegistry)
     {
-        super(config, ioApi, "Courtesy", cloudWatchMetricJob);
+        super(config, ioApi, "Courtesy", meterRegistry);
     }
 
 
