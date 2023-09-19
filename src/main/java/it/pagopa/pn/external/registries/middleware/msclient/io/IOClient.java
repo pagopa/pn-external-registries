@@ -53,7 +53,7 @@ class IOClient extends OcpBaseClient {
         }
 
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message )
-                .map((response)-> {
+                .map(response-> {
                     this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_SUCCESSFULLY).counter().increment();
                     return response;
                 })

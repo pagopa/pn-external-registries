@@ -24,7 +24,7 @@ public class SpringAnalyzerActivation extends SpringAnalyzer {
     MeterRegistry meterRegistry;
     CloudWatchMetricHandler cloudWatchMetricHandler;
 
-    public static final Collection<String> BUSINESS_METRICS = Arrays.asList(IO_SENT_SUCCESSFULLY, IO_SENT_FAILURE);
+    protected static final Collection<String> BUSINESS_METRICS = Arrays.asList(IO_SENT_SUCCESSFULLY, IO_SENT_FAILURE);
 
     public SpringAnalyzerActivation(CloudWatchMetricHandler cloudWatchMetricHandler, MetricsEndpoint metricsEndpoint, MeterRegistry meterRegistry) {
         super(cloudWatchMetricHandler, metricsEndpoint);
