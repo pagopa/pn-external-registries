@@ -1,10 +1,7 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.InfoPaApi;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
 import lombok.extern.slf4j.Slf4j;
@@ -110,4 +107,12 @@ public class InfoPaController implements InfoPaApi {
                 .collectList()
                 .map(paGroupDtos -> ResponseEntity.ok(Flux.fromIterable(paGroupDtos)));
     }
+
+    @Override
+    public Mono<ResponseEntity<Flux<InstitutionResourceDto>>> getInstitutions(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
+        log.debug("getPaInstitutions - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
+        return infoSelfcareInstitutionsService.listInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
+                .collectList()
+                .map(institutionResourceDtos -> ResponseEntity.ok(Flux.fromIterable(institutionResourceDtos)));
+        }
 }
