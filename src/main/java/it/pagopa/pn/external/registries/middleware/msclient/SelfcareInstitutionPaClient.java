@@ -4,6 +4,7 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.InstitutionsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,17 @@ public class SelfcareInstitutionPaClient {
                 .doOnNext(institutionsResponseDto -> log.info("getInstitutions result: {}", institutionsResponseDto))
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.error("getInstitutions response error {}", x.getResponseBodyAsString(), x);
-                    return Mono.error(new PnInternalException("Errore lettura institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
+                    return Mono.error(new PnInternalException("Error getting institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
+                });
+    }
+
+    public Flux<ProductResourceDto> getInstitutionProduct(String institutionId, String userId) {
+        log.logInvokingExternalService(SELFCARE_PA, "getInstitutions");
+        return institutionsApi.getInstitutionUserProductsUsingGET(institutionId, userId)
+                .doOnNext(productResourceDto -> log.info("getInstitutionProduct result: {}", productResourceDto))
+                .onErrorResume(WebClientResponseException.class, x -> {
+                    log.error("getInstitutionProduct response error {}", x.getResponseBodyAsString(), x);
+                    return Mono.error(new PnInternalException("Error getting product institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
                 });
     }
 

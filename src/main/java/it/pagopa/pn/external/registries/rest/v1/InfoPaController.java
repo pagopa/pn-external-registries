@@ -114,5 +114,15 @@ public class InfoPaController implements InfoPaApi {
         return infoSelfcareInstitutionsService.listInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
                 .collectList()
                 .map(institutionResourceDtos -> ResponseEntity.ok(Flux.fromIterable(institutionResourceDtos)));
-        }
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<ProductResourceDto>>> getInstitutionsProducts(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, String institutionId, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
+        log.debug("getPaInstitutions - institutionId={} xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", institutionId, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
+
+        return infoSelfcareInstitutionsService.listProductsByInstitutionAndCurrentUser(institutionId, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
+                .collectList()
+                .map(productResourceDtos -> ResponseEntity.ok(Flux.fromIterable(productResourceDtos)));
+
+    }
 }

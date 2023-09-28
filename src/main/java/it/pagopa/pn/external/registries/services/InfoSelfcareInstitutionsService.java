@@ -3,10 +3,7 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.CxTypeAuthFleetDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaInfoDto;
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
@@ -55,9 +52,16 @@ public class InfoSelfcareInstitutionsService {
   }
 
   public Flux<InstitutionResourceDto> listInstitutionByCurrentUser(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails) {
-    log.info("listPaByCurrentUser - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
+    log.info("listInstitutionByCurrentUser - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
     return selfcareInstitutionPaClient.getInstitutions(xPagopaPnUid).map(
             institutionResourceDto -> modelMapper.map(institutionResourceDto, InstitutionResourceDto.class)
+    );
+  }
+
+  public Flux<ProductResourceDto> listProductsByInstitutionAndCurrentUser(String institutionId, String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails) {
+    log.info("listProductsByInstitutionAndCurrentUser - institutionId={} xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", institutionId, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
+    return selfcareInstitutionPaClient.getInstitutionProduct(institutionId, xPagopaPnUid).map(
+            productResourceDto -> modelMapper.map(productResourceDto, ProductResourceDto.class)
     );
   }
 

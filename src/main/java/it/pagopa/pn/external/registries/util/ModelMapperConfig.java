@@ -14,6 +14,7 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy( MatchingStrategies.STRICT );
         modelMapper.createTypeMap( it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourceDto.class, it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto.class );
+        modelMapper.createTypeMap( it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourceDto.class, it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto.class );
         return modelMapper;
     }
 

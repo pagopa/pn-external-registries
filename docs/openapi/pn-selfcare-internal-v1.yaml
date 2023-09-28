@@ -299,6 +299,48 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry/pa/v1/institutions/{institutionId}/products':
+    get:
+      operationId: getInstitutionsProducts
+      summary: Retrieve all active products for given institution and user
+      description: >
+        etrieve all active products for given institution and user using SelfCare API
+      tags:
+        - InfoPA
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'        # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'     # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'       # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'   # NO EXTERNAL
+        - $ref: '#/components/parameters/headerSourceChannel'                 # NO EXTERNAL
+        - $ref: '#/components/parameters/headerSourceChannelDetails'          # NO EXTERNAL
+        - name: institutionId                                                                      # NO EXTERNAL
+          description: The identifier of one Institution                                            # NO EXTERNAL
+          in: path                                                                              # NO EXTERNAL
+          required: true                                                                        # NO EXTERNAL
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
     InstitutionResourceList:
@@ -596,6 +638,92 @@ components:
       maxLength: 50
       # ASCII printable characters
       pattern: ^[ -~ ]*$
+    ProductResourceList:
+      title: ProductResourceList
+      description: Contains the list of products related institution and current user
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductResource'
+    ProductResource:
+      title: ProductResource
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Date the products was activated/created
+          format: date-time
+        depictImageUrl:
+          type: string
+          description: Product's depiction image url
+        description:
+          type: string
+          description: Product's description
+        id:
+          type: string
+          description: Product's unique identifier
+        identityTokenAudience:
+          type: string
+          description: Product's identity token audience
+        logo:
+          type: string
+          description: Product's logo url
+        logoBgColor:
+          pattern: ^#0-9A-F6$
+          type: string
+          description: Product logo's background color
+        parentId:
+          type: string
+          description: Root parent of the sub product
+        roleManagementURL:
+          type: string
+          description: Url of the utilities management
+        roleMappings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ProductRoleInfoRes'
+          description: Mappings between Party's and Product's role
+        title:
+          type: string
+          description: Product's title
+        urlBO:
+          type: string
+          description: URL that redirects to the back-office section where is possible to manage the product
+        urlPublic:
+          type: string
+          description: URL that redirects to the public information webpage of the product
+    ProductRoleInfoRes:
+      title: ProductRoleInfoRes
+      required:
+        - multiroleAllowed
+        - roles
+      type: object
+      properties:
+        multiroleAllowed:
+          type: boolean
+          description: Flag indicating if a User can have more than one product role
+          example: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRole'
+          description: Available product roles
+    ProductRole:
+      title: ProductRole
+      required:
+        - code
+        - description
+        - label
+      type: object
+      properties:
+        code:
+          type: string
+          description: Product role internal code
+        description:
+          type: string
+          description: Product role description
+        label:
+          type: string
+          description: Product role label
   parameters:
     headerSourceChannel: # NO EXTERNAL
       name: x-pagopa-pn-src-ch                                                      # NO EXTERNAL
