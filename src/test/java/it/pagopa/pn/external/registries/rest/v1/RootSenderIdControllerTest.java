@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @WebFluxTest(RootSenderIdController.class)
 class RootSenderIdControllerTest {
-    private static final String URL = "/ext-registry-private/pa/v1/getRootSenderId/{senderId}";
+    private static final String URL = "/ext-registry-private/pa/v1/{senderId}/root-id";
 
     @Autowired
     WebTestClient webTestClient;
