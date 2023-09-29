@@ -30,6 +30,8 @@ public class OnboardInstitutionEntity {
     private static final String COL_ZIPCODE = "zipCode";
     private static final String COL_IPACODE = "ipaCode";
     private static final String COL_SDICODE = "sdiCode";
+    private static final String COL_ROOT_ID = "rootId";
+    private static final String COL_ONLY_ROOT_STATUS = "onlyRootStatus";
 
 
     @DynamoDbIgnore
@@ -55,4 +57,6 @@ public class OnboardInstitutionEntity {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_DIGITALADDRESS)}))  private String digitalAddress;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_IPACODE)}))  private String ipaCode;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SDICODE)}))  private String sdiCode;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ROOT_ID)}))  private String rootId;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ONLY_ROOT_STATUS)}))  private String onlyRootStatus;
 }
