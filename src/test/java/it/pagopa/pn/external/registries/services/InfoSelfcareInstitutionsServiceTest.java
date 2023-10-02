@@ -2,10 +2,13 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import it.pagopa.pn.external.registries.services.helpers.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,6 +23,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,6 +45,9 @@ class InfoSelfcareInstitutionsServiceTest {
 
     @MockBean
     private OnboardInstitutionFulltextSearchHelper onboardInstitutionFulltextSearchHelper;
+
+    @MockBean
+    private SelfcarePaInstitutionClient selfcarePaInstitutionClient;
 
     @Test
     void getOnePa() {
@@ -141,6 +148,86 @@ class InfoSelfcareInstitutionsServiceTest {
         assertEquals(2, res.size());
         assertEquals("Comune di Milano", res.get(0).getName());
         assertEquals("Comune di Verona", res.get(1).getName());
+    }
+
+    @Test
+    void listInstitutionByCurrentUser() {
+        //GIVEN
+        String user = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        UUID institutionId1 = UUID.randomUUID();
+        UUID institutionId2 = UUID.randomUUID();
+
+        List<InstitutionResourceDto> list = new ArrayList<>();
+        InstitutionResourceDto dto = new InstitutionResourceDto();
+        dto.setAddress("Via vittorio veneto, 23");
+        dto.setDescription("Comune di Milano");
+        dto.setDigitalAddress("xxx@cert.xxx.it");
+        dto.setExternalId("00431230123");
+        dto.setId(institutionId1);
+        dto.setInstitutionType(InstitutionResourceDto.InstitutionTypeEnum.PA);
+        dto.setZipCode("12345");
+        dto.setTaxCode("00431230123");
+        dto.setStatus("ACTIVE");
+        List<String> userProductRoles = new ArrayList<>();
+        userProductRoles.add("admin");
+        dto.setUserProductRoles(userProductRoles);
+        list.add(dto);
+        dto.setAddress("Via Roma, 23");
+        dto.setId(institutionId2);
+        list.add(dto);
+        Mockito.when(selfcarePaInstitutionClient.getInstitutions(user)).thenReturn(Flux.fromIterable(list));
+        List<String> header = new ArrayList<>();
+        // WHEN
+        List<it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourceDto> res = service.listInstitutionByCurrentUser(user, "",  "WEB", header, "PA" ).collectList().block();
+
+        //THEN
+        assertNotNull(res);
+        assertEquals(2, res.size());
+        res.forEach(x -> {
+            if (x.getId().equals(institutionId1)) {
+                assertEquals(institutionId1, x.getId());
+            }
+            else {
+                assertEquals(institutionId2, x.getId());
+            }
+        });
+    }
+
+    @Test
+    void listProductsByInstitutionAndCurrentUser() {
+        //GIVEN
+        String user = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        String institutionId = UUID.randomUUID().toString();
+        String idProduct1 = "test1-pn";
+        String idProduct2 = "test2-pn";
+        List<ProductResourceDto> list = new ArrayList<>();
+        ProductResourceDto dto = new ProductResourceDto();
+        dto.setCreatedAt(new Date());
+        dto.setDescription("Comune di Milano");
+        dto.setId(idProduct1);
+        dto.setLogo("http://test.com/logo.csv");
+        dto.setLogoBgColor("#0066CC");
+        dto.setIdentityTokenAudience("identityToken");
+        dto.setTitle("SEND - Servizio Notifiche Digitali");
+        list.add(dto);
+        dto.setId(idProduct2);
+        list.add(dto);
+        Mockito.when(selfcarePaInstitutionClient.getInstitutionProducts(institutionId, user)).thenReturn(Flux.fromIterable(list));
+        List<String> header = new ArrayList<>();
+        // WHEN
+        List<it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourceDto> res = service.listProductsByInstitutionAndCurrentUser(institutionId, user, "",  "WEB", header, "PA" ).collectList().block();
+
+        //THEN
+        assertNotNull(res);
+        assertEquals(2, res.size());
+        res.forEach(x -> {
+            if (x.getId().equals(idProduct1)) {
+                assertEquals(idProduct1, x.getId());
+            }
+            else {
+                assertEquals(idProduct2, x.getId());
+            }
+        });
     }
 
 }

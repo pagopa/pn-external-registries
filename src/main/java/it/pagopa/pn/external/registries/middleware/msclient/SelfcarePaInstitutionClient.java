@@ -18,7 +18,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @CustomLog
 @Component
 @RequiredArgsConstructor
-public class SelfcareInstitutionPaClient {
+public class SelfcarePaInstitutionClient {
 
     private final InstitutionsApi institutionsApi; //inject by name
     private final PnExternalRegistriesConfig config;
@@ -33,7 +33,7 @@ public class SelfcareInstitutionPaClient {
                 });
     }
 
-    public Flux<ProductResourceDto> getInstitutionProduct(String institutionId, String userId) {
+    public Flux<ProductResourceDto> getInstitutionProducts(String institutionId, String userId) {
         log.logInvokingExternalService(SELFCARE_PA, "getInstitutions");
         return institutionsApi.getInstitutionUserProductsUsingGET(institutionId, userId)
                 .doOnNext(productResourceDto -> log.info("getInstitutionProduct result: {}", productResourceDto))

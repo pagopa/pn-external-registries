@@ -299,9 +299,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
-  '/ext-registry/pa/v1/institutions/{institutionId}/products':
+  '/ext-registry/pa/v1/institutions/{id}/products':
     get:
-      operationId: getInstitutionsProducts
+      operationId: getInstitutionProducts
       summary: Retrieve all active products for given institution and user
       description: >
         etrieve all active products for given institution and user using SelfCare API
@@ -315,13 +315,13 @@ paths:
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'       # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'   # NO EXTERNAL
         - $ref: '#/components/parameters/headerSourceChannel'                 # NO EXTERNAL
-        - $ref: '#/components/parameters/headerSourceChannelDetails'          # NO EXTERNAL
-        - name: institutionId                                                                      # NO EXTERNAL
-          description: The identifier of one Institution                                            # NO EXTERNAL
+        - $ref: '#/components/parameters/headerSourceChannelDetails'          # NO EXTERNAL                                                                             # NO EXTERNAL
+        - name: id                                                                              # NO EXTERNAL
+          description: The identifier of one PA                                                 # NO EXTERNAL
           in: path                                                                              # NO EXTERNAL
           required: true                                                                        # NO EXTERNAL
-          schema:
-            type: string
+          schema:                                                                               # NO EXTERNAL
+            $ref: '#/components/schemas/SelfCarePaId'
       responses:
         '200':
           description: OK

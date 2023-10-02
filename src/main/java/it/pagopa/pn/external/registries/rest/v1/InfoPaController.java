@@ -111,16 +111,16 @@ public class InfoPaController implements InfoPaApi {
     @Override
     public Mono<ResponseEntity<Flux<InstitutionResourceDto>>> getInstitutions(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
         log.debug("getPaInstitutions - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
-        return infoSelfcareInstitutionsService.listInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
+        return infoSelfcareInstitutionsService.listInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
                 .collectList()
                 .map(institutionResourceDtos -> ResponseEntity.ok(Flux.fromIterable(institutionResourceDtos)));
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<ProductResourceDto>>> getInstitutionsProducts(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, String institutionId, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<ProductResourceDto>>> getInstitutionProducts(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, String institutionId, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
         log.debug("getPaInstitutions - institutionId={} xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", institutionId, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
 
-        return infoSelfcareInstitutionsService.listProductsByInstitutionAndCurrentUser(institutionId, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
+        return infoSelfcareInstitutionsService.listProductsByInstitutionAndCurrentUser(institutionId, xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
                 .collectList()
                 .map(productResourceDtos -> ResponseEntity.ok(Flux.fromIterable(productResourceDtos)));
 
