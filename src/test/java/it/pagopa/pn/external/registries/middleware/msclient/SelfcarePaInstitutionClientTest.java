@@ -3,13 +3,11 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
@@ -47,42 +45,8 @@ class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
         mockServer.stop();
     }
 
-    @Test
-    void getInstitutions() {
-        InstitutionResourceDto institutionResourceDto = new InstitutionResourceDto();
-        institutionResourceDto.setAddress("Via vittorio veneto, 23");
 
-        List<InstitutionResourceDto> list = new ArrayList<>();
-        list.add(institutionResourceDto);
 
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor(new TypeReference<List<InstitutionResourceDto>>(){});
-        try {
-            responseBodyBites = mapper.writeValueAsBytes(list);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
-            mockServerClient.when(request()
-                            .withMethod("GET")
-                            .withPath("/institutions"))
-                    .respond(response()
-                            .withBody(responseBodyBites)
-                            .withContentType(MediaType.APPLICATION_JSON)
-                            .withStatusCode(200));
-
-            //When
-            List<InstitutionResourceDto> response = client.getInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
-
-            //Then
-            Assertions.assertNotNull(response);
-            Assertions.assertEquals(1, response.size());
-            Assertions.assertEquals(response.get(0).getAddress(), institutionResourceDto.getAddress());
-        }
-    }
 
     @Test
     void getInstitutionProducts() {
@@ -101,8 +65,9 @@ class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
             e.printStackTrace();
         }
 
-        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
-            mockServerClient.when(request()
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request()
                             .withMethod("GET")
                             .withPath("/institutions/" + institutionId + "/products"))
                     .respond(response()
@@ -111,12 +76,100 @@ class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
                             .withStatusCode(200));
 
             //When
-            List<ProductResourceDto> response = client.getInstitutionProducts(institutionId, "1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
+            List<ProductResourceDto> response = client.getInstitutionProducts(institutionId, "1a2qp213-f1cb-4021-b3d0-5241216a0622").collectList().block();
 
             //Then
             Assertions.assertNotNull(response);
             Assertions.assertEquals(1, response.size());
             Assertions.assertEquals(response.get(0).getId(), productResourceDto.getId());
+    }
+
+    @Test
+    void getInstitutionProductsKO() {
+        String institutionId = UUID.randomUUID().toString();
+        int status = 200;
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor(new TypeReference<List<ProductResourceDto>>(){});
+
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request()
+                        .withMethod("GET")
+                        .withPath("/institutions/" + institutionId + "/products"))
+                .respond(response().withStatusCode(500));
+
+        //When
+        try {
+            client.getInstitutionProducts(institutionId, "1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
         }
+        catch (Exception e) {
+            status = ((PnInternalException) e).getStatus();
+        }
+
+        //Then
+        Assertions.assertEquals(500, status);
+    }
+
+    @Test
+    void getInstitutionsKO() {
+        int status = 200;
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor(new TypeReference<List<InstitutionResourceDto>>(){});
+
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request()
+                        .withMethod("GET")
+                        .withPath("/institutions"))
+                .respond(response().withStatusCode(500));
+
+        //When
+        try {
+            client.getInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
+        }
+        catch (Exception e) {
+            status = ((PnInternalException) e).getStatus();
+        }
+
+        //Then
+        Assertions.assertEquals(500, status);
+    }
+
+    @Test
+    void getInstitutions() {
+        InstitutionResourceDto institutionResourceDto = new InstitutionResourceDto();
+        institutionResourceDto.setAddress("Via vittorio veneto, 23");
+
+        List<InstitutionResourceDto> list = new ArrayList<>();
+        list.add(institutionResourceDto);
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor(new TypeReference<List<InstitutionResourceDto>>(){});
+        try {
+            responseBodyBites = mapper.writeValueAsBytes(list);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request()
+                        .withMethod("GET")
+                        .withPath("/institutions"))
+                .respond(response()
+                        .withBody(responseBodyBites)
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200));
+
+        //When
+        List<InstitutionResourceDto> response = client.getInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0622").collectList().block();
+
+        //Then
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(1, response.size());
+        Assertions.assertEquals(response.get(0).getAddress(), institutionResourceDto.getAddress());
     }
 }
