@@ -184,14 +184,14 @@ class InfoPaControllerTest {
         // Given
         String url = "/ext-registry/pa/v1/institutions";
 
-        List<InstitutionResourceDto> res = new ArrayList<>();
-        InstitutionResourceDto dto = new InstitutionResourceDto();
+        List<InstitutionResourcePNDto> res = new ArrayList<>();
+        InstitutionResourcePNDto dto = new InstitutionResourcePNDto();
         dto.setAddress("Via vittorio veneto, 23");
         dto.setDescription("Comune di Milano");
         dto.setDigitalAddress("xxx@cert.xxx.it");
         dto.setExternalId("00431230123");
         dto.setId(UUID.randomUUID());
-        dto.setInstitutionType(InstitutionResourceDto.InstitutionTypeEnum.PA);
+        dto.setInstitutionType(InstitutionResourcePNDto.InstitutionTypeEnum.PA);
         dto.setZipCode("12345");
         dto.setTaxCode("00431230123");
         dto.setStatus("ACTIVE");
@@ -217,7 +217,7 @@ class InfoPaControllerTest {
                 .header( PN_PAGOPA_USER_TYPE, "PA")
                 .header( PN_PAGOPA_SRC_CH_TYPE, "PA")
                 .exchange()
-                .expectStatus().isOk().expectBodyList(InstitutionResourceDto.class).hasSize(2);
+                .expectStatus().isOk().expectBodyList(InstitutionResourcePNDto.class).hasSize(2);
     }
 
     @Test
@@ -227,8 +227,8 @@ class InfoPaControllerTest {
         String url = "/ext-registry/pa/v1/institutions/{id}/products"
                 .replace("{id}", UUID.randomUUID().toString());
 
-        List<ProductResourceDto> res = new ArrayList<>();
-        ProductResourceDto dto = new ProductResourceDto();
+        List<ProductResourcePNDto> res = new ArrayList<>();
+        ProductResourcePNDto dto = new ProductResourcePNDto();
         dto.setCreatedAt(new Date());
         dto.setDescription("Comune di Milano");
         dto.setId("test-pn");
@@ -254,6 +254,6 @@ class InfoPaControllerTest {
                 .header( PN_PAGOPA_USER_TYPE, "PA")
                 .header( PN_PAGOPA_SRC_CH_TYPE, "PA")
                 .exchange()
-                .expectStatus().isOk().expectBodyList(ProductResourceDto.class).hasSize(2);
+                .expectStatus().isOk().expectBodyList(ProductResourcePNDto.class).hasSize(2);
     }
 }

@@ -348,9 +348,9 @@ components:
       description: Contains the list of institution defined in SelfCare PA
       type: array
       items:
-        $ref: '#/components/schemas/InstitutionResource'
-    InstitutionResource:
-      title: InstitutionResource
+        $ref: '#/components/schemas/InstitutionResourcePN'
+    InstitutionResourcePN:
+      title: InstitutionResourcePN
       type: object
       properties:
         address:
@@ -360,9 +360,9 @@ components:
           type: string
           description: AOO unit parent institution Code
         assistanceContacts:
-          $ref: '#/components/schemas/AssistanceContactsResource'
+          $ref: '#/components/schemas/AssistanceContactsResourcePN'
         companyInformations:
-          $ref: '#/components/schemas/CompanyInformationsResource'
+          $ref: '#/components/schemas/CompanyInformationsResourcePN'
         description:
           type: string
           description: Institution's legal name
@@ -370,7 +370,7 @@ components:
           type: string
           description: Institution's digitalAddress
         dpoData:
-          $ref: '#/components/schemas/DpoDataResource'
+          $ref: '#/components/schemas/DpoDataResourcePN'
         externalId:
           type: string
           description: Institution's unique external identifier
@@ -395,9 +395,9 @@ components:
           type: string
           description: Institution's details origin Id
         rootParent:
-          $ref: '#/components/schemas/RootParentResource'
+          $ref: '#/components/schemas/RootParentResourcePN'
         pspData:
-          $ref: '#/components/schemas/PspDataResource'
+          $ref: '#/components/schemas/PspDataResourcePN'
         recipientCode:
           type: string
           description: Billing recipient code
@@ -421,8 +421,8 @@ components:
         zipCode:
           type: string
           description: Institution's zipCode
-    CompanyInformationsResource:
-      title: CompanyInformationsResource
+    CompanyInformationsResourcePN:
+      title: CompanyInformationsResourcePN
       type: object
       properties:
         businessRegisterPlace:
@@ -434,8 +434,8 @@ components:
         shareCapital:
           type: string
           description: Institution's share capital value
-    DpoDataResource:
-      title: DpoDataResource
+    DpoDataResourcePN:
+      title: DpoDataResourcePN
       type: object
       properties:
         address:
@@ -451,8 +451,8 @@ components:
           description: DPO's PEC
           format: email
           example: email@example.com
-    AssistanceContactsResource:
-      title: AssistanceContactsResource
+    AssistanceContactsResourcePN:
+      title: AssistanceContactsResourcePN
       type: object
       properties:
         supportEmail:
@@ -461,8 +461,8 @@ components:
         supportPhone:
           type: string
           description: Institution's support phone contact
-    RootParentResource:
-      title: RootParentResource
+    RootParentResourcePN:
+      title: RootParentResourcePN
       type: object
       properties:
         description:
@@ -471,8 +471,8 @@ components:
         id:
           type: string
           description: Institution's unique internal Id
-    PspDataResource:
-      title: PspDataResource
+    PspDataResourcePN:
+      title: PspDataResourcePN
       type: object
       properties:
         abiCode:
@@ -643,9 +643,9 @@ components:
       description: Contains the list of products related institution and current user
       type: array
       items:
-        $ref: '#/components/schemas/ProductResource'
-    ProductResource:
-      title: ProductResource
+        $ref: '#/components/schemas/ProductResourcePN'
+    ProductResourcePN:
+      title: ProductResourcePN
       type: object
       properties:
         createdAt:
@@ -680,7 +680,7 @@ components:
         roleMappings:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/ProductRoleInfoRes'
+            $ref: '#/components/schemas/ProductRoleInfoResPN'
           description: Mappings between Party's and Product's role
         title:
           type: string
@@ -691,8 +691,8 @@ components:
         urlPublic:
           type: string
           description: URL that redirects to the public information webpage of the product
-    ProductRoleInfoRes:
-      title: ProductRoleInfoRes
+    ProductRoleInfoResPN:
+      title: ProductRoleInfoResPN
       required:
         - multiroleAllowed
         - roles
@@ -705,10 +705,10 @@ components:
         roles:
           type: array
           items:
-            $ref: '#/components/schemas/ProductRole'
+            $ref: '#/components/schemas/ProductRolePN'
           description: Available product roles
-    ProductRole:
-      title: ProductRole
+    ProductRolePN:
+      title: ProductRolePN
       required:
         - code
         - description

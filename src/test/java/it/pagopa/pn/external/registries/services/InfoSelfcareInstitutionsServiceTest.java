@@ -4,8 +4,10 @@ import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourcePNDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourcePNDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
@@ -178,7 +180,7 @@ class InfoSelfcareInstitutionsServiceTest {
         Mockito.when(selfcarePaInstitutionClient.getInstitutions(user)).thenReturn(Flux.fromIterable(list));
         List<String> header = new ArrayList<>();
         // WHEN
-        List<it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourceDto> res = service.listInstitutionByCurrentUser(user, "",  "WEB", header, "PA" ).collectList().block();
+        List<InstitutionResourcePNDto> res = service.listInstitutionByCurrentUser(user, "",  "WEB", header, "PA" ).collectList().block();
 
         //THEN
         assertNotNull(res);
@@ -215,7 +217,7 @@ class InfoSelfcareInstitutionsServiceTest {
         Mockito.when(selfcarePaInstitutionClient.getInstitutionProducts(institutionId, user)).thenReturn(Flux.fromIterable(list));
         List<String> header = new ArrayList<>();
         // WHEN
-        List<it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourceDto> res = service.listProductsByInstitutionAndCurrentUser(institutionId, user, "",  "WEB", header, "PA" ).collectList().block();
+        List<ProductResourcePNDto> res = service.listProductsByInstitutionAndCurrentUser(institutionId, user, "",  "WEB", header, "PA" ).collectList().block();
 
         //THEN
         assertNotNull(res);

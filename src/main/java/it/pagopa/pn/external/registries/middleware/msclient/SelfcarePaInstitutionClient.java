@@ -20,7 +20,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @RequiredArgsConstructor
 public class SelfcarePaInstitutionClient {
 
-    private final InstitutionsApi institutionsApi; //inject by name
+    private final InstitutionsApi institutionsApi;
     private final PnExternalRegistriesConfig config;
 
     public Flux<InstitutionResourceDto> getInstitutions(String userIdForAuth) {

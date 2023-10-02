@@ -5,9 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.PageOfUserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserGroupResourceDto;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -77,7 +75,7 @@ class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
                             .withStatusCode(200));
 
             //When
-            List<InstitutionResourceDto> response = client.getInstitutions("8c9ed305-f1ab-4031-b3f0-5241216d0635").collectList().block();
+            List<InstitutionResourceDto> response = client.getInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
 
             //Then
             Assertions.assertNotNull(response);
