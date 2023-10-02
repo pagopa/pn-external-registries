@@ -12,7 +12,6 @@ import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import it.pagopa.pn.external.registries.services.helpers.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,15 +26,12 @@ public class InfoSelfcareInstitutionsService {
   private final OnboardInstitutionFulltextSearchHelper onboardInstitutionFulltextSearchHelper;
   private final SelfcarePaInstitutionClient selfcarePaInstitutionClient;
 
-  private final ModelMapper modelMapper;
   public InfoSelfcareInstitutionsService(OnboardInstitutionsDao onboardInstitutionsDao,
                                          OnboardInstitutionFulltextSearchHelper onboardInstitutionFulltextSearchHelper,
-                                         SelfcarePaInstitutionClient selfcarePaInstitutionClient,
-                                         ModelMapper modelMapper) {
+                                         SelfcarePaInstitutionClient selfcarePaInstitutionClient) {
     this.onboardInstitutionsDao = onboardInstitutionsDao;
     this.onboardInstitutionFulltextSearchHelper = onboardInstitutionFulltextSearchHelper;
     this.selfcarePaInstitutionClient = selfcarePaInstitutionClient;
-    this.modelMapper = modelMapper;
   }
 
   public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
