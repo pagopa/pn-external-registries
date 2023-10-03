@@ -45,8 +45,11 @@ public class OnboardInstitutionEntity {
     }
 
     @Setter @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PK)}))  private String pk;
-    @Setter @Getter(onMethod=@__({@DynamoDbSecondaryPartitionKey(indexNames = { GSI_INDEX_LASTUPDATE}), @DynamoDbAttribute(COL_STATUS)}))  private String status;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_STATUS)}))  private String status;
     @Setter @Getter(onMethod=@__({@DynamoDbSecondarySortKey(indexNames = { GSI_INDEX_LASTUPDATE }), @DynamoDbAttribute(COL_LASTUPDATE)}))  private Instant lastUpdate;
+    @Setter @Getter(onMethod=@__({@DynamoDbSecondaryPartitionKey(indexNames = { GSI_INDEX_LASTUPDATE}), @DynamoDbAttribute(COL_ONLY_ROOT_STATUS)}))  private String onlyRootStatus;
+
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ROOT_ID)}))  private String rootId;
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_CREATED), @DynamoDbUpdateBehavior(UpdateBehavior.WRITE_IF_NOT_EXISTS)}))  private Instant created;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_DESCRIPTION)}))  private String description;
@@ -57,6 +60,5 @@ public class OnboardInstitutionEntity {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_DIGITALADDRESS)}))  private String digitalAddress;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_IPACODE)}))  private String ipaCode;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SDICODE)}))  private String sdiCode;
-    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ROOT_ID)}))  private String rootId;
-    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_ONLY_ROOT_STATUS)}))  private String onlyRootStatus;
+
 }

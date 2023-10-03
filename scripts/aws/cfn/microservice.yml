@@ -658,6 +658,45 @@ Resources:
   
                 //logging the incoming message body (view in cloudwatch):
                 console.log("Incoming message body from SQS :", body);
+          
+                if(body.id === body.rootId){//put will automatically update the element if exists
+                  delete body.rootDescription;
+                  delete body.rootIpaCode;
+                  body.onlyRootStatus = body.status;
+                }else{
+                  body.onlyRootStatus = "";
+                  const params = {
+                    TableName: TABLE_NAME,
+                    Key: {
+                      id: body.rootId
+                    }
+                  }
+                  let result = await dynamoDB.get(params).promise();
+                  if(!result.Item){
+                    //insert root institutions
+                    let rootInstitutions = {
+                      id: body.rootId,
+                      address: "",
+                      created: body.created,
+                      description: body.rootDescription,
+                      externalId: "",
+                      digitalAddress: "",
+                      ipaCode: rootIpaCode,
+                      lastUpdate: body.lastUpdate,
+                      sdiCode: "",
+                      status: body.status,
+                      onlyRootStatus: body.status,
+                      taxCode: body.taxCode,
+                    }
+                    const params = {
+                        TableName: TABLE_NAME,
+                        Item: rootInstitutions
+                    };
+                    await dynamoDB.put(params).promise();
+                }
+                delete body.rootDescription;
+                delete body.rootIpaCode;
+              }
   
                 //configure params for writing data to dynamo DB:
                 const params = {

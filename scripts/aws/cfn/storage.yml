@@ -58,7 +58,7 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "id"
           AttributeType: "S"
-        - AttributeName: "status"
+        - AttributeName: "onlyRootStatus"
           AttributeType: "S"
         - AttributeName: "lastUpdate"
           AttributeType: "S"
@@ -68,7 +68,7 @@ Resources:
       GlobalSecondaryIndexes:
         - IndexName: "status-lastUpdate-gsi"
           KeySchema:
-            - AttributeName: "status"
+            - AttributeName: "onlyRootStatus"
               KeyType: "HASH"
             - AttributeName: "lastUpdate"
               KeyType: "RANGE"
