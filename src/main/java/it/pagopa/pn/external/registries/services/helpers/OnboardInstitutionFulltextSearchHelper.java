@@ -34,7 +34,7 @@ public class OnboardInstitutionFulltextSearchHelper {
     public OnboardInstitutionFulltextSearchHelper(OnboardInstitutionsDao onboardInstitutionsDao, PnExternalRegistriesConfig cfg) {
         this.onboardInstitutionsDao = onboardInstitutionsDao;
         this.maxSearchResults = cfg.getFulltextsearchMaxResults();
-        this.aooUoSenderID = Arrays.asList(cfg.getAoouoSenderId());
+        this.aooUoSenderID = cfg.getAoouoSenderId();
     }
 
     @PostConstruct
@@ -56,7 +56,7 @@ public class OnboardInstitutionFulltextSearchHelper {
                         atleastOneUpdate.set(true);
                         timestamps.add(entity.getLastUpdate());
 
-                        if (entity.isActive()) {
+                        if (entity.isActive() && !aooUoSenderID.contains(entity.getInstitutionId())) {
                             PaSummaryDtoForSearch dtoForSearch = new PaSummaryDtoForSearch();
                             dtoForSearch.setDenominationForSearch(entity.getDescription().toLowerCase(Locale.ROOT));
                             dtoForSearch.setPaSummaryDto(OnboardInstitutionEntityToPaSummaryDto.toDto(entity));
@@ -98,8 +98,7 @@ public class OnboardInstitutionFulltextSearchHelper {
 
     @NotNull
     private List<PaSummaryDto> search(String fquery) {
-        List<PaSummaryDto> results = localCache.values().stream().filter(x -> x.getDenominationForSearch().contains(fquery)
-                && !aooUoSenderID.contains(x.getPaSummaryDto().getId()))
+        List<PaSummaryDto> results = localCache.values().stream().filter(x -> x.getDenominationForSearch().contains(fquery))
                 .limit(this.maxSearchResults)
                 .map(PaSummaryDtoForSearch::getPaSummaryDto)
                 .sorted(Comparator.comparing(PaSummaryDto::getName))
