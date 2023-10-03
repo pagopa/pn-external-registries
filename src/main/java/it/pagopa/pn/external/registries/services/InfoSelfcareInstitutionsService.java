@@ -3,8 +3,10 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.RootSenderIdResponseDto;
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaInfoDto;
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
@@ -49,6 +51,13 @@ public class InfoSelfcareInstitutionsService {
     return Flux.fromIterable(ids)
             .flatMap(onboardInstitutionsDao::get)
             .map(OnboardInstitutionEntityToPaSummaryDto::toDto);
+  }
+
+  public Mono<RootSenderIdResponseDto> getRootId(String id) throws PnRuntimeException {
+    log.info("getRootId - id={}", id);
+    return onboardInstitutionsDao.get(id)
+        .switchIfEmpty(Mono.error(new PnRootIdNotFoundException(String.format("no root id for sender id=%s", id))))
+        .map( response -> new RootSenderIdResponseDto().rootId(response.getRootId()));
   }
 
 }
