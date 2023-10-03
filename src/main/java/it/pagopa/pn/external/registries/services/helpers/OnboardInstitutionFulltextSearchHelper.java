@@ -27,11 +27,14 @@ public class OnboardInstitutionFulltextSearchHelper {
     private final Map<String, PaSummaryDtoForSearch> localCache = new ConcurrentHashMap<>();
 
     private final int maxSearchResults;
+
+    private final List<String> aooUoSenderID;
     private Instant mostRecentUpdate = null;
 
     public OnboardInstitutionFulltextSearchHelper(OnboardInstitutionsDao onboardInstitutionsDao, PnExternalRegistriesConfig cfg) {
         this.onboardInstitutionsDao = onboardInstitutionsDao;
         this.maxSearchResults = cfg.getFulltextsearchMaxResults();
+        this.aooUoSenderID = Arrays.asList(cfg.getAoouoSenderId());
     }
 
     @PostConstruct
@@ -95,7 +98,8 @@ public class OnboardInstitutionFulltextSearchHelper {
 
     @NotNull
     private List<PaSummaryDto> search(String fquery) {
-        List<PaSummaryDto> results = localCache.values().stream().filter(x -> x.getDenominationForSearch().contains(fquery))
+        List<PaSummaryDto> results = localCache.values().stream().filter(x -> x.getDenominationForSearch().contains(fquery)
+                && !aooUoSenderID.contains(x.getPaSummaryDto().getId()))
                 .limit(this.maxSearchResults)
                 .map(PaSummaryDtoForSearch::getPaSummaryDto)
                 .sorted(Comparator.comparing(PaSummaryDto::getName))
