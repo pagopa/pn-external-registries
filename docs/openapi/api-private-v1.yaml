@@ -169,6 +169,45 @@ paths:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
+  /ext-registry-private/pa/v1/actions/filter-out-root-pa-ids:
+    get:
+      operationId: getFilteredAooUoIdPrivate
+      summary: Filter the given Ids removing Root Ids
+      description: >
+        Filter the given Ids removing Root Ids
+      tags:
+        - aoo-uo-ids
+      parameters:
+        - name: id
+          description: gli id delle PA da fltrare
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SelfCarePaId'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
 components:
   schemas:
     PrivacyNoticeVersionResponse:
@@ -191,6 +230,7 @@ components:
         rootId:
           type: string
           description: The root Id (Ente) for the given sender Id
-
-
-
+    SelfCarePaId:
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
+      type: string

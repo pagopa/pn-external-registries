@@ -27,7 +27,7 @@ class RootSenderIdControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void getPrivacyNoticeVersionOK() throws JsonProcessingException {
+    void getRootIdOK() throws JsonProcessingException {
 
         final String ROOT_ID = "parent-root-id";
         RootSenderIdResponseDto expected = new RootSenderIdResponseDto().rootId(ROOT_ID);
@@ -47,7 +47,7 @@ class RootSenderIdControllerTest {
     }
 
     @Test
-    void getPrivacyNoticeVersionKO() {
+    void getRootIdKO() {
 
         // When
         Mockito.when( infoSelfcareInstitutionsService.getRootId(Mockito.anyString()))

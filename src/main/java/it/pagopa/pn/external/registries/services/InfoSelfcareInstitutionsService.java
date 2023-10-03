@@ -10,6 +10,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.Root
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaInfoDto;
 import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaSummaryDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
+import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.services.helpers.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,11 @@ public class InfoSelfcareInstitutionsService {
     return onboardInstitutionsDao.get(id)
         .switchIfEmpty(Mono.error(new PnRootIdNotFoundException(String.format("no root id for sender id=%s", id))))
         .map( response -> new RootSenderIdResponseDto().rootId(response.getRootId()));
+  }
+
+  public Flux<String> filterOutRootIds(List<String> ids) {
+    log.info("listFiltered - ids={}", ids);
+    return onboardInstitutionsDao.filterOutRootIds(ids).map(OnboardInstitutionEntity::getInstitutionId);
   }
 
 }
