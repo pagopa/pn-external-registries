@@ -73,6 +73,8 @@ public class PnExternalRegistriesConfig {
     private String onetrustToken;
     private String onetrustBaseUrl;
 
+    private List<String> aoouosenderid;
+
     @Data
     public static class AppIoTemplate{
         private String markdownUpgradeAppIoENMessage;
