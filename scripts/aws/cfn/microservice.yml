@@ -189,7 +189,7 @@ Parameters:
     Type: String
     Description: 'PnExternalRegistriesTriggerLambdaName'
 
-  AoouoSenderId:
+  AoouoSenderID:
     Type: String
     Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
 
