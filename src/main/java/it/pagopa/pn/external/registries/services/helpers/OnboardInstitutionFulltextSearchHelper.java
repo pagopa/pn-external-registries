@@ -34,7 +34,7 @@ public class OnboardInstitutionFulltextSearchHelper {
     public OnboardInstitutionFulltextSearchHelper(OnboardInstitutionsDao onboardInstitutionsDao, PnExternalRegistriesConfig cfg) {
         this.onboardInstitutionsDao = onboardInstitutionsDao;
         this.maxSearchResults = cfg.getFulltextsearchMaxResults();
-        this.aooUoSenderID = cfg.getAoouoSenderId();
+        this.aooUoSenderID = Optional.ofNullable(cfg.getAoouoSenderId()).orElse(new LinkedList<>());
     }
 
     @PostConstruct
