@@ -134,80 +134,6 @@ paths:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
-  /ext-registry-private/pa/v1/{senderId}/root-id:
-    get:
-      operationId: getRootSenderIdPrivate
-      summary: Retrieve the Root Id
-      description: >
-        Retrieve the Root Id for the given sender Id
-      tags:
-        - root-sender-id
-      parameters:
-        - name: senderId
-          schema:
-            type: string
-          description: 'The AOO/UO sender Id, return the Root Id (Ente)'
-          in: path
-          required: true
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RootSenderIdResponse'
-        '400':
-          description: Invalid input
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'remote-refs.yaml#/components/schemas/Problem'
-        '500':
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'remote-refs.yaml#/components/schemas/Problem'
-
-  /ext-registry-private/pa/v1/actions/filter-out-root-pa-ids:
-    get:
-      operationId: getFilteredAooUoIdPrivate
-      summary: Filter the given Ids removing Root Ids
-      description: >
-        Filter the given Ids removing Root Ids
-      tags:
-        - aoo-uo-ids
-      parameters:
-        - name: id
-          description: gli id delle PA da fltrare
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/SelfCarePaId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SelfCarePaId'
-        '400':
-          description: Invalid input
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'remote-refs.yaml#/components/schemas/Problem'
-        '500':
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: 'remote-refs.yaml#/components/schemas/Problem'
-
 components:
   schemas:
     PrivacyNoticeVersionResponse:
@@ -221,16 +147,4 @@ components:
           format: int32
           description: The version of the privacy notice retrieved from one trust
 
-    RootSenderIdResponse:
-      description: The response that contains the root Id (Ente) for the given sender Id
-      type: object
-      required:
-        - rootId
-      properties:
-        rootId:
-          type: string
-          description: The root Id (Ente) for the given sender Id
-    SelfCarePaId:
-      title: The PA id used by self care
-      description: An unique ID that identify a Public Administration
-      type: string
+
