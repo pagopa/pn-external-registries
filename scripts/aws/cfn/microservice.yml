@@ -664,7 +664,7 @@ Resources:
                   delete body.rootIpaCode;
                   body.onlyRootStatus = body.status;
                 }else{
-                  body.onlyRootStatus = "";
+                  delete body.onlyRootStatus;
                   const params = {
                     TableName: TABLE_NAME,
                     Key: {

@@ -51,7 +51,7 @@ class OnboardInstitutionDaoTestIT {
     @Test
     void get() {
         //Given
-        OnboardInstitutionEntity entity = newOnboard();
+        OnboardInstitutionEntity entity = newOnboard(true);
 
         try {
             testDao.delete(entity.getPk(), null);
@@ -84,7 +84,7 @@ class OnboardInstitutionDaoTestIT {
     void getNewer() {
 
         //Given
-        OnboardInstitutionEntity entity = newOnboard();
+        OnboardInstitutionEntity entity = newOnboard(true);
 
 
         try {
@@ -117,8 +117,8 @@ class OnboardInstitutionDaoTestIT {
     void getNewerOfInstant() {
 
         //Given
-        OnboardInstitutionEntity entity = newOnboard();
-        OnboardInstitutionEntity entity1 = newOnboard();
+        OnboardInstitutionEntity entity = newOnboard(true);
+        OnboardInstitutionEntity entity1 = newOnboard(true);
         entity1.setPk(entity1.getPk() + "1");
         entity1.setLastUpdate(entity1.getLastUpdate().plusMillis(1000));
 
@@ -151,10 +151,43 @@ class OnboardInstitutionDaoTestIT {
         }
     }
 
-    private OnboardInstitutionEntity newOnboard() {
+
+    @Test
+    void getAooUO() {
+        //Given
+        OnboardInstitutionEntity entity = newOnboard(false);
+
+
+        try {
+            testDao.delete(entity.getPk(), null);
+            testDao.put(entity);
+        } catch (Exception e) {
+            System.out.println("Problem to insert");
+        }
+
+        //When
+        List<OnboardInstitutionEntity> result = consentDao.getNewer(null).collectList().block(d);
+
+        //Then
+        try {
+            Assertions.assertNotNull(result);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        } finally {
+            try {
+                testDao.delete(entity.getPk(), null);
+
+            } catch (Exception e) {
+                System.out.println("Nothing to remove");
+            }
+        }
+    }
+
+    private OnboardInstitutionEntity newOnboard(boolean rootPa) {
         OnboardInstitutionEntity res = new OnboardInstitutionEntity();
         res.setPk("12345");
         res.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        res.setOnlyRootStatus(rootPa ? OnboardInstitutionEntity.STATUS_ACTIVE : null);
         res.setDescription("comune di milano");
         res.setTaxCode("123456");
         res.setCreated(Instant.EPOCH.plusMillis(1000));

@@ -73,8 +73,8 @@ scanTable(params, function(err, data) {
     data.Items.forEach(function (item) {
       const key = item.id;
       console.log("Id: ", key, "at Index: ", index++ );
-      const updateExpression = "SET #lastupdate = :now, #rootId = :id, #onlyRootStatus = :status";
-      const updateParams = {
+      let updateExpression = idAooUO.has(key) ?  "SET #lastupdate = :now, #rootId = :id" : "SET #lastupdate = :now, #rootId = :id, #onlyRootStatus = :status";
+      let updateParams = {
         TableName: TABLE_NAME,
         Key: {
           "id": key
@@ -83,14 +83,17 @@ scanTable(params, function(err, data) {
         ExpressionAttributeNames: {
           "#lastupdate": 'lastUpdate',
           "#rootId": 'rootId',
-          "#onlyRootStatus": 'onlyRootStatus'
         },
         ExpressionAttributeValues: {
           ":now": now_str,
           ":id": idAooUO.has(key) ? idAooUO.get(key) : key,
-          ":status": idAooUO.has(key) ? "" : item.status
         }
       };
+      if(!idAooUO.has(key)){
+        updateParams.ExpressionAttributeNames["#onlyRootStatus"] = 'onlyRootStatus'
+        updateParams.ExpressionAttributeValues[":status"] = "TEST"
+      }
+
       docClient.update(updateParams, (err, data) => {
         if (err) {
           console.error("Errore nell'aggiornamento dell'elemento:", JSON.stringify(err, null, 2));
