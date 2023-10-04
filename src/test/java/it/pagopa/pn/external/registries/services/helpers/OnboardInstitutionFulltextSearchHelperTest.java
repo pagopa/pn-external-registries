@@ -73,6 +73,8 @@ class OnboardInstitutionFulltextSearchHelperTest {
                     entity.setLastUpdate(Instant.now());
                     entity.setTaxCode(((ArrayNode)d).get(3).asText());
                     entity.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+                    entity.setOnlyRootStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+
                     testDao.put(entity);
                     if (i % 100 == 0)
                         log.info("inserted " + i + "pas");
