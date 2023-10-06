@@ -26,13 +26,13 @@ public class CheckoutClient extends OcpBaseClient {
     }
 
     public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptIdFromString) throws WebClientResponseException {
-        log.logInvokingExternalService(CHECKOUT, "getPaymentInfo", true);
+        log.logInvokingExternalDownstreamService(CHECKOUT, "getPaymentInfo");
         return defaultApiClient.getPaymentInfo( rptIdFromString )
                 .doOnError(throwable -> log.logInvokationResultDownstreamFailed(CHECKOUT, elabExceptionMessage(throwable)));
     }
 
     public Mono<ResponseEntity<Void>> checkoutCart(CartRequestDto cartRequestDto) throws WebClientResponseException {
-        log.logInvokingExternalService(CHECKOUT, "checkoutCart", true);
+        log.logInvokingExternalDownstreamService(CHECKOUT, "checkoutCart");
         return defaultApiClientCartCheckout.postCartsWithHttpInfo( cartRequestDto )
                 .doOnError(throwable -> log.logInvokationResultDownstreamFailed(CHECKOUT, elabExceptionMessage(throwable)));
     }

@@ -37,7 +37,7 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> upsertServiceActivation(String taxId, boolean activated)
     {
-        log.logInvokingExternalService(IO, "upsertServiceActivation", true);
+        log.logInvokingExternalDownstreamService(IO, "upsertServiceActivation");
         log.debug("upsertServiceActivation taxId={} activated={}", LogUtils.maskTaxId(taxId), activated);
 
         if (!checkWhitelist(taxId))
@@ -75,7 +75,7 @@ public class IOCourtesyMessageClient extends IOClient {
      */
     public Mono<Activation> getServiceActivation(String taxId)
     {
-        log.logInvokingExternalService(IO, "getServiceActivation",true);
+        log.logInvokingExternalDownstreamService(IO, "getServiceActivation");
         log.debug("getServiceActivation taxId={}", LogUtils.maskTaxId(taxId));
 
         if (!checkWhitelist(taxId))

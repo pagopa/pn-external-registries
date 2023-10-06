@@ -47,7 +47,7 @@ public class OneTrustClient extends CommonBaseClient {
      * @return il Privacy Notice se trovato, altrimenti One Trust restituisce 500
      */
     public Mono<PrivacyNoticeOneTrustResponse> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {
-        log.logInvokingExternalService(ONE_TRUST, "getPrivacyNoticeVersionByPrivacyNoticeId", true);
+        log.logInvokingExternalDownstreamService(ONE_TRUST, "getPrivacyNoticeVersionByPrivacyNoticeId");
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(PRIVACY_NOTICES_URL)

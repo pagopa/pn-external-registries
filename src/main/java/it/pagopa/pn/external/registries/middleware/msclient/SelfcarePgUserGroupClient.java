@@ -28,7 +28,7 @@ public class SelfcarePgUserGroupClient {
 
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
-        log.logInvokingExternalService(SELFCARE_PG, "getUserGroups", true);
+        log.logInvokingExternalDownstreamService(SELFCARE_PG, "getUserGroups");
         return userGroupPgApi.getUserGroupsUsingGET(config.getSelfcarepgusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, null, null)
                 .doOnNext(dto -> log.info("PG GetUserGroup result for institutionId {}: {}", institutionId, dto))
                 .onErrorResume(WebClientResponseException.class, e -> {

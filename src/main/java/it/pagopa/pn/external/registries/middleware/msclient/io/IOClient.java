@@ -33,7 +33,7 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        log.logInvokingExternalService(IO, "submitMessageforUserWithFiscalCodeInBody", true);
+        log.logInvokingExternalDownstreamService(IO, "submitMessageforUserWithFiscalCodeInBody");
         log.debug("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
@@ -53,7 +53,7 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        log.logInvokingExternalService(IO, "getProfileByPOST", true);
+        log.logInvokingExternalDownstreamService(IO, "getProfileByPOST");
         log.debug("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))
