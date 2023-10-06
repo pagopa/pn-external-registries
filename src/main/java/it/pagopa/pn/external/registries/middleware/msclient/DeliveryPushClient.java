@@ -18,7 +18,7 @@ public class DeliveryPushClient extends CommonBaseClient {
     private final TimelineAndStatusApi pnDeliveryPushApi;
 
     public Mono<ProbableSchedulingAnalogDateResponse> getSchedulingAnalogDateWithHttpInfo(String iun, String recipientId) {
-        log.logInvokingExternalService(PN_DELIVERY_PUSH, "getSchedulingAnalogDate");
+        log.logInvokingExternalService(PN_DELIVERY_PUSH, "getSchedulingAnalogDate", false);
         return pnDeliveryPushApi.getSchedulingAnalogDate(iun, recipientId);
     }
 }

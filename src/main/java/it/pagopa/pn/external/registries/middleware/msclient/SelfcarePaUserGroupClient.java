@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserGroupApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.PageOfUserGroupResourceDto;
@@ -23,10 +24,11 @@ public class SelfcarePaUserGroupClient {
 
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
-        log.logInvokingExternalService(SELFCARE_PA, "getUserGroups");
+        log.logInvokingExternalService(SELFCARE_PA, "getUserGroups", true);
         return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, null, null)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientResponseException.class, x -> {
+                    log.logInvokationResultDownstreamFailed(SELFCARE_PA, CommonBaseClient.elabExceptionMessage(x));
                     log.error("getUserGroups response error {}", x.getResponseBodyAsString(), x);
                     return Mono.error(new PnInternalException("Errore lettura usergroups", ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR, x));
                 });

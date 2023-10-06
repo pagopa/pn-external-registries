@@ -33,7 +33,7 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        log.logInvokingExternalService(IO, "submitMessageforUserWithFiscalCodeInBody");
+        log.logInvokingExternalService(IO, "submitMessageforUserWithFiscalCodeInBody", true);
         log.debug("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
@@ -45,14 +45,15 @@ class IOClient extends OcpBaseClient {
         }
 
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
-            log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
-            return Mono.error(throwable);
+                    log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
+                    log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
+                    return Mono.error(throwable);
         });
     }
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        log.logInvokingExternalService(IO, "getProfileByPOST");
+        log.logInvokingExternalService(IO, "getProfileByPOST", true);
         log.debug("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))
@@ -62,7 +63,9 @@ class IOClient extends OcpBaseClient {
             return Mono.error(res);
         }
 
-        return ioApi.getProfileByPOST( payload );
+        return ioApi.getProfileByPOST( payload ).doOnError(throwable -> {
+            log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
+        });
     }
 
     protected boolean checkWhitelist(String taxId)
