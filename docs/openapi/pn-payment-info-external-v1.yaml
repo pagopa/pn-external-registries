@@ -15,6 +15,7 @@ tags:
 paths:
   /ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
     get:
+      deprecated: true
       operationId: getPaymentInfo
       summary: Retrieve payment information
       description: Use to enable payment button in notification detail page and display amount
@@ -44,6 +45,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentInfo'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  /ext-registry/pagopa/v2.1/paymentinfo:
+    post:
+      operationId: getPaymentInfoV21
+      summary: Retrieve payment information given a list of payments identifiers
+      description: Use to enable payment buttons in notification detail page and display amount
+      tags:
+        - PaymentInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+               $ref: '#/components/schemas/PaymentInfoRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInfoV21'
         '400':
           description: Invalid input
           content:
@@ -94,6 +126,64 @@ paths:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
+    PaymentInfoRequest:
+      title: Request for a payment info
+      description: Object containing sender and payment id
+      type: array
+      minItems: 1
+      items:
+        type: object
+        properties:
+          creditorTaxId:
+            $ref: 'remote-refs.yaml#/components/schemas/paTaxId'
+          noticeCode:
+            $ref: 'remote-refs.yaml#/components/schemas/noticeCode'
+        required:
+          - creditorTaxId
+          - noticeCode
+    PaymentInfoV21:
+      title: Payment brief information
+      description: Payment minimal information
+      type: array
+      minItems: 1
+      items:
+        type: object
+        required:
+          - status
+          - creditorTaxId
+          - noticeCode
+        properties:
+          creditorTaxId:
+            $ref: 'remote-refs.yaml#/components/schemas/paTaxId'
+          noticeCode:
+            $ref: 'remote-refs.yaml#/components/schemas/noticeCode'
+          status:
+            $ref: '#/components/schemas/PaymentStatus'
+          detail:
+            $ref: '#/components/schemas/Detail'
+          detail_v2:
+            $ref: '#/components/schemas/DetailV2'
+          errorCode:
+            description: error code to show at the user
+            type: string
+            example: PPT_AUTORIZZAZIONE
+          amount:
+            description: Amount for required payment in eurocents
+            example: 1200
+            type: integer
+          url:
+            description: Checkout base url used for check payment info
+            example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+            type: string
+          causaleVersamento:
+            description: reason for payment
+            type: string
+            example: Seconda rata TARI
+          dueDate:
+            description: payment expiration date
+            type: string
+            example: 2025-07-31
+            pattern: ([0-9]{4})-(1[0-2]|0[1-9])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])
     PaymentInfo:
       title: Payment brief information
       description: Payment minimal information
