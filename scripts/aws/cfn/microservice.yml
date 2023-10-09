@@ -277,6 +277,19 @@ Parameters:
     Type: String
     Default: ''
 
+  # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueARN:
+    Type: String
+    Description: Queue ARN
+    
+  DeliveryPushToExternalRegistriesQueueAlarmARN:
+    Type: String
+    Description: Queue DLQ alarm
+  
+  DeliveryPushToExternalRegistriesQueueAgeAlarmARN:
+    Type: String
+    Description: Queue max age alarm
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -553,6 +566,9 @@ Resources:
         LambdaArns: !Join
           - ','
           - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+        QueueArns: !Join
+          - ','
+          - - !Ref DeliveryPushToExternalRegistriesQueueARN
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
@@ -560,6 +576,8 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+            - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
+            - !Ref DeliveryPushToExternalRegistriesQueueAgeAlarmARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-external-registries'
