@@ -1,14 +1,13 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.api.PaymentInfoApi;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.services.InfoPaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -22,14 +21,12 @@ public class InfoPaymentController implements PaymentInfoApi {
     }
 
     @Override
-    public Mono<ResponseEntity<PaymentInfoDto>> getPaymentInfo(String paTaxId, String noticeNumber, ServerWebExchange exchange) {
-        log.info("[enter] paTaxId:{} ,noticeNumber:{}", paTaxId, noticeNumber);
-        return this.infoPaymentService.getPaymentInfo( paTaxId , noticeNumber )
+    public Mono<ResponseEntity<Flux<PaymentInfoV21InnerDto>>> getPaymentInfoV21(Flux<PaymentInfoRequestInnerDto> paymentInfoRequestInnerDto, final ServerWebExchange exchange) {
+        return infoPaymentService.getPaymentInfo(paymentInfoRequestInnerDto)
                 .map(body -> {
                     log.debug("[exit]");
-                    return ResponseEntity.ok(body);
-                })
-                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+                    return ResponseEntity.ok(Flux.fromIterable(body));
+                });
     }
 
     @Override
