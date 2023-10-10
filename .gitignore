@@ -34,3 +34,5 @@ build/
 
 ### Ignore all jks
 **/*.jks
+
+scripts/client/node_modules/*

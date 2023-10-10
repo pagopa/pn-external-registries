@@ -16,6 +16,8 @@ console.log("Using profile "+awsProfile)
 
 let credentials = null
 
+console.log("aws profile: ",awsProfile);
+
 process.env.AWS_SDK_LOAD_CONFIG=1
 if(awsProfile.indexOf('sso_')>=0){ // sso profile
   credentials = new AWS.SsoCredentials({profile:awsProfile});
@@ -26,16 +28,15 @@ if(awsProfile.indexOf('sso_')>=0){ // sso profile
 }
 AWS.config.update({region: 'eu-south-1'});
 
-
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-TABLE_NAME = 'pn-OnboardInstitutions'
+TABLE_NAME = 'pn-onboardingInstitutions-copy'
 SCAN_LIMIT = 2000 // max 2000
 DELAY_MS = 1000; //1 second
 
 var index = 1;
 
-const idAooUO = new Map([["IdAooUO", "RootIdAooUO"]]);
+const idAooUO = new Map([["cc1c6a8e-5967-42c6-9d83-bfb12ba1665a", "7b2fff42-d3c1-44f0-b53a-bf9089a37c73"],["a95dace4-4a47-4149-a814-0e669113ce40", "16dabc75-f12e-42c4-aa0c-be9c22e9c89e"]]);
 
 
 const params = {
@@ -66,6 +67,71 @@ scanTable(params, function(err, data) {
   if (err) {
     console.log(err);
   } else {
+
+    console.log('update gsi');
+
+    const paramsDeleting = {
+      TableName: TABLE_NAME,
+      GlobalSecondaryIndexUpdates: [
+        {
+          Delete: {
+            IndexName: 'status-lastUpdate-gsi'
+          }
+        }
+      ]
+    };
+    
+    console.log('deleting old gsi');
+    dynamodb.updateTable(paramsDeleting, (err, data) => {
+      if (err) {
+        console.error('error deleting gsi:', err);
+      } else {
+        console.log('success deleting:', data);
+      }
+    });
+
+    console.log('creating new gsi');
+
+    const paramsCreation = {
+      TableName: TABLE_NAME,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'onlyRootStatus',
+          AttributeType: 'S' 
+        },
+        {
+          AttributeName: 'lastUpdate',
+          AttributeType: 'S' 
+        }
+      ],
+      GlobalSecondaryIndexUpdates: [
+        {
+          Create: {
+            IndexName: newGSIName,
+            KeySchema: [
+              {
+                AttributeName: 'onlyRootStatus',
+                KeyType: 'HASH'  
+              },
+              {
+                AttributeName: 'lastUpdate',
+                KeyType: 'RANGE' 
+              }
+            ]
+          }
+        }
+      ]
+    };
+    console.log('creating new gsi');
+    dynamodb.updateTable(paramsCreation, (err, data) => {
+      if (err) {
+        console.error('error creation gsi:', err);
+      } else {
+        console.log('succes creation:', data);
+      }
+    });
+
+    console.log('start update item');
     let now_str = new Date().toISOString();
     console.log( "Scanned items: ", data.Items.length )
     console.log( "now: ", now_str )
