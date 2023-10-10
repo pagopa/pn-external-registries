@@ -9,17 +9,14 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.d
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
@@ -27,7 +24,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @Service
 @Slf4j
 public class InfoPaymentService {
-    public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId={} noticeCode={}";
+    public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId=%s noticeCode=%s";
     private final CheckoutClient checkoutClient;
     private final PnExternalRegistriesConfig config;
 
@@ -36,24 +33,83 @@ public class InfoPaymentService {
         this.config = config;
     }
 
-    public Mono<PaymentInfoDto> getPaymentInfo(String paTaxId, String noticeNumber) {
+    public Mono<List<PaymentInfoV21InnerDto>> getPaymentInfo(Flux<PaymentInfoRequestInnerDto> paymentInfoRequestInnerDtoFlux) {
+        return paymentInfoRequestInnerDtoFlux
+                .flatMap(this::callCheckoutPaymentInfo)
+                .collectList();
+    }
+
+    private Mono<PaymentInfoV21InnerDto> callCheckoutPaymentInfo(PaymentInfoRequestInnerDto request) {
+        String paTaxId = request.getCreditorTaxId();
+        String noticeNumber = request.getNoticeCode();
         String paymentId = paTaxId + noticeNumber;
-        
+
         log.info( "get payment info paymentId={}", paymentId );
         return checkoutClient.getPaymentInfo(paymentId)
-                .map(paymentInfoResponse0 -> new PaymentInfoDto()
-                    .status( PaymentStatusDto.REQUIRED )
-                    .amount( paymentInfoResponse0.getImportoSingoloVersamento() )
-                    .url( config.getCheckoutSiteUrl() )
-                )
+                .map(paymentRequestsGetResponseDto -> apiResponseToPaymentInfoV21InnerDtoV2(paymentRequestsGetResponseDto, request))
                 .onErrorResume( WebClientResponseException.class, ex -> {
                     HttpStatus httpStatus = ex.getStatusCode();
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
                     return fromCheckoutToPn( paTaxId, noticeNumber, httpStatus, ex.getResponseBodyAsString() );
-        });
+                });
     }
 
-    private Mono<PaymentInfoDto> checkoutStatusManagement( HttpStatus status, PaymentInfoDto paymentInfoDto) {
+    private PaymentInfoV21InnerDto apiResponseToPaymentInfoV21InnerDtoV2(PaymentRequestsGetResponseDto paymentInfoResponse, PaymentInfoRequestInnerDto request) {
+        return new PaymentInfoV21InnerDto()
+                .status(PaymentStatusDto.REQUIRED)
+                .amount(paymentInfoResponse.getImportoSingoloVersamento())
+                .url(config.getCheckoutSiteUrl())
+                .creditorTaxId(request.getCreditorTaxId())
+                .noticeCode(request.getNoticeCode())
+                .causaleVersamento(paymentInfoResponse.getCausaleVersamento() != null ? paymentInfoResponse.getCausaleVersamento() : null)
+                .dueDate(paymentInfoResponse.getDueDate() != null ? paymentInfoResponse.getDueDate() : null);
+    }
+
+    private Mono<PaymentInfoV21InnerDto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
+        log.info( checkoutResult );
+        ObjectMapper objectMapper = new ObjectMapper();
+        PaymentStatusFaultPaymentProblemJsonDto result;
+
+        PaymentInfoV21InnerDto paymentInfoDto = new PaymentInfoV21InnerDto();
+        paymentInfoDto.setCreditorTaxId(paTaxId);
+        paymentInfoDto.setNoticeCode(noticeNumber);
+
+        try {
+            checkoutStatusManagement(status);
+
+            result = objectMapper.readValue( checkoutResult, PaymentStatusFaultPaymentProblemJsonDto.class );
+            if (result != null) {
+                DetailDto detailDto = DetailDto.fromValue(result.getCategory());
+                paymentInfoDto.setDetail(detailDto);
+                paymentInfoDto.setDetailV2(result.getDetailV2());
+                paymentInfoDto.setStatus(getPaymentStatus(detailDto));
+            }
+        } catch (JsonProcessingException e) {
+            log.error(String.format(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber), e);
+            paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
+            paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
+            paymentInfoDto.setDetailV2(String.format(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber));
+        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException e) {
+            log.error(
+                    "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
+                    status, paTaxId, noticeNumber, e
+            );
+            paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
+            paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
+            paymentInfoDto.setDetailV2(e.getMessage());
+        }
+        return Mono.just( paymentInfoDto );
+    }
+
+    private PaymentStatusDto getPaymentStatus(DetailDto detail) {
+        return switch (detail) {
+            case PAYMENT_ONGOING -> PaymentStatusDto.IN_PROGRESS;
+            case PAYMENT_DUPLICATED -> PaymentStatusDto.SUCCEEDED;
+            default -> PaymentStatusDto.FAILURE;
+        };
+    }
+
+    private void checkoutStatusManagement( HttpStatus status) {
         if (HttpStatus.BAD_REQUEST.equals(status)) {
             throw new PnCheckoutBadRequestException(
                     "Formally invalid input",
@@ -80,42 +136,6 @@ public class InfoPaymentService {
                     "Timeout from PagoPA services",
                     ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_GATEWAY_TIMEOUT);
         }
-        return Mono.just(paymentInfoDto);
-    }
-
-    private Mono<PaymentInfoDto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
-        log.info( checkoutResult );
-        ObjectMapper objectMapper = new ObjectMapper();
-        PaymentStatusFaultPaymentProblemJsonDto result;
-        PaymentInfoDto paymentInfoDto = new PaymentInfoDto();
-        try {
-            result = objectMapper.readValue( checkoutResult, PaymentStatusFaultPaymentProblemJsonDto.class );
-            if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue(result.getCategory());
-                paymentInfoDto.setDetail(detailDto);
-                paymentInfoDto.setDetailV2(result.getDetailV2());
-                paymentInfoDto.setStatus(getPaymentStatus(detailDto));
-                return checkoutStatusManagement(status, paymentInfoDto);
-            }
-        } catch (JsonProcessingException e) {
-            log.error(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber, e);
-            return Mono.error( e );
-        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException e) {
-            log.error(
-                    "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
-                    status, paTaxId, noticeNumber, e
-            );
-            return Mono.error( e );
-        }
-        return Mono.just( paymentInfoDto );
-    }
-
-    private PaymentStatusDto getPaymentStatus(DetailDto detail) {
-        return switch (detail) {
-            case PAYMENT_ONGOING -> PaymentStatusDto.IN_PROGRESS;
-            case PAYMENT_DUPLICATED -> PaymentStatusDto.SUCCEEDED;
-            default -> PaymentStatusDto.FAILURE;
-        };
     }
 
     public Mono<PaymentResponseDto> checkoutCart(PaymentRequestDto paymentRequestDto) {
@@ -162,12 +182,6 @@ public class InfoPaymentService {
     private PaymentResponseDto buildPaymentResponseDto(URI uri) {
         assert (uri != null );
         return new PaymentResponseDto().checkoutUrl(uri.toString());
-    }
-
-    @NotNull
-    private String formatInstantToString(Instant instantToFormat) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
-        return formatter.format(instantToFormat);
     }
 
 }

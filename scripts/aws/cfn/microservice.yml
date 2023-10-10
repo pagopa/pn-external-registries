@@ -290,6 +290,14 @@ Parameters:
     Type: String
     Description: Queue max age alarm
 
+  EnhancedWebSecurityEnabled:
+    Type: String
+    Default: false
+    Description: Enable additional WAF Web rules
+    AllowedValues:
+      - true
+      - false
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -487,6 +495,7 @@ Resources:
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
         Limit: 600000
+        EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
