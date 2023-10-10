@@ -277,6 +277,19 @@ Parameters:
     Type: String
     Default: ''
 
+  # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueARN:
+    Type: String
+    Description: Queue ARN
+
+  DeliveryPushToExternalRegistriesQueueAlarmARN:
+    Type: String
+    Description: Queue DLQ alarm
+
+  DeliveryPushToExternalRegistriesQueueAgeAlarmARN:
+    Type: String
+    Description: Queue max age alarm
+
   PnCronAnalyzer:
     Type: String
     Default: '-'
@@ -405,8 +418,6 @@ Resources:
           - Effect: Allow
             Action:
               - cloudwatch:PutMetricData
-              - cloudwatch:GetMetricStream
-              - cloudwatch:GetMetricData
             Resource:
               - "*"
 
