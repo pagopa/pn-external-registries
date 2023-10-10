@@ -2,7 +2,6 @@ package it.pagopa.pn.external.registries.middleware.msclient.io;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import it.pagopa.pn.commons.utils.LogUtils;
-import it.pagopa.pn.commons.utils.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.CreatedMessage;
@@ -16,9 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 
-import java.awt.*;
 import java.util.UUID;
 
 import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.IO;
