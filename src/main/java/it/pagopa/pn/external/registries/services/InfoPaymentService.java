@@ -6,10 +6,8 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.*;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentNoticeDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.PaymentEventPagoPaPrivate;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
-import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -31,12 +29,10 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 public class InfoPaymentService {
     public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId={} noticeCode={}";
     private final CheckoutClient checkoutClient;
-    private final DeliveryClient deliveryClient;
     private final PnExternalRegistriesConfig config;
 
-    public InfoPaymentService(CheckoutClient checkoutClient, DeliveryClient deliveryClient, PnExternalRegistriesConfig config) {
+    public InfoPaymentService(CheckoutClient checkoutClient, PnExternalRegistriesConfig config) {
         this.checkoutClient = checkoutClient;
-        this.deliveryClient = deliveryClient;
         this.config = config;
     }
 
@@ -57,16 +53,7 @@ public class InfoPaymentService {
         });
     }
 
-    private Mono<PaymentInfoDto> checkoutStatusManagement(String paTaxId, String noticeNumber, HttpStatus status, PaymentInfoDto paymentInfoDto) {
-        if (HttpStatus.CONFLICT.equals(status) && DetailDto.PAYMENT_DUPLICATED.equals(paymentInfoDto.getDetail()) ) {
-            PaymentEventPagoPaPrivate paymentEventPagoPa = new PaymentEventPagoPaPrivate()
-                    .creditorTaxId( paTaxId )
-                    .noticeCode( noticeNumber )
-                    .paymentDate( formatInstantToString( Instant.now() ) )
-                    .uncertainPaymentDate( true )
-                    .amount( paymentInfoDto.getAmount() );
-            return deliveryClient.paymentEventPagoPaPrivate( paymentEventPagoPa ).thenReturn( paymentInfoDto );
-        }
+    private Mono<PaymentInfoDto> checkoutStatusManagement( HttpStatus status, PaymentInfoDto paymentInfoDto) {
         if (HttpStatus.BAD_REQUEST.equals(status)) {
             throw new PnCheckoutBadRequestException(
                     "Formally invalid input",
@@ -108,7 +95,7 @@ public class InfoPaymentService {
                 paymentInfoDto.setDetail(detailDto);
                 paymentInfoDto.setDetailV2(result.getDetailV2());
                 paymentInfoDto.setStatus(getPaymentStatus(detailDto));
-                return checkoutStatusManagement(paTaxId, noticeNumber, status, paymentInfoDto);
+                return checkoutStatusManagement(status, paymentInfoDto);
             }
         } catch (JsonProcessingException e) {
             log.error(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber, e);

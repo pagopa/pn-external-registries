@@ -9,10 +9,8 @@ import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.ValidationFaultPaymentProblemJsonDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.PaymentEventPagoPaPrivate;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
-import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,9 +49,6 @@ class InfoPaymentServiceTest {
     private CheckoutClient checkoutClient;
 
     @Mock
-    private DeliveryClient deliveryClient;
-
-    @Mock
     PnExternalRegistriesConfig config;
 
 
@@ -77,7 +72,6 @@ class InfoPaymentServiceTest {
         WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
-        Mockito.when( deliveryClient.paymentEventPagoPaPrivate( Mockito.any( PaymentEventPagoPaPrivate.class ) ) ).thenReturn( Mono.empty() );
 
         PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
 
