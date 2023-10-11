@@ -66,7 +66,7 @@ Resources:
         - AttributeName: "id"
           KeyType: "HASH"
       GlobalSecondaryIndexes:
-        - IndexName: "status-lastUpdate-gsi"
+        - IndexName: "onlyRootStatus-lastUpdate-gsi"
           KeySchema:
             - AttributeName: "onlyRootStatus"
               KeyType: "HASH"
