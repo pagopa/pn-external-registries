@@ -263,6 +263,81 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
+  '/ext-registry-private/pa/v1/{senderId}/root-id':                                         # NO EXTERNAL
+    get:                                                                                    # NO EXTERNAL
+      operationId: getRootSenderIdPrivate                                                   # NO EXTERNAL
+      summary: Retrieve the Root Id                                                         # NO EXTERNAL
+      description: >                                                                        # NO EXTERNAL
+        Retrieve the Root Id for the given sender Id
+      tags:                                                                                 # NO EXTERNAL
+        - root-sender-id                                                                    # NO EXTERNAL
+      parameters:                                                                           # NO EXTERNAL
+        - name: senderId                                                                    # NO EXTERNAL
+          schema:                                                                           # NO EXTERNAL
+            type: string                                                                    # NO EXTERNAL
+          description: 'The AOO/UO sender Id, return the Root Id (Ente)'                    # NO EXTERNAL
+          in: path                                                                          # NO EXTERNAL
+          required: true                                                                    # NO EXTERNAL
+      responses:                                                                            # NO EXTERNAL
+        '200':                                                                              # NO EXTERNAL
+          description: OK                                                                   # NO EXTERNAL
+          content:                                                                          # NO EXTERNAL
+            application/json:                                                               # NO EXTERNAL
+              schema:                                                                       # NO EXTERNAL
+                $ref: '#/components/schemas/RootSenderIdResponse'                           # NO EXTERNAL
+        '400':                                                                              # NO EXTERNAL
+          description: Invalid input                                                        # NO EXTERNAL
+          content:                                                                          # NO EXTERNAL
+            application/problem+json:                                                       # NO EXTERNAL
+              schema:                                                                       # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                        # NO EXTERNAL
+        '500':                                                                              # NO EXTERNAL
+          description: Internal Server Error                                                # NO EXTERNAL
+          content:                                                                          # NO EXTERNAL
+            application/problem+json:                                                       # NO EXTERNAL
+              schema:                                                                       # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                        # NO EXTERNAL
+
+  '/ext-registry-private/pa/v1/actions/filter-out-root-pa-ids':                             # NO EXTERNAL
+    get:                                                                                    # NO EXTERNAL
+      operationId: getFilteredAooUoIdPrivate                                                # NO EXTERNAL
+      summary: Filter the given Ids removing Root Ids                                       # NO EXTERNAL
+      description: >                                                                        # NO EXTERNAL
+        Filter the given Ids removing Root Ids
+      tags:                                                                                 # NO EXTERNAL
+        - aoo-uo-ids                                                                        # NO EXTERNAL
+      parameters:                                                                           # NO EXTERNAL
+        - name: id                                                                          # NO EXTERNAL
+          description: gli id delle PA da fltrare                                           # NO EXTERNAL
+          in: query                                                                         # NO EXTERNAL
+          required: true                                                                    # NO EXTERNAL
+          schema:                                                                           # NO EXTERNAL
+            type: array                                                                     # NO EXTERNAL
+            items:                                                                          # NO EXTERNAL
+              $ref: '#/components/schemas/SelfCarePaId'                                     # NO EXTERNAL
+      responses:                                                                            # NO EXTERNAL
+        '200':                                                                              # NO EXTERNAL
+          description: OK                                                                   # NO EXTERNAL
+          content:                                                                          # NO EXTERNAL
+            application/json:                                                               # NO EXTERNAL
+              schema:                                                                       # NO EXTERNAL
+                type: array                                                                 # NO EXTERNAL
+                items:                                                                      # NO EXTERNAL
+                  $ref: '#/components/schemas/SelfCarePaId'                                 # NO EXTERNAL
+        '400':                                                                              # NO EXTERNAL
+          description: Invalid input                                                        # NO EXTERNAL
+          content:                                                                          # NO EXTERNAL
+            application/problem+json:                                                       # NO EXTERNAL
+              schema:                                                                       # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                        # NO EXTERNAL
+        '500':                                                                              # NO EXTERNAL
+          description: Internal Server Error                                                # NO EXTERNAL
+          content:                                                                          # NO EXTERNAL
+            application/problem+json:                                                       # NO EXTERNAL
+              schema:                                                                       # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                        # NO EXTERNAL
+
 components:
   schemas:
     PaNameFilter:
@@ -412,7 +487,15 @@ components:
       maxLength: 50
       # ASCII printable characters
       pattern: ^[ -~ ]*$
-
+    RootSenderIdResponse:                                                                                 # NO EXTERNAL
+      description: The response that contains the root Id (Ente) for the given sender Id                  # NO EXTERNAL
+      type: object                                                                                        # NO EXTERNAL
+      required:                                                                                           # NO EXTERNAL
+        - rootId                                                                                          # NO EXTERNAL
+      properties:                                                                                         # NO EXTERNAL
+        rootId:                                                                                           # NO EXTERNAL
+          type: string                                                                                    # NO EXTERNAL
+          description: The root Id (Ente) for the given sender Id                                         # NO EXTERNAL
 #  securitySchemes:                                      # ONLY EXTERNAL
 #    bearerAuth:                                         # ONLY EXTERNAL
 #      type: http                                        # ONLY EXTERNAL

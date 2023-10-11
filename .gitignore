@@ -34,3 +34,6 @@ build/
 
 ### Ignore all jks
 **/*.jks
+
+# Node.js
+node_modules/
