@@ -281,6 +281,27 @@ Parameters:
     Type: String
     Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
 
+  # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueARN:
+    Type: String
+    Description: Queue ARN
+
+  DeliveryPushToExternalRegistriesQueueAlarmARN:
+    Type: String
+    Description: Queue DLQ alarm
+
+  DeliveryPushToExternalRegistriesQueueAgeAlarmARN:
+    Type: String
+    Description: Queue max age alarm
+
+  EnhancedWebSecurityEnabled:
+    Type: String
+    Default: false
+    Description: Enable additional WAF Web rules
+    AllowedValues:
+      - true
+      - false
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -479,6 +500,7 @@ Resources:
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
         Limit: 600000
+        EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -558,6 +580,9 @@ Resources:
         LambdaArns: !Join
           - ','
           - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+        QueueArns: !Join
+          - ','
+          - - !Ref DeliveryPushToExternalRegistriesQueueARN
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
@@ -565,6 +590,8 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+            - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
+            - !Ref DeliveryPushToExternalRegistriesQueueAgeAlarmARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-external-registries'
