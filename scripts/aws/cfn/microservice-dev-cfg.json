@@ -14,6 +14,7 @@
     "AutoscalingThreshold": "2207",
     "IsLollipopActive": "false",
     "LollipopExpectedLcOriginalUrl": "^https://api-app.io.pagopa.it/api/v1/third-party-messages/[a-zA-Z0-9]{26}/precondition$",
-    "LollipopEnableConsumerLogging": "true"
+    "LollipopEnableConsumerLogging": "true",
+    "EnhancedWebSecurityEnabled": "true"
   }
 }
