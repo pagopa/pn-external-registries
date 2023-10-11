@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
+import java.util.List;
+
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
 class CostComponentsDaoTestIT {
@@ -45,6 +47,28 @@ class CostComponentsDaoTestIT {
 
         //Then
         Assertions.assertEquals(entity, result);
+    }
+
+    @Test
+    void multipleInsertAndGetMultiple() {
+        //Given
+        CostComponentsEntity entity1 = newCostComponentsEntity();
+        CostComponentsEntity entity2 = newCostComponentsEntity();
+        entity2.setSk("sk2");
+
+        testDao.delete(entity1.getPk(), entity1.getSk()).block();
+        testDao.delete(entity2.getPk(), entity2.getSk()).block();
+        testDao.insertOrUpdate(entity1).block();
+        testDao.insertOrUpdate(entity2).block();
+
+        //When
+        List<CostComponentsEntity> result = costComponentsDao.getItems(entity1.getPk()).collectList().block();
+
+        //Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertEquals(entity1, result.get(0));
+        Assertions.assertEquals(entity2, result.get(1));
     }
 
     private CostComponentsEntity newCostComponentsEntity() {
