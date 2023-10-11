@@ -74,6 +74,8 @@ Resources:
               KeyType: "HASH"
             - AttributeName: "lastUpdate"
               KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
         - IndexName: "status-lastUpdate-gsi	"
           KeySchema:
             - AttributeName: "status"
