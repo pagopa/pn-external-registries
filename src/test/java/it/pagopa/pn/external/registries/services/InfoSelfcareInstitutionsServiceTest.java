@@ -8,6 +8,10 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.Inst
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourcePNDto;
+import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.RootSenderIdResponseDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
@@ -180,7 +184,7 @@ class InfoSelfcareInstitutionsServiceTest {
         Mockito.when(selfcarePaInstitutionClient.getInstitutions(user)).thenReturn(Flux.fromIterable(list));
         List<String> header = new ArrayList<>();
         // WHEN
-        List<InstitutionResourcePNDto> res = service.listInstitutionByCurrentUser(user, "",  "WEB", header, "PA" ).collectList().block();
+        List<InstitutionResourcePNDto> res = service.listInstitutionByCurrentUser(user, "", "WEB", header, "PA").collectList().block();
 
         //THEN
         assertNotNull(res);
@@ -188,10 +192,48 @@ class InfoSelfcareInstitutionsServiceTest {
         res.forEach(x -> {
             if (x.getId().equals(institutionId1)) {
                 assertEquals(institutionId1, x.getId());
-            }
-            else {
+            } else {
                 assertEquals(institutionId2, x.getId());
             }
+        });
+    }
+
+    @Test
+    void getRootId() {
+        //GIVEN
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        String rootId = "d0d28368-1695-0f00-a260-6fda526e9aab";
+        OnboardInstitutionEntity inst = new OnboardInstitutionEntity();
+        inst.setPk(UUID.fromString(id).toString());
+        inst.setRootId(rootId);
+        inst.setDescription("Comune di Milano");
+        inst.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        inst.setTaxCode("123456789");
+
+        Mockito.when(onboardInstitutionsDao.get(Mockito.anyString())).thenReturn(Mono.just(inst));
+
+        // WHEN
+        RootSenderIdResponseDto rootSenderIdResponseDto = service.getRootId(id).block();
+
+
+        //THEN
+        assertNotNull(rootSenderIdResponseDto);
+        assertEquals(rootId, rootSenderIdResponseDto.getRootId());
+        assertNotEquals(id, rootSenderIdResponseDto.getRootId());
+    }
+
+
+    @Test
+    void getRootIdSenderNull() {
+        //GIVEN
+        String id = "d0d28368-1695-0f00-a260-6fda526e9aab";
+        Mockito.when(onboardInstitutionsDao.get(Mockito.anyString())).thenReturn(Mono.empty());
+
+        // WHEN
+        Mono<RootSenderIdResponseDto> monoResponse = service.getRootId(id);
+
+        assertThrows(PnRootIdNotFoundException.class, () -> {
+            monoResponse.block(d);
         });
     }
 
@@ -217,7 +259,7 @@ class InfoSelfcareInstitutionsServiceTest {
         Mockito.when(selfcarePaInstitutionClient.getInstitutionProducts(institutionId, user)).thenReturn(Flux.fromIterable(list));
         List<String> header = new ArrayList<>();
         // WHEN
-        List<ProductResourcePNDto> res = service.listProductsByInstitutionAndCurrentUser(institutionId, user, "",  "WEB", header, "PA" ).collectList().block();
+        List<ProductResourcePNDto> res = service.listProductsByInstitutionAndCurrentUser(institutionId, user, "", "WEB", header, "PA").collectList().block();
 
         //THEN
         assertNotNull(res);
@@ -225,11 +267,46 @@ class InfoSelfcareInstitutionsServiceTest {
         res.forEach(x -> {
             if (x.getId().equals(idProduct1)) {
                 assertEquals(idProduct1, x.getId());
-            }
-            else {
+            } else {
                 assertEquals(idProduct2, x.getId());
             }
         });
+    }
+
+    void filterOutRootIds() {
+        //GIVEN
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        String rootId = "d0d28368-1695-0f00-a260-6fda526e9aab";
+        OnboardInstitutionEntity paNotRoot = new OnboardInstitutionEntity();
+        paNotRoot.setPk(UUID.fromString(id).toString());
+        paNotRoot.setRootId(rootId);
+        paNotRoot.setDescription("Comune di Milano");
+        paNotRoot.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        paNotRoot.setTaxCode("123456789");
+
+
+        String secondId = "f1f12345-1695-4c50-a260-6fda526e9aab";
+        String secondRootId = "f1f12345-1695-4c50-a260-6fda526e9aab";
+        OnboardInstitutionEntity paRoot = new OnboardInstitutionEntity();
+        paRoot.setPk(UUID.fromString(secondId).toString());
+        paRoot.setRootId(secondRootId);
+        paRoot.setDescription("Comune di Roma");
+        paRoot.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        paRoot.setTaxCode("123456789");
+
+        Mockito.when(onboardInstitutionsDao.filterOutRootIds(Mockito.anyList())).thenReturn(Flux.just(paNotRoot));
+
+        // WHEN
+        Flux<String> stringFlux = service.filterOutRootIds(List.of(paRoot.getInstitutionId(), paNotRoot.getInstitutionId()));
+        Mono<List<String>> risultatiListMono = stringFlux.collectList();
+        List<String> risultatiList = risultatiListMono.block();
+
+
+        //THEN
+        assertNotNull(risultatiList);
+        assertFalse(risultatiList.isEmpty());
+        assertTrue(risultatiList.size() == 1);
+        assertEquals(risultatiList.get(0), paNotRoot.getInstitutionId());
     }
 
 }

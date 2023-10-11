@@ -180,7 +180,7 @@ public class IOService {
                 .flatMap(sendMessageResponseDto -> sendIOMessageSentEventToDeliveyPush(sendMessageRequestDto, sendMessageResponseDto))
                 .flatMap(sendMessageResponseDto -> saveProbableSchedulingAnalogDateIfPresent(sendMessageRequestDto).thenReturn(sendMessageResponseDto))
                 .onErrorResume( exception ->{
-                    log.error( "Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
+                    log.error( "[DOWNSTREAM APPIO] Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
                     SendMessageResponseDto res = new SendMessageResponseDto();
                     res.setResult(SendMessageResponseDto.ResultEnum.ERROR_COURTESY);
                     return Mono.just(res);
