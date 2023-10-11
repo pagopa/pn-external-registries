@@ -60,6 +60,8 @@ Resources:
           AttributeType: "S"
         - AttributeName: "onlyRootStatus"
           AttributeType: "S"
+        - AttributeName: "status"
+          AttributeType: "S"
         - AttributeName: "lastUpdate"
           AttributeType: "S"
       KeySchema:
@@ -69,6 +71,12 @@ Resources:
         - IndexName: "onlyRootStatus-lastUpdate-gsi"
           KeySchema:
             - AttributeName: "onlyRootStatus"
+              KeyType: "HASH"
+            - AttributeName: "lastUpdate"
+              KeyType: "RANGE"
+        - IndexName: "status-lastUpdate-gsi	"
+          KeySchema:
+            - AttributeName: "status"
               KeyType: "HASH"
             - AttributeName: "lastUpdate"
               KeyType: "RANGE"
