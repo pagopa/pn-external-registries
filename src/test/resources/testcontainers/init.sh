@@ -63,7 +63,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     --global-secondary-indexes \
     "[
         {
-            \"IndexName\": \"status-lastUpdate-gsi\",
+            \"IndexName\": \"onlyRootStatus-lastUpdate-gsi\",
             \"KeySchema\": [{\"AttributeName\":\"onlyRootStatus\",\"KeyType\":\"HASH\"},
                             {\"AttributeName\":\"lastUpdate\",\"KeyType\":\"RANGE\"}],
             \"Projection\":{

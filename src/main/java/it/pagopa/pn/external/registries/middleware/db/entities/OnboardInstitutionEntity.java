@@ -15,7 +15,7 @@ public class OnboardInstitutionEntity {
     public static final String STATUS_ACTIVE = "ACTIVE";
     public static final String STATUS_CLOSED = "CLOSED";
 
-    public static final String GSI_INDEX_LASTUPDATE = "status-lastUpdate-gsi";
+    public static final String GSI_INDEX_LASTUPDATE = "onlyRootStatus-lastUpdate-gsi";
 
     public static final String COL_PK = "id";
     public static final String COL_LASTUPDATE = "lastUpdate";

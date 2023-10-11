@@ -98,6 +98,7 @@ async function scanTable(params, callback) {
 
 
 async function main(){
+/*
   console.log('update gsi');
 
   const paramsDeleting = {
@@ -141,7 +142,7 @@ async function main(){
     GlobalSecondaryIndexUpdates: [
       {
         Create: {
-          IndexName: 'status-lastUpdate-gsi',
+          IndexName: 'onlyRootStatus-lastUpdate-gsi',
           KeySchema: [
             {
               AttributeName: 'onlyRootStatus',
@@ -169,7 +170,7 @@ async function main(){
     throw error;
   }
   
-
+*/
   console.log('start update item');
 
   scanTable(scanParams, function(err, data) {
