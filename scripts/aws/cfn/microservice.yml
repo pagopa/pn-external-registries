@@ -124,6 +124,14 @@ Parameters:
     Type: String
     Description: 'ARN of dynamodb table containing OnboardInstitutionsTable information'
 
+  CostComponentsTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing CostComponents information'
+
+  CostComponentsTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing CostComponents information'
+
   PortalUrl:
     Type: String
     Description: 'Url del portale della da inserire negli avvisi a IO'
@@ -345,6 +353,7 @@ Resources:
         ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
         ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
         ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
+        ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_COMPONENTS=${CostComponentsTableName}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -390,6 +399,8 @@ Resources:
               - !Ref IOMessagesTableArn
               - !Sub "${OnboardInstitutionsTableArn}"
               - !Sub "${OnboardInstitutionsTableArn}/*"
+              - !Sub "${CostComponentsTableArn}"
+              - !Sub "${CostComponentsTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -564,6 +575,7 @@ Resources:
           - ',' 
           - - !Ref IOMessagesTableName
             - !Ref OnboardInstitutionsTableName
+            - !Ref CostComponentsTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn

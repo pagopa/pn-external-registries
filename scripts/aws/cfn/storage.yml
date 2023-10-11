@@ -135,6 +135,13 @@ Outputs:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${OnboardInstitutionsTable.Arn}'
 
+  CostComponentsTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref CostComponentsTable
+  CostComponentsTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${CostComponentsTable.Arn}'
+
   # Log group exports
   EcsLogGroup:
     Value: !GetAtt PnExternalRegistriesLogGroup.Outputs.LogGroupName
