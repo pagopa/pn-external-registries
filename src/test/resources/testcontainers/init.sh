@@ -54,7 +54,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     --table-name OnboardInstitutions  \
     --attribute-definitions \
         AttributeName=id,AttributeType=S \
-        AttributeName=status,AttributeType=S \
+        AttributeName=onlyRootStatus,AttributeType=S \
         AttributeName=lastUpdate,AttributeType=S \
     --key-schema \
         AttributeName=id,KeyType=HASH \
@@ -64,7 +64,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     "[
         {
             \"IndexName\": \"status-lastUpdate-gsi\",
-            \"KeySchema\": [{\"AttributeName\":\"status\",\"KeyType\":\"HASH\"},
+            \"KeySchema\": [{\"AttributeName\":\"onlyRootStatus\",\"KeyType\":\"HASH\"},
                             {\"AttributeName\":\"lastUpdate\",\"KeyType\":\"RANGE\"}],
             \"Projection\":{
                 \"ProjectionType\":\"ALL\"

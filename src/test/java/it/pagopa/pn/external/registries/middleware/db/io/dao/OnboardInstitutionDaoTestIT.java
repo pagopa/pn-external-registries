@@ -20,7 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
@@ -51,7 +51,7 @@ class OnboardInstitutionDaoTestIT {
     @Test
     void get() {
         //Given
-        OnboardInstitutionEntity entity = newOnboard();
+        OnboardInstitutionEntity entity = newOnboard(true, false);
 
         try {
             testDao.delete(entity.getPk(), null);
@@ -84,7 +84,7 @@ class OnboardInstitutionDaoTestIT {
     void getNewer() {
 
         //Given
-        OnboardInstitutionEntity entity = newOnboard();
+        OnboardInstitutionEntity entity = newOnboard(true, false);
 
 
         try {
@@ -117,8 +117,8 @@ class OnboardInstitutionDaoTestIT {
     void getNewerOfInstant() {
 
         //Given
-        OnboardInstitutionEntity entity = newOnboard();
-        OnboardInstitutionEntity entity1 = newOnboard();
+        OnboardInstitutionEntity entity = newOnboard(true, false);
+        OnboardInstitutionEntity entity1 = newOnboard(true, false);
         entity1.setPk(entity1.getPk() + "1");
         entity1.setLastUpdate(entity1.getLastUpdate().plusMillis(1000));
 
@@ -151,14 +151,86 @@ class OnboardInstitutionDaoTestIT {
         }
     }
 
-    private OnboardInstitutionEntity newOnboard() {
+
+    @Test
+    void getAooUO() {
+        //Given
+        OnboardInstitutionEntity entity = newOnboard(false, false);
+
+
+        try {
+            testDao.delete(entity.getPk(), null);
+            testDao.put(entity);
+        } catch (Exception e) {
+            System.out.println("Problem to insert");
+        }
+
+        //When
+        List<OnboardInstitutionEntity> result = consentDao.getNewer(null).collectList().block(d);
+
+        //Then
+        try {
+            Assertions.assertNotNull(result);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        } finally {
+            try {
+                testDao.delete(entity.getPk(), null);
+
+            } catch (Exception e) {
+                System.out.println("Nothing to remove");
+            }
+        }
+    }
+
+
+    @Test
+    void filterOutRootIds() {
+        //Given
+        OnboardInstitutionEntity entityNotRoot = newOnboard(false, false);
+        OnboardInstitutionEntity entityRoot = newOnboard(true, true);
+
+        try {
+            testDao.delete(entityNotRoot.getPk(), null);
+            testDao.delete(entityRoot.getPk(), null);
+            testDao.put(entityNotRoot);
+            testDao.put(entityRoot);
+        } catch (Exception e) {
+            System.out.println("Problem to insert");
+        }
+
+        //When
+        List<OnboardInstitutionEntity> result = consentDao.filterOutRootIds(List.of(entityNotRoot.getInstitutionId(),entityRoot.getInstitutionId())).collectList().block(d);
+
+        //Then
+        try {
+            Assertions.assertNotNull(result);
+            assertFalse(result.isEmpty());
+            assertTrue(result.size() == 1);
+            assertEquals(result.get(0).getPk(), entityNotRoot.getInstitutionId());
+        } catch (Exception e) {
+            throw new RuntimeException();
+        } finally {
+            try {
+                testDao.delete(entityRoot.getPk(), null);
+                testDao.delete(entityNotRoot.getPk(), null);
+            } catch (Exception e) {
+                System.out.println("Nothing to remove");
+            }
+        }
+    }
+
+    private OnboardInstitutionEntity newOnboard(boolean rootPa, boolean secondOnboard) {
         OnboardInstitutionEntity res = new OnboardInstitutionEntity();
-        res.setPk("12345");
+        res.setPk(secondOnboard? "11111" : "22222" );
+        res.setRootId(rootPa ? res.getPk() : "33333");
         res.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        res.setOnlyRootStatus(rootPa ? OnboardInstitutionEntity.STATUS_ACTIVE : null);
         res.setDescription("comune di milano");
         res.setTaxCode("123456");
         res.setCreated(Instant.EPOCH.plusMillis(1000));
         res.setLastUpdate(Instant.EPOCH.plusMillis(1000));
         return res;
     }
+
 }
