@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.middleware.msclient.io;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
@@ -8,6 +9,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Fis
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
+import it.pagopa.pn.external.registries.springbootcfg.SpringAnalyzerActivation;
 import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
@@ -24,11 +26,14 @@ class IOClient extends OcpBaseClient {
     protected final DefaultApi ioApi;
     private final PnExternalRegistriesConfig config;
     String ioMode;
+    private final MeterRegistry meterRegistry;
 
-    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode) {
+
+    public IOClient(PnExternalRegistriesConfig config, DefaultApi ioApi, String ioMode, MeterRegistry meterRegistry) {
         this.config = config;
         this.ioApi = ioApi;
         this.ioMode = ioMode;
+        this.meterRegistry = meterRegistry;
     }
 
 
@@ -44,9 +49,15 @@ class IOClient extends OcpBaseClient {
             return Mono.just(res);
         }
 
-        return ioApi.submitMessageforUserWithFiscalCodeInBody( message ).onErrorResume(throwable -> {
-            log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
-            return Mono.error(throwable);
+        return ioApi.submitMessageforUserWithFiscalCodeInBody( message )
+                .map(response-> {
+                    this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_SUCCESSFULLY).counter().increment();
+                    return response;
+                })
+                .onErrorResume(throwable -> {
+                    log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
+                    this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_FAILURE).counter().increment();
+                    return Mono.error(throwable);
         });
     }
 
@@ -69,4 +80,6 @@ class IOClient extends OcpBaseClient {
     {
         return  (CollectionUtils.isEmpty(config.getIoWhitelist()) || config.getIoWhitelist().get(0).equals("*") || config.getIoWhitelist().contains(taxId));
     }
+
+
 }
