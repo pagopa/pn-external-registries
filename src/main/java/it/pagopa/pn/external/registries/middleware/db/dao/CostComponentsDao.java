@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.DeleteItemEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
-import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
 @Repository
 @Slf4j
@@ -30,22 +30,26 @@ public class CostComponentsDao extends BaseDao {
     }
 
     /**
+     * delete an item by pk and sk
+     */
+    public Mono<Void> delete(String pk, String sk) {
+        DeleteItemEnhancedRequest deleteItemEnhancedRequest = DeleteItemEnhancedRequest.builder()
+                .key(getKeyBuild(pk, sk))
+                .build();
+
+        return Mono.fromFuture(() -> costComponentsTable.deleteItem(deleteItemEnhancedRequest)).then();
+    }
+
+    /**
      * update from and entity (if not exists, it will not insert): returns the Entity in case of success or empty in case of failure
      */
-    public Mono<CostComponentsEntity> updateNotNullIfNotExists(CostComponentsEntity costComponentsEntity) {
+    public Mono<CostComponentsEntity> updateNotNull(CostComponentsEntity costComponentsEntity) {
         UpdateItemEnhancedRequest<CostComponentsEntity> updateItemEnhancedRequest = UpdateItemEnhancedRequest.builder(CostComponentsEntity.class)
                 .item(costComponentsEntity)
                 .ignoreNulls(true)
-                .conditionExpression(Expression.builder()
-                    .expression("attribute_exists(pk) AND attribute_exists(sk)") // if it doesn't exist, ConditionalCheckFailedException is thrown
-                    .build())
                 .build();
 
-        return Mono.fromFuture(() -> costComponentsTable.updateItem(updateItemEnhancedRequest).thenApply(item -> costComponentsEntity))
-                .onErrorResume(ConditionalCheckFailedException.class, e -> {
-                    log.error("Item with pk {} and sk {} does not exist", costComponentsEntity.getPk(), costComponentsEntity.getSk());
-                    return Mono.empty();
-                });
+        return Mono.fromFuture(() -> costComponentsTable.updateItem(updateItemEnhancedRequest).thenApply(item -> costComponentsEntity));
     }
 
     /**
