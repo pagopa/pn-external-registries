@@ -487,15 +487,15 @@ components:
       maxLength: 50
       # ASCII printable characters
       pattern: ^[ -~ ]*$
-    RootSenderIdResponse:
-      description: The response that contains the root Id (Ente) for the given sender Id
-      type: object
-      required:
-        - rootId
-      properties:
-        rootId:
-          type: string
-          description: The root Id (Ente) for the given sender Id
+    RootSenderIdResponse:                                                                                 # NO EXTERNAL
+      description: The response that contains the root Id (Ente) for the given sender Id                  # NO EXTERNAL
+      type: object                                                                                        # NO EXTERNAL
+      required:                                                                                           # NO EXTERNAL
+        - rootId                                                                                          # NO EXTERNAL
+      properties:                                                                                         # NO EXTERNAL
+        rootId:                                                                                           # NO EXTERNAL
+          type: string                                                                                    # NO EXTERNAL
+          description: The root Id (Ente) for the given sender Id                                         # NO EXTERNAL
 #  securitySchemes:                                      # ONLY EXTERNAL
 #    bearerAuth:                                         # ONLY EXTERNAL
 #      type: http                                        # ONLY EXTERNAL
