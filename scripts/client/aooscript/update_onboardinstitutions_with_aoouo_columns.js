@@ -50,7 +50,7 @@ function awsProfileConfig() {
 const dynamoDBClient = new DynamoDBClient(awsProfileConfig());
 console.log("DOCUMENT CLIENT CREATO");
 
-const TABLE_NAME = 'pn-onboardingInstitutions';
+const TABLE_NAME = 'pn-OnboardInstitutions';
 const SCAN_LIMIT = 10; // max 2000
 DELAY_MS = 1000; //1 second
 
@@ -204,7 +204,7 @@ async function main(){
           {
             ":now": now_str,
             ":id": key,
-            ":status": "ACTIVE"
+            ":status": item.status.S
           } 
           )
         };
