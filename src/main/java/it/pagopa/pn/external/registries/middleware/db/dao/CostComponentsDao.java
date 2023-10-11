@@ -41,7 +41,7 @@ public class CostComponentsDao extends BaseDao {
     }
 
     /**
-     * update from and entity (if not exists, it will not insert): returns the Entity in case of success or empty in case of failure
+     * update from an entity, updating only the fields not set to null
      */
     public Mono<CostComponentsEntity> updateNotNull(CostComponentsEntity costComponentsEntity) {
         UpdateItemEnhancedRequest<CostComponentsEntity> updateItemEnhancedRequest = UpdateItemEnhancedRequest.builder(CostComponentsEntity.class)
