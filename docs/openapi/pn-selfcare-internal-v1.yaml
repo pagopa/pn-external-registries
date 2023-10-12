@@ -152,8 +152,8 @@ paths:
         Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
       tags:
         - InfoPA
-      #      security:                                                                # ONLY EXTERNAL
-      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+#      security:                                                                # ONLY EXTERNAL
+#        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                          # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                         # NO EXTERNAL
@@ -192,8 +192,8 @@ paths:
         Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
       tags:
         - InfoPA
-      #      security:                                                                # ONLY EXTERNAL
-      #        - ApiKeyAuth: [ ]                                                      # ONLY EXTERNAL
+#      security:                                                                # ONLY EXTERNAL
+#        - ApiKeyAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                          # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                         # NO EXTERNAL
@@ -232,8 +232,8 @@ paths:
         Return the PgGroupList of the current user, or if the user isn't in some group, all the groups of the current PG
       tags:
         - InfoPG
-      #      security:                                                                # ONLY EXTERNAL
-      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+#      security:                                                                # ONLY EXTERNAL
+#        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                          # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                         # NO EXTERNAL
@@ -271,9 +271,9 @@ paths:
         Retrieves all the onboarded institutions related to the provided user and the product using selfcare API
       tags:
         - InfoPA
-      #      security:                                                                # ONLY EXTERNAL
-      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
-      parameters:
+#      security:                                                                # ONLY EXTERNAL
+#        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:                                                             # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'        # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'     # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'       # NO EXTERNAL
@@ -307,8 +307,8 @@ paths:
         etrieve all active products for given institution and user using SelfCare API
       tags:
         - InfoPA
-      #      security:                                                                # ONLY EXTERNAL
-      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+#      security:                                                                # ONLY EXTERNAL
+#        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'        # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'     # NO EXTERNAL
@@ -316,11 +316,11 @@ paths:
         - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'   # NO EXTERNAL
         - $ref: '#/components/parameters/headerSourceChannel'                 # NO EXTERNAL
         - $ref: '#/components/parameters/headerSourceChannelDetails'          # NO EXTERNAL                                                                             # NO EXTERNAL
-        - name: id                                                                              # NO EXTERNAL
-          description: The identifier of one PA                                                 # NO EXTERNAL
-          in: path                                                                              # NO EXTERNAL
-          required: true                                                                        # NO EXTERNAL
-          schema:                                                                               # NO EXTERNAL
+        - name: id                                                                              
+          description: The identifier of one PA                                                 
+          in: path                                                                              
+          required: true                                                                        
+          schema:                                                                               
             $ref: '#/components/schemas/SelfCarePaId'
       responses:
         '200':
@@ -346,7 +346,7 @@ paths:
       operationId: getRootSenderIdPrivate                                                   # NO EXTERNAL
       summary: Retrieve the Root Id                                                         # NO EXTERNAL
       description: >                                                                        # NO EXTERNAL
-        Retrieve the Root Id for the given sender Id
+        Retrieve the Root Id for the given sender Id                                        # NO EXTERNAL
       tags:                                                                                 # NO EXTERNAL
         - root-sender-id                                                                    # NO EXTERNAL
       parameters:                                                                           # NO EXTERNAL
@@ -381,7 +381,7 @@ paths:
       operationId: getFilteredAooUoIdPrivate                                                # NO EXTERNAL
       summary: Filter the given Ids removing Root Ids                                       # NO EXTERNAL
       description: >                                                                        # NO EXTERNAL
-        Filter the given Ids removing Root Ids
+        Filter the given Ids removing Root Ids                                              # NO EXTERNAL
       tags:                                                                                 # NO EXTERNAL
         - aoo-uo-ids                                                                        # NO EXTERNAL
       parameters:                                                                           # NO EXTERNAL
@@ -806,7 +806,7 @@ components:
         rootId: # NO EXTERNAL
           type: string                                                                                    # NO EXTERNAL
           description: The root Id (Ente) for the given sender Id                                         # NO EXTERNAL
-  parameters:
+  parameters: # NO EXTERNAL
     headerSourceChannel: # NO EXTERNAL
       name: x-pagopa-pn-src-ch                                                      # NO EXTERNAL
       in: header                                                                    # NO EXTERNAL
