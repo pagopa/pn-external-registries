@@ -36,10 +36,9 @@ class InstitutionToInstitutionPNDtoMapperTest {
         AssistanceContactsResourceDto assistanceContactsResourceDto = new AssistanceContactsResourceDto();
         assistanceContactsResourceDto.setSupportEmail("email@pec.it");
         institutionResourceDto.setAssistanceContacts(assistanceContactsResourceDto);
-        RootParentResourceDto rootParentResourceDto = new RootParentResourceDto();
-        institutionResourceDto.setRootParent(rootParentResourceDto);
-        DpoDataResourceDto dpoDataResourceDto = new DpoDataResourceDto();
-        institutionResourceDto.setDpoData(dpoDataResourceDto);
+        institutionResourceDto.setRootParent(new RootParentResourceDto());
+        institutionResourceDto.setDpoData(new DpoDataResourceDto());
+        institutionResourceDto.setPspData(new PspDataResourceDto());
 
         // When
         InstitutionResourcePNDto institutionResourcePNDto = InstitutionsToInstitutionPNDtoMapper.toDto(institutionResourceDto);
@@ -49,6 +48,7 @@ class InstitutionToInstitutionPNDtoMapperTest {
         assertEquals(institutionResourcePNDto.getId(), institutionResourceDto.getId());
         assertEquals(institutionResourcePNDto.getRecipientCode(), institutionResourceDto.getRecipientCode());
         assertEquals(institutionResourcePNDto.getDigitalAddress(), institutionResourceDto.getDigitalAddress());
+        assert institutionResourceDto.getAssistanceContacts() != null;
         assertEquals(institutionResourcePNDto.getAssistanceContacts().getSupportEmail(), institutionResourceDto.getAssistanceContacts().getSupportEmail());
     }
 }
