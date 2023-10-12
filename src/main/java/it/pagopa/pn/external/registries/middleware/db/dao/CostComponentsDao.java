@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.*;
-import software.amazon.awssdk.enhanced.dynamodb.model.DeleteItemEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
 
@@ -27,17 +26,6 @@ public class CostComponentsDao extends BaseDao {
      */
     public Mono<CostComponentsEntity> insertOrUpdate(CostComponentsEntity costComponentsEntity) {
         return Mono.fromFuture(costComponentsTable.putItem(costComponentsEntity).thenApply(item -> costComponentsEntity));
-    }
-
-    /**
-     * delete an item by pk and sk
-     */
-    public Mono<Void> delete(String pk, String sk) {
-        DeleteItemEnhancedRequest deleteItemEnhancedRequest = DeleteItemEnhancedRequest.builder()
-                .key(getKeyBuild(pk, sk))
-                .build();
-
-        return Mono.fromFuture(() -> costComponentsTable.deleteItem(deleteItemEnhancedRequest)).then();
     }
 
     /**

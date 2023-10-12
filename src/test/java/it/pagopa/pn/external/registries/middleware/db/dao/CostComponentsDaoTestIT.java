@@ -1,14 +1,16 @@
 package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
-import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
+import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
 import java.util.List;
 
@@ -17,10 +19,19 @@ import java.util.List;
 class CostComponentsDaoTestIT {
 
     @Autowired
-    private CostComponentsDao testDao;
+    private CostComponentsDao costComponentsDao;
+
+    @Autowired
+    DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient;
+
+    @Autowired
+    PnExternalRegistriesConfig pnExternalRegistriesConfig;
+
+    TestDao<CostComponentsEntity> testDao;
 
     @BeforeEach
     void setup() {
+        testDao = new TestDao<>(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameCostComponents(), CostComponentsEntity.class);
     }
 
     @Test
@@ -28,14 +39,22 @@ class CostComponentsDaoTestIT {
         //Given
         CostComponentsEntity entity = newCostComponentsEntity();
 
-        testDao.delete(entity.getPk(), entity.getSk()).block();
-        testDao.insertOrUpdate(entity).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+        costComponentsDao.insertOrUpdate(entity).block();
 
         //When
-        CostComponentsEntity result = testDao.getItem(entity.getPk(), entity.getSk()).block();
+        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
-        testDao.delete(entity.getPk(), entity.getSk()).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //Then
         Assertions.assertEquals(entity, result);
@@ -46,17 +65,25 @@ class CostComponentsDaoTestIT {
         //Given
         CostComponentsEntity entity = newCostComponentsEntity();
 
-        testDao.delete(entity.getPk(), entity.getSk()).block();
-        testDao.insertOrUpdate(entity).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+        costComponentsDao.insertOrUpdate(entity).block();
         // little change before reinserting
         entity.setBaseCost(2);
-        testDao.insertOrUpdate(entity).block();
+        costComponentsDao.insertOrUpdate(entity).block();
 
         //When
-        CostComponentsEntity result = testDao.getItem(entity.getPk(), entity.getSk()).block();
+        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
-        testDao.delete(entity.getPk(), entity.getSk()).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //Then
         Assertions.assertEquals(entity, result); // the second insertion should have overwritten the first one
@@ -69,17 +96,26 @@ class CostComponentsDaoTestIT {
         CostComponentsEntity entity2 = newCostComponentsEntity();
         entity2.setSk("sk2");
 
-        testDao.delete(entity1.getPk(), entity1.getSk()).block();
-        testDao.delete(entity2.getPk(), entity2.getSk()).block();
-        testDao.insertOrUpdate(entity1).block();
-        testDao.insertOrUpdate(entity2).block();
+        try {
+            testDao.delete(entity1.getPk(), entity1.getSk());
+            testDao.delete(entity2.getPk(), entity2.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+        costComponentsDao.insertOrUpdate(entity1).block();
+        costComponentsDao.insertOrUpdate(entity2).block();
 
         //When
-        List<CostComponentsEntity> result = testDao.getItems(entity1.getPk()).collectList().block();
+        List<CostComponentsEntity> result = costComponentsDao.getItems(entity1.getPk()).collectList().block();
 
         //Clean
-        testDao.delete(entity1.getPk(), entity1.getSk()).block();
-        testDao.delete(entity2.getPk(), entity2.getSk()).block();
+        try {
+            testDao.delete(entity1.getPk(), entity1.getSk());
+            testDao.delete(entity2.getPk(), entity2.getSk());
+
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //Then
         Assertions.assertNotNull(result);
@@ -95,18 +131,26 @@ class CostComponentsDaoTestIT {
         CostComponentsEntity entity2 = newCostComponentsEntity();
         entity2.setPk("pk2");
 
-        testDao.delete(entity1.getPk(), entity1.getSk()).block();
-        testDao.delete(entity2.getPk(), entity2.getSk()).block();
-        testDao.insertOrUpdate(entity1).block();
-        testDao.insertOrUpdate(entity2).block();
+        try {
+            testDao.delete(entity1.getPk(), entity1.getSk());
+            testDao.delete(entity2.getPk(), entity2.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+        costComponentsDao.insertOrUpdate(entity1).block();
+        costComponentsDao.insertOrUpdate(entity2).block();
 
         //When
-        List<CostComponentsEntity> result1 = testDao.getItems(entity1.getPk()).collectList().block();
-        List<CostComponentsEntity> result2 = testDao.getItems(entity2.getPk()).collectList().block();
+        List<CostComponentsEntity> result1 = costComponentsDao.getItems(entity1.getPk()).collectList().block();
+        List<CostComponentsEntity> result2 = costComponentsDao.getItems(entity2.getPk()).collectList().block();
 
         //Clean
-        testDao.delete(entity1.getPk(), entity1.getSk()).block();
-        testDao.delete(entity2.getPk(), entity2.getSk()).block();
+        try {
+            testDao.delete(entity1.getPk(), entity1.getSk());
+            testDao.delete(entity2.getPk(), entity2.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //Then
         Assertions.assertNotNull(result1);
@@ -128,8 +172,12 @@ class CostComponentsDaoTestIT {
         entity.setSecondAnalogCost(0);
         entity.setIsRefusedCancelled(true);
 
-        testDao.delete(entity.getPk(), entity.getSk()).block();
-        testDao.insertOrUpdate(entity).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+        costComponentsDao.insertOrUpdate(entity).block();
 
         //When
         // set all parameters to null, except for firstAnalogCost
@@ -139,11 +187,15 @@ class CostComponentsDaoTestIT {
         entity.setIsRefusedCancelled(null);
         entity.setFirstAnalogCost(12);
         // update the entity
-        testDao.updateNotNull(entity).block();
-        CostComponentsEntity result = testDao.getItem(entity.getPk(), entity.getSk()).block();
+        costComponentsDao.updateNotNull(entity).block();
+        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
-        testDao.delete(entity.getPk(), entity.getSk()).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //Then all the other values should be unchanged and the set one must be present
         Assertions.assertNotNull(result);
@@ -165,7 +217,11 @@ class CostComponentsDaoTestIT {
         entity.setSecondAnalogCost(0);
         entity.setIsRefusedCancelled(false);
 
-        testDao.delete(entity.getPk(), entity.getSk()).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //When
         // set all parameters to null, except for firstAnalogCost
@@ -175,11 +231,15 @@ class CostComponentsDaoTestIT {
         entity.setIsRefusedCancelled(null);
         entity.setFirstAnalogCost(12);
         // update the entity
-        testDao.updateNotNull(entity).block();
-        CostComponentsEntity result = testDao.getItem(entity.getPk(), entity.getSk()).block();
+        costComponentsDao.updateNotNull(entity).block();
+        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
-        testDao.delete(entity.getPk(), entity.getSk()).block();
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
 
         //Then all the other values should be null and the set one must be present
         Assertions.assertNotNull(result);
