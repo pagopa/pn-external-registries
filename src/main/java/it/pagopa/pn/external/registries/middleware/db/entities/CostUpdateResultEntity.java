@@ -12,7 +12,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class CostUpdateResultEntity {
+public class CostUpdateResultEntity implements Cloneable {
     public static final String COL_PK = "pk";
     public static final String COL_SK = "sk";
     public static final String COL_REQUEST_ID = "requestId";
@@ -61,4 +61,12 @@ public class CostUpdateResultEntity {
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_TTL)}))
     private Long ttl;
+
+    @Override public CostUpdateResultEntity clone() {
+        try {
+            return (CostUpdateResultEntity) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

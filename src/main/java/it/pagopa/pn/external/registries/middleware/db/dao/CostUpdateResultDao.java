@@ -27,12 +27,16 @@ public class CostUpdateResultDao extends BaseDao {
 
     /**
      * insert or update, passing an entity;
-     * ttl is set to now + parameter regardless of the passed value
+     * ttl is set to now + dynamodbTableNameCostUpdateResultTtlDays parameter regardless of the passed value;
+     * the original entity is not changed when setting the TTL
      */
     public Mono<CostUpdateResultEntity> insertOrUpdate(CostUpdateResultEntity costUpdateResultEntity) {
-        // the DAO always sets the TTL, ignoring the value passed in the entity
-        costUpdateResultEntity.setTtl(Instant.now().plus(pnExternalRegistriesConfig.getDynamodbTableNameCostUpdateResultTtlDays(), ChronoUnit.DAYS).getEpochSecond());
+        // clone the entity to avoid changing the original
+        var clonedEntity = costUpdateResultEntity.clone();
 
-        return Mono.fromFuture(costUpdateResultTable.putItem(costUpdateResultEntity).thenApply(item -> costUpdateResultEntity));
+        // the DAO always sets the TTL, ignoring the value passed in the entity
+        clonedEntity.setTtl(Instant.now().plus(pnExternalRegistriesConfig.getDynamodbTableNameCostUpdateResultTtlDays(), ChronoUnit.DAYS).getEpochSecond());
+
+        return Mono.fromFuture(costUpdateResultTable.putItem(clonedEntity).thenApply(item -> clonedEntity));
     }
 }
