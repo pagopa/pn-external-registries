@@ -303,7 +303,7 @@ class InfoSelfcareInstitutionsServiceTestIT {
         //THEN
         assertNotNull(risultatiList);
         assertFalse(risultatiList.isEmpty());
-        assertTrue(risultatiList.size() == 1);
+        assertEquals(1, risultatiList.size());
         assertEquals(risultatiList.get(0), paNotRoot.getInstitutionId());
     }
 
