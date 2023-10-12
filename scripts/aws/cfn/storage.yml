@@ -103,7 +103,7 @@ Resources:
   CostUpdateResultTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: 'CostComponents'
+      TableName: !Sub '${ProjectName}-CostUpdateResult'
       AttributeDefinitions:
         - AttributeName: 'pk'
           AttributeType: 'S'
