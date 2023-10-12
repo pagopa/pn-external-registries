@@ -3,7 +3,6 @@ package it.pagopa.pn.external.registries.mapper;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupStatusDto;
-import org.springframework.stereotype.Component;
 
 public class UserGroupToPaGroupDtoMapper {
 

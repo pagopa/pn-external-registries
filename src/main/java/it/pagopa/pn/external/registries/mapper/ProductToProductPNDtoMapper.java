@@ -3,7 +3,6 @@ package it.pagopa.pn.external.registries.mapper;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductRoleInfoResDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
