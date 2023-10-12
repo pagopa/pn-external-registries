@@ -81,7 +81,7 @@ Resources:
   CostComponentsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: 'CostComponents'
+      TableName: !Sub '${ProjectName}-CostComponents'
       AttributeDefinitions:
         - AttributeName: 'pk'
           AttributeType: 'S'
