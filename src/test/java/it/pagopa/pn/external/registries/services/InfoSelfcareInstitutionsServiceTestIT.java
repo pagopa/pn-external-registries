@@ -9,8 +9,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaIn
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourcePNDto;
 import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.RootSenderIdResponseDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
@@ -39,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(LocalStackTestConfig.class)
 @Slf4j
 @ActiveProfiles("test")
-class InfoSelfcareInstitutionsServiceTest {
+class InfoSelfcareInstitutionsServiceTestIT {
 
     private final Duration d = Duration.ofMillis(3000);
 

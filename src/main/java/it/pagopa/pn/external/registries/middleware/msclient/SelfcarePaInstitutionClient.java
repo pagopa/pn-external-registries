@@ -28,7 +28,7 @@ public class SelfcarePaInstitutionClient {
         return institutionsApi.getInstitutionsUsingGET(userIdForAuth)
                 .doOnNext(institutionsResponseDto -> log.info("getInstitutions result: {}", institutionsResponseDto))
                 .onErrorResume(WebClientResponseException.class, x -> {
-                    log.error("getInstitutions response error {}", x.getResponseBodyAsString(), x);
+                    log.error("getInstitutions for userId " + userIdForAuth + " response error {}", x.getResponseBodyAsString(), x);
                     return Mono.error(new PnInternalException("Error getting institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
                 });
     }
@@ -38,7 +38,7 @@ public class SelfcarePaInstitutionClient {
         return institutionsApi.getInstitutionUserProductsUsingGET(institutionId, userId)
                 .doOnNext(productResourceDto -> log.info("getInstitutionProduct result: {}", productResourceDto))
                 .onErrorResume(WebClientResponseException.class, x -> {
-                    log.error("getInstitutionProduct response error {}", x.getResponseBodyAsString(), x);
+                    log.error("getInstitutionProduct for institutionId " + institutionId + " response error {}", x.getResponseBodyAsString(), x);
                     return Mono.error(new PnInternalException("Error getting product institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
                 });
     }

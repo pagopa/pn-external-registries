@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGr
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupStatusDto;
 import org.springframework.stereotype.Component;
 
-@Component
 public class UserGroupToPgGroupDtoMapper {
 
     private UserGroupToPgGroupDtoMapper() {

@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.Activ
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.ActivationStatusDto;
 import org.springframework.stereotype.Component;
 
-@Component
 public class ActivationToActivationDtoMapper {
 
     private ActivationToActivationDtoMapper(){}
