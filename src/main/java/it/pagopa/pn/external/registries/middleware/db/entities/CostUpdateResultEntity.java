@@ -57,7 +57,7 @@ public class CostUpdateResultEntity {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_COMMUNICATION_TIMESTAMP)}))
     private Instant communicationTimestamp;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_JSON_RESPONSE)}))
-    private String jsonResponse;
+    private String jsonResponse; // the complete JSON string (not object) returned by the GPD service
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_TTL)}))
     private Long ttl;

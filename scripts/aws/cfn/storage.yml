@@ -28,6 +28,10 @@ Parameters:
     Type: Number
     Default: 14
 
+  CdcKinesisSourceStreamArn:
+    Type: String
+    Description: "Where to send CDC"
+
 Conditions:
   Never: !Equals [ 'true', 'false' ]
 
@@ -96,6 +100,32 @@ Resources:
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
 
+  CostUpdateResultTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 'CostComponents'
+      AttributeDefinitions:
+        - AttributeName: 'pk'
+          AttributeType: 'S'
+        - AttributeName: 'sk'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'pk'
+          KeyType: 'HASH'
+        - AttributeName: 'sk'
+          KeyType: 'RANGE'
+      BillingMode: 'PAY_PER_REQUEST'
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: "ttl"
+        Enabled: true
+      # Kinesis CDC source
+      KinesisStreamSpecification:
+        StreamArn: !Ref CdcKinesisSourceStreamArn
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
   PnExternalRegistriesLogGroup:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Retain
@@ -141,6 +171,15 @@ Outputs:
   CostComponentsTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${CostComponentsTable.Arn}'
+
+  CostUpdateResultTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref CostUpdateResultTable
+
+  CostUpdateResultTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${CostUpdateResultTable.Arn}'
+
 
   # Log group exports
   EcsLogGroup:

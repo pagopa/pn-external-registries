@@ -59,6 +59,7 @@ public class PnExternalRegistriesConfig {
     private String dynamodbTableNameIOMessages;
     private String dynamodbTableNameOnboardInstitutions;
     private String dynamodbTableNameCostComponents;
+    private String dynamodbTableNameCostUpdateResult;
 
     private String piattaformanotificheurlTos;
     private String piattaformanotificheurlPrivacy;
