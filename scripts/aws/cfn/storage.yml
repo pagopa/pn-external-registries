@@ -76,7 +76,25 @@ Resources:
             ProjectionType: "ALL"
       BillingMode: "PAY_PER_REQUEST"
       PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true      
+        PointInTimeRecoveryEnabled: true
+
+  CostComponentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-CostComponents'
+      AttributeDefinitions:
+        - AttributeName: 'pk'
+          AttributeType: 'S'
+        - AttributeName: 'sk'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'pk'
+          KeyType: 'HASH'
+        - AttributeName: 'sk'
+          KeyType: 'RANGE'
+      BillingMode: 'PAY_PER_REQUEST'
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
 
   PnExternalRegistriesLogGroup:
     Type: AWS::CloudFormation::Stack
@@ -116,6 +134,13 @@ Outputs:
   OnboardInstitutionsTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${OnboardInstitutionsTable.Arn}'
+
+  CostComponentsTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref CostComponentsTable
+  CostComponentsTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${CostComponentsTable.Arn}'
 
   # Log group exports
   EcsLogGroup:

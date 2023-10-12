@@ -10,9 +10,9 @@ public class BaseDao {
 
     protected Key getKeyBuild(String pk, String sk) {
         if (sk == null)
-                return Key.builder().partitionValue(pk).build();
+            return Key.builder().partitionValue(pk).build();
         else
-                return Key.builder().partitionValue(pk).sortValue(sk).build();
+            return Key.builder().partitionValue(pk).sortValue(sk).build();
     }
 
 }
