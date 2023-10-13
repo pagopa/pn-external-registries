@@ -180,10 +180,8 @@ Outputs:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${CostUpdateResultTable.Arn}'
 
-
   # Log group exports
   EcsLogGroup:
     Value: !GetAtt PnExternalRegistriesLogGroup.Outputs.LogGroupName
   PnExternalRegistriesTriggerLambdaName:
     Value: !Sub "${ProjectName}-external-registries-trigger-lambda"
-
