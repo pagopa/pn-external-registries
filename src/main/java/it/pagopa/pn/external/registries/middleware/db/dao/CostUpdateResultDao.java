@@ -32,11 +32,11 @@ public class CostUpdateResultDao extends BaseDao {
      */
     public Mono<CostUpdateResultEntity> insertOrUpdate(CostUpdateResultEntity costUpdateResultEntity) {
         // clone the entity to avoid changing the original
-        var clonedEntity = costUpdateResultEntity.clone();
+        var copiedEntity = new CostUpdateResultEntity(costUpdateResultEntity);
 
         // the DAO always sets the TTL, ignoring the value passed in the entity
-        clonedEntity.setTtl(Instant.now().plus(pnExternalRegistriesConfig.getDynamodbTableNameCostUpdateResultTtlDays(), ChronoUnit.DAYS).getEpochSecond());
+        copiedEntity.setTtl(Instant.now().plus(pnExternalRegistriesConfig.getDynamodbTableNameCostUpdateResultTtlDays(), ChronoUnit.DAYS).getEpochSecond());
 
-        return Mono.fromFuture(costUpdateResultTable.putItem(clonedEntity).thenApply(item -> clonedEntity));
+        return Mono.fromFuture(costUpdateResultTable.putItem(copiedEntity).thenApply(item -> copiedEntity));
     }
 }

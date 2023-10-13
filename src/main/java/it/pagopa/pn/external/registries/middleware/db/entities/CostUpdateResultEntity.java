@@ -12,7 +12,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class CostUpdateResultEntity implements Cloneable {
+public class CostUpdateResultEntity {
     public static final String COL_PK = "pk";
     public static final String COL_SK = "sk";
     public static final String COL_REQUEST_ID = "requestId";
@@ -57,16 +57,26 @@ public class CostUpdateResultEntity implements Cloneable {
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_COMMUNICATION_TIMESTAMP)}))
     private Instant communicationTimestamp;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_JSON_RESPONSE)}))
-    private String jsonResponse; // the complete JSON string (not object) returned by the GPD service
+    private String jsonResponse; // the JSON string (not object) returned by the GPD service
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_TTL)}))
     private Long ttl;
 
-    @Override public CostUpdateResultEntity clone() {
-        try {
-            return (CostUpdateResultEntity) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+    public CostUpdateResultEntity(CostUpdateResultEntity other) {
+        // shallow copy
+        this.pk = other.pk;
+        this.sk = other.sk;
+        this.requestId = other.requestId;
+        this.failedIuv = other.failedIuv;
+        this.communicationResult = other.communicationResult;
+        this.communicationResultGroup = other.communicationResultGroup;
+        this.updateCostPhase = other.updateCostPhase;
+        this.notificationCost = other.notificationCost;
+        this.iun = other.iun;
+        this.eventTimestamp = other.eventTimestamp;
+        this.eventStorageTimestamp = other.eventStorageTimestamp;
+        this.communicationTimestamp = other.communicationTimestamp;
+        this.jsonResponse = other.jsonResponse;
+        this.ttl = other.ttl;
     }
 }
