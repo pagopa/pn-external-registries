@@ -37,31 +37,50 @@ class CostUpdateResultServiceTest {
     }
 
     @Test
-    void testCreateUpdateResult_200_OK() {
+    void checkCleanUp() {
         int statusCode = 200;
 
-        String jsonString = "{\"iuv\":null,\"organizationFiscalCode\":null,\"amount\":null,\"description\":null,\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
+        String sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[{\"amount\":180, \"remittanceInformation\":\"remittanceInformation\"}]}";
+        String cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[{\"amount\":180}]}";
 
         // Setup request
-        CostUpdateResultRequestInt request = new CostUpdateResultRequestInt();
-        request.setCreditorTaxId("1234");
-        request.setNoticeCode("NOTICE123");
-        request.setUpdateCostPhase(CostUpdateCostPhaseInt.VALIDATION);
-        request.setRequestId("REQ123");
-        request.setStatusCode(statusCode);
-        request.setJsonResponse(jsonString);
-        request.setNotificationCost(100);
-        request.setIun("IUN123");
-        var now = Instant.now();
-        request.setEventTimestamp(Instant.now());
-        request.setEventStorageTimestamp(now.plusSeconds(1));
-        request.setCommunicationTimestamp(now.plusSeconds(5));
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
 
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
         entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
         entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
                 "OK" + "##" +
                 UUID.randomUUID());
+
+        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
+
+        // Execute & Verify
+        String result = service.createUpdateResult(request).block();
+
+        verify(dao).insertOrUpdate(captor.capture());
+        CostUpdateResultEntity capturedEntity = captor.getValue();
+
+        // communicationResult
+        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
+        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+    }
+
+    @Test
+    void testCreateUpdateResult_200_OK() {
+        int statusCode = 200;
+
+        String sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
+        String cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[]}";
+
+        // Setup request
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
+        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
+                "OK" + "##" +
+                UUID.randomUUID());
+
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
@@ -86,7 +105,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("OK_UPDATED", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(request.getJsonResponse(), capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("OK", capturedEntity.getCommunicationResultGroup());
@@ -109,5 +128,23 @@ class CostUpdateResultServiceTest {
         Assertions.assertEquals(request.getEventStorageTimestamp(), capturedEntity.getEventStorageTimestamp());
         // communicationTimestamp
         Assertions.assertEquals(request.getCommunicationTimestamp(), capturedEntity.getCommunicationTimestamp());
+    }
+
+    private CostUpdateResultRequestInt newCostUpdateResultRequestInt(int statusCode, String sourceJsonString) {
+        CostUpdateResultRequestInt request = new CostUpdateResultRequestInt();
+        request.setCreditorTaxId("1234");
+        request.setNoticeCode("NOTICE123");
+        request.setUpdateCostPhase(CostUpdateCostPhaseInt.VALIDATION);
+        request.setRequestId("REQ123");
+        request.setStatusCode(statusCode);
+        request.setJsonResponse(sourceJsonString);
+        request.setNotificationCost(100);
+        request.setIun("IUN123");
+        var now = Instant.now();
+        request.setEventTimestamp(Instant.now());
+        request.setEventStorageTimestamp(now.plusSeconds(1));
+        request.setCommunicationTimestamp(now.plusSeconds(5));
+
+        return request;
     }
 }

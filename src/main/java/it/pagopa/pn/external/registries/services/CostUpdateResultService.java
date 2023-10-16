@@ -79,8 +79,13 @@ public class CostUpdateResultService {
         try {
             var paymentInfo = objectMapper.readValue(jsonResponse, GPDPaymentInfoInt.class);
 
-            // initialize the transfer list to an empty list
-            paymentInfo.setTransfer(List.of());
+            // log paymentInfo
+            log.info("PaymentInfo: {}", paymentInfo);
+
+            // initialize the transfer list to an empty list, if null
+            if (paymentInfo.getTransfer() == null) {
+                paymentInfo.setTransfer(List.of());
+            }
 
             // serialize back to JSON
             return objectMapper.writeValueAsString(paymentInfo);
