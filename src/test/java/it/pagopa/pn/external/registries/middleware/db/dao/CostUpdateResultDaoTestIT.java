@@ -2,11 +2,10 @@ package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.dto.UpdateResultResponseInt;
+import it.pagopa.pn.external.registries.dto.CostUpdateResultResponseInt;
 import it.pagopa.pn.external.registries.middleware.db.entities.CommunicationResultEntity;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostUpdateResultEntity;
 import it.pagopa.pn.external.registries.dto.gpd.GPDPaymentInfoInt;
-import it.pagopa.pn.external.registries.dto.gpd.GPDTransferInt;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +88,7 @@ class CostUpdateResultDaoTestIT {
             System.out.println("Nothing to remove");
         }
         costUpdateResultDao.insertOrUpdate(entity).block();
-        entity.getCommunicationResult().setResultEnum(UpdateResultResponseInt.KO_CANNOT_UPDATE.getValue());
+        entity.getCommunicationResult().setResultEnum(CostUpdateResultResponseInt.KO_CANNOT_UPDATE.getValue());
         costUpdateResultDao.insertOrUpdate(entity).block();
 
         //When
@@ -141,7 +140,7 @@ class CostUpdateResultDaoTestIT {
         CommunicationResultEntity entity = new CommunicationResultEntity();
         entity.setStatusCode(200);
 
-        entity.setResultEnum(UpdateResultResponseInt.OK_UPDATED.getValue());
+        entity.setResultEnum(CostUpdateResultResponseInt.OK_UPDATED.getValue());
 
         GPDPaymentInfoInt jsonResponse = new GPDPaymentInfoInt();
         jsonResponse.setAmount(100);

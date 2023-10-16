@@ -7,10 +7,10 @@ import java.time.Instant;
 
 @Data
 @EqualsAndHashCode
-public class UpdateResultRequestInt {
+public class CostUpdateResultRequestInt {
     private String creditorTaxId;
     private String noticeCode;
-    private UpdateCostPhaseInt updateCostPhase;
+    private CostUpdateCostPhaseInt updateCostPhase;
     private String requestId;
     private int statusCode;
     private String jsonResponse;

@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.dto.gpd.GPDPaymentInfoInt;
-import it.pagopa.pn.external.registries.dto.UpdateResultRequestInt;
+import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostUpdateResultDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CommunicationResultEntity;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostUpdateResultEntity;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,14 +28,16 @@ public class CostUpdateResultService {
         this.communicationResultGroupMapper = communicationResultGroupMapper;
     }
 
-    public Mono<String> createUpdateResult(UpdateResultRequestInt request) {
+    public Mono<String> createUpdateResult(CostUpdateResultRequestInt request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String communicationResultGroup = communicationResultGroupMapper.mapToCommunicationResultGroup(request.getStatusCode());
-
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
+
+        String communicationResultGroup = communicationResultGroupMapper.mapToCommunicationResultGroup(request.getStatusCode());
+        entity.setCommunicationResultGroup(communicationResultGroup);
+
         entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
         entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
                 communicationResultGroup + "##" +
@@ -49,6 +52,8 @@ public class CostUpdateResultService {
 
         communicationResultEntity.setJsonResponse(this.cleanUpJsonResponse(request.getJsonResponse()));
 
+        entity.setCommunicationResult(communicationResultEntity);
+
         entity.setFailedIuv("KO".equals(communicationResultGroup) ? request.getIun() : null);
         entity.setUpdateCostPhase(request.getUpdateCostPhase().getValue());
         entity.setNotificationCost(request.getNotificationCost());
@@ -56,6 +61,8 @@ public class CostUpdateResultService {
         entity.setEventTimestamp(request.getEventTimestamp());
         entity.setEventStorageTimestamp(request.getEventStorageTimestamp());
         entity.setCommunicationTimestamp(request.getCommunicationTimestamp());
+
+        log.info("Inserting CostUpdateResultEntity: {}", entity);
 
         // insert and only return communication result group to the caller
         return dao.insertOrUpdate(entity)
@@ -71,6 +78,10 @@ public class CostUpdateResultService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             var paymentInfo = objectMapper.readValue(jsonResponse, GPDPaymentInfoInt.class);
+
+            // initialize the transfer list to an empty list
+            paymentInfo.setTransfer(List.of());
+
             // serialize back to JSON
             return objectMapper.writeValueAsString(paymentInfo);
         } catch (Exception e) {

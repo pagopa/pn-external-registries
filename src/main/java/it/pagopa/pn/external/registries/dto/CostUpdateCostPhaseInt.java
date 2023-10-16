@@ -3,7 +3,7 @@ package it.pagopa.pn.external.registries.dto;
 import lombok.Getter;
 
 @Getter
-public enum UpdateCostPhaseInt {
+public enum CostUpdateCostPhaseInt {
     VALIDATION("VALIDATION"),
     SEND_ANALOG_DOMICILE_ATTEMPT_0("SEND_ANALOG_DOMICILE_ATTEMPT_0"),
     SEND_ANALOG_DOMICILE_ATTEMPT_1("SEND_ANALOG_DOMICILE_ATTEMPT_1"),
@@ -13,12 +13,12 @@ public enum UpdateCostPhaseInt {
 
     private final String value;
 
-    UpdateCostPhaseInt(String value) {
+    CostUpdateCostPhaseInt(String value) {
         this.value = value;
     }
 
-    public static UpdateCostPhaseInt fromValue(String value) {
-        for (UpdateCostPhaseInt phase : UpdateCostPhaseInt.values()) {
+    public static CostUpdateCostPhaseInt fromValue(String value) {
+        for (CostUpdateCostPhaseInt phase : CostUpdateCostPhaseInt.values()) {
             if (phase.getValue().equalsIgnoreCase(value)) {
                 return phase;
             }
