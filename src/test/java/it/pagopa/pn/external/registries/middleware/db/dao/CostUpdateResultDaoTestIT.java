@@ -71,6 +71,43 @@ class CostUpdateResultDaoTestIT {
         Assertions.assertEquals(entity, result);
     }
 
+    @Test
+    void insertAndReinsertUpdating() {
+        //Given
+        CostUpdateResultEntity entity = newCostUpdateResultEntity();
+
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+        costUpdateResultDao.insertOrUpdate(entity).block();
+        entity.setCommunicationResult("newCommunicationResult");
+        costUpdateResultDao.insertOrUpdate(entity).block();
+
+        //When
+        CostUpdateResultEntity result = null;
+        try {
+            result = testDao.get(entity.getPk(), entity.getSk());
+        } catch (InterruptedException | ExecutionException e) {
+            fail(e);
+        }
+
+        //Clean
+        try {
+            testDao.delete(entity.getPk(), entity.getSk());
+        } catch (Exception e) {
+            System.out.println("Nothing to remove");
+        }
+
+        //Then
+        // since the TTL has been set by the DAO, we force the value of the returned one to be the same as the entity,
+        // after checking it is different from the original value
+        Assertions.assertNotEquals(entity.getTtl(), result.getTtl());
+        result.setTtl(entity.getTtl());
+        Assertions.assertEquals(entity, result);
+    }
+
     private CostUpdateResultEntity newCostUpdateResultEntity() {
         var now = Instant.now();
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
