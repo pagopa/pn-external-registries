@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum CostUpdateResultResponseInt {
     OK_UPDATED("OK_UPDATED"),
     OK_IN_PAYMENT("OK_IN_PAYMENT"),
-    SEND_ANALOG_DOMICILE_ATTEMPT_1("KO_NOT_FOUND"),
+    KO_NOT_FOUND("KO_NOT_FOUND"),
     KO_CANNOT_UPDATE("KO_CANNOT_UPDATE"),
     KO_RETRY("KO_RETRY");
 

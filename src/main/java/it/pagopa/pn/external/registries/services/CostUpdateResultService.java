@@ -35,7 +35,7 @@ public class CostUpdateResultService {
 
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
 
-        String communicationResultGroup = communicationResultGroupMapper.mapToCommunicationResultGroup(request.getStatusCode());
+        String communicationResultGroup = communicationResultGroupMapper.mapToCommunicationResultGroup(request.getStatusCode()).getValue();
         entity.setCommunicationResultGroup(communicationResultGroup);
 
         entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
@@ -45,7 +45,7 @@ public class CostUpdateResultService {
 
         entity.setRequestId(request.getRequestId());
 
-        String resultEnum = communicationResultGroupMapper.getResultEnum(request.getStatusCode());
+        String resultEnum = communicationResultGroupMapper.getResultEnum(request.getStatusCode()).getValue();
         CommunicationResultEntity communicationResultEntity = new CommunicationResultEntity();
         communicationResultEntity.setStatusCode(request.getStatusCode());
         communicationResultEntity.setResultEnum(resultEnum);
@@ -78,9 +78,6 @@ public class CostUpdateResultService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             var paymentInfo = objectMapper.readValue(jsonResponse, GPDPaymentInfoInt.class);
-
-            // log paymentInfo
-            log.info("PaymentInfo: {}", paymentInfo);
 
             // initialize the transfer list to an empty list, if null
             if (paymentInfo.getTransfer() == null) {

@@ -29,11 +29,17 @@ class CostUpdateResultServiceTest {
     @Captor
     private ArgumentCaptor<CostUpdateResultEntity> captor;
 
+    String sourceJsonString;
+    String cleanedJsonString;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         this.service = new CostUpdateResultService(dao, communicationResultGroupMapper);
         captor = ArgumentCaptor.forClass(CostUpdateResultEntity.class);
+
+        sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
+        cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[]}";
     }
 
     @Test
@@ -56,6 +62,7 @@ class CostUpdateResultServiceTest {
 
         // Execute & Verify
         String result = service.createUpdateResult(request).block();
+        Assertions.assertEquals("OK", result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -68,9 +75,6 @@ class CostUpdateResultServiceTest {
     @Test
     void testCreateUpdateResult_200_OK() {
         int statusCode = 200;
-
-        String sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
-        String cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[]}";
 
         // Setup request
         CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
@@ -128,6 +132,136 @@ class CostUpdateResultServiceTest {
         Assertions.assertEquals(request.getEventStorageTimestamp(), capturedEntity.getEventStorageTimestamp());
         // communicationTimestamp
         Assertions.assertEquals(request.getCommunicationTimestamp(), capturedEntity.getCommunicationTimestamp());
+    }
+
+    @Test
+    void testCreateUpdateResult_202_OK_IN_PAYMENT_Reduced() {
+        // TODO: choose the correct one
+        int statusCode = 202;
+
+        // Setup request
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
+        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
+                "OK" + "##" +
+                UUID.randomUUID());
+
+        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
+
+        // Execute & Verify
+        String result = service.createUpdateResult(request).block();
+        Assertions.assertEquals("OK", result);
+
+        verify(dao).insertOrUpdate(captor.capture());
+        CostUpdateResultEntity capturedEntity = captor.getValue();
+
+        // pk
+        Assertions.assertEquals(request.getCreditorTaxId() + "##" + request.getNoticeCode(), capturedEntity.getPk());
+
+        // sk - we want to check that the SK is composed by the updateCostPhase, the communicationResultGroup, but ignore the final random UUID
+        String expectedSkPrefix = request.getUpdateCostPhase().getValue() + "##" + "OK";
+        String actualSkPrefix = capturedEntity.getSk().split("##")[0] + "##" + capturedEntity.getSk().split("##")[1];
+        Assertions.assertEquals(expectedSkPrefix, actualSkPrefix);
+
+        // communicationResult
+        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
+        Assertions.assertEquals("OK_IN_PAYMENT", capturedEntity.getCommunicationResult().getResultEnum());
+        Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
+        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+
+        // communicationResultGroup
+        Assertions.assertEquals("OK", capturedEntity.getCommunicationResultGroup());
+
+        // failedIuv
+        Assertions.assertNull(capturedEntity.getFailedIuv());
+    }
+
+    @Test
+    void testCreateUpdateResult_404_KO_NOT_FOUND_Reduced() {
+        int statusCode = 404;
+
+        // Setup request
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
+        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
+                "KO" + "##" +
+                UUID.randomUUID());
+
+        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
+
+        // Execute & Verify
+        String result = service.createUpdateResult(request).block();
+        Assertions.assertEquals("KO", result);
+
+        verify(dao).insertOrUpdate(captor.capture());
+        CostUpdateResultEntity capturedEntity = captor.getValue();
+
+        // pk
+        Assertions.assertEquals(request.getCreditorTaxId() + "##" + request.getNoticeCode(), capturedEntity.getPk());
+
+        // sk - we want to check that the SK is composed by the updateCostPhase, the communicationResultGroup, but ignore the final random UUID
+        String expectedSkPrefix = request.getUpdateCostPhase().getValue() + "##" + "KO";
+        String actualSkPrefix = capturedEntity.getSk().split("##")[0] + "##" + capturedEntity.getSk().split("##")[1];
+        Assertions.assertEquals(expectedSkPrefix, actualSkPrefix);
+
+        // communicationResult
+        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
+        Assertions.assertEquals("KO_NOT_FOUND", capturedEntity.getCommunicationResult().getResultEnum());
+        Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
+        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+
+        // communicationResultGroup
+        Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
+
+        // failedIuv
+        Assertions.assertEquals(request.getIun(), capturedEntity.getFailedIuv());
+    }
+
+    @Test
+    void testCreateUpdateResult_422_KO_CANNOT_UPDATE_Reduced() {
+        int statusCode = 422;
+
+        // Setup request
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
+        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
+                "KO" + "##" +
+                UUID.randomUUID());
+
+        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
+
+        // Execute & Verify
+        String result = service.createUpdateResult(request).block();
+        Assertions.assertEquals("KO", result);
+
+        verify(dao).insertOrUpdate(captor.capture());
+        CostUpdateResultEntity capturedEntity = captor.getValue();
+
+        // pk
+        Assertions.assertEquals(request.getCreditorTaxId() + "##" + request.getNoticeCode(), capturedEntity.getPk());
+
+        // sk - we want to check that the SK is composed by the updateCostPhase, the communicationResultGroup, but ignore the final random UUID
+        String expectedSkPrefix = request.getUpdateCostPhase().getValue() + "##" + "KO";
+        String actualSkPrefix = capturedEntity.getSk().split("##")[0] + "##" + capturedEntity.getSk().split("##")[1];
+        Assertions.assertEquals(expectedSkPrefix, actualSkPrefix);
+
+        // communicationResult
+        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
+        Assertions.assertEquals("KO_CANNOT_UPDATE", capturedEntity.getCommunicationResult().getResultEnum());
+        Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
+        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+
+        // communicationResultGroup
+        Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
+
+        // failedIuv
+        Assertions.assertEquals(request.getIun(), capturedEntity.getFailedIuv());
     }
 
     private CostUpdateResultRequestInt newCostUpdateResultRequestInt(int statusCode, String sourceJsonString) {
