@@ -2,7 +2,11 @@ package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.dto.UpdateResultResponseInt;
+import it.pagopa.pn.external.registries.middleware.db.entities.CommunicationResultEntity;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostUpdateResultEntity;
+import it.pagopa.pn.external.registries.dto.gpd.GPDPaymentInfoInt;
+import it.pagopa.pn.external.registries.dto.gpd.GPDTransferInt;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -82,7 +89,7 @@ class CostUpdateResultDaoTestIT {
             System.out.println("Nothing to remove");
         }
         costUpdateResultDao.insertOrUpdate(entity).block();
-        entity.setCommunicationResult("newCommunicationResult");
+        entity.getCommunicationResult().setResultEnum(UpdateResultResponseInt.KO_CANNOT_UPDATE.getValue());
         costUpdateResultDao.insertOrUpdate(entity).block();
 
         //When
@@ -114,10 +121,11 @@ class CostUpdateResultDaoTestIT {
         entity.setPk("pk");
         entity.setSk("sk");
         entity.setTtl(0L); // ignored and replaced by the DAO
+
         // fill all the fields
         entity.setRequestId("requestId");
         entity.setFailedIuv("failedIuv");
-        entity.setCommunicationResult("communicationResult");
+        entity.setCommunicationResult(newCommunicationResultEntity());
         entity.setCommunicationResultGroup("communicationResultGroup");
         entity.setUpdateCostPhase("updateCostPhase");
         entity.setNotificationCost(100);
@@ -125,7 +133,31 @@ class CostUpdateResultDaoTestIT {
         entity.setEventTimestamp(Instant.now());
         entity.setEventStorageTimestamp(now.plusSeconds(1));
         entity.setCommunicationTimestamp(now.plusSeconds(5));
-        entity.setJsonResponse("{object: 'value'}");
+
+        return entity;
+    }
+
+    private CommunicationResultEntity newCommunicationResultEntity() {
+        CommunicationResultEntity entity = new CommunicationResultEntity();
+        entity.setStatusCode(200);
+
+        entity.setResultEnum(UpdateResultResponseInt.OK_UPDATED.getValue());
+
+        GPDPaymentInfoInt jsonResponse = new GPDPaymentInfoInt();
+        jsonResponse.setAmount(100);
+        jsonResponse.setIuv("iuv");
+        jsonResponse.setTransfer(new ArrayList<>());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String jsonString = objectMapper.writeValueAsString(jsonResponse);
+            System.out.println("JSON response: " + jsonString);
+            entity.setJsonResponse(jsonString);
+        } catch (Exception e) {
+            System.err.println("Error while serializing the JSON response");
+            fail(e);
+        }
+
         return entity;
     }
 }
