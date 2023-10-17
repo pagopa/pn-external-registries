@@ -16,13 +16,4 @@ public enum CostUpdateCostPhaseInt {
     CostUpdateCostPhaseInt(String value) {
         this.value = value;
     }
-
-    public static CostUpdateCostPhaseInt fromValue(String value) {
-        for (CostUpdateCostPhaseInt phase : CostUpdateCostPhaseInt.values()) {
-            if (phase.getValue().equalsIgnoreCase(value)) {
-                return phase;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value: " + value);
-    }
 }

@@ -15,13 +15,4 @@ public enum CostUpdateResultResponseInt {
     CostUpdateResultResponseInt(String value) {
         this.value = value;
     }
-
-    public static CostUpdateResultResponseInt fromValue(String value) {
-        for (CostUpdateResultResponseInt phase : CostUpdateResultResponseInt.values()) {
-            if (phase.getValue().equalsIgnoreCase(value)) {
-                return phase;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value: " + value);
-    }
 }
