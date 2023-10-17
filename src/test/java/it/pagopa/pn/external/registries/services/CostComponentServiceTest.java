@@ -51,6 +51,8 @@ class CostComponentServiceTest {
         when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
         when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
 
+        ArgumentCaptor<CostComponentsEntity> captor = ArgumentCaptor.forClass(CostComponentsEntity.class);
+
         // When
         CostComponentsInt costComponentsInt = costComponentService
                 .insertStepCost(CostUpdateCostPhaseInt.VALIDATION, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
@@ -66,8 +68,15 @@ class CostComponentServiceTest {
         Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
         Assertions.assertFalse(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be false");
 
-        verify(costComponentsDao, times(1)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(1)).insertOrUpdate(captor.capture());
         verify(costComponentsDao, times(0)).updateNotNull(any(CostComponentsEntity.class));
+
+        CostComponentsEntity capturedEntity = captor.getValue();
+        Assertions.assertEquals(notificationStepCost, capturedEntity.getBaseCost());
+        Assertions.assertEquals(0, capturedEntity.getSimpleRegisteredLetterCost());
+        Assertions.assertEquals(0, capturedEntity.getFirstAnalogCost());
+        Assertions.assertEquals(0, capturedEntity.getSecondAnalogCost());
+        Assertions.assertFalse(capturedEntity.getIsRefusedCancelled());
     }
 
     @Test
@@ -80,6 +89,8 @@ class CostComponentServiceTest {
 
         when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
         when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
+
+        ArgumentCaptor<CostComponentsEntity> captor = ArgumentCaptor.forClass(CostComponentsEntity.class);
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
@@ -96,8 +107,15 @@ class CostComponentServiceTest {
         Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
         Assertions.assertTrue(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be true");
 
-        verify(costComponentsDao, times(1)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(1)).insertOrUpdate(captor.capture());
         verify(costComponentsDao, times(0)).updateNotNull(any(CostComponentsEntity.class));
+
+        CostComponentsEntity capturedEntity = captor.getValue();
+        Assertions.assertEquals(0, capturedEntity.getBaseCost());
+        Assertions.assertEquals(0, capturedEntity.getSimpleRegisteredLetterCost());
+        Assertions.assertEquals(0, capturedEntity.getFirstAnalogCost());
+        Assertions.assertEquals(0, capturedEntity.getSecondAnalogCost());
+        Assertions.assertTrue(capturedEntity.getIsRefusedCancelled());
     }
 
     @Test
@@ -225,7 +243,7 @@ class CostComponentServiceTest {
         entity.setSimpleRegisteredLetterCost(50);
         entity.setFirstAnalogCost(25);
         entity.setSecondAnalogCost(25);
-        entity.setIsRefusedCancelled(false);
+        entity.setIsRefusedCancelled(false); // null is treated as false, too
 
         when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
 

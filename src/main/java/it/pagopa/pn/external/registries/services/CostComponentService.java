@@ -119,6 +119,7 @@ public class CostComponentService {
                     if (Boolean.TRUE.equals(entity.getIsRefusedCancelled())) {
                         return 0;
                     } else {
+                        // false or null
                         var baseCost = entity.getBaseCost();
                         var simpleRegisteredLetterCost = entity.getSimpleRegisteredLetterCost();
                         var firstAnalogCost = entity.getFirstAnalogCost();
