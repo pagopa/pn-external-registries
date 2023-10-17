@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
+import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CostComponentsMapper;
@@ -23,8 +24,11 @@ public class CostComponentService {
         this.costComponentsMapper = costComponentsMapper;
     }
 
-    public Mono<CostComponentsInt> insertStepCost(String updateCostPhase, String iun, String recIndex,
+    public Mono<CostComponentsInt> insertStepCost(CostUpdateCostPhaseInt updateCostPhase, String iun, String recIndex,
                                                   String creditorTaxId, String noticeCode, Integer notificationStepCost) {
+        final String insertString = "inserting cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
+        final String updatingString = "updating cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
+
         // Validation of input parameters
         if (updateCostPhase == null || iun == null || recIndex == null ||
                 creditorTaxId == null || noticeCode == null || notificationStepCost == null) {
@@ -38,7 +42,7 @@ public class CostComponentService {
         entity.setPk(pk);
         entity.setSk(sk);
 
-        // Setting cost fields to null for avoid updating them
+        // Setting cost fields to null to avoid updating them
         entity.setBaseCost(null);
         entity.setSimpleRegisteredLetterCost(null);
         entity.setFirstAnalogCost(null);
@@ -46,49 +50,61 @@ public class CostComponentService {
         entity.setIsRefusedCancelled(null);
 
         switch (updateCostPhase) {
-            case "VALIDATION":
+            case VALIDATION:
                 entity.setBaseCost(notificationStepCost);
                 entity.setSimpleRegisteredLetterCost(0);
                 entity.setFirstAnalogCost(0);
                 entity.setSecondAnalogCost(0);
                 entity.setIsRefusedCancelled(false);
 
+                log.info(insertString,
+                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
+
                 return costComponentsDao.insertOrUpdate(entity)
                         .map(costComponentsMapper::dbToInternal);
 
-            case "REQUEST_REFUSED", "NOTIFICATION_CANCELLED":
+            case REQUEST_REFUSED, NOTIFICATION_CANCELLED:
                 entity.setIsRefusedCancelled(true);
                 entity.setBaseCost(0);
                 entity.setSimpleRegisteredLetterCost(0);
                 entity.setFirstAnalogCost(0);
                 entity.setSecondAnalogCost(0);
 
+                log.info(insertString,
+                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
+
                 return costComponentsDao.insertOrUpdate(entity)
                         .map(costComponentsMapper::dbToInternal);
 
-            case "SEND_SIMPLE_REGISTERED_LETTER":
-                // all other fields to null, for leaving them unchanged
+            case SEND_SIMPLE_REGISTERED_LETTER:
                 entity.setSimpleRegisteredLetterCost(notificationStepCost);
 
+                log.info(updatingString,
+                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
+
                 return costComponentsDao.updateNotNull(entity)
                         .map(costComponentsMapper::dbToInternal);
 
-            case "SEND_ANALOG_DOMICILE_ATTEMPT_0":
-                // all other fields to null, for leaving them unchanged
+            case SEND_ANALOG_DOMICILE_ATTEMPT_0:
                 entity.setFirstAnalogCost(notificationStepCost);
 
+                log.info(updatingString,
+                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
+
                 return costComponentsDao.updateNotNull(entity)
                         .map(costComponentsMapper::dbToInternal);
 
-            case "SEND_ANALOG_DOMICILE_ATTEMPT_1":
-                // all other fields to null, for leaving them unchanged
+            case SEND_ANALOG_DOMICILE_ATTEMPT_1:
                 entity.setSecondAnalogCost(notificationStepCost);
+
+                log.info(updatingString,
+                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
 
                 return costComponentsDao.updateNotNull(entity)
                         .map(costComponentsMapper::dbToInternal);
 
             default:
-                return Mono.error(new IllegalArgumentException("Invalid updateCostPhase"));
+                return Mono.error(new IllegalArgumentException("Invalid updateCostPhase: " + updateCostPhase));
         }
     }
 
@@ -142,6 +158,10 @@ public class CostComponentService {
      */
     public Flux<CostComponentsInt> getIuvsForIunAndRecIndex(String iun, String recIndex) {
         String pk = iun + "##" + recIndex;
+
+        log.info("getting cost components: pk={}, iun={}, recIndex={}",
+                pk, iun, recIndex);
+
         return costComponentsDao.getItems(pk)
                 .map(costComponentsMapper::dbToInternal);
     }
