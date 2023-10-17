@@ -253,6 +253,25 @@ class CostComponentServiceTest {
     }
 
     @Test
+    void getIuvsForIunAndRecIndex_NoResultsTest() {
+        // Given
+        String iun = "iun";
+        String recIndex = "recIndex";
+        String pk = iun + "##" + recIndex;
+
+        when(costComponentsDao.getItems(pk)).thenReturn(Flux.empty());  // No results returned
+
+        // When
+        List<CostComponentsInt> resultList = costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList().block();
+
+        // Then
+        Assertions.assertNotNull(resultList, "Result list should not be null");
+        Assertions.assertTrue(resultList.isEmpty(), "Result list should be empty");  // Assert that the result list is empty
+
+        verify(costComponentsDao, times(1)).getItems(pk);
+    }
+
+    @Test
     void getIuvsForIunAndRecIndex_IllegalPkSkTest() {
         // Given
         String iun = "iun";
