@@ -110,6 +110,11 @@
             <artifactId>spring-cloud-starter-aws-messaging</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>de.idealo.spring</groupId>
+            <artifactId>spring-cloud-stream-binder-sqs</artifactId>
+            <version>1.9.0</version>
+        </dependency>
     </dependencies>
 
     <build>
