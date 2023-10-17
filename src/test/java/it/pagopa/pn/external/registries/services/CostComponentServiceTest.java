@@ -213,8 +213,6 @@ class CostComponentServiceTest {
         // Given
         String iun = "iun";
         String recIndex = "recIndex";
-        String creditorTaxId = "creditorTaxId";
-        String noticeCode = "noticeCode";
         String pk = iun + "##" + recIndex;
 
         CostComponentsEntity entity1 = newCostComponentsEntity();
@@ -244,8 +242,6 @@ class CostComponentServiceTest {
         // Given
         String iun = "iun";
         String recIndex = "recIndex";
-        String creditorTaxId = "creditorTaxId";
-        String noticeCode = "noticeCode";
         String pk = iun + "##" + recIndex;
 
         CostComponentsEntity entity1 = newCostComponentsEntity();
