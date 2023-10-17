@@ -18,6 +18,7 @@
     "PnCronAnalyzer": "* */1 * * * *",
     "WireTapLogActivation": "true",
     "EnhancedWebSecurityEnabled": "true",
-    "AoouoSenderID": "DUMMY"
+    "AoouoSenderID": "DUMMY",
+    "MountEfs": "true"
   }
 }
