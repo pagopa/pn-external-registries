@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.queue.consumer;
 
 import it.pagopa.pn.commons.utils.MDCUtils;
+import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.EventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.cloud.function.context.MessageRoutingCallback;
@@ -8,15 +9,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
 @Configuration
 @Slf4j
 public class PnEventInboundService {
-    //private final EventHandler eventHandler;
+    private final EventHandler eventHandler;
 
-    public PnEventInboundService() {
+    public PnEventInboundService(EventHandler eventHandler) {
+        this.eventHandler = eventHandler;
     }
 
     @Bean
@@ -53,7 +56,18 @@ public class PnEventInboundService {
     }
 
     private String handleMessage(Message<?> message) {
-        log.info("new message received from queue {}", message);
-        return "";
+        String eventType = (String) message.getHeaders().get("eventType");
+        log.info("Received message from customRouter with eventType={}", eventType);
+
+        String iun = (String) message.getHeaders().get("iun");
+        
+        String handlerName = eventHandler.getHandler().get(eventType);
+        if (!StringUtils.hasText(handlerName)) {
+            log.error("undefined handler for eventType={}", eventType);
+        }
+
+        log.debug("Handler for eventType={} is {} - iun={}", eventType, handlerName, iun);
+
+        return handlerName;
     }
 }
