@@ -38,8 +38,10 @@ public class CostUpdateResultEntity {
     private String requestId;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_FAILED_IUV)}))
     private String failedIuv;
+
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_COMMUNICATION_RESULT)}))
-    private String communicationResult;
+    private CommunicationResultEntity communicationResult;
+
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_COMMUNICATION_RESULT_GROUP)}))
     private String communicationResultGroup;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_UPDATE_COST_PHASE)}))
