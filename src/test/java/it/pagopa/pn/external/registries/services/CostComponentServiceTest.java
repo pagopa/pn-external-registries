@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
+import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CostComponentsMapper;
@@ -31,6 +32,48 @@ class CostComponentServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         costComponentService = new CostComponentService(costComponentsDao, costComponentsMapper);
+    }
+
+    @Test
+    void insertStepCost_ValidationTest() {
+        // Given
+        String iun = "testIun";
+        String recIndex = "testRecIndex";
+        String creditorTaxId = "testTaxId";
+        String noticeCode = "testNoticeCode";
+        Integer notificationStepCost = 100;
+
+        CostComponentsEntity entity = new CostComponentsEntity();
+        entity.setBaseCost(notificationStepCost);
+        entity.setSimpleRegisteredLetterCost(0);
+        entity.setFirstAnalogCost(0);
+        entity.setSecondAnalogCost(0);
+        entity.setIsRefusedCancelled(false);
+
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+        entity.setPk(pk);
+        entity.setSk(sk);
+
+        when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
+
+        // When
+        CostComponentsInt costComponentsInt = costComponentService
+                .insertStepCost(CostUpdateCostPhaseInt.VALIDATION, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .block();
+
+        // Then
+        Assertions.assertNotNull(costComponentsInt, "Result should not be null");
+        Assertions.assertEquals(iun, costComponentsInt.getIun(), "IUN should match");
+        Assertions.assertEquals(recIndex, costComponentsInt.getRecIndex(), "recIndex should match");
+        Assertions.assertEquals(notificationStepCost, costComponentsInt.getBaseCost(), "Base cost should match");
+        Assertions.assertEquals(0, costComponentsInt.getSimpleRegisteredLetterCost(), "Simple Registered Letter Cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getFirstAnalogCost(), "First Analog Cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
+        Assertions.assertFalse(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be false");
+
+        verify(costComponentsDao, times(1)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(0)).updateNotNull(any(CostComponentsEntity.class));
     }
 
     @Test
