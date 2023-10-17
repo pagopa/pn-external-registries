@@ -64,11 +64,11 @@ public class CostComponentService {
                         .map(costComponentsMapper::dbToInternal);
 
             case REQUEST_REFUSED, NOTIFICATION_CANCELLED:
-                entity.setIsRefusedCancelled(true);
                 entity.setBaseCost(0);
                 entity.setSimpleRegisteredLetterCost(0);
                 entity.setFirstAnalogCost(0);
                 entity.setSecondAnalogCost(0);
+                entity.setIsRefusedCancelled(true);
 
                 log.info(insertString,
                         pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);

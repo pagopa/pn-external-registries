@@ -56,6 +56,7 @@ class CostComponentServiceTest {
         entity.setSk(sk);
 
         when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
+        when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
@@ -71,6 +72,49 @@ class CostComponentServiceTest {
         Assertions.assertEquals(0, costComponentsInt.getFirstAnalogCost(), "First Analog Cost should be 0");
         Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
         Assertions.assertFalse(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be false");
+
+        verify(costComponentsDao, times(1)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(0)).updateNotNull(any(CostComponentsEntity.class));
+    }
+
+    @Test
+    void insertStepCost_RequestRefusedOrNotificationCancelledTest() {
+        // Given
+        String iun = "testIun";
+        String recIndex = "testRecIndex";
+        String creditorTaxId = "testTaxId";
+        String noticeCode = "testNoticeCode";
+        Integer notificationStepCost = 100;  // This value should be ignored as the request is refused
+
+        CostComponentsEntity entity = new CostComponentsEntity();
+        entity.setBaseCost(0);
+        entity.setSimpleRegisteredLetterCost(0);
+        entity.setFirstAnalogCost(0);
+        entity.setSecondAnalogCost(0);
+        entity.setIsRefusedCancelled(true);
+
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+        entity.setPk(pk);
+        entity.setSk(sk);
+
+        when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
+        when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
+
+        // When
+        CostComponentsInt costComponentsInt = costComponentService
+                .insertStepCost(CostUpdateCostPhaseInt.REQUEST_REFUSED, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .block(); // replace REQUEST_REFUSED with NOTIFICATION_CANCELLED to test the other case: the behavior is the same
+
+        // Then
+        Assertions.assertNotNull(costComponentsInt, "Result should not be null");
+        Assertions.assertEquals(iun, costComponentsInt.getIun(), "IUN should match");
+        Assertions.assertEquals(recIndex, costComponentsInt.getRecIndex(), "recIndex should match");
+        Assertions.assertEquals(0, costComponentsInt.getBaseCost(), "Base cost should be 0 as the request is refused");
+        Assertions.assertEquals(0, costComponentsInt.getSimpleRegisteredLetterCost(), "Simple Registered Letter Cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getFirstAnalogCost(), "First Analog Cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
+        Assertions.assertTrue(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be true");
 
         verify(costComponentsDao, times(1)).insertOrUpdate(any(CostComponentsEntity.class));
         verify(costComponentsDao, times(0)).updateNotNull(any(CostComponentsEntity.class));
