@@ -11,10 +11,15 @@ public class CostComponentsMapper {
         String[] pkParts = entity.getPk().split("##");
         String[] skParts = entity.getSk().split("##");
 
+        if (pkParts.length != 2 || skParts.length != 2) {
+            throw new IllegalArgumentException("Invalid pk or sk");
+        }
+
         costComponents.setIun(pkParts[0]);
         costComponents.setRecIndex(pkParts[1]);
         costComponents.setCreditorTaxId(skParts[0]);
         costComponents.setNoticeCode(skParts[1]);
+
         costComponents.setBaseCost(entity.getBaseCost());
         costComponents.setSimpleRegisteredLetterCost(entity.getSimpleRegisteredLetterCost());
         costComponents.setFirstAnalogCost(entity.getFirstAnalogCost());
