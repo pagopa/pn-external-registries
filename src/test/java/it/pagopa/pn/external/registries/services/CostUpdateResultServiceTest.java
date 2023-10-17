@@ -264,6 +264,55 @@ class CostUpdateResultServiceTest {
         Assertions.assertEquals(request.getIun(), capturedEntity.getFailedIuv());
     }
 
+    @Test
+    void testCreateUpdateResult_500_KO_RETRY_Reduced() {
+        int statusCode = 500;
+
+        // Setup request
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
+        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
+                "RETRY" + "##" +
+                UUID.randomUUID());
+
+        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
+
+        // Execute & Verify
+        String result = service.createUpdateResult(request).block();
+        Assertions.assertEquals("RETRY", result);
+
+        verify(dao).insertOrUpdate(captor.capture());
+        CostUpdateResultEntity capturedEntity = captor.getValue();
+
+        // pk
+        Assertions.assertEquals(request.getCreditorTaxId() + "##" + request.getNoticeCode(), capturedEntity.getPk());
+
+        // sk - we want to check that the SK is composed by the updateCostPhase, the communicationResultGroup, but ignore the final random UUID
+        String expectedSkPrefix = request.getUpdateCostPhase().getValue() + "##" + "RETRY";
+        String actualSkPrefix = capturedEntity.getSk().split("##")[0] + "##" + capturedEntity.getSk().split("##")[1];
+        Assertions.assertEquals(expectedSkPrefix, actualSkPrefix);
+
+        // communicationResult
+        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
+        Assertions.assertEquals("KO_RETRY", capturedEntity.getCommunicationResult().getResultEnum());
+        Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
+        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+
+        // communicationResultGroup
+        Assertions.assertEquals("RETRY", capturedEntity.getCommunicationResultGroup());
+
+        // failedIuv
+        Assertions.assertNull(capturedEntity.getFailedIuv());
+    }
+
+    @Test
+    void testNullRequest() {
+        // Execute & Verify
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.createUpdateResult(null).block());
+    }
+
     private CostUpdateResultRequestInt newCostUpdateResultRequestInt(int statusCode, String sourceJsonString) {
         CostUpdateResultRequestInt request = new CostUpdateResultRequestInt();
         request.setCreditorTaxId("1234");

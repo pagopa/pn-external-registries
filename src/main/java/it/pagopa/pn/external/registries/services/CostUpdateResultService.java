@@ -30,7 +30,7 @@ public class CostUpdateResultService {
 
     public Mono<String> createUpdateResult(CostUpdateResultRequestInt request) {
         if (request == null) {
-            throw new IllegalArgumentException("Request cannot be null");
+            return Mono.error(new IllegalArgumentException("Request cannot be null"));
         }
 
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
