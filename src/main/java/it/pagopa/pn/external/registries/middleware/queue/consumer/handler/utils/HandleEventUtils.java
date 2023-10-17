@@ -3,8 +3,11 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils
 import it.pagopa.pn.api.dto.events.StandardEventHeader;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.MDCUtils;
+import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
 import java.time.Instant;
@@ -45,9 +48,14 @@ public class HandleEventUtils {
         return createdAt != null ? Instant.parse((CharSequence) createdAt) : null;
     }
 
-    public static void addIunAndCorrIdToMdc(String iun, String correlationId) {
-        addIunToMdc(iun);
-        addCorrelationIdToMdc(correlationId);
+    @Nullable
+    public static String getEventId(Message<UpdateNotificationCost> message) {
+        MessageHeaders messageHeaders = message.getHeaders();
+        String eventId = null;
+        if (messageHeaders.containsKey("eventId")){
+            eventId = messageHeaders.get("eventId", String.class);
+        }
+        return eventId;
     }
 
     public static void addIunAndRecIndexAndCorrIdToMdc(String iun, Integer recIndex, String correlationId) {
@@ -55,12 +63,7 @@ public class HandleEventUtils {
         addRecIndexToMdc(recIndex);
         addCorrelationIdToMdc(correlationId);
     }
-
-    public static void addIunAndRecIndexToMdc(String iun, int recIndex) {
-        addIunToMdc(iun);
-        addRecIndexToMdc(recIndex);
-    }
-
+    
     public static void addIunToMdc(String iun) {
         MDC.put(MDCUtils.MDC_PN_IUN_KEY, iun);
     }
