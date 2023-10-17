@@ -135,9 +135,8 @@ class CostUpdateResultServiceTest {
     }
 
     @Test
-    void testCreateUpdateResult_202_OK_IN_PAYMENT_Reduced() {
-        // TODO: choose the correct one
-        int statusCode = 202;
+    void testCreateUpdateResult_209_OK_IN_PAYMENT_Reduced() {
+        int statusCode = 209;
 
         // Setup request
         CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);

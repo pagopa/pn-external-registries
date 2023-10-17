@@ -19,11 +19,13 @@ public class CommunicationResultGroupMapper {
     public CostUpdateResultResponseInt getResultEnum(int statusCode) {
         return switch (statusCode) {
             case 200 -> CostUpdateResultResponseInt.OK_UPDATED;
+            // updated, with payment in progress
+            case 209 -> CostUpdateResultResponseInt.OK_IN_PAYMENT;
             // IUV not present on GPD or EC not present
             case 404 -> CostUpdateResultResponseInt.KO_NOT_FOUND;
             case 422 -> CostUpdateResultResponseInt.KO_CANNOT_UPDATE;
-            // TODO: to be changed once we have a specific status code for OK_IN_PAYMENT
-            default -> statusCode >= 200 && statusCode < 300 ? CostUpdateResultResponseInt.OK_IN_PAYMENT : CostUpdateResultResponseInt.KO_RETRY;
+            // retry in all other cases
+            default -> CostUpdateResultResponseInt.KO_RETRY;
         };
     }
 }
