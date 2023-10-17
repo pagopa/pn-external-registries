@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.middleware.msclient.io;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi;
@@ -21,9 +22,9 @@ public class IOCourtesyMessageClient extends IOClient {
     public static final String IO_STATUS_INACTIVE = "INACTIVE";
 
     //inject by name
-    public IOCourtesyMessageClient(PnExternalRegistriesConfig config, DefaultApi ioApi)
+    public IOCourtesyMessageClient(PnExternalRegistriesConfig config, DefaultApi ioApi, MeterRegistry meterRegistry)
     {
-        super(config, ioApi, "Courtesy");
+        super(config, ioApi, "Courtesy", meterRegistry);
     }
 
 
