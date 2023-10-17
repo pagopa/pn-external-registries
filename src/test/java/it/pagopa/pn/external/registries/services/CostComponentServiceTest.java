@@ -25,8 +25,13 @@ class CostComponentServiceTest {
 
     CostComponentService costComponentService;
 
-    private final String pk = "iun##recIndex";
-    private final String sk = "creditorTaxId + \"##\" + noticeCode";
+    private final String iun = "iun";
+    private final String recIndex = "recIndex";
+    private final String creditorTaxId = "testTaxId";
+    private final String noticeCode = "testNoticeCode";
+
+    private final String pk = iun + "##" + recIndex;
+    private final String sk = creditorTaxId + "##" + noticeCode;
 
     @BeforeEach
     void setUp() {
@@ -37,23 +42,10 @@ class CostComponentServiceTest {
     @Test
     void insertStepCost_ValidationTest() {
         // Given
-        String iun = "testIun";
-        String recIndex = "testRecIndex";
-        String creditorTaxId = "testTaxId";
-        String noticeCode = "testNoticeCode";
         Integer notificationStepCost = 100;
 
-        CostComponentsEntity entity = new CostComponentsEntity();
+        CostComponentsEntity entity = newCostComponentsEntity();
         entity.setBaseCost(notificationStepCost);
-        entity.setSimpleRegisteredLetterCost(0);
-        entity.setFirstAnalogCost(0);
-        entity.setSecondAnalogCost(0);
-        entity.setIsRefusedCancelled(false);
-
-        String pk = iun + "##" + recIndex;
-        String sk = creditorTaxId + "##" + noticeCode;
-        entity.setPk(pk);
-        entity.setSk(sk);
 
         when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
         when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
@@ -80,23 +72,10 @@ class CostComponentServiceTest {
     @Test
     void insertStepCost_RequestRefusedOrNotificationCancelledTest() {
         // Given
-        String iun = "testIun";
-        String recIndex = "testRecIndex";
-        String creditorTaxId = "testTaxId";
-        String noticeCode = "testNoticeCode";
         Integer notificationStepCost = 100;  // This value should be ignored as the request is refused
 
-        CostComponentsEntity entity = new CostComponentsEntity();
-        entity.setBaseCost(0);
-        entity.setSimpleRegisteredLetterCost(0);
-        entity.setFirstAnalogCost(0);
-        entity.setSecondAnalogCost(0);
+        CostComponentsEntity entity = newCostComponentsEntity();
         entity.setIsRefusedCancelled(true);
-
-        String pk = iun + "##" + recIndex;
-        String sk = creditorTaxId + "##" + noticeCode;
-        entity.setPk(pk);
-        entity.setSk(sk);
 
         when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
         when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
@@ -123,16 +102,7 @@ class CostComponentServiceTest {
     @Test
     void getTotalCostTest() {
         // Given
-        String iun = "testIun";
-        String recIndex = "testRecIndex";
-        String creditorTaxId = "testTaxId";
-        String noticeCode = "testNoticeCode";
-        String pk = iun + "##" + recIndex;
-        String sk = creditorTaxId + "##" + noticeCode;
-
-        CostComponentsEntity entity = new CostComponentsEntity();
-        entity.setPk(pk);
-        entity.setSk(sk);
+        CostComponentsEntity entity = newCostComponentsEntity();
         entity.setBaseCost(100);
         entity.setSimpleRegisteredLetterCost(50);
         entity.setFirstAnalogCost(25);
@@ -154,16 +124,7 @@ class CostComponentServiceTest {
     @Test
     void getTotalCost_AllNulls_Test() {
         // Given
-        String iun = "testIun";
-        String recIndex = "testRecIndex";
-        String creditorTaxId = "testTaxId";
-        String noticeCode = "testNoticeCode";
-        String pk = iun + "##" + recIndex;
-        String sk = creditorTaxId + "##" + noticeCode;
-
-        CostComponentsEntity entity = new CostComponentsEntity();
-        entity.setPk(pk);
-        entity.setSk(sk);
+        CostComponentsEntity entity = newCostComponentsEntity();
         entity.setBaseCost(null);
         entity.setSimpleRegisteredLetterCost(null);
         entity.setFirstAnalogCost(null);
@@ -185,16 +146,7 @@ class CostComponentServiceTest {
     @Test
     void getTotalCost_RefusedOrCancelled() {
         // Given
-        String iun = "testIun";
-        String recIndex = "testRecIndex";
-        String creditorTaxId = "testTaxId";
-        String noticeCode = "testNoticeCode";
-        String pk = iun + "##" + recIndex;
-        String sk = creditorTaxId + "##" + noticeCode;
-
-        CostComponentsEntity entity = new CostComponentsEntity();
-        entity.setPk(pk);
-        entity.setSk(sk);
+        CostComponentsEntity entity = newCostComponentsEntity();
         entity.setBaseCost(100);
         entity.setSimpleRegisteredLetterCost(50);
         entity.setFirstAnalogCost(25);
@@ -216,13 +168,8 @@ class CostComponentServiceTest {
     @Test
     void getIuvsForIunAndRecIndexTest() {
         // Given
-        String iun = "iun";
-        String recIndex = "recIndex";
-        String creditorTaxId = "creditorTaxId";
         String creditorTaxId2 = "creditorTaxId2";
-        String noticeCode = "noticeCode";
         String noticeCode2 = "noticeCode2";
-        String pk = iun + "##" + recIndex;
 
         CostComponentsEntity entity1 = newCostComponentsEntity();
         CostComponentsEntity entity2 = newCostComponentsEntity();
@@ -255,10 +202,6 @@ class CostComponentServiceTest {
     @Test
     void getIuvsForIunAndRecIndex_NoResultsTest() {
         // Given
-        String iun = "iun";
-        String recIndex = "recIndex";
-        String pk = iun + "##" + recIndex;
-
         when(costComponentsDao.getItems(pk)).thenReturn(Flux.empty());  // No results returned
 
         // When
@@ -274,10 +217,6 @@ class CostComponentServiceTest {
     @Test
     void getIuvsForIunAndRecIndex_IllegalPkSkTest() {
         // Given
-        String iun = "iun";
-        String recIndex = "recIndex";
-        String pk = iun + "##" + recIndex;
-
         CostComponentsEntity entity1 = newCostComponentsEntity();
         entity1.setPk("iun##recIndex##extra");
         entity1.setSk("creditorTaxId##noticeCode##extra");
@@ -303,10 +242,6 @@ class CostComponentServiceTest {
     @Test
     void getIuvsForIunAndRecIndex_NullPkSkTest() {
         // Given
-        String iun = "iun";
-        String recIndex = "recIndex";
-        String pk = iun + "##" + recIndex;
-
         CostComponentsEntity entity1 = newCostComponentsEntity();
         entity1.setPk(null);
         entity1.setSk(null);
@@ -323,8 +258,8 @@ class CostComponentServiceTest {
         CostComponentsEntity entity = new CostComponentsEntity();
 
         // the pk and sk must be in the correct for, for the mapper not to fail
-        entity.setPk("iun##recIndex");
-        entity.setSk("creditorTaxId##noticeCode");
+        entity.setPk(pk);
+        entity.setSk(sk);
 
         entity.setBaseCost(0);
         entity.setSimpleRegisteredLetterCost(0);
