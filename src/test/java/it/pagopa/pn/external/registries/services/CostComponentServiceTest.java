@@ -100,6 +100,96 @@ class CostComponentServiceTest {
     }
 
     @Test
+    void insertStepCost_SendSimpleRegisteredLetterTest() {
+        // Given
+        Integer notificationStepCost = 100;
+
+        CostComponentsEntity entity = newCostComponentsEntity();
+        entity.setSimpleRegisteredLetterCost(notificationStepCost);
+
+        when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
+        when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
+
+        // When
+        CostComponentsInt costComponentsInt = costComponentService
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .block();
+
+        // Then
+        Assertions.assertNotNull(costComponentsInt, "Result should not be null");
+        Assertions.assertEquals(iun, costComponentsInt.getIun(), "IUN should match");
+        Assertions.assertEquals(recIndex, costComponentsInt.getRecIndex(), "recIndex should match");
+        Assertions.assertEquals(0, costComponentsInt.getBaseCost(), "Base cost should be 0");
+        Assertions.assertEquals(notificationStepCost, costComponentsInt.getSimpleRegisteredLetterCost(), "Simple Registered Letter Cost should match");
+        Assertions.assertEquals(0, costComponentsInt.getFirstAnalogCost(), "First Analog Cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
+        Assertions.assertFalse(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be false");
+
+        verify(costComponentsDao, times(0)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(1)).updateNotNull(any(CostComponentsEntity.class));
+    }
+
+    @Test
+    void insertStepCost_SendAnalogDomicileAttempt0Test() {
+        // Given
+        Integer notificationStepCost = 100;
+
+        CostComponentsEntity entity = newCostComponentsEntity();
+        entity.setFirstAnalogCost(notificationStepCost);
+
+        when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
+        when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
+
+        // When
+        CostComponentsInt costComponentsInt = costComponentService
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .block();
+
+        // Then
+        Assertions.assertNotNull(costComponentsInt, "Result should not be null");
+        Assertions.assertEquals(iun, costComponentsInt.getIun(), "IUN should match");
+        Assertions.assertEquals(recIndex, costComponentsInt.getRecIndex(), "recIndex should match");
+        Assertions.assertEquals(0, costComponentsInt.getBaseCost(), "Base cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getSimpleRegisteredLetterCost(), "Simple Registered Letter Cost should be 0");
+        Assertions.assertEquals(notificationStepCost, costComponentsInt.getFirstAnalogCost(), "First Analog Cost should match");
+        Assertions.assertEquals(0, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should be 0");
+        Assertions.assertFalse(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be false");
+
+        verify(costComponentsDao, times(0)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(1)).updateNotNull(any(CostComponentsEntity.class));
+    }
+
+    @Test
+    void insertStepCost_SendAnalogDomicileAttempt1Test() {
+        // Given
+        Integer notificationStepCost = 150;
+
+        CostComponentsEntity entity = newCostComponentsEntity();
+        entity.setSecondAnalogCost(notificationStepCost);
+
+        when(costComponentsDao.insertOrUpdate(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity)); // it shouldn't be called
+        when(costComponentsDao.updateNotNull(any(CostComponentsEntity.class))).thenReturn(Mono.just(entity));
+
+        // When
+        CostComponentsInt costComponentsInt = costComponentService
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_1, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .block();
+
+        // Then
+        Assertions.assertNotNull(costComponentsInt, "Result should not be null");
+        Assertions.assertEquals(iun, costComponentsInt.getIun(), "IUN should match");
+        Assertions.assertEquals(recIndex, costComponentsInt.getRecIndex(), "recIndex should match");
+        Assertions.assertEquals(0, costComponentsInt.getBaseCost(), "Base cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getSimpleRegisteredLetterCost(), "Simple Registered Letter Cost should be 0");
+        Assertions.assertEquals(0, costComponentsInt.getFirstAnalogCost(), "First Analog Cost should be 0");
+        Assertions.assertEquals(notificationStepCost, costComponentsInt.getSecondAnalogCost(), "Second Analog Cost should match");
+        Assertions.assertFalse(costComponentsInt.getIsRefusedCancelled(), "Is Refused Cancelled should be false");
+
+        verify(costComponentsDao, times(0)).insertOrUpdate(any(CostComponentsEntity.class));
+        verify(costComponentsDao, times(1)).updateNotNull(any(CostComponentsEntity.class));
+    }
+
+    @Test
     void getTotalCostTest() {
         // Given
         CostComponentsEntity entity = newCostComponentsEntity();
