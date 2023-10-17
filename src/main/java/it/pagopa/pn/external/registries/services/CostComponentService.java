@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
+import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CostComponentsMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,75 @@ public class CostComponentService {
     CostComponentService(CostComponentsDao costComponentsDao, CostComponentsMapper costComponentsMapper) {
         this.costComponentsDao = costComponentsDao;
         this.costComponentsMapper = costComponentsMapper;
+    }
+
+    public Mono<CostComponentsInt> insertStepCost(String updateCostPhase, String iun, String recIndex,
+                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost) {
+        // Validation of input parameters
+        if (updateCostPhase == null || iun == null || recIndex == null ||
+                creditorTaxId == null || noticeCode == null || notificationStepCost == null) {
+            return Mono.error(new IllegalArgumentException("Input parameters should not be null"));
+        }
+
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+
+        CostComponentsEntity entity = new CostComponentsEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+
+        // Setting cost fields to null for avoid updating them
+        entity.setBaseCost(null);
+        entity.setSimpleRegisteredLetterCost(null);
+        entity.setFirstAnalogCost(null);
+        entity.setSecondAnalogCost(null);
+        entity.setIsRefusedCancelled(null);
+
+        switch (updateCostPhase) {
+            case "VALIDATION":
+                entity.setBaseCost(notificationStepCost);
+                entity.setSimpleRegisteredLetterCost(0);
+                entity.setFirstAnalogCost(0);
+                entity.setSecondAnalogCost(0);
+                entity.setIsRefusedCancelled(false);
+
+                return costComponentsDao.insertOrUpdate(entity)
+                        .map(costComponentsMapper::dbToInternal);
+
+            case "REQUEST_REFUSED", "NOTIFICATION_CANCELLED":
+                entity.setIsRefusedCancelled(true);
+                entity.setBaseCost(0);
+                entity.setSimpleRegisteredLetterCost(0);
+                entity.setFirstAnalogCost(0);
+                entity.setSecondAnalogCost(0);
+
+                return costComponentsDao.insertOrUpdate(entity)
+                        .map(costComponentsMapper::dbToInternal);
+
+            case "SEND_SIMPLE_REGISTERED_LETTER":
+                // all other fields to null, for leaving them unchanged
+                entity.setSimpleRegisteredLetterCost(notificationStepCost);
+
+                return costComponentsDao.updateNotNull(entity)
+                        .map(costComponentsMapper::dbToInternal);
+
+            case "SEND_ANALOG_DOMICILE_ATTEMPT_0":
+                // all other fields to null, for leaving them unchanged
+                entity.setFirstAnalogCost(notificationStepCost);
+
+                return costComponentsDao.updateNotNull(entity)
+                        .map(costComponentsMapper::dbToInternal);
+
+            case "SEND_ANALOG_DOMICILE_ATTEMPT_1":
+                // all other fields to null, for leaving them unchanged
+                entity.setSecondAnalogCost(notificationStepCost);
+
+                return costComponentsDao.updateNotNull(entity)
+                        .map(costComponentsMapper::dbToInternal);
+
+            default:
+                return Mono.error(new IllegalArgumentException("Invalid updateCostPhase"));
+        }
     }
 
     /**
