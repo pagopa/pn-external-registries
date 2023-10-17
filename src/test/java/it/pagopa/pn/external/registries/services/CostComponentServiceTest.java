@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -30,6 +31,99 @@ class CostComponentServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         costComponentService = new CostComponentService(costComponentsDao, costComponentsMapper);
+    }
+
+    @Test
+    void getTotalCostTest() {
+        // Given
+        String iun = "testIun";
+        String recIndex = "testRecIndex";
+        String creditorTaxId = "testTaxId";
+        String noticeCode = "testNoticeCode";
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+
+        CostComponentsEntity entity = new CostComponentsEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setBaseCost(100);
+        entity.setSimpleRegisteredLetterCost(50);
+        entity.setFirstAnalogCost(25);
+        entity.setSecondAnalogCost(25);
+        entity.setIsRefusedCancelled(false);
+
+        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+
+        // When
+        Integer totalCost = costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode).block();
+
+        // Then
+        Assertions.assertNotNull(totalCost, "Total cost should not be null");
+        Assertions. assertEquals(200, totalCost, "The total cost should be 200");
+
+        verify(costComponentsDao, times(1)).getItem(pk, sk);
+    }
+
+    @Test
+    void getTotalCost_AllNulls_Test() {
+        // Given
+        String iun = "testIun";
+        String recIndex = "testRecIndex";
+        String creditorTaxId = "testTaxId";
+        String noticeCode = "testNoticeCode";
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+
+        CostComponentsEntity entity = new CostComponentsEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setBaseCost(null);
+        entity.setSimpleRegisteredLetterCost(null);
+        entity.setFirstAnalogCost(null);
+        entity.setSecondAnalogCost(null);
+        entity.setIsRefusedCancelled(false);
+
+        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+
+        // When
+        Integer totalCost = costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode).block();
+
+        // Then
+        Assertions.assertNotNull(totalCost, "Total cost should not be null");
+        Assertions. assertEquals(0, totalCost, "The total cost should be 0");
+
+        verify(costComponentsDao, times(1)).getItem(pk, sk);
+    }
+
+    @Test
+    void getTotalCost_RefusedOrCancelled() {
+        // Given
+        String iun = "testIun";
+        String recIndex = "testRecIndex";
+        String creditorTaxId = "testTaxId";
+        String noticeCode = "testNoticeCode";
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+
+        CostComponentsEntity entity = new CostComponentsEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setBaseCost(100);
+        entity.setSimpleRegisteredLetterCost(50);
+        entity.setFirstAnalogCost(25);
+        entity.setSecondAnalogCost(25);
+        entity.setIsRefusedCancelled(true);
+
+        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+
+        // When
+        Integer totalCost = costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode).block();
+
+        // Then
+        Assertions.assertNotNull(totalCost, "Total cost should not be null");
+        Assertions.assertEquals(0, totalCost, "The total cost should be 0");
+
+        verify(costComponentsDao, times(1)).getItem(pk, sk);
     }
 
     @Test
