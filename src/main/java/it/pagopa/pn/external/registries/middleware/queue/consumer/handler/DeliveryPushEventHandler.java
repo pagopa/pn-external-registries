@@ -1,18 +1,14 @@
 package it.pagopa.pn.external.registries.middleware.queue.consumer.handler;
 
 import it.pagopa.pn.commons.log.PnLogger;
-import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import it.pagopa.pn.external.registries.services.CostUpdateOrchestratorService;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.MDC;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 
 import java.util.function.Consumer;
 
@@ -50,6 +46,4 @@ public class DeliveryPushEventHandler {
             }
         };
     }
-
-
 }

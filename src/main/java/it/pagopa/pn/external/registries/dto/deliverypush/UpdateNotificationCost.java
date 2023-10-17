@@ -2,6 +2,8 @@ package it.pagopa.pn.external.registries.dto.deliverypush;
 
 import lombok.*;
 
+import java.time.Instant;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -12,7 +14,7 @@ public class UpdateNotificationCost {
     private String iun;
     private int recIndex;
     private int notificationStepCost;
-    private String eventTimestamp;
-    private String eventStorageTimestamp;
+    private Instant eventTimestamp;
+    private Instant eventStorageTimestamp;
     private UpdateCostPhase updateCostPhase;
 }
