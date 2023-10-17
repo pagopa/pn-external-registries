@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CostComponentsMapper {
     public CostComponentsInt dbToInternal(CostComponentsEntity entity) {
+        if (entity.getPk() == null || entity.getSk() == null) {
+            throw new IllegalArgumentException("Invalid pk or sk");
+        }
+
         CostComponentsInt costComponents = new CostComponentsInt();
         String[] pkParts = entity.getPk().split("##");
         String[] skParts = entity.getSk().split("##");

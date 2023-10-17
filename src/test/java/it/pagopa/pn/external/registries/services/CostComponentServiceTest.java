@@ -196,6 +196,27 @@ class CostComponentServiceTest {
         });
     }
 
+    @Test
+    void getIuvsForIunAndRecIndex_NullPkSkTest() {
+        // Given
+        String iun = "iun";
+        String recIndex = "recIndex";
+        String creditorTaxId = "creditorTaxId";
+        String noticeCode = "noticeCode";
+        String pk = iun + "##" + recIndex;
+
+        CostComponentsEntity entity1 = newCostComponentsEntity();
+        entity1.setPk(null);
+        entity1.setSk(null);
+
+        when(costComponentsDao.getItems(pk)).thenReturn(Flux.just(entity1));
+
+        // When
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList().block();
+        });
+    }
+
     private CostComponentsEntity newCostComponentsEntity() {
         CostComponentsEntity entity = new CostComponentsEntity();
 
