@@ -78,34 +78,27 @@ public class CostComponentService {
 
             case SEND_SIMPLE_REGISTERED_LETTER:
                 entity.setSimpleRegisteredLetterCost(notificationStepCost);
-
-                log.info(updatingString,
-                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
-
-                return costComponentsDao.updateNotNull(entity)
-                        .map(costComponentsMapper::dbToInternal);
+                break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_0:
                 entity.setFirstAnalogCost(notificationStepCost);
-
-                log.info(updatingString,
-                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
-
-                return costComponentsDao.updateNotNull(entity)
-                        .map(costComponentsMapper::dbToInternal);
+                break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_1:
                 entity.setSecondAnalogCost(notificationStepCost);
-
-                log.info(updatingString,
-                        pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
-
-                return costComponentsDao.updateNotNull(entity)
-                        .map(costComponentsMapper::dbToInternal);
+                break;
 
             default:
                 return Mono.error(new IllegalArgumentException("Invalid updateCostPhase: " + updateCostPhase));
         }
+
+        // we arrive here only for SEND_SIMPLE_REGISTERED_LETTER, SEND_ANALOG_DOMICILE_ATTEMPT_0 and SEND_ANALOG_DOMICILE_ATTEMPT_1,
+        // requiring an update of the entity
+        log.info(updatingString,
+                pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
+
+        return costComponentsDao.updateNotNull(entity)
+                .map(costComponentsMapper::dbToInternal);
     }
 
     /**
