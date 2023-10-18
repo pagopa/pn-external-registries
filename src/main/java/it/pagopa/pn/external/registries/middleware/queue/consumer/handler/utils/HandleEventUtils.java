@@ -22,7 +22,7 @@ public class HandleEventUtils {
     public static void handleException(MessageHeaders headers, Exception ex) {
         if(headers != null){
             StandardEventHeader standardEventHeader = mapStandardEventHeader(headers);
-            log.error("Generic exception for iun={} ex={}", standardEventHeader.getIun(), ex);
+            log.error("Generic exception for iun={} ", standardEventHeader.getIun(), ex);
         }else {
             log.error("Generic exception ex ", ex);
         }

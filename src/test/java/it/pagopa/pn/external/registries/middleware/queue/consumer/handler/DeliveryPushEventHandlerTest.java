@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.handler;
 import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
 import it.pagopa.pn.external.registries.services.CostUpdateOrchestratorService;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
@@ -38,6 +40,20 @@ class DeliveryPushEventHandlerTest {
         verify(costUpdateOrchestratorService).handleCostUpdate();
     }
 
+    @Test
+    void pnDeliveryPushUpdateCostEventConsumerError(){
+        //GIVEN
+        Message<UpdateNotificationCost> message = getActionMessageError();
+
+        //WHEN
+        Consumer<Message<UpdateNotificationCost>> consumer = actionHandler.pnDeliveryPushUpdateCostEventConsumer();
+        
+        Assertions.assertThrows(NullPointerException.class, () -> consumer.accept(message));
+
+        //THEN
+        verify(costUpdateOrchestratorService, never()).handleCostUpdate();
+    }
+
     @NotNull
     private static Message<UpdateNotificationCost> getActionMessage() {
         return new Message<>() {
@@ -58,4 +74,22 @@ class DeliveryPushEventHandlerTest {
             }
         };
     }
+
+    @NotNull
+    private static Message<UpdateNotificationCost> getActionMessageError() {
+        return new Message<>() {
+            @Override
+            public UpdateNotificationCost getPayload() {
+                return null;
+            }
+            @Override
+            @NotNull
+            public MessageHeaders getHeaders() {
+                HashMap<String,Object> hashMap = new HashMap<>();
+                hashMap.put("eventId", "eventIdTest");
+                return new MessageHeaders(hashMap);
+            }
+        };
+    }
+
 }
