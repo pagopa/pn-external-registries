@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.queue.consumer;
 
 import it.pagopa.pn.commons.utils.MDCUtils;
+import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.DeliveryPushEventHandler;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.EventHandler;
@@ -15,6 +16,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.function.context.MessageRoutingCallback;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
+@Import(LocalStackTestConfig.class)
 @SpringBootTest
 class PnEventInboundServiceTest { 
     //Viene fatto l'@Autowired di MessageRoutingCallback perchè in PnEventInboundService viene fatta un implementazione anonima di questa classe, 
