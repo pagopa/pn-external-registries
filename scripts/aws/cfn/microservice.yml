@@ -80,9 +80,20 @@ Parameters:
     Type: String
     Description: 'The name of the ECS cluster where the microservice is going to be deployed'
 
+  FargateEFSFileSystemID:
+    Type: String
+    Description: "EFS Filesystem"
+
   SubnetsIds:
     Type: String
     Description: 'subnets ids comma separated list. Where to deploy the microservice'
+
+  MountEfs:
+    Type: String
+    Default: false
+    AllowedValues:
+         - "true"
+         - "false"
 
   VpcId:
     Type: String
@@ -277,6 +288,44 @@ Parameters:
     Type: String
     Default: ''
 
+  AoouoSenderID:
+    Type: String
+    Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
+
+  # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueARN:
+    Type: String
+    Description: Queue ARN
+
+  DeliveryPushToExternalRegistriesQueueAlarmARN:
+    Type: String
+    Description: Queue DLQ alarm
+
+  DeliveryPushToExternalRegistriesQueueAgeAlarmARN:
+    Type: String
+    Description: Queue max age alarm
+
+  PnCronAnalyzer:
+    Type: String
+    Default: '-'
+    Description: Cron for which you send the metric to CloudWatch
+
+  WireTapLogActivation:
+    Type: String
+    Default: false
+    Description: Activation of wire logs
+    AllowedValues:
+      - true
+      - false
+
+  EnhancedWebSecurityEnabled:
+    Type: String
+    Default: false
+    Description: Enable additional WAF Web rules
+    AllowedValues:
+      - true
+      - false
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -300,6 +349,9 @@ Resources:
         AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
         MinTasksNumber: !Ref MinTasksNumber
         MaxTasksNumber: !Ref MaxTasksNumber
+        EfsFilesystem: !Ref FargateEFSFileSystemID
+        MountEfs: !Ref MountEfs
+        WireTapLogActivation: !Ref WireTapLogActivation
         AutoscalingDataPointN: !Ref AutoscalingDataPointN
         AutoscalingDataPointM: !Ref AutoscalingDataPointM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
@@ -324,6 +376,9 @@ Resources:
         ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
         ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
         ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
+        ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_AOOUOSENDERID=${AoouoSenderID}'
+        ContainerEnvEntry22: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry23: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -388,6 +443,11 @@ Resources:
               - ssm:GetParameters
             Resource:
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPrivacyNotice'
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            Resource:
+              - "*"
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND    ###
   ###   La chiave viene impiegata per firmare il client assertion che serve          ###
@@ -474,6 +534,7 @@ Resources:
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
         Limit: 600000
+        EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -553,6 +614,9 @@ Resources:
         LambdaArns: !Join
           - ','
           - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+        QueueArns: !Join
+          - ','
+          - - !Ref DeliveryPushToExternalRegistriesQueueARN
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
@@ -560,6 +624,8 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+            - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
+            - !Ref DeliveryPushToExternalRegistriesQueueAgeAlarmARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-external-registries'
@@ -658,6 +724,45 @@ Resources:
   
                 //logging the incoming message body (view in cloudwatch):
                 console.log("Incoming message body from SQS :", body);
+          
+                if(body.id === body.rootId){//put will automatically update the element if exists
+                  delete body.rootDescription;
+                  delete body.rootIpaCode;
+                  body.onlyRootStatus = body.status;
+                }else{
+                  delete body.onlyRootStatus;
+                  const params = {
+                    TableName: TABLE_NAME,
+                    Key: {
+                      id: body.rootId
+                    }
+                  }
+                  let result = await dynamoDB.get(params).promise();
+                  if(!result.Item){
+                    //insert root institutions
+                    let rootInstitutions = {
+                      id: body.rootId,
+                      address: "",
+                      created: body.created,
+                      description: body.rootDescription,
+                      externalId: "",
+                      digitalAddress: "",
+                      ipaCode: rootIpaCode,
+                      lastUpdate: body.lastUpdate,
+                      sdiCode: "",
+                      status: body.status,
+                      onlyRootStatus: body.status,
+                      taxCode: body.taxCode,
+                    }
+                    const params = {
+                        TableName: TABLE_NAME,
+                        Item: rootInstitutions
+                    };
+                    await dynamoDB.put(params).promise();
+                }
+                delete body.rootDescription;
+                delete body.rootIpaCode;
+              }
   
                 //configure params for writing data to dynamo DB:
                 const params = {
