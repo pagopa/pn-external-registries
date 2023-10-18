@@ -21,14 +21,17 @@ public class PnEventInboundService {
     public PnEventInboundService(EventHandler eventHandler) {
         this.eventHandler = eventHandler;
     }
-
+    
+    
+    //Viene definita un implementazione specifica di MessageRoutingCallback
     @Bean
     public MessageRoutingCallback customRouter() {
         return new MessageRoutingCallback() {
             @Override
             public FunctionRoutingResult routingResult(Message<?> message) {
                 setMdc(message);
-                return new FunctionRoutingResult(handleMessage(message));
+                final String handlerName = handleMessage(message);
+                return new FunctionRoutingResult(handlerName);
             }
         };
     }
