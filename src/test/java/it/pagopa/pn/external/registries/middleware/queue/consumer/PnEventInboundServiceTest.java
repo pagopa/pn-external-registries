@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-class PnEventInboundServiceTest {
+class PnEventInboundServiceTest { 
     //Viene fatto l'@Autowired di MessageRoutingCallback perchè in PnEventInboundService viene fatta un implementazione anonima di questa classe, 
     // iniettandola nel contesto spring con il @Bean. Dunque con l'@Autowired ci riferiamo a quella specifica implementazione
     @Autowired
