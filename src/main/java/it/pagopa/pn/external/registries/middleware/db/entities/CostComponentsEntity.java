@@ -25,14 +25,14 @@ public class CostComponentsEntity {
     private String sk;
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_BASECOST)}))
-    private Integer baseCost;
+    private Integer baseCost = 0;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SIMPLE_REGISTERED_LETTER_COST)}))
-    private Integer simpleRegisteredLetterCost;
+    private Integer simpleRegisteredLetterCost = null;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_FIRST_ANALOG_COST)}))
-    private Integer firstAnalogCost;
+    private Integer firstAnalogCost = null;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SECOND_ANALOG_COST)}))
-    private Integer secondAnalogCost;
+    private Integer secondAnalogCost = null;
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_IS_REFUSED_CANCELLED)}))
-    private Boolean isRefusedCancelled;
+    private Boolean isRefusedCancelled = false;
 }

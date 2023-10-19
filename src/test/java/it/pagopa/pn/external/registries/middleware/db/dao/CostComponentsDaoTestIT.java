@@ -243,10 +243,10 @@ class CostComponentsDaoTestIT {
 
         //Then all the other values should be null and the set one must be present
         Assertions.assertNotNull(result);
-        Assertions.assertNull(result.getBaseCost());
+        Assertions.assertEquals(0, result.getBaseCost());
         Assertions.assertNull(result.getSimpleRegisteredLetterCost());
         Assertions.assertNull(result.getSecondAnalogCost());
-        Assertions.assertNull(result.getIsRefusedCancelled());
+        Assertions.assertFalse(result.getIsRefusedCancelled());
         Assertions.assertEquals(12, result.getFirstAnalogCost());
     }
 
