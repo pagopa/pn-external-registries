@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -32,19 +31,17 @@ class UpdateCostServiceTestIT {
     @Mock
     private CostUpdateResultDao costUpdateResultDao; // DynamoDB DAO
 
-    private CommunicationResultGroupMapper communicationResultGroupMapper = new CommunicationResultGroupMapper();
+    private final CommunicationResultGroupMapper communicationResultGroupMapper = new CommunicationResultGroupMapper();
 
     @Mock
     private GpdClient gpdClient; // GPD remote service
-
-    private final String iun = "iun";
     private final String creditorTaxId = "testTaxId";
     private final String noticeCode = "testNoticeCode";
 
     private final String pk = "testPk";
     private final String sk = "testSk";
 
-    private final long notificationCost = 100L;
+    private final int notificationCost = 100;
 
     @BeforeEach
     void setUp() {
@@ -56,12 +53,7 @@ class UpdateCostServiceTestIT {
     @Test
     void testUpdateCost_200_OK() {
         // Given
-        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
-                .iuv(iun)
-                .organizationFiscalCode(creditorTaxId)
-                .amount(notificationCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
-                .lastUpdatedDate(new Date());
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
         // GPD client returns a successful response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
@@ -96,12 +88,7 @@ class UpdateCostServiceTestIT {
         int status = 209;
 
         // Given
-        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
-                .iuv(iun)
-                .organizationFiscalCode(creditorTaxId)
-                .amount(notificationCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
-                .lastUpdatedDate(new Date());
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
         // GPD client returns a successful response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
@@ -136,12 +123,7 @@ class UpdateCostServiceTestIT {
         int status = 404;
 
         // Given
-        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
-                .iuv(iun)
-                .organizationFiscalCode(creditorTaxId)
-                .amount(notificationCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
-                .lastUpdatedDate(new Date());
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
         // GPD client returns a successful response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
@@ -177,12 +159,7 @@ class UpdateCostServiceTestIT {
         int status = 422;
 
         // Given
-        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
-                .iuv(iun)
-                .organizationFiscalCode(creditorTaxId)
-                .amount(notificationCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
-                .lastUpdatedDate(new Date());
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
         // GPD client returns a successful response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
@@ -218,12 +195,7 @@ class UpdateCostServiceTestIT {
         int status = 500;
 
         // Given
-        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
-                .iuv(iun)
-                .organizationFiscalCode(creditorTaxId)
-                .amount(notificationCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
-                .lastUpdatedDate(new Date());
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
         // GPD client returns a successful response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
@@ -252,5 +224,16 @@ class UpdateCostServiceTestIT {
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.RETRY, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
+    }
+
+    private PaymentsModelResponse newPaymentModelResponse() {
+        String iun = "iun";
+
+        return new PaymentsModelResponse()
+                .iuv(iun)
+                .organizationFiscalCode(creditorTaxId)
+                .amount((long)notificationCost)
+                .status(PaymentsModelResponse.StatusEnum.PAID)
+                .lastUpdatedDate(new Date());
     }
 }

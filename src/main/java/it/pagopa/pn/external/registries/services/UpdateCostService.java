@@ -28,7 +28,7 @@ public class UpdateCostService {
         this.costUpdateResultService = costUpdateResultService;
     }
 
-    public Mono<UpdateCostResponseInt> updateCost(String creditorTaxId, String noticeCode, Long notificationCost,
+    public Mono<UpdateCostResponseInt> updateCost(String creditorTaxId, String noticeCode, int notificationCost,
                                                   String updateCostPhase, Instant  eventTimestamp, Instant eventStorageTimestamp) {
 
         String iuv = creditorTaxId + noticeCode;
@@ -40,7 +40,7 @@ public class UpdateCostService {
         request.setNoticeCode(noticeCode);
         request.setUpdateCostPhase(CostUpdateCostPhaseInt.valueOf(updateCostPhase));
         request.setRequestId(requestId);
-        request.setNotificationCost(notificationCost.intValue());
+        request.setNotificationCost(notificationCost);
         request.setIun(iuv);
         request.setEventTimestamp(eventTimestamp);
         request.setEventStorageTimestamp(eventStorageTimestamp);
@@ -50,7 +50,7 @@ public class UpdateCostService {
         log.info("Updating the cost on GPD: iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
                 iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
-        return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, notificationCost)
+        return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long)notificationCost)
                 .flatMap(response -> {
                     request.setStatusCode(response.getStatusCodeValue());
 
