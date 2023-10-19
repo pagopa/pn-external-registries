@@ -37,7 +37,7 @@ class CostUpdateResultServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         this.service = new CostUpdateResultService(dao, communicationResultGroupMapper);
-        captor = ArgumentCaptor.forClass(CostUpdateResultEntity.class);
+        this.captor = ArgumentCaptor.forClass(CostUpdateResultEntity.class);
 
         sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
     }
