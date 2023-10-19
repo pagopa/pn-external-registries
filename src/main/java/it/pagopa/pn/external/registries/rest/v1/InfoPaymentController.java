@@ -21,7 +21,7 @@ public class InfoPaymentController implements PaymentInfoApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<PaymentInfoV21InnerDto>>> getPaymentInfoV21(Flux<PaymentInfoRequestDto> paymentInfoRequestDto, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<PaymentInfoV21Dto>>> getPaymentInfoV21(Flux<PaymentInfoRequestDto> paymentInfoRequestDto, ServerWebExchange exchange) {
         return infoPaymentService.getPaymentInfo(paymentInfoRequestDto)
                 .map(body -> {
                     log.debug("[exit]");

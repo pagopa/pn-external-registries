@@ -33,13 +33,13 @@ public class InfoPaymentService {
         this.config = config;
     }
 
-    public Mono<List<PaymentInfoV21InnerDto>> getPaymentInfo(Flux<PaymentInfoRequestDto> paymentInfoRequestDtoFlux) {
+    public Mono<List<PaymentInfoV21Dto>> getPaymentInfo(Flux<PaymentInfoRequestDto> paymentInfoRequestDtoFlux) {
         return paymentInfoRequestDtoFlux
                 .flatMap(this::callCheckoutPaymentInfo)
                 .collectList();
     }
 
-    private Mono<PaymentInfoV21InnerDto> callCheckoutPaymentInfo(PaymentInfoRequestDto request) {
+    private Mono<PaymentInfoV21Dto> callCheckoutPaymentInfo(PaymentInfoRequestDto request) {
         String paTaxId = request.getCreditorTaxId();
         String noticeNumber = request.getNoticeCode();
         String paymentId = paTaxId + noticeNumber;
@@ -54,8 +54,8 @@ public class InfoPaymentService {
                 });
     }
 
-    private PaymentInfoV21InnerDto apiResponseToPaymentInfoV21InnerDtoV2(PaymentRequestsGetResponseDto paymentInfoResponse, PaymentInfoRequestDto request) {
-        return new PaymentInfoV21InnerDto()
+    private PaymentInfoV21Dto apiResponseToPaymentInfoV21InnerDtoV2(PaymentRequestsGetResponseDto paymentInfoResponse, PaymentInfoRequestDto request) {
+        return new PaymentInfoV21Dto()
                 .status(PaymentStatusDto.REQUIRED)
                 .amount(paymentInfoResponse.getImportoSingoloVersamento())
                 .url(config.getCheckoutSiteUrl())
@@ -65,12 +65,12 @@ public class InfoPaymentService {
                 .dueDate(paymentInfoResponse.getDueDate() != null ? paymentInfoResponse.getDueDate() : null);
     }
 
-    private Mono<PaymentInfoV21InnerDto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
+    private Mono<PaymentInfoV21Dto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
         PaymentStatusFaultPaymentProblemJsonDto result;
 
-        PaymentInfoV21InnerDto paymentInfoDto = new PaymentInfoV21InnerDto();
+        PaymentInfoV21Dto paymentInfoDto = new PaymentInfoV21Dto();
         paymentInfoDto.setCreditorTaxId(paTaxId);
         paymentInfoDto.setNoticeCode(noticeNumber);
 

@@ -39,8 +39,8 @@ class InfoPaymentControllerTest {
 
     @Test
     void getPaymentInfoSuccess() {
-        List<PaymentInfoV21InnerDto> paymentInfoList = new ArrayList<>();
-        PaymentInfoV21InnerDto PaymentInfoV21InnerDto = new PaymentInfoV21InnerDto();
+        List<PaymentInfoV21Dto> paymentInfoList = new ArrayList<>();
+        PaymentInfoV21Dto PaymentInfoV21InnerDto = new PaymentInfoV21Dto();
         PaymentInfoV21InnerDto.setStatus(PaymentStatusDto.SUCCEEDED);
         PaymentInfoV21InnerDto.setAmount(20);
         PaymentInfoV21InnerDto.setUrl("https://api.uat.platform.pagopa.it/checkout/auth/payments/v2");
@@ -61,7 +61,7 @@ class InfoPaymentControllerTest {
                 .body(BodyInserters.fromValue(new PaymentInfoRequestDto()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(PaymentInfoV21InnerDto.class)
+                .expectBodyList(PaymentInfoV21Dto.class)
                 .hasSize(1)
                 .contains(PaymentInfoV21InnerDto);
     }

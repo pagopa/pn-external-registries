@@ -75,7 +75,7 @@ class InfoPaymentServiceTest {
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
-        List<PaymentInfoV21InnerDto> result = service.getPaymentInfo(Flux.just(requestInnerDto)).block(Duration.ofMillis( 3000 ));
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo(Flux.just(requestInnerDto)).block(Duration.ofMillis( 3000 ));
 
         assertNotNull( result );
         assertEquals( PaymentStatusDto.SUCCEEDED , result.get(0).getStatus() );
@@ -106,7 +106,7 @@ class InfoPaymentServiceTest {
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
-        List<PaymentInfoV21InnerDto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block(Duration.ofMillis( 3000 ));
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block(Duration.ofMillis( 3000 ));
 
         assertNotNull( result );
         assertEquals( PaymentStatusDto.IN_PROGRESS, result.get(0).getStatus() );
@@ -126,7 +126,7 @@ class InfoPaymentServiceTest {
         PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("fake_payment_id");
         requestInnerDto.setNoticeCode("fakeNoticeNumber");
-        List<PaymentInfoV21InnerDto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
 
         //Then
         assertNotNull( result );
@@ -158,7 +158,7 @@ class InfoPaymentServiceTest {
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
-        List<PaymentInfoV21InnerDto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
 
         //Then
         assertNotNull( result );
@@ -190,7 +190,7 @@ class InfoPaymentServiceTest {
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
-        List<PaymentInfoV21InnerDto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
 
         //Then
         assertNotNull( result );
@@ -218,7 +218,7 @@ class InfoPaymentServiceTest {
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
-        List<PaymentInfoV21InnerDto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
 
         //Then
         assertNotNull( result );
