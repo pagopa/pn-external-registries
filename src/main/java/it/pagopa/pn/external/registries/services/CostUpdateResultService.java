@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostUpdateResultDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CommunicationResultEntity;
@@ -25,15 +26,15 @@ public class CostUpdateResultService {
         this.communicationResultGroupMapper = communicationResultGroupMapper;
     }
 
-    public Mono<String> createUpdateResult(CostUpdateResultRequestInt request) {
+    public Mono<CommunicationResultGroupInt> createUpdateResult(CostUpdateResultRequestInt request) {
         if (request == null) {
             return Mono.error(new IllegalArgumentException("Request cannot be null"));
         }
 
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
 
-        String communicationResultGroup = communicationResultGroupMapper.mapToCommunicationResultGroup(request.getStatusCode()).getValue();
-        entity.setCommunicationResultGroup(communicationResultGroup);
+        CommunicationResultGroupInt communicationResultGroup = communicationResultGroupMapper.mapToCommunicationResultGroup(request.getStatusCode());
+        entity.setCommunicationResultGroup(communicationResultGroup.getValue());
 
         entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
         entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
@@ -51,7 +52,7 @@ public class CostUpdateResultService {
 
         entity.setCommunicationResult(communicationResultEntity);
 
-        entity.setFailedIuv("KO".equals(communicationResultGroup) ? request.getIun() : null);
+        entity.setFailedIuv("KO".equals(communicationResultGroup.getValue()) ? request.getIun() : null);
         entity.setUpdateCostPhase(request.getUpdateCostPhase().getValue());
         entity.setNotificationCost(request.getNotificationCost());
         entity.setIun(request.getIun());

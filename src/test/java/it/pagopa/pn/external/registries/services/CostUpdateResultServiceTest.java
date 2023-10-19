@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostUpdateResultDao;
@@ -15,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -56,7 +58,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
+        String result = Objects.requireNonNull(service.createUpdateResult(request).block()).getValue();
         Assertions.assertEquals("OK", result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -118,8 +120,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("OK", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -161,8 +163,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("KO", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.KO, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -204,8 +206,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("KO", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.KO, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -247,8 +249,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("RETRY", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.RETRY, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();

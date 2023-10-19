@@ -14,10 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.fail;

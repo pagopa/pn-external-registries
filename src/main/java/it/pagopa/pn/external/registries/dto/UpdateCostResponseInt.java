@@ -10,5 +10,5 @@ import lombok.EqualsAndHashCode;
 public class UpdateCostResponseInt {
     private String creditorTaxId;
     private String noticeCode;
-    private String result;
+    private CommunicationResultGroupInt result;
 }
