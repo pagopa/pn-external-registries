@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.dto.UpdateCostResponseInt;
@@ -7,6 +8,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.Pa
 import it.pagopa.pn.external.registries.middleware.msclient.gpd.GpdClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -44,41 +46,60 @@ public class UpdateCostService {
         request.setEventStorageTimestamp(eventStorageTimestamp);
         request.setCommunicationTimestamp(communicationTimestamp);
 
+        // log, including passed information and requestId
+        log.info("Updating the cost on GPD: iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
+                iuv, creditorTaxId, noticeCode, requestId, notificationCost);
+
         return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, notificationCost)
                 .flatMap(response -> {
                     request.setStatusCode(response.getStatusCodeValue());
 
-                    // TODO: move to utility method, with logging
-                    PaymentsModelResponse paymentsModelResponse = response.getBody();
-                    // remove sensitive information
-                    if (paymentsModelResponse != null &&
-                            paymentsModelResponse.getTransfer() != null &&
-                            !paymentsModelResponse.getTransfer().isEmpty()) {
-                        paymentsModelResponse.getTransfer().forEach( obj -> obj.setRemittanceInformation("************"));
+                    PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
+                    // convert to JSON
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonResponse = null;
+                    try {
+                        jsonResponse = mapper.writeValueAsString(paymentsModelResponse);
+                    } catch (Exception e) {
+                        log.error("Error converting paymentsModelResponse to JSON: {}", e.getMessage());
                     }
-                    // ...
-                    request.setJsonResponse(/*response.getBody()*/"");
 
-                    return costUpdateResultService.createUpdateResult(request)
-                            .map(result -> new UpdateCostResponseInt(
-                                    creditorTaxId,
-                                    noticeCode,
-                                    result
-                            ));
+                    request.setJsonResponse(jsonResponse);
+
+                    return createUpdateCostResponse(request, creditorTaxId, noticeCode);
                 })
                 .onErrorResume(WebClientResponseException.class, error -> {
-                    log.info("Error calling GPD: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
-                            error.getResponseBodyAsString(), creditorTaxId, noticeCode, requestId, notificationCost);
+                    log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
+                            error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
                     request.setStatusCode(error.getRawStatusCode());
                     request.setJsonResponse(error.getResponseBodyAsString());
 
-                    return costUpdateResultService.createUpdateResult(request)
-                            .map(result -> new UpdateCostResponseInt(
-                                    creditorTaxId,
-                                    noticeCode,
-                                    result
-                            ));
+                    return createUpdateCostResponse(request, creditorTaxId, noticeCode);
                 });
+    }
+
+    private PaymentsModelResponse getPaymentsModelResponseAndCleanUp(ResponseEntity<PaymentsModelResponse> response) {
+        PaymentsModelResponse paymentsModelResponse = response.getBody();
+
+        // remove sensitive information
+        if (paymentsModelResponse != null &&
+                paymentsModelResponse.getTransfer() != null &&
+                !paymentsModelResponse.getTransfer().isEmpty()) {
+            paymentsModelResponse.getTransfer().forEach( obj -> obj.setRemittanceInformation("************"));
+        }
+
+        log.info("Response from GPD after removing sensitive information: {}", paymentsModelResponse);
+
+        return paymentsModelResponse;
+    }
+
+    private Mono<UpdateCostResponseInt> createUpdateCostResponse(CostUpdateResultRequestInt request, String creditorTaxId, String noticeCode) {
+        return costUpdateResultService.createUpdateResult(request)
+                .map(result -> new UpdateCostResponseInt(
+                        creditorTaxId,
+                        noticeCode,
+                        result
+                ));
     }
 }
