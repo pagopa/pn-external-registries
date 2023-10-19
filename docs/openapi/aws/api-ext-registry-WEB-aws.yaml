@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: B7+Lare4zqquLNMRqUHj0lQsdx+dDWaPyTqmmNMuoTQ=
+  version: qnk69pkbnwLET+o2pxLIGg0w+kL4PM+mYaSa8qL54hs=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -447,7 +447,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentInfoRequest'
+              $ref: '#/components/schemas/PaymentInfoRequests'
       responses:
         '200':
           description: OK
@@ -1022,21 +1022,25 @@ components:
       required:
         - status
         - errors
-    PaymentInfoRequest:
-      title: Request for a payment info
-      description: Object containing sender and payment id
+    PaymentInfoRequests:
+      title: Requests for payment info
+      description: List of request payment info containing sender and payment id
       type: array
       minItems: 1
       items:
-        type: object
-        properties:
-          creditorTaxId:
-            $ref: '#/components/schemas/paTaxId'
-          noticeCode:
-            $ref: '#/components/schemas/noticeCode'
-        required:
-          - creditorTaxId
-          - noticeCode
+        $ref: '#/components/schemas/PaymentInfoRequest'
+    PaymentInfoRequest:
+      title: Request for a payment info
+      description: Object containing sender and payment id
+      type: object
+      properties:
+        creditorTaxId:
+          $ref: '#/components/schemas/paTaxId'
+        noticeCode:
+          $ref: '#/components/schemas/noticeCode'
+      required:
+        - creditorTaxId
+        - noticeCode
     PaymentInfoV21:
       title: Payment brief information
       description: Payment minimal information

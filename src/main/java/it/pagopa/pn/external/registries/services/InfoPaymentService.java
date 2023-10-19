@@ -33,13 +33,13 @@ public class InfoPaymentService {
         this.config = config;
     }
 
-    public Mono<List<PaymentInfoV21InnerDto>> getPaymentInfo(Flux<PaymentInfoRequestInnerDto> paymentInfoRequestInnerDtoFlux) {
-        return paymentInfoRequestInnerDtoFlux
+    public Mono<List<PaymentInfoV21InnerDto>> getPaymentInfo(Flux<PaymentInfoRequestDto> paymentInfoRequestDtoFlux) {
+        return paymentInfoRequestDtoFlux
                 .flatMap(this::callCheckoutPaymentInfo)
                 .collectList();
     }
 
-    private Mono<PaymentInfoV21InnerDto> callCheckoutPaymentInfo(PaymentInfoRequestInnerDto request) {
+    private Mono<PaymentInfoV21InnerDto> callCheckoutPaymentInfo(PaymentInfoRequestDto request) {
         String paTaxId = request.getCreditorTaxId();
         String noticeNumber = request.getNoticeCode();
         String paymentId = paTaxId + noticeNumber;
@@ -54,7 +54,7 @@ public class InfoPaymentService {
                 });
     }
 
-    private PaymentInfoV21InnerDto apiResponseToPaymentInfoV21InnerDtoV2(PaymentRequestsGetResponseDto paymentInfoResponse, PaymentInfoRequestInnerDto request) {
+    private PaymentInfoV21InnerDto apiResponseToPaymentInfoV21InnerDtoV2(PaymentRequestsGetResponseDto paymentInfoResponse, PaymentInfoRequestDto request) {
         return new PaymentInfoV21InnerDto()
                 .status(PaymentStatusDto.REQUIRED)
                 .amount(paymentInfoResponse.getImportoSingoloVersamento())

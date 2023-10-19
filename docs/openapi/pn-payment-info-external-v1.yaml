@@ -68,7 +68,7 @@ paths:
         content:
           application/json:
             schema:
-               $ref: '#/components/schemas/PaymentInfoRequest'
+               $ref: '#/components/schemas/PaymentInfoRequests'
       responses:
         '200':
           description: OK
@@ -126,21 +126,25 @@ paths:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
   schemas:
-    PaymentInfoRequest:
-      title: Request for a payment info
-      description: Object containing sender and payment id
+    PaymentInfoRequests:
+      title: Requests for payment info
+      description: List of request payment info containing sender and payment id
       type: array
       minItems: 1
       items:
-        type: object
-        properties:
-          creditorTaxId:
-            $ref: 'remote-refs.yaml#/components/schemas/paTaxId'
-          noticeCode:
-            $ref: 'remote-refs.yaml#/components/schemas/noticeCode'
-        required:
-          - creditorTaxId
-          - noticeCode
+        $ref: '#/components/schemas/PaymentInfoRequest'
+    PaymentInfoRequest:
+      title: Request for a payment info
+      description: Object containing sender and payment id
+      type: object
+      properties:
+        creditorTaxId:
+          $ref: 'remote-refs.yaml#/components/schemas/paTaxId'
+        noticeCode:
+          $ref: 'remote-refs.yaml#/components/schemas/noticeCode'
+      required:
+        - creditorTaxId
+        - noticeCode
     PaymentInfoV21:
       title: Payment brief information
       description: Payment minimal information

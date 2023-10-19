@@ -71,7 +71,7 @@ class InfoPaymentServiceTest {
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
 
-        PaymentInfoRequestInnerDto requestInnerDto = new PaymentInfoRequestInnerDto();
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
@@ -102,7 +102,7 @@ class InfoPaymentServiceTest {
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
 
-        PaymentInfoRequestInnerDto requestInnerDto = new PaymentInfoRequestInnerDto();
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
@@ -123,7 +123,7 @@ class InfoPaymentServiceTest {
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
         Mockito.when( config.getCheckoutSiteUrl() ).thenReturn(CHECKOUT_SITE_URL);
 
-        PaymentInfoRequestInnerDto requestInnerDto = new PaymentInfoRequestInnerDto();
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("fake_payment_id");
         requestInnerDto.setNoticeCode("fakeNoticeNumber");
         List<PaymentInfoV21InnerDto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
@@ -154,7 +154,7 @@ class InfoPaymentServiceTest {
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
 
-        PaymentInfoRequestInnerDto requestInnerDto = new PaymentInfoRequestInnerDto();
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
@@ -186,7 +186,7 @@ class InfoPaymentServiceTest {
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
 
-        PaymentInfoRequestInnerDto requestInnerDto = new PaymentInfoRequestInnerDto();
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 
@@ -214,7 +214,7 @@ class InfoPaymentServiceTest {
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
 
-        PaymentInfoRequestInnerDto requestInnerDto = new PaymentInfoRequestInnerDto();
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
         requestInnerDto.setCreditorTaxId("asdasda");
         requestInnerDto.setNoticeCode("asdasda");
 

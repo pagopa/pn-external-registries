@@ -58,7 +58,7 @@ class InfoPaymentControllerTest {
         // Make the request and validate the response
         webTestClient.post()
                 .uri(url)
-                .body(BodyInserters.fromValue(new PaymentInfoRequestInnerDto()))
+                .body(BodyInserters.fromValue(new PaymentInfoRequestDto()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(PaymentInfoV21InnerDto.class)
