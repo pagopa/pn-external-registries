@@ -58,7 +58,6 @@ public class UpdateCostService {
                     }
                     // ...
                     request.setJsonResponse(/*response.getBody()*/"");
-                    // ...
 
                     return costUpdateResultService.createUpdateResult(request)
                             .map(result -> new UpdateCostResponseInt(

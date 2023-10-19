@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultResponseInt;
 import it.pagopa.pn.external.registries.middleware.db.entities.CommunicationResultEntity;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostUpdateResultEntity;
-import it.pagopa.pn.external.registries.dto.gpd.GPDPaymentInfoInt;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -142,20 +141,10 @@ class CostUpdateResultDaoTestIT {
 
         entity.setResultEnum(CostUpdateResultResponseInt.OK_UPDATED.getValue());
 
-        GPDPaymentInfoInt jsonResponse = new GPDPaymentInfoInt();
-        jsonResponse.setAmount(100);
-        jsonResponse.setIuv("iuv");
-        jsonResponse.setTransfer(new ArrayList<>());
+        String jsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"transfer\":[]}";
+        System.out.println("JSON response: " + jsonString);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String jsonString = objectMapper.writeValueAsString(jsonResponse);
-            System.out.println("JSON response: " + jsonString);
-            entity.setJsonResponse(jsonString);
-        } catch (Exception e) {
-            System.err.println("Error while serializing the JSON response");
-            fail(e);
-        }
+        entity.setJsonResponse(jsonString);
 
         return entity;
     }

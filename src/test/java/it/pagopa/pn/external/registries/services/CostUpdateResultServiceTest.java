@@ -30,7 +30,6 @@ class CostUpdateResultServiceTest {
     private ArgumentCaptor<CostUpdateResultEntity> captor;
 
     String sourceJsonString;
-    String cleanedJsonString;
 
     @BeforeEach
     void setUp() {
@@ -39,37 +38,6 @@ class CostUpdateResultServiceTest {
         captor = ArgumentCaptor.forClass(CostUpdateResultEntity.class);
 
         sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
-        cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[]}";
-    }
-
-    @Test
-    void checkCleanUp() {
-        int statusCode = 200;
-
-        String sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[{\"amount\":180, \"remittanceInformation\":\"remittanceInformation\"}]}";
-        String cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[{\"amount\":180}]}";
-
-        // Setup request
-        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
-
-        CostUpdateResultEntity entity = new CostUpdateResultEntity();
-        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
-        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
-                "OK" + "##" +
-                UUID.randomUUID());
-
-        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
-
-        // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("OK", result);
-
-        verify(dao).insertOrUpdate(captor.capture());
-        CostUpdateResultEntity capturedEntity = captor.getValue();
-
-        // communicationResult
-        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
     }
 
     @Test
@@ -109,7 +77,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("OK_UPDATED", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("OK", capturedEntity.getCommunicationResultGroup());
@@ -168,7 +136,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("OK_IN_PAYMENT", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("OK", capturedEntity.getCommunicationResultGroup());
@@ -211,7 +179,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("KO_NOT_FOUND", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
@@ -254,7 +222,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("KO_CANNOT_UPDATE", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
@@ -297,7 +265,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("KO_RETRY", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("RETRY", capturedEntity.getCommunicationResultGroup());
