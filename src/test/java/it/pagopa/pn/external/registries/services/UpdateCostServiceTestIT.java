@@ -13,7 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -53,7 +55,6 @@ class UpdateCostServiceTestIT {
 
     @Test
     void testUpdateCost_200_OK() {
-
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
                 .iuv(iun)
@@ -91,7 +92,8 @@ class UpdateCostServiceTestIT {
     }
 
     @Test
-    void testUpdateCost_202_OK() {
+    void testUpdateCost_209_OK() {
+        int status = 209;
 
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
@@ -102,7 +104,7 @@ class UpdateCostServiceTestIT {
                 .lastUpdatedDate(new Date());
 
         // GPD client returns a successful response
-        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(200).body(paymentsModelResponse);
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
         System.out.println("responseEntity: " + responseEntity);
 
@@ -131,6 +133,7 @@ class UpdateCostServiceTestIT {
 
     @Test
     void testUpdateCost_404_KO() {
+        int status = 404;
 
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
@@ -141,8 +144,9 @@ class UpdateCostServiceTestIT {
                 .lastUpdatedDate(new Date());
 
         // GPD client returns a successful response
-        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(404).body(paymentsModelResponse);
-        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any()))
+                .thenReturn(Mono.error(new WebClientResponseException("An error occurred", status, "Not found", null, null, null)));
         System.out.println("responseEntity: " + responseEntity);
 
         // CostUpdateResultDao returns a successful response
@@ -170,6 +174,7 @@ class UpdateCostServiceTestIT {
 
     @Test
     void testUpdateCost_422_KO() {
+        int status = 422;
 
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
@@ -180,8 +185,9 @@ class UpdateCostServiceTestIT {
                 .lastUpdatedDate(new Date());
 
         // GPD client returns a successful response
-        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(422).body(paymentsModelResponse);
-        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any()))
+                .thenReturn(Mono.error(new WebClientResponseException("An error occurred", status, "Can't update", null, null, null)));
         System.out.println("responseEntity: " + responseEntity);
 
         // CostUpdateResultDao returns a successful response
@@ -209,6 +215,7 @@ class UpdateCostServiceTestIT {
 
     @Test
     void testUpdateCost_500_RETRY() {
+        int status = 500;
 
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
@@ -219,8 +226,9 @@ class UpdateCostServiceTestIT {
                 .lastUpdatedDate(new Date());
 
         // GPD client returns a successful response
-        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(500).body(paymentsModelResponse);
-        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any()))
+                .thenReturn(Mono.error(new WebClientResponseException("An error occurred", status, "Internal Server Error", null, null, null)));
         System.out.println("responseEntity: " + responseEntity);
 
         // CostUpdateResultDao returns a successful response
