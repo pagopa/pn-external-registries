@@ -742,14 +742,11 @@ Resources:
                     //insert root institutions
                     let rootInstitutions = {
                       id: body.rootId,
-                      address: "",
+                      rootId: body.rootId,
                       created: body.created,
                       description: body.rootDescription,
-                      externalId: "",
-                      digitalAddress: "",
-                      ipaCode: rootIpaCode,
+                      ipaCode: body.rootIpaCode,
                       lastUpdate: body.lastUpdate,
-                      sdiCode: "",
                       status: body.status,
                       onlyRootStatus: body.status,
                       taxCode: body.taxCode,
