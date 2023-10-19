@@ -11,14 +11,14 @@ import reactor.core.publisher.Mono;
 
 @CustomLog
 @Component
-class GpdClient extends OcpBaseClient {
+public class GpdClient extends OcpBaseClient {
     private final PaymentsApiApi paymentsApiApi;
 
     public GpdClient(PaymentsApiApi paymentsApiApi) {
         this.paymentsApiApi = paymentsApiApi;
     }
     
-    public Mono<ResponseEntity<PaymentsModelResponse>> updateNotificationFee(
+    public Mono<ResponseEntity<PaymentsModelResponse>> setNotificationCost(
             String creditorTaxId, 
             String noticeCode,
             String requestId, 
@@ -27,14 +27,15 @@ class GpdClient extends OcpBaseClient {
         //TODO Da valorizzare su commons il valore "GPD"
         log.logInvokingExternalService("GPD", "updateNotificationFee");
 
-        String iuv = removeFirstChar(noticeCode);
+        String iuv = getIuvFromNoticeCode(noticeCode);
         NotificationFeeUpdateModel notificationFeeUpdateModel = new NotificationFeeUpdateModel();
         notificationFeeUpdateModel.setNotificationFee(notificationFee);
         paymentsApiApi.updateNotificationFee(creditorTaxId, iuv, notificationFeeUpdateModel);
         return paymentsApiApi.updateNotificationFeeWithHttpInfo(creditorTaxId, iuv, notificationFeeUpdateModel);
     }
 
-    public String removeFirstChar(String s){
-        return s.substring(1);
+    public String getIuvFromNoticeCode(String noticeCode){
+        //per ottenere lo iuv dal notice code viene rimosso il primo carattere
+        return noticeCode.substring(1);
     }
 }
