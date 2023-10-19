@@ -28,16 +28,21 @@ class UpdateCostServiceTestIT {
     private UpdateCostService updateCostService;
 
     @Mock
-    private CostUpdateResultDao costUpdateResultDao;
+    private CostUpdateResultDao costUpdateResultDao; // DynamoDB DAO
 
     private CommunicationResultGroupMapper communicationResultGroupMapper = new CommunicationResultGroupMapper();
 
     @Mock
-    private GpdClient gpdClient;
+    private GpdClient gpdClient; // GPD remote service
 
     private final String iun = "iun";
     private final String creditorTaxId = "testTaxId";
     private final String noticeCode = "testNoticeCode";
+
+    private final String pk = "testPk";
+    private final String sk = "testSk";
+
+    private final long notificationCost = 100L;
 
     @BeforeEach
     void setUp() {
@@ -47,8 +52,7 @@ class UpdateCostServiceTestIT {
     }
 
     @Test
-    void testUpdateCost_200() {
-        long notificationCost = 100L;
+    void testUpdateCost_200_OK() {
 
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
@@ -65,8 +69,8 @@ class UpdateCostServiceTestIT {
 
         // CostUpdateResultDao returns a successful response
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
-        entity.setPk("testPk");
-        entity.setSk("testSk");
+        entity.setPk(pk);
+        entity.setSk(sk);
         entity.setEventTimestamp(Instant.now());
         when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
                 .thenReturn(Mono.just(entity));
@@ -87,8 +91,7 @@ class UpdateCostServiceTestIT {
     }
 
     @Test
-    void testUpdateCost_202() {
-        long notificationCost = 100L;
+    void testUpdateCost_202_OK() {
 
         // Given
         PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
@@ -105,8 +108,8 @@ class UpdateCostServiceTestIT {
 
         // CostUpdateResultDao returns a successful response
         CostUpdateResultEntity entity = new CostUpdateResultEntity();
-        entity.setPk("testPk");
-        entity.setSk("testSk");
+        entity.setPk(pk);
+        entity.setSk(sk);
         entity.setEventTimestamp(Instant.now());
         when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
                 .thenReturn(Mono.just(entity));
@@ -124,5 +127,122 @@ class UpdateCostServiceTestIT {
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.OK, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
+    }
+
+    @Test
+    void testUpdateCost_404_KO() {
+
+        // Given
+        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
+                .iuv(iun)
+                .organizationFiscalCode(creditorTaxId)
+                .amount(notificationCost)
+                .status(PaymentsModelResponse.StatusEnum.PAID)
+                .lastUpdatedDate(new Date());
+
+        // GPD client returns a successful response
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(404).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+        System.out.println("responseEntity: " + responseEntity);
+
+        // CostUpdateResultDao returns a successful response
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setEventTimestamp(Instant.now());
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(entity));
+        System.out.println("entity: " + entity);
+
+        // When
+        UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
+                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                Instant.now(), Instant.now()
+        ).block();
+        System.out.println("updateCostResponse: " + updateCostResponse);
+
+        // Then
+        Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
+        Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
+        Assertions.assertEquals(CommunicationResultGroupInt.KO, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
+    }
+
+    @Test
+    void testUpdateCost_422_KO() {
+
+        // Given
+        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
+                .iuv(iun)
+                .organizationFiscalCode(creditorTaxId)
+                .amount(notificationCost)
+                .status(PaymentsModelResponse.StatusEnum.PAID)
+                .lastUpdatedDate(new Date());
+
+        // GPD client returns a successful response
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(422).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+        System.out.println("responseEntity: " + responseEntity);
+
+        // CostUpdateResultDao returns a successful response
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setEventTimestamp(Instant.now());
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(entity));
+        System.out.println("entity: " + entity);
+
+        // When
+        UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
+                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                Instant.now(), Instant.now()
+        ).block();
+        System.out.println("updateCostResponse: " + updateCostResponse);
+
+        // Then
+        Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
+        Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
+        Assertions.assertEquals(CommunicationResultGroupInt.KO, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
+    }
+
+    @Test
+    void testUpdateCost_500_RETRY() {
+
+        // Given
+        PaymentsModelResponse paymentsModelResponse = new PaymentsModelResponse()
+                .iuv(iun)
+                .organizationFiscalCode(creditorTaxId)
+                .amount(notificationCost)
+                .status(PaymentsModelResponse.StatusEnum.PAID)
+                .lastUpdatedDate(new Date());
+
+        // GPD client returns a successful response
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(500).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+        System.out.println("responseEntity: " + responseEntity);
+
+        // CostUpdateResultDao returns a successful response
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setEventTimestamp(Instant.now());
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(entity));
+        System.out.println("entity: " + entity);
+
+        // When
+        UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
+                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                Instant.now(), Instant.now()
+        ).block();
+        System.out.println("updateCostResponse: " + updateCostResponse);
+
+        // Then
+        Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
+        Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
+        Assertions.assertEquals(CommunicationResultGroupInt.RETRY, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
     }
 }
