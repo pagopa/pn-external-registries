@@ -111,7 +111,7 @@ public class CostComponentService {
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
-        log.info("getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
+        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
                 pk, sk, iun, recIndex, creditorTaxId, noticeCode);
 
         return costComponentsDao.getItem(pk, sk)
@@ -153,7 +153,7 @@ public class CostComponentService {
     public Flux<CostComponentsInt> getIuvsForIunAndRecIndex(String iun, int recIndex) {
         String pk = iun + "##" + recIndex;
 
-        log.info("getting cost components: pk={}, iun={}, recIndex={}",
+        log.info("Getting cost components: pk={}, iun={}, recIndex={}",
                 pk, iun, recIndex);
 
         return costComponentsDao.getItems(pk)
