@@ -35,16 +35,16 @@ public class UpdateCostService {
         String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
         Instant communicationTimestamp = Instant.now();
 
-        CostUpdateResultRequestInt request = new CostUpdateResultRequestInt();
-        request.setCreditorTaxId(creditorTaxId);
-        request.setNoticeCode(noticeCode);
-        request.setUpdateCostPhase(CostUpdateCostPhaseInt.valueOf(updateCostPhase));
-        request.setRequestId(requestId);
-        request.setNotificationCost(notificationCost);
-        request.setIun(iuv);
-        request.setEventTimestamp(eventTimestamp);
-        request.setEventStorageTimestamp(eventStorageTimestamp);
-        request.setCommunicationTimestamp(communicationTimestamp);
+        CostUpdateResultRequestInt communicationResult = new CostUpdateResultRequestInt();
+        communicationResult.setCreditorTaxId(creditorTaxId);
+        communicationResult.setNoticeCode(noticeCode);
+        communicationResult.setUpdateCostPhase(CostUpdateCostPhaseInt.valueOf(updateCostPhase));
+        communicationResult.setRequestId(requestId);
+        communicationResult.setNotificationCost(notificationCost);
+        communicationResult.setIun(iuv);
+        communicationResult.setEventTimestamp(eventTimestamp);
+        communicationResult.setEventStorageTimestamp(eventStorageTimestamp);
+        communicationResult.setCommunicationTimestamp(communicationTimestamp);
 
         // log, including passed information and requestId
         log.info("Updating the cost on GPD: iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
@@ -52,7 +52,7 @@ public class UpdateCostService {
 
         return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long)notificationCost)
                 .flatMap(response -> {
-                    request.setStatusCode(response.getStatusCodeValue());
+                    communicationResult.setStatusCode(response.getStatusCodeValue());
 
                     PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
                     // convert to JSON
@@ -64,18 +64,18 @@ public class UpdateCostService {
                         log.error("Error converting paymentsModelResponse to JSON: {}", e.getMessage());
                     }
 
-                    request.setJsonResponse(jsonResponse);
+                    communicationResult.setJsonResponse(jsonResponse);
 
-                    return createUpdateCostResponse(request, creditorTaxId, noticeCode);
+                    return createUpdateCostResponse(communicationResult, creditorTaxId, noticeCode);
                 })
                 .onErrorResume(WebClientResponseException.class, error -> {
                     log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
                             error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
-                    request.setStatusCode(error.getRawStatusCode());
-                    request.setJsonResponse(error.getResponseBodyAsString());
+                    communicationResult.setStatusCode(error.getRawStatusCode());
+                    communicationResult.setJsonResponse(error.getResponseBodyAsString());
 
-                    return createUpdateCostResponse(request, creditorTaxId, noticeCode);
+                    return createUpdateCostResponse(communicationResult, creditorTaxId, noticeCode);
                 });
     }
 

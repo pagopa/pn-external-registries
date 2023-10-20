@@ -52,7 +52,7 @@ public class CostUpdateResultService {
 
         entity.setCommunicationResult(communicationResultEntity);
 
-        entity.setFailedIuv("KO".equals(communicationResultGroup.getValue()) ? request.getIun() : null);
+        entity.setFailedIuv(CommunicationResultGroupInt.KO == communicationResultGroup ? request.getIun() : null);
         entity.setUpdateCostPhase(request.getUpdateCostPhase().getValue());
         entity.setNotificationCost(request.getNotificationCost());
         entity.setIun(request.getIun());

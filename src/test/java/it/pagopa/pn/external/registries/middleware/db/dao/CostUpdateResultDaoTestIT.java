@@ -139,7 +139,6 @@ class CostUpdateResultDaoTestIT {
         entity.setResultEnum(CostUpdateResultResponseInt.OK_UPDATED.getValue());
 
         String jsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"transfer\":[]}";
-        System.out.println("JSON response: " + jsonString);
 
         entity.setJsonResponse(jsonString);
 
