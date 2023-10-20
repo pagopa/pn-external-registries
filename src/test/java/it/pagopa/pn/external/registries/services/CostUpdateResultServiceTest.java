@@ -278,8 +278,12 @@ class CostUpdateResultServiceTest {
 
     @Test
     void testNullRequest() {
+        final Mono<String> updateResult = service.createUpdateResult(null);
+
         // Execute & Verify
-        Assertions.assertThrows(IllegalArgumentException.class, () -> service.createUpdateResult(null).block());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            updateResult.block();
+        });
     }
 
     private CostUpdateResultRequestInt newCostUpdateResultRequestInt(int statusCode, String sourceJsonString) {

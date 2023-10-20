@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries;
 
+import com.amazonaws.services.sqs.AmazonSQSAsync;
 import io.awspring.cloud.autoconfigure.messaging.SqsAutoConfiguration;
 import it.pagopa.pn.api.dto.events.MomProducer;
 import it.pagopa.pn.api.dto.events.PnExtRegistryIOSentMessageEvent;
@@ -19,4 +20,7 @@ public class MockAWSObjectsTestConfig {
 
     @MockBean
     private OnboardInstitutionFulltextSearchHelper onboardInstitutionFulltextSearchHelper;
+
+    @MockBean
+    private AmazonSQSAsync amazonSQS;
 }

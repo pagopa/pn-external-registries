@@ -303,6 +303,10 @@ Parameters:
     Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
 
   # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueName:
+    Type: String
+    Description: Queue name
+    
   DeliveryPushToExternalRegistriesQueueARN:
     Type: String
     Description: Queue ARN
@@ -380,6 +384,7 @@ Resources:
         ContainerEnvEntry23: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_COMPONENTS=${CostComponentsTableName}'
         ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT=${CostUpdateResultTableName}'
         ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT_TTL_DAYS=${CostUpdateResultTableTtlDays}'
+        ContainerEnvEntry26: !Sub 'SPRING_CLOUD_FUNCTIONROUTER_QUEUES_LIST=${DeliveryPushToExternalRegistriesQueueName}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
