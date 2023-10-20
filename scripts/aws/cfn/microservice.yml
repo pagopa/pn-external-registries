@@ -297,6 +297,11 @@ Parameters:
     Type: Number
     Description: b2b waf limit
 
+  WebWafLimit:
+    Default: 600000
+    Type: Number
+    Description: b2b waf limit
+
   # Delivery Push to External Registries Queue
   DeliveryPushToExternalRegistriesQueueARN:
     Type: String
@@ -385,6 +390,7 @@ Resources:
         ContainerEnvEntry22: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
         ContainerEnvEntry23: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
         ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_B2B_WAF_LIMIT=${B2bWafLimit}'
+        ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_WEB_WAF_LIMIT=${WebWafLimit}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -539,7 +545,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-web'
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
-        Limit: 600000
+        Limit: !Ref WebWafLimit
         EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
