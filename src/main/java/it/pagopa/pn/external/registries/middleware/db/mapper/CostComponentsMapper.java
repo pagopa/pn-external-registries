@@ -20,7 +20,7 @@ public class CostComponentsMapper {
         }
 
         costComponents.setIun(pkParts[0]);
-        costComponents.setRecIndex(pkParts[1]);
+        costComponents.setRecIndex(Integer.parseInt(pkParts[1]));
         costComponents.setCreditorTaxId(skParts[0]);
         costComponents.setNoticeCode(skParts[1]);
 

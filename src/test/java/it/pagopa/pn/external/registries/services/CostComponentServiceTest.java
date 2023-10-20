@@ -27,7 +27,7 @@ class CostComponentServiceTest {
     CostComponentService costComponentService;
 
     private final String iun = "iun";
-    private final String recIndex = "recIndex";
+    private final int recIndex = 0;
     private final String creditorTaxId = "testTaxId";
     private final String noticeCode = "testNoticeCode";
 

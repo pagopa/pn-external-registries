@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class CostComponentsInt {
     private String iun;
-    private String recIndex;
+    private int recIndex;
     private String creditorTaxId;
     private String noticeCode;
     private Integer baseCost = 0;

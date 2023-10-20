@@ -24,13 +24,13 @@ public class CostComponentService {
         this.costComponentsMapper = costComponentsMapper;
     }
 
-    public Mono<CostComponentsInt> insertStepCost(CostUpdateCostPhaseInt updateCostPhase, String iun, String recIndex,
+    public Mono<CostComponentsInt> insertStepCost(CostUpdateCostPhaseInt updateCostPhase, String iun, int recIndex,
                                                   String creditorTaxId, String noticeCode, Integer notificationStepCost) {
         final String insertString = "inserting cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
         final String updatingString = "updating cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
 
         // Validation of input parameters
-        if (updateCostPhase == null || iun == null || recIndex == null ||
+        if (updateCostPhase == null || iun == null || recIndex < 0 ||
                 creditorTaxId == null || noticeCode == null || notificationStepCost == null) {
             return Mono.error(new IllegalArgumentException("Input parameters should not be null"));
         }
@@ -107,7 +107,7 @@ public class CostComponentService {
      * @param recIndex recipient index
      * @return a Mono of Integer (the computed total cost)
      */
-    public Mono<Integer> getTotalCost(String iun, String recIndex, String creditorTaxId, String noticeCode) {
+    public Mono<Integer> getTotalCost(String iun, int recIndex, String creditorTaxId, String noticeCode) {
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
@@ -150,7 +150,7 @@ public class CostComponentService {
      * @param recIndex recipient index
      * @return a Flux of CostComponentsInt
      */
-    public Flux<CostComponentsInt> getIuvsForIunAndRecIndex(String iun, String recIndex) {
+    public Flux<CostComponentsInt> getIuvsForIunAndRecIndex(String iun, int recIndex) {
         String pk = iun + "##" + recIndex;
 
         log.info("getting cost components: pk={}, iun={}, recIndex={}",
