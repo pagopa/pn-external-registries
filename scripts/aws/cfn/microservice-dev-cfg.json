@@ -19,6 +19,7 @@
     "PnCronAnalyzer": "* */1 * * * *",
     "EnhancedWebSecurityEnabled": "true",
     "AoouoSenderID": "DUMMY",
-    "CostUpdateResultTableTtlDays": "365"
+    "CostUpdateResultTableTtlDays": "365",
+    "GpdApiBaseUrl": "https://api.uat.platform.pagopa.it/pn-integration/gpd/api/v1"
   }
 }
