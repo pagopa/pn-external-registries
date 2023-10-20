@@ -8,6 +8,8 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -27,13 +29,14 @@ public class SpringAnalyzerActivation extends SpringAnalyzer {
         super(cloudWatchMetricHandler, metricsEndpoint);
         this.cloudWatchMetricHandler = cloudWatchMetricHandler;
         this.meterRegistry = meterRegistry;
-        this.meterRegistry.counter(IO_SENT_SUCCESSFULLY);
-        this.meterRegistry.counter(IO_SENT_FAILURE);
     }
+
 
     @Override
     public void init() {
         super.init();
+        this.meterRegistry.counter(IO_SENT_SUCCESSFULLY);
+        this.meterRegistry.counter(IO_SENT_FAILURE);
         this.getMetrics().addAll(BUSINESS_METRICS);
     }
 
