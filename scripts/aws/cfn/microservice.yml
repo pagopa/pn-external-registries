@@ -300,7 +300,7 @@ Parameters:
   WebWafLimit:
     Default: 600000
     Type: Number
-    Description: b2b waf limit
+    Description: web waf limit
 
   # Delivery Push to External Registries Queue
   DeliveryPushToExternalRegistriesQueueARN:
