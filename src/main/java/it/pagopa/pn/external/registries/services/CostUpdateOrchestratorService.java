@@ -39,10 +39,36 @@ public class CostUpdateOrchestratorService {
     public Flux<UpdateCostResponseInt> handleCostUpdateForIun(int notificationStepCost, String iun, int recIndex,
                                                               Instant eventTimestamp, Instant eventStorageTimestamp,
                                                               CostUpdateCostPhaseInt updateCostPhase) {
-        // Method implementation
-        // ...
+        if (iun == null || iun.trim().isEmpty()) {
+            log.warn("IUN is null or empty. No cost update will be performed.");
+            return Flux.empty();
+        }
 
-        return Flux.empty();
+        log.info("Handling cost update for IUN: {}, recIndex: {}, notificationStepCost: {}, updateCostPhase: {}",
+                iun, recIndex, notificationStepCost, updateCostPhase);
+
+        // Retrieve IUVs using the provided iun and recIndex
+        return costComponentService.getIuvsForIunAndRecIndex(iun, recIndex)
+                .collectList() // collect the list of IUVs because I need to pass them all to handleCostUpdateForIuvs, accepting an array
+                .flatMapMany(iuvs -> {
+                    if (iuvs.isEmpty()) {
+                        log.warn("No IUVs found for IUN: {} and recIndex: {}. No cost update will be performed.", iun, recIndex);
+                        return Flux.empty();
+                    }
+
+                    PaymentForRecipientInt[] paymentsForRecipients = iuvs.stream()
+                            .map(iuv -> new PaymentForRecipientInt(recIndex, iuv.getCreditorTaxId(), iuv.getNoticeCode()))
+                            .toArray(PaymentForRecipientInt[]::new);
+
+                    // the actual update
+                    return handleCostUpdateForIuvs(notificationStepCost, iun, paymentsForRecipients,
+                            eventTimestamp, eventStorageTimestamp, updateCostPhase);
+                })
+                .onErrorResume(e -> {
+                    log.error("An error occurred while processing IUVs for IUN: {} and recIndex: {}. Error: {}",
+                            iun, recIndex, e.getMessage());
+                    return Flux.empty();
+                });
     }
 
     /**
