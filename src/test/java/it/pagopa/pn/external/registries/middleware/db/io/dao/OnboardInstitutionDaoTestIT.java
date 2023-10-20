@@ -206,7 +206,7 @@ class OnboardInstitutionDaoTestIT {
         try {
             Assertions.assertNotNull(result);
             assertFalse(result.isEmpty());
-            assertTrue(result.size() == 1);
+            assertEquals(1, result.size());
             assertEquals(result.get(0).getPk(), entityNotRoot.getInstitutionId());
         } catch (Exception e) {
             throw new RuntimeException();
