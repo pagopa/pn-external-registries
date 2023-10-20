@@ -2,11 +2,9 @@ package it.pagopa.pn.external.registries.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode
-@NoArgsConstructor
 public class CostComponentsInt {
     private String iun;
     private String recIndex;

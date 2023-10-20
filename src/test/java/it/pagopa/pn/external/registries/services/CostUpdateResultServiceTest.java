@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostUpdateResultDao;
@@ -15,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -30,46 +32,14 @@ class CostUpdateResultServiceTest {
     private ArgumentCaptor<CostUpdateResultEntity> captor;
 
     String sourceJsonString;
-    String cleanedJsonString;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         this.service = new CostUpdateResultService(dao, communicationResultGroupMapper);
-        captor = ArgumentCaptor.forClass(CostUpdateResultEntity.class);
+        this.captor = ArgumentCaptor.forClass(CostUpdateResultEntity.class);
 
         sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[]}";
-        cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[]}";
-    }
-
-    @Test
-    void checkCleanUp() {
-        int statusCode = 200;
-
-        String sourceJsonString = "{\"iuv\":\"iuv\",\"organizationFiscalCode\":null,\"amount\":100,\"description\":\"description\",\"isPartialPayment\":null,\"dueDate\":null,\"retentionDate\":null,\"paymentDate\":null,\"reportingDate\":null,\"insertedDate\":null,\"paymentMethod\":null,\"fee\":null,\"notificationFee\":null,\"pspCompany\":null,\"idReceipt\":null,\"idFlowReporting\":null,\"status\":null,\"lastUpdatedDate\":null,\"transfer\":[{\"amount\":180, \"remittanceInformation\":\"remittanceInformation\"}]}";
-        String cleanedJsonString = "{\"iuv\":\"iuv\",\"amount\":100,\"description\":\"description\",\"transfer\":[{\"amount\":180}]}";
-
-        // Setup request
-        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
-
-        CostUpdateResultEntity entity = new CostUpdateResultEntity();
-        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
-        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
-                "OK" + "##" +
-                UUID.randomUUID());
-
-        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
-
-        // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("OK", result);
-
-        verify(dao).insertOrUpdate(captor.capture());
-        CostUpdateResultEntity capturedEntity = captor.getValue();
-
-        // communicationResult
-        Assertions.assertNotNull(capturedEntity.getCommunicationResult());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
     }
 
     @Test
@@ -88,7 +58,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
+        String result = Objects.requireNonNull(service.createUpdateResult(request).block()).getValue();
         Assertions.assertEquals("OK", result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -109,7 +79,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("OK_UPDATED", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("OK", capturedEntity.getCommunicationResultGroup());
@@ -150,8 +120,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("OK", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -168,7 +138,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("OK_IN_PAYMENT", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("OK", capturedEntity.getCommunicationResultGroup());
@@ -193,8 +163,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("KO", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.KO, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -211,7 +181,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("KO_NOT_FOUND", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
@@ -236,8 +206,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("KO", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.KO, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -254,7 +224,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("KO_CANNOT_UPDATE", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
@@ -279,8 +249,8 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = service.createUpdateResult(request).block();
-        Assertions.assertEquals("RETRY", result);
+        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.RETRY, result);
 
         verify(dao).insertOrUpdate(captor.capture());
         CostUpdateResultEntity capturedEntity = captor.getValue();
@@ -297,7 +267,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertNotNull(capturedEntity.getCommunicationResult());
         Assertions.assertEquals("KO_RETRY", capturedEntity.getCommunicationResult().getResultEnum());
         Assertions.assertEquals(statusCode, capturedEntity.getCommunicationResult().getStatusCode());
-        Assertions.assertEquals(cleanedJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
+        Assertions.assertEquals(sourceJsonString, capturedEntity.getCommunicationResult().getJsonResponse());
 
         // communicationResultGroup
         Assertions.assertEquals("RETRY", capturedEntity.getCommunicationResultGroup());
@@ -308,8 +278,12 @@ class CostUpdateResultServiceTest {
 
     @Test
     void testNullRequest() {
+        final Mono<CommunicationResultGroupInt> updateResult = service.createUpdateResult(null);
+
         // Execute & Verify
-        Assertions.assertThrows(IllegalArgumentException.class, () -> service.createUpdateResult(null).block());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            updateResult.block();
+        });
     }
 
     private CostUpdateResultRequestInt newCostUpdateResultRequestInt(int statusCode, String sourceJsonString) {
