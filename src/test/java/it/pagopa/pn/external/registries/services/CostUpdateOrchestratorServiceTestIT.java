@@ -65,7 +65,6 @@ class CostUpdateOrchestratorServiceTestIT {
         this.costUpdateOrchestratorService = new CostUpdateOrchestratorService(costComponentService, updateCostService);
     }
 
-    // TODO: if this test is exectuted, OnboardInstitutionDaoTestIT.getNewerOfInstant fails!!!!!
     // test handleCostUpdateForIuvs
     @Test
     void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_Success() {
