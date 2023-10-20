@@ -28,7 +28,7 @@ public class UpdateCostService {
         this.costUpdateResultService = costUpdateResultService;
     }
 
-    public Mono<UpdateCostResponseInt> updateCost(String creditorTaxId, String noticeCode, int notificationCost,
+    public Mono<UpdateCostResponseInt> updateCost(int recIndex, String creditorTaxId, String noticeCode, int notificationCost,
                                                   String updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
         String iuv = creditorTaxId + noticeCode;
@@ -56,7 +56,7 @@ public class UpdateCostService {
                             updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iuv,
                             response.getStatusCodeValue(), jsonResponse);
 
-                    return createUpdateCostResponse(costUpdateResultRequestInt, creditorTaxId, noticeCode);
+                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
                 })
                 .onErrorResume(WebClientResponseException.class, error -> {
                     log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
@@ -66,7 +66,7 @@ public class UpdateCostService {
                             updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iuv,
                             error.getRawStatusCode(), error.getResponseBodyAsString());
 
-                    return createUpdateCostResponse(costUpdateResultRequestInt, creditorTaxId, noticeCode);
+                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
                 });
     }
 
@@ -106,9 +106,10 @@ public class UpdateCostService {
         return paymentsModelResponse;
     }
 
-    private Mono<UpdateCostResponseInt> createUpdateCostResponse(CostUpdateResultRequestInt request, String creditorTaxId, String noticeCode) {
+    private Mono<UpdateCostResponseInt> createUpdateCostResponse(CostUpdateResultRequestInt request, int recIndex, String creditorTaxId, String noticeCode) {
         return costUpdateResultService.createUpdateResult(request)
                 .map(result -> new UpdateCostResponseInt(
+                        recIndex,
                         creditorTaxId,
                         noticeCode,
                         result

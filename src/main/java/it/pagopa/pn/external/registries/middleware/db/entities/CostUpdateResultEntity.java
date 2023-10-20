@@ -30,9 +30,9 @@ public class CostUpdateResultEntity {
 
     @Setter
     @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PK)}))
-    private String pk;
+    private String pk; // creditorTaxId + "##" + noticeCode
     @Setter @Getter(onMethod=@__({@DynamoDbSortKey, @DynamoDbAttribute(COL_SK)}))
-    private String sk;
+    private String sk; // updateCostPhase + "##" + communicationResultGroup + "##" + randomUUID
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_REQUEST_ID)}))
     private String requestId;

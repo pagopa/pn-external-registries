@@ -20,9 +20,9 @@ public class CostComponentsEntity {
     public static final String COL_IS_REFUSED_CANCELLED = "isRefusedCancelled";
 
     @Setter @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PK)}))
-    private String pk;
+    private String pk; // iun + "##" + recIndex
     @Setter @Getter(onMethod=@__({@DynamoDbSortKey, @DynamoDbAttribute(COL_SK)}))
-    private String sk;
+    private String sk; // creditorTaxId + "##" + noticeCode
 
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_BASECOST)}))
     private Integer baseCost = 0;

@@ -36,7 +36,8 @@ public class DeliveryPushEventHandler {
 
                 log.logStartingProcess(processName);
 
-                costUpdateOrchestratorService.handleCostUpdateForIun();
+                // TODO
+                // costUpdateOrchestratorService.handleCostUpdateForIun();
                 
                 log.logEndingProcess(processName);
             } catch (Exception ex) {

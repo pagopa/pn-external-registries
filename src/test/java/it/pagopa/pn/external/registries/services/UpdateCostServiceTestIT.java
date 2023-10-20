@@ -35,6 +35,8 @@ class UpdateCostServiceTestIT {
 
     @Mock
     private GpdClient gpdClient; // GPD remote service
+
+    private final int recIndex = 0;
     private final String creditorTaxId = "testTaxId";
     private final String noticeCode = "testNoticeCode";
 
@@ -71,13 +73,14 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
 
         // Then
         Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.OK, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
@@ -106,13 +109,14 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
 
         // Then
         Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.OK, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
@@ -142,13 +146,14 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
 
         // Then
         Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.KO, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
@@ -178,13 +183,14 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
 
         // Then
         Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.KO, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
@@ -214,13 +220,14 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
 
         // Then
         Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.RETRY, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");

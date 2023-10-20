@@ -7,9 +7,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode
 @AllArgsConstructor
-public class UpdateCostResponseInt {
+public class PaymentForRecipientInt {
     private int recIndex;
     private String creditorTaxId;
     private String noticeCode;
-    private CommunicationResultGroupInt result;
 }
