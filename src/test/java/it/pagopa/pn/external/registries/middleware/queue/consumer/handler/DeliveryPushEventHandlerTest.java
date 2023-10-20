@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -16,7 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -37,7 +35,7 @@ class DeliveryPushEventHandlerTest {
         consumer.accept(message);
 
         //THEN
-        verify(costUpdateOrchestratorService).handleCostUpdate();
+        verify(costUpdateOrchestratorService).handleCostUpdateForIun();
     }
 
     @Test
@@ -51,7 +49,7 @@ class DeliveryPushEventHandlerTest {
         Assertions.assertThrows(NullPointerException.class, () -> consumer.accept(message));
 
         //THEN
-        verify(costUpdateOrchestratorService, never()).handleCostUpdate();
+        verify(costUpdateOrchestratorService, never()).handleCostUpdateForIun();
     }
 
     @NotNull

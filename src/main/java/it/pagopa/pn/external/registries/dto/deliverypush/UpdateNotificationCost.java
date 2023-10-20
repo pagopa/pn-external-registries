@@ -16,5 +16,5 @@ public class UpdateNotificationCost {
     private int notificationStepCost;
     private Instant eventTimestamp;
     private Instant eventStorageTimestamp;
-    private UpdateCostPhase updateCostPhase;
+    private AnalogUpdateCostPhase updateCostPhase;
 }

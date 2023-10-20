@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class CostUpdateOrchestratorService {
-    public void handleCostUpdate(){
+    public void handleCostUpdateForIun(){
         //TODO DA DEFINIRE
     }
 }
