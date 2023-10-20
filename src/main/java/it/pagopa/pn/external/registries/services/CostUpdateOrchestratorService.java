@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.PaymentForRecipientInt;
 import it.pagopa.pn.external.registries.dto.UpdateCostResponseInt;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class CostUpdateOrchestratorService {
      */
     public Flux<UpdateCostResponseInt> handleCostUpdateForIun(int notificationStepCost, String iun, String recIndex,
                                                               Instant eventTimestamp, Instant eventStorageTimestamp,
-                                                              String updateCostPhase) {
+                                                              CostUpdateCostPhaseInt updateCostPhase) {
         // Method implementation
         // ...
 
@@ -48,7 +49,7 @@ public class CostUpdateOrchestratorService {
     public Flux<UpdateCostResponseInt> handleCostUpdateForIuvs(int notificationStepCost, String iun,
                                               PaymentForRecipientInt[] paymentsForRecipients,
                                               Instant eventTimestamp, Instant eventStorageTimestamp,
-                                              String updateCostPhase) {
+                                                               CostUpdateCostPhaseInt updateCostPhase) {
         // Method implementation
         // ...
 

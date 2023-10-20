@@ -29,7 +29,7 @@ public class UpdateCostService {
     }
 
     public Mono<UpdateCostResponseInt> updateCost(int recIndex, String creditorTaxId, String noticeCode, int notificationCost,
-                                                  String updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
+                                                  CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
         String iuv = creditorTaxId + noticeCode;
         String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
@@ -71,14 +71,14 @@ public class UpdateCostService {
     }
 
     private CostUpdateResultRequestInt getCostUpdateResultRequest(String creditorTaxId, String noticeCode, int notificationCost,
-                                                                  String updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp,
+                                                                  CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp,
                                                                   Instant communicationTimestamp, String requestId, String iuv, int statusCode,
                                                                   String jsonResponse) {
         CostUpdateResultRequestInt costUpdateResultRequestInt = new CostUpdateResultRequestInt();
 
         costUpdateResultRequestInt.setCreditorTaxId(creditorTaxId);
         costUpdateResultRequestInt.setNoticeCode(noticeCode);
-        costUpdateResultRequestInt.setUpdateCostPhase(CostUpdateCostPhaseInt.valueOf(updateCostPhase));
+        costUpdateResultRequestInt.setUpdateCostPhase(updateCostPhase);
         costUpdateResultRequestInt.setRequestId(requestId);
         costUpdateResultRequestInt.setNotificationCost(notificationCost);
         costUpdateResultRequestInt.setIun(iuv);

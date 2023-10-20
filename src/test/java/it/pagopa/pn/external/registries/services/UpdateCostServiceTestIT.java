@@ -73,7 +73,7 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION,
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
@@ -109,7 +109,7 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION,
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
@@ -146,7 +146,7 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION,
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
@@ -183,7 +183,7 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION,
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
@@ -220,7 +220,7 @@ class UpdateCostServiceTestIT {
 
         // When
         UpdateCostResponseInt updateCostResponse = updateCostService.updateCost(
-                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION.name(),
+                recIndex, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.VALIDATION,
                 Instant.now(), Instant.now()
         ).block();
         System.out.println("updateCostResponse: " + updateCostResponse);
