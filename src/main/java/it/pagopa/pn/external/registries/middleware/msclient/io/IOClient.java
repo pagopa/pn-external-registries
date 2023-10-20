@@ -38,7 +38,7 @@ class IOClient extends OcpBaseClient {
 
 
     public Mono<CreatedMessage> submitMessageforUserWithFiscalCodeInBody(NewMessage message) {
-        log.logInvokingExternalService(IO, "submitMessageforUserWithFiscalCodeInBody");
+        log.logInvokingExternalDownstreamService(IO, "submitMessageforUserWithFiscalCodeInBody");
         log.debug("[enter] submitMessageforUserWithFiscalCodeInBody ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(message.getFiscalCode()));
 
         if (!checkWhitelist(message.getFiscalCode()))
@@ -48,22 +48,23 @@ class IOClient extends OcpBaseClient {
             res.setId(UUID.randomUUID().toString());
             return Mono.just(res);
         }
-
         return ioApi.submitMessageforUserWithFiscalCodeInBody( message )
                 .map(response-> {
                     this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_SUCCESSFULLY).counter().increment();
                     return response;
                 })
                 .onErrorResume(throwable -> {
+                    log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
                     log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
                     this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_FAILURE).counter().increment();
+
                     return Mono.error(throwable);
         });
     }
 
 
     public Mono<LimitedProfile> getProfileByPOST(FiscalCodePayload payload) {
-        log.logInvokingExternalService(IO, "getProfileByPOST");
+        log.logInvokingExternalDownstreamService(IO, "getProfileByPOST");
         log.debug("[enter] getProfileByPOST ioMode={} taxId={}", ioMode, LogUtils.maskTaxId(payload.getFiscalCode()));
 
         if (!checkWhitelist(payload.getFiscalCode()))
@@ -73,7 +74,9 @@ class IOClient extends OcpBaseClient {
             return Mono.error(res);
         }
 
-        return ioApi.getProfileByPOST( payload );
+        return ioApi.getProfileByPOST( payload ).doOnError(throwable -> {
+            log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
+        });
     }
 
     protected boolean checkWhitelist(String taxId)

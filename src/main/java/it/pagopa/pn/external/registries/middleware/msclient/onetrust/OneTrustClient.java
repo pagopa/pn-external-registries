@@ -47,7 +47,7 @@ public class OneTrustClient extends CommonBaseClient {
      * @return il Privacy Notice se trovato, altrimenti One Trust restituisce 500
      */
     public Mono<PrivacyNoticeOneTrustResponse> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {
-        log.logInvokingExternalService(ONE_TRUST, "getPrivacyNoticeVersionByPrivacyNoticeId");
+        log.logInvokingExternalDownstreamService(ONE_TRUST, "getPrivacyNoticeVersionByPrivacyNoticeId");
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(PRIVACY_NOTICES_URL)
@@ -56,7 +56,10 @@ public class OneTrustClient extends CommonBaseClient {
                 .retrieve()
                 .bodyToMono(PrivacyNoticeOneTrustResponse.class)
                 .doOnSuccess(response -> log.info("Response from OneTrust: {}", response))
-                .doOnError(throwable -> log.error(String.format("Error from OnTrust with privacyNoticeId: %s", privacyNoticeId), throwable));
+                .doOnError(throwable -> {
+                    log.logInvokationResultDownstreamFailed(ONE_TRUST, elabExceptionMessage(throwable));
+                    log.error(String.format("Error from OnTrust with privacyNoticeId: %s", privacyNoticeId), throwable);
+                });
     }
 
 }
