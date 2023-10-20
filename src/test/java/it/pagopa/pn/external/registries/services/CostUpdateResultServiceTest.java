@@ -278,7 +278,7 @@ class CostUpdateResultServiceTest {
 
     @Test
     void testNullRequest() {
-        final Mono<String> updateResult = service.createUpdateResult(null);
+        final Mono<CommunicationResultGroupInt> updateResult = service.createUpdateResult(null);
 
         // Execute & Verify
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
