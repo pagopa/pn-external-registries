@@ -1,5 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.msclient.gpd;
 
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.NotificationFeeUpdateModel;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.PaymentsModelResponse;
@@ -9,13 +11,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.GPD;
+
 @CustomLog
 @Component
 public class GpdClient extends OcpBaseClient {
-    private final PaymentsApiApi paymentsApiApi;
-
-    public GpdClient(PaymentsApiApi paymentsApiApi) {
-        this.paymentsApiApi = paymentsApiApi;
+    private final PnExternalRegistriesConfig config;
+    
+    public GpdClient(PnExternalRegistriesConfig config) {
+        this.config = config;
     }
     
     public Mono<ResponseEntity<PaymentsModelResponse>> setNotificationCost(
@@ -24,8 +28,8 @@ public class GpdClient extends OcpBaseClient {
             String requestId, 
             Long notificationFee
     ) {
-        //TODO Da valorizzare su commons il valore "GPD"
-        log.logInvokingExternalService("GPD", "updateNotificationFee");
+        log.logInvokingExternalService(GPD, "updateNotificationFee");
+        PaymentsApiApi paymentsApiApi = getPaymentsApiApi(config, requestId);
 
         String iuv = getIuvFromNoticeCode(noticeCode);
         NotificationFeeUpdateModel notificationFeeUpdateModel = new NotificationFeeUpdateModel();
@@ -34,8 +38,15 @@ public class GpdClient extends OcpBaseClient {
         return paymentsApiApi.updateNotificationFeeWithHttpInfo(creditorTaxId, iuv, notificationFeeUpdateModel);
     }
 
-    public String getIuvFromNoticeCode(String noticeCode){
-        //per ottenere lo iuv dal notice code viene rimosso il primo carattere
+    private String getIuvFromNoticeCode(String noticeCode){
+        //iuv is noticeCode without first char
         return noticeCode.substring(1);
+    }
+
+    PaymentsApiApi getPaymentsApiApi(PnExternalRegistriesConfig config, String requestId) {
+        ApiClient apiClient = new
+                ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey(), requestId).build());
+        apiClient.setBasePath( config.getGpdApiBaseUrl() );
+        return new PaymentsApiApi( apiClient );
     }
 }
