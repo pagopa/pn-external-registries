@@ -125,7 +125,7 @@ class UpdateCostServiceTestIT {
         // Given
         PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
-        // GPD client returns a successful response
+        // GPD client returns an error response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any()))
                 .thenReturn(Mono.error(new WebClientResponseException("An error occurred", status, "Not found", null, null, null)));
@@ -161,7 +161,7 @@ class UpdateCostServiceTestIT {
         // Given
         PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
-        // GPD client returns a successful response
+        // GPD client returns an error response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any()))
                 .thenReturn(Mono.error(new WebClientResponseException("An error occurred", status, "Can't update", null, null, null)));
@@ -197,7 +197,7 @@ class UpdateCostServiceTestIT {
         // Given
         PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
 
-        // GPD client returns a successful response
+        // GPD client returns an error response
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(status).body(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any()))
                 .thenReturn(Mono.error(new WebClientResponseException("An error occurred", status, "Internal Server Error", null, null, null)));
