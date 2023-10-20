@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
@@ -60,9 +61,54 @@ public class CostUpdateOrchestratorService {
                                               PaymentForRecipientInt[] paymentsForRecipients,
                                               Instant eventTimestamp, Instant eventStorageTimestamp,
                                                                CostUpdateCostPhaseInt updateCostPhase) {
-        // Method implementation
-        // ...
 
-        return Flux.empty();
+        if (paymentsForRecipients == null || paymentsForRecipients.length == 0) {
+            log.warn("PaymentsForRecipients is null or empty. No cost update will be performed.");
+            return Flux.empty();
+        }
+
+        log.info("Updating the cost on GPD: iun: {}, notificationStepCost: {}, updateCostPhase: {}",
+                iun, notificationStepCost, updateCostPhase);
+
+        // the starting array
+        return Flux.fromArray(paymentsForRecipients)
+                // for each IUV of the array, we insert the cost step
+                .flatMap(paymentForRecipient -> {
+                    log.info("Inserting cost step for: iun: {}, recIndex: {}, creditorTaxId: {}, noticeCode: {}, notificationStepCost: {}, updateCostPhase: {}",
+                            iun, paymentForRecipient.getRecIndex(), paymentForRecipient.getCreditorTaxId(),
+                            paymentForRecipient.getNoticeCode(), notificationStepCost, updateCostPhase);
+
+                    return costComponentService.insertStepCost(updateCostPhase, iun,
+                                    paymentForRecipient.getRecIndex(),
+                                    paymentForRecipient.getCreditorTaxId(),
+                                    paymentForRecipient.getNoticeCode(),
+                                    notificationStepCost)
+                            // then we retrieve the total cost after the update
+                            .flatMap(costComponent -> {
+                                log.info("Getting total cost for: iun: {}, recIndex: {}, creditorTaxId: {}, noticeCode: {}",
+                                        iun, paymentForRecipient.getRecIndex(), paymentForRecipient.getCreditorTaxId(),
+                                        paymentForRecipient.getNoticeCode());
+
+                                return costComponentService.getTotalCost(iun,
+                                                paymentForRecipient.getRecIndex(),
+                                                paymentForRecipient.getCreditorTaxId(),
+                                                paymentForRecipient.getNoticeCode())
+                                        // then we update the cost on GPD
+                                        .flatMap(totalCost ->
+                                                updateCostService.updateCost(paymentForRecipient.getRecIndex(),
+                                                        paymentForRecipient.getCreditorTaxId(),
+                                                        paymentForRecipient.getNoticeCode(),
+                                                        totalCost,
+                                                        updateCostPhase,
+                                                        eventTimestamp,
+                                                        eventStorageTimestamp)
+                                        );
+                            })
+                            .onErrorResume(e -> { // the insert and retrieve on DynamoDB can fail
+                                log.error("An error occurred while processing paymentForRecipient with recIndex: {}, Error: {}",
+                                        paymentForRecipient.getRecIndex(), e.getMessage());
+                                return Mono.empty();
+                            });
+                });
     }
 }
