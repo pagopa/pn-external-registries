@@ -67,7 +67,7 @@ public class CostUpdateOrchestratorService {
                 .onErrorResume(e -> {
                     log.error("An error occurred while processing IUVs for IUN: {} and recIndex: {}. Error: {}",
                             iun, recIndex, e.getMessage());
-                    return Flux.empty();
+                    return Mono.error(new RuntimeException());
                 });
     }
 
@@ -98,43 +98,28 @@ public class CostUpdateOrchestratorService {
 
         // the starting array
         return Flux.fromArray(paymentsForRecipients)
-                // for each IUV of the array, we insert the cost step
-                .flatMap(paymentForRecipient -> {
-                    log.info("Inserting cost step for: iun: {}, recIndex: {}, creditorTaxId: {}, noticeCode: {}, notificationStepCost: {}, updateCostPhase: {}",
-                            iun, paymentForRecipient.getRecIndex(), paymentForRecipient.getCreditorTaxId(),
-                            paymentForRecipient.getNoticeCode(), notificationStepCost, updateCostPhase);
-
-                    return costComponentService.insertStepCost(updateCostPhase, iun,
-                                    paymentForRecipient.getRecIndex(),
-                                    paymentForRecipient.getCreditorTaxId(),
-                                    paymentForRecipient.getNoticeCode(),
-                                    notificationStepCost)
-                            // then we retrieve the total cost after the update
-                            .flatMap(costComponent -> {
-                                log.info("Getting total cost for: iun: {}, recIndex: {}, creditorTaxId: {}, noticeCode: {}",
-                                        iun, paymentForRecipient.getRecIndex(), paymentForRecipient.getCreditorTaxId(),
-                                        paymentForRecipient.getNoticeCode());
-
-                                return costComponentService.getTotalCost(iun,
-                                                paymentForRecipient.getRecIndex(),
-                                                paymentForRecipient.getCreditorTaxId(),
-                                                paymentForRecipient.getNoticeCode())
-                                        // then we update the cost on GPD
-                                        .flatMap(totalCost ->
-                                                updateCostService.updateCost(paymentForRecipient.getRecIndex(),
-                                                        paymentForRecipient.getCreditorTaxId(),
-                                                        paymentForRecipient.getNoticeCode(),
-                                                        totalCost,
-                                                        updateCostPhase,
-                                                        eventTimestamp,
-                                                        eventStorageTimestamp)
-                                        );
-                            })
-                            .onErrorResume(e -> { // the insert and retrieve on DynamoDB can fail
-                                log.error("An error occurred while processing paymentForRecipient with recIndex: {}, Error: {}",
-                                        paymentForRecipient.getRecIndex(), e.getMessage());
-                                return Mono.empty();
-                            });
-                });
+                .flatMap(paymentForRecipient ->
+                        costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
+                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
+                                .onErrorResume(e -> {
+                                    log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
+                                            paymentForRecipient.getRecIndex(), e.getMessage());
+                                    return Mono.empty();
+                                })
+                                .flatMap(costComponent ->
+                                        costComponentService.getTotalCost(iun, paymentForRecipient.getRecIndex(),
+                                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
+                                                .onErrorResume(e -> {
+                                                    log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
+                                                            paymentForRecipient.getRecIndex(), e.getMessage());
+                                                    return Mono.empty();
+                                                })
+                                )
+                                .flatMap(totalCost ->
+                                        updateCostService.updateCost(paymentForRecipient.getRecIndex(),
+                                                paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(),
+                                                totalCost, updateCostPhase, eventTimestamp, eventStorageTimestamp)
+                                )
+                );
     }
 }
