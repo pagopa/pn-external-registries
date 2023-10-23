@@ -64,7 +64,6 @@ class CostUpdateOrchestratorServiceTest {
     @Test
     void handleCostUpdateForIun_SEND_SIMPLE_REGISTERED_LETTER_Success() {
         // Given
-        int recIndex = 0;
         Instant eventTimestamp = Instant.now();
         Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
         CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER;
@@ -122,7 +121,6 @@ class CostUpdateOrchestratorServiceTest {
     @Test
     void handleCostUpdateForIun_SEND_SIMPLE_REGISTERED_LETTER_GetItemsFailure() {
         // Given
-        int recIndex = 0;
         Instant eventTimestamp = Instant.now();
         Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
         CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER;
@@ -355,8 +353,6 @@ class CostUpdateOrchestratorServiceTest {
 
     @Test
     void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_GetFailure() {
-        // it must be like the test before, but have an exception on insertStep operation
-
         // Given
         PaymentForRecipientInt paymentForRecipient = new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode);
         PaymentForRecipientInt[] paymentsForRecipients = {paymentForRecipient};
