@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
@@ -64,11 +63,8 @@ public class CostUpdateOrchestratorService {
                     return handleCostUpdateForIuvs(notificationStepCost, iun, paymentsForRecipients,
                             eventTimestamp, eventStorageTimestamp, updateCostPhase);
                 })
-                .onErrorResume(e -> {
-                    log.error("An error occurred while processing IUVs for IUN: {} and recIndex: {}. Error: {}",
-                            iun, recIndex, e.getMessage());
-                    return Mono.error(new RuntimeException());
-                });
+                .doOnError(e -> log.error("An error occurred while processing IUVs for IUN: {} and recIndex: {}. Error: {}",
+                            iun, recIndex, e.getMessage()));
     }
 
     /**
@@ -101,19 +97,13 @@ public class CostUpdateOrchestratorService {
                 .flatMap(paymentForRecipient ->
                         costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
                                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
-                                .onErrorResume(e -> {
-                                    log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
-                                            paymentForRecipient.getRecIndex(), e.getMessage());
-                                    return Mono.empty();
-                                })
+                                .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
+                                            paymentForRecipient.getRecIndex(), e.getMessage()))
                                 .flatMap(costComponent ->
                                         costComponentService.getTotalCost(iun, paymentForRecipient.getRecIndex(),
                                                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
-                                                .onErrorResume(e -> {
-                                                    log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
-                                                            paymentForRecipient.getRecIndex(), e.getMessage());
-                                                    return Mono.empty();
-                                                })
+                                                .doOnError(e -> log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
+                                                            paymentForRecipient.getRecIndex(), e.getMessage()))
                                 )
                                 .flatMap(totalCost ->
                                         updateCostService.updateCost(paymentForRecipient.getRecIndex(),
