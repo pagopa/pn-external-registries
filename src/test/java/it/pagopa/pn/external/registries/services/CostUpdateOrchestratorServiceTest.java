@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class CostUpdateOrchestratorServiceTest {
     private CostUpdateOrchestratorService costUpdateOrchestratorService;
@@ -119,6 +119,12 @@ class CostUpdateOrchestratorServiceTest {
         Assertions.assertEquals(creditorTaxId, result.get(1).getCreditorTaxId());
         Assertions.assertEquals(noticeCode, result.get(1).getNoticeCode());
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(1).getResult());
+
+        // Verify called methods
+        verify(costComponentsDao, times(2)).updateNotNull(any());
+        verify(costComponentsDao, times(2)).getItem(any(), any());
+        verify(gpdClient, times(2)).setNotificationCost(any(), any(), any(), any());
+        verify(costUpdateResultDao, times(2)).insertOrUpdate(any());
     }
 
     @Test
@@ -155,7 +161,7 @@ class CostUpdateOrchestratorServiceTest {
         when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
                 .thenReturn(Mono.just(new CostUpdateResultEntity()));
 
-        // When: we should get an exception on UpdateOrchestratorService.handleCostUpdateForIuvs
+        // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
                     notificationStepCost,
@@ -170,6 +176,12 @@ class CostUpdateOrchestratorServiceTest {
             // Then
             Assertions.assertEquals("java.lang.RuntimeException", e.getClass().getName());
         }
+
+        // Verify called methods
+        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(0)).getItem(any(), any());
+        verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
+        verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
     }
 
     @Test
@@ -207,7 +219,7 @@ class CostUpdateOrchestratorServiceTest {
         when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
                 .thenReturn(Mono.just(new CostUpdateResultEntity()));
 
-        // When: we should get an exception on UpdateOrchestratorService.handleCostUpdateForIuvs
+        // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
                     notificationStepCost,
@@ -222,6 +234,66 @@ class CostUpdateOrchestratorServiceTest {
             // Then
             Assertions.assertEquals("java.lang.RuntimeException", e.getClass().getName());
         }
+
+        // Verify called methods
+        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
+        verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
+    }
+
+    @Test
+    void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_GpdFailure() {
+        // Given
+        PaymentForRecipientInt paymentForRecipient = new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode);
+        PaymentForRecipientInt[] paymentsForRecipients = {paymentForRecipient};
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+        CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER; // performs an update
+
+        // mock gpdClient
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.error(new RuntimeException()));
+
+        // mock costComponentsDao
+        CostComponentsEntity costComponentsEntity = new CostComponentsEntity(
+                costComponentEntityPk,
+                costComponentEntitySk,
+                baseCost,
+                notificationStepCost,
+                0,
+                0,
+                false
+        );
+        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
+
+        // mock costUpdateResultDao
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(new CostUpdateResultEntity()));
+
+        // When
+        try {
+            costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    notificationStepCost,
+                    iun,
+                    paymentsForRecipients,
+                    eventTimestamp,
+                    eventStorageTimestamp,
+                    updateCostPhase
+            ).collectList().block();
+            Assertions.fail("We should get an exception");
+        } catch (Exception e) {
+            // Then
+            Assertions.assertEquals("java.lang.RuntimeException", e.getClass().getName());
+        }
+
+        // Verify called methods
+        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
+        verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
     }
 
     private PaymentsModelResponse newPaymentModelResponse() {
