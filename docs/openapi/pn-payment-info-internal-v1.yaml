@@ -421,12 +421,8 @@ components:
       title: Update notification cost response
       type: object
       required:
-        - iun
         - updateResults
       properties:
-        iun:
-          description: Notification Unique identifier
-          type: string
         updateResults:
           type: array
           description: Update notification cost results
