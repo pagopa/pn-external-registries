@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries;
 
+import it.pagopa.pn.commons.configs.listeners.TaskIdApplicationListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PnExternalRegistriesApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PnExternalRegistriesApplication.class, args);
+        SpringApplication app = new SpringApplication(PnExternalRegistriesApplication.class);
+        app.addListeners(new TaskIdApplicationListener());
+        app.run(args);
     }
 
 

@@ -16,6 +16,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST;
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND;
 
@@ -36,25 +39,31 @@ class InfoPaymentControllerTest {
 
     @Test
     void getPaymentInfoSuccess() {
-        //Given
-        PaymentInfoDto dto = new PaymentInfoDto();
-        dto.setStatus( PaymentStatusDto.SUCCEEDED );
-        dto.setAmount( 20 );
-        dto.setUrl( "https://api.uat.platform.pagopa.it/checkout/auth/payments/v2" );
+        List<PaymentInfoV21Dto> paymentInfoList = new ArrayList<>();
+        PaymentInfoV21Dto PaymentInfoV21InnerDto = new PaymentInfoV21Dto();
+        PaymentInfoV21InnerDto.setStatus(PaymentStatusDto.SUCCEEDED);
+        PaymentInfoV21InnerDto.setAmount(20);
+        PaymentInfoV21InnerDto.setUrl("https://api.uat.platform.pagopa.it/checkout/auth/payments/v2");
+        paymentInfoList.add(PaymentInfoV21InnerDto);
 
-        String url = "/ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}"
-                .replace( "{paTaxId}", "77777777777" )
-                .replace( "{noticeNumber}", "302000100000019421" );
 
-        //When
-        Mockito.when( service.getPaymentInfo( Mockito.anyString(), Mockito.anyString() ) ).thenReturn( Mono.just( dto ) );
+        String url = "/ext-registry/pagopa/v2.1/paymentinfo";
 
-        //Then
-        webTestClient.get()
+
+        // Mock the service
+        Mockito.when(service.getPaymentInfo(Mockito.any()))
+                .thenReturn(Mono.just(paymentInfoList));
+
+
+        // Make the request and validate the response
+        webTestClient.post()
                 .uri(url)
+                .body(BodyInserters.fromValue(new PaymentInfoRequestDto()))
                 .exchange()
-                .expectStatus().isOk();
-
+                .expectStatus().isOk()
+                .expectBodyList(PaymentInfoV21Dto.class)
+                .hasSize(1)
+                .contains(PaymentInfoV21InnerDto);
     }
 
     @Test

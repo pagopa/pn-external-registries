@@ -1,3 +1,16 @@
+echo "### CREATE QUEUES ###"
+
+queues="local-delivery-push-to-ext-registries"
+
+for qn in  $( echo $queues | tr " " "\n" ) ; do
+    echo creating queue $qn ...
+
+    aws --profile default --region us-east-1 --endpoint-url http://localstack:4566 \
+        sqs create-queue \
+        --attributes '{"DelaySeconds":"2"}' \
+        --queue-name $qn
+done
+
 echo "### CREATE PS ###"
 
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
@@ -54,7 +67,7 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     --table-name OnboardInstitutions  \
     --attribute-definitions \
         AttributeName=id,AttributeType=S \
-        AttributeName=status,AttributeType=S \
+        AttributeName=onlyRootStatus,AttributeType=S \
         AttributeName=lastUpdate,AttributeType=S \
     --key-schema \
         AttributeName=id,KeyType=HASH \
@@ -63,8 +76,8 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     --global-secondary-indexes \
     "[
         {
-            \"IndexName\": \"status-lastUpdate-gsi\",
-            \"KeySchema\": [{\"AttributeName\":\"status\",\"KeyType\":\"HASH\"},
+            \"IndexName\": \"onlyRootStatus-lastUpdate-gsi\",
+            \"KeySchema\": [{\"AttributeName\":\"onlyRootStatus\",\"KeyType\":\"HASH\"},
                             {\"AttributeName\":\"lastUpdate\",\"KeyType\":\"RANGE\"}],
             \"Projection\":{
                 \"ProjectionType\":\"ALL\"
@@ -76,7 +89,30 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
         }
     ]"
 
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+    dynamodb create-table \
+    --table-name CostComponents  \
+    --attribute-definitions \
+        AttributeName=pk,AttributeType=S \
+        AttributeName=sk,AttributeType=S \
+    --key-schema \
+        AttributeName=pk,KeyType=HASH \
+        AttributeName=sk,KeyType=RANGE \
+    --provisioned-throughput \
+        ReadCapacityUnits=10,WriteCapacityUnits=5
 
+
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+    dynamodb create-table \
+    --table-name CostUpdateResult  \
+    --attribute-definitions \
+        AttributeName=pk,AttributeType=S \
+        AttributeName=sk,AttributeType=S \
+    --key-schema \
+        AttributeName=pk,KeyType=HASH \
+        AttributeName=sk,KeyType=RANGE \
+    --provisioned-throughput \
+        ReadCapacityUnits=10,WriteCapacityUnits=5
 
 
 echo "Initialization terminated"

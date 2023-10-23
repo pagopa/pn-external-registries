@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: lmoGYCRf6r3NC56QezJLP+f36/zs+9G51WZUoTExheg=
+  version: P6HiWiVIkbA4JUq8FyemOEE3IZTXXFHfQTWQhxN0sWQ=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -71,6 +71,7 @@ paths:
           integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -138,6 +139,7 @@ paths:
           integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -164,6 +166,8 @@ paths:
         all the groups of the current PG
       tags:
         - InfoPG
+      security:
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
       parameters:
         - name: statusFilter
           description: Se valorizzato indica di tornare solo i gruppi nello stato passato
@@ -190,8 +194,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-      security:
-        - pn-auth-fleet_jwtAuthorizer_openapi: []
       x-amazon-apigateway-integration:
         uri: >-
           http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/groups
@@ -205,6 +207,7 @@ paths:
           integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -221,8 +224,139 @@ paths:
         connectionType: VPC_LINK
         timeoutInMillis: 29000
         type: http_proxy
+  /pa/v1/institutions:
+    get:
+      operationId: getInstitutions
+      summary: Retrieve institutions of current user defined in Self Care
+      description: >
+        Retrieves all the onboarded institutions related to the provided user
+        and the product using selfcare API
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+      parameters: []
+    options:
+      operationId: Options for /pa/v1/institutions API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pa/v1/institutions/{id}/products:
+    get:
+      operationId: getInstitutionProducts
+      summary: Retrieve all active products for given institution and user
+      description: >
+        etrieve all active products for given institution and user using
+        SelfCare API
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
+      parameters:
+        - name: id
+          description: The identifier of one PA
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions/{id}/products
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.path.id: method.request.path.id
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pa/v1/institutions/{id}/products API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions/{id}/products
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.path.id: method.request.path.id
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
   /pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
     get:
+      deprecated: true
       operationId: getPaymentInfo
       summary: Retrieve payment information
       description: >-
@@ -279,6 +413,7 @@ paths:
           integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
           integration.request.path.paTaxId: method.request.path.paTaxId
           integration.request.path.noticeNumber: method.request.path.noticeNumber
         passthroughBehavior: when_no_match
@@ -295,6 +430,72 @@ paths:
         requestParameters:
           integration.request.path.paTaxId: method.request.path.paTaxId
           integration.request.path.noticeNumber: method.request.path.noticeNumber
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pagopa/v2.1/paymentinfo:
+    post:
+      operationId: getPaymentInfoV21
+      summary: Retrieve payment information given a list of payments identifiers
+      description: >-
+        Use to enable payment buttons in notification detail page and display
+        amount
+      tags:
+        - PaymentInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInfoRequests'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInfoResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security:
+        - pn-auth-fleet_jwtAuthorizer_openapi: []
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pagopa/v2.1/paymentinfo
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+      parameters: []
+    options:
+      operationId: Options for /pagopa/v2.1/paymentinfo API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pagopa/v2.1/paymentinfo
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -348,6 +549,7 @@ paths:
           integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -368,6 +570,154 @@ paths:
 components:
   parameters: {}
   schemas:
+    InstitutionResourceList:
+      title: InstitutionResourceList
+      description: Contains the list of institution defined in SelfCare PA
+      type: array
+      items:
+        $ref: '#/components/schemas/InstitutionResourcePN'
+    InstitutionResourcePN:
+      title: InstitutionResourcePN
+      type: object
+      properties:
+        address:
+          type: string
+          description: Institution's physical address
+        aooParentCode:
+          type: string
+          description: AOO unit parent institution Code
+        assistanceContacts:
+          $ref: '#/components/schemas/AssistanceContactsResourcePN'
+        companyInformations:
+          $ref: '#/components/schemas/CompanyInformationsResourcePN'
+        description:
+          type: string
+          description: Institution's legal name
+        digitalAddress:
+          type: string
+          description: Institution's digitalAddress
+        dpoData:
+          $ref: '#/components/schemas/DpoDataResourcePN'
+        externalId:
+          type: string
+          description: Institution's unique external identifier
+        id:
+          type: string
+          description: Institution's unique internal Id
+          format: uuid
+        institutionType:
+          enum:
+            - GSP
+            - PA
+            - PG
+            - PSP
+            - PT
+            - SCP
+          type: string
+          description: Institution's type
+        origin:
+          type: string
+          description: Institution data origin
+        originId:
+          type: string
+          description: Institution's details origin Id
+        rootParent:
+          $ref: '#/components/schemas/RootParentResourcePN'
+        pspData:
+          $ref: '#/components/schemas/PspDataResourcePN'
+        recipientCode:
+          type: string
+          description: Billing recipient code
+        status:
+          type: string
+          description: Institution onboarding status
+        subunitCode:
+          type: string
+          description: Institutions AOO/UO unit Code
+        subunitType:
+          type: string
+          description: Institutions AOO/UO unit type
+        taxCode:
+          type: string
+          description: Institution's taxCode
+        userProductRoles:
+          type: array
+          items:
+            type: string
+          description: Logged user's roles on product
+        zipCode:
+          type: string
+          description: Institution's zipCode
+    CompanyInformationsResourcePN:
+      title: CompanyInformationsResourcePN
+      type: object
+      properties:
+        businessRegisterPlace:
+          type: string
+          description: Institution's business register place
+        rea:
+          type: string
+          description: Institution's REA
+        shareCapital:
+          type: string
+          description: Institution's share capital value
+    DpoDataResourcePN:
+      title: DpoDataResourcePN
+      type: object
+      properties:
+        address:
+          type: string
+          description: DPO's address
+        email:
+          type: string
+          description: DPO's email
+          format: email
+          example: email@example.com
+        pec:
+          type: string
+          description: DPO's PEC
+          format: email
+          example: email@example.com
+    AssistanceContactsResourcePN:
+      title: AssistanceContactsResourcePN
+      type: object
+      properties:
+        supportEmail:
+          type: string
+          description: Institution's support email contact
+        supportPhone:
+          type: string
+          description: Institution's support phone contact
+    RootParentResourcePN:
+      title: RootParentResourcePN
+      type: object
+      properties:
+        description:
+          type: string
+          description: swagger.external_api.institutions.model.parentDescription
+        id:
+          type: string
+          description: Institution's unique internal Id
+    PspDataResourcePN:
+      title: PspDataResourcePN
+      type: object
+      properties:
+        abiCode:
+          type: string
+          description: PSP's ABI code
+        businessRegisterNumber:
+          type: string
+          description: PSP's Business Register number
+        legalRegisterName:
+          type: string
+          description: PSP's legal register name
+        legalRegisterNumber:
+          type: string
+          description: PSP's legal register number
+        vatNumberGroup:
+          type: boolean
+          description: PSP's Vat Number group
+          example: false
     PaNameFilter:
       title: Admitted character for PA denomination field
       type: string
@@ -518,6 +868,94 @@ components:
       minLength: 1
       maxLength: 50
       pattern: ^[ -~ ]*$
+    ProductResourceList:
+      title: ProductResourceList
+      description: Contains the list of products related institution and current user
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductResourcePN'
+    ProductResourcePN:
+      title: ProductResourcePN
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Date the products was activated/created
+          format: date-time
+        depictImageUrl:
+          type: string
+          description: Product's depiction image url
+        description:
+          type: string
+          description: Product's description
+        id:
+          type: string
+          description: Product's unique identifier
+        identityTokenAudience:
+          type: string
+          description: Product's identity token audience
+        logo:
+          type: string
+          description: Product's logo url
+        logoBgColor:
+          pattern: ^#0-9A-F6$
+          type: string
+          description: Product logo's background color
+        parentId:
+          type: string
+          description: Root parent of the sub product
+        roleManagementURL:
+          type: string
+          description: Url of the utilities management
+        roleMappings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ProductRoleInfoResPN'
+          description: Mappings between Party's and Product's role
+        title:
+          type: string
+          description: Product's title
+        urlBO:
+          type: string
+          description: >-
+            URL that redirects to the back-office section where is possible to
+            manage the product
+        urlPublic:
+          type: string
+          description: URL that redirects to the public information webpage of the product
+    ProductRoleInfoResPN:
+      title: ProductRoleInfoResPN
+      required:
+        - multiroleAllowed
+        - roles
+      type: object
+      properties:
+        multiroleAllowed:
+          type: boolean
+          description: Flag indicating if a User can have more than one product role
+          example: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRolePN'
+          description: Available product roles
+    ProductRolePN:
+      title: ProductRolePN
+      required:
+        - code
+        - description
+        - label
+      type: object
+      properties:
+        code:
+          type: string
+          description: Product role internal code
+        description:
+          type: string
+          description: Product role description
+        label:
+          type: string
+          description: Product role label
     ProblemError:
       properties:
         code:
@@ -584,6 +1022,72 @@ components:
       required:
         - status
         - errors
+    PaymentInfoRequests:
+      title: Requests for payment info
+      description: List of request payment info containing sender and payment id
+      type: array
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/PaymentInfoRequest'
+    PaymentInfoRequest:
+      title: Request for a payment info
+      description: Object containing sender and payment id
+      type: object
+      properties:
+        creditorTaxId:
+          $ref: '#/components/schemas/paTaxId'
+        noticeCode:
+          $ref: '#/components/schemas/noticeCode'
+      required:
+        - creditorTaxId
+        - noticeCode
+    PaymentInfoResponse:
+      title: Response for payment info requests
+      description: List of payment info
+      type: array
+      minItems: 1
+      items:
+        $ref: '#/components/schemas/PaymentInfoV21'
+    PaymentInfoV21:
+      title: Payment brief information
+      description: Payment minimal information
+      type: object
+      required:
+        - status
+        - creditorTaxId
+        - noticeCode
+      properties:
+        creditorTaxId:
+          $ref: '#/components/schemas/paTaxId'
+        noticeCode:
+          $ref: '#/components/schemas/noticeCode'
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        detail:
+          $ref: '#/components/schemas/Detail'
+        detail_v2:
+          $ref: '#/components/schemas/DetailV2'
+        errorCode:
+          description: error code to show at the user
+          type: string
+          example: PPT_AUTORIZZAZIONE
+        amount:
+          description: Amount for required payment in eurocents
+          example: 1200
+          type: number
+        url:
+          description: Checkout base url used for check payment info
+          example: https://api.uat.platform.pagopa.it/checkout/auth/payments/v2
+          type: string
+        causaleVersamento:
+          description: reason for payment
+          type: string
+          example: Seconda rata TARI
+        dueDate:
+          description: payment expiration date
+          type: string
+          example: '2025-07-31T00:00:00.000Z'
+          pattern: ([0-9]{4})-(1[0-2]|0[1-9])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])
     PaymentInfo:
       title: Payment brief information
       description: Payment minimal information

@@ -37,6 +37,10 @@ Parameters:
   CheckoutCartApiBaseUrl:
     Type: String
     Description: 'Checkout cart endpoint base url'
+  
+  GpdApiBaseUrl:
+    Type: String
+    Description: 'Gpd endpoint base url'
 
   IoOptInMinDays:
     Type: String
@@ -80,9 +84,20 @@ Parameters:
     Type: String
     Description: 'The name of the ECS cluster where the microservice is going to be deployed'
 
+  FargateEFSFileSystemID:
+    Type: String
+    Description: "EFS Filesystem"
+
   SubnetsIds:
     Type: String
     Description: 'subnets ids comma separated list. Where to deploy the microservice'
+
+  MountEfs:
+    Type: String
+    Default: false
+    AllowedValues:
+         - "true"
+         - "false"
 
   VpcId:
     Type: String
@@ -123,6 +138,27 @@ Parameters:
   OnboardInstitutionsTableArn:
     Type: String
     Description: 'ARN of dynamodb table containing OnboardInstitutionsTable information'
+
+  CostComponentsTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing CostComponents information'
+
+  CostComponentsTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing CostComponents information'
+
+  CostUpdateResultTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing CostUpdateResult information'
+
+  CostUpdateResultTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing CostUpdateResult information'
+
+  CostUpdateResultTableTtlDays:
+    Type: Number
+    Description: 'TTL in days for CostUpdateResult table'
+    Default: 365
 
   PortalUrl:
     Type: String
@@ -277,6 +313,48 @@ Parameters:
     Type: String
     Default: ''
 
+  AoouoSenderID:
+    Type: String
+    Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
+
+  # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueName:
+    Type: String
+    Description: Queue name
+
+  DeliveryPushToExternalRegistriesQueueARN:
+    Type: String
+    Description: Queue ARN
+
+  DeliveryPushToExternalRegistriesQueueAlarmARN:
+    Type: String
+    Description: Queue DLQ alarm
+
+  DeliveryPushToExternalRegistriesQueueAgeAlarmARN:
+    Type: String
+    Description: Queue max age alarm
+
+  PnCronAnalyzer:
+    Type: String
+    Default: '-'
+    Description: Cron for which you send the metric to CloudWatch
+
+  WireTapLogActivation:
+    Type: String
+    Default: false
+    Description: Activation of wire logs
+    AllowedValues:
+      - true
+      - false
+
+  EnhancedWebSecurityEnabled:
+    Type: String
+    Default: false
+    Description: Enable additional WAF Web rules
+    AllowedValues:
+      - true
+      - false
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -300,6 +378,9 @@ Resources:
         AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
         MinTasksNumber: !Ref MinTasksNumber
         MaxTasksNumber: !Ref MaxTasksNumber
+        EfsFilesystem: !Ref FargateEFSFileSystemID
+        MountEfs: !Ref MountEfs
+        WireTapLogActivation: !Ref WireTapLogActivation
         AutoscalingDataPointN: !Ref AutoscalingDataPointN
         AutoscalingDataPointM: !Ref AutoscalingDataPointM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
@@ -324,6 +405,14 @@ Resources:
         ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
         ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
         ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
+        ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_AOOUOSENDERID=${AoouoSenderID}'
+        ContainerEnvEntry22: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry23: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_COMPONENTS=${CostComponentsTableName}'
+        ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT=${CostUpdateResultTableName}'
+        ContainerEnvEntry26: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT_TTL_DAYS=${CostUpdateResultTableTtlDays}'
+        ContainerEnvEntry27: !Sub 'SPRING_CLOUD_FUNCTIONROUTER_QUEUES_LIST=${DeliveryPushToExternalRegistriesQueueName}'
+        ContainerEnvEntry28: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_BASE_URL=${GpdApiBaseUrl}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -332,6 +421,7 @@ Resources:
         ContainerSecret6: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_TOKEN=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:OneTrustToken:AWSCURRENT:'
         ContainerSecret7: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCarePgApiKey:AWSCURRENT:'
         ContainerSecret8: !Sub 'ASSERTION_REST_SUBSCRIPTION_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:AssertionRestSubscriptionKey:AWSCURRENT:'
+        ContainerSecret9: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:GpdApiKey:AWSCURRENT:'
         MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
@@ -369,6 +459,10 @@ Resources:
               - !Ref IOMessagesTableArn
               - !Sub "${OnboardInstitutionsTableArn}"
               - !Sub "${OnboardInstitutionsTableArn}/*"
+              - !Sub "${CostComponentsTableArn}"
+              - !Sub "${CostComponentsTableArn}/*"
+              - !Sub "${CostUpdateResultTableArn}"
+              - !Sub "${CostUpdateResultTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -388,6 +482,11 @@ Resources:
               - ssm:GetParameters
             Resource:
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPrivacyNotice'
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            Resource:
+              - "*"
 
   ###      KEY PAIR PER CREARE JWT NECESSARIO PER ACCEDERE AI SERVIZI M2M DI PDND    ###
   ###   La chiave viene impiegata per firmare il client assertion che serve          ###
@@ -474,6 +573,7 @@ Resources:
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
         Limit: 600000
+        EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -542,6 +642,8 @@ Resources:
           - ',' 
           - - !Ref IOMessagesTableName
             - !Ref OnboardInstitutionsTableName
+            - !Ref CostComponentsTableName
+            - !Ref CostUpdateResultTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
@@ -553,6 +655,9 @@ Resources:
         LambdaArns: !Join
           - ','
           - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
+        QueueArns: !Join
+          - ','
+          - - !Ref DeliveryPushToExternalRegistriesQueueARN
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
@@ -560,6 +665,8 @@ Resources:
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+            - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
+            - !Ref DeliveryPushToExternalRegistriesQueueAgeAlarmARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-external-registries'
@@ -658,6 +765,42 @@ Resources:
   
                 //logging the incoming message body (view in cloudwatch):
                 console.log("Incoming message body from SQS :", body);
+          
+                if(body.id === body.rootId){//put will automatically update the element if exists
+                  delete body.rootDescription;
+                  delete body.rootIpaCode;
+                  body.onlyRootStatus = body.status;
+                }else{
+                  delete body.onlyRootStatus;
+                  const params = {
+                    TableName: TABLE_NAME,
+                    Key: {
+                      id: body.rootId
+                    }
+                  }
+                  let result = await dynamoDB.get(params).promise();
+                  if(!result.Item){
+                    //insert root institutions
+                    let rootInstitutions = {
+                      id: body.rootId,
+                      rootId: body.rootId,
+                      created: body.created,
+                      description: body.rootDescription,
+                      ipaCode: body.rootIpaCode,
+                      lastUpdate: body.lastUpdate,
+                      status: body.status,
+                      onlyRootStatus: body.status,
+                      taxCode: body.taxCode,
+                    }
+                    const params = {
+                        TableName: TABLE_NAME,
+                        Item: rootInstitutions
+                    };
+                    await dynamoDB.put(params).promise();
+                }
+                delete body.rootDescription;
+                delete body.rootIpaCode;
+              }
   
                 //configure params for writing data to dynamo DB:
                 const params = {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
-import it.pagopa.pn.external.registries.exceptions.PnCheckoutServerErrorException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
@@ -20,22 +19,21 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 
-import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST;
-import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class InfoPaymentServiceTest {
-
-    Duration d = Duration.ofMillis(3000);
 
     private final String CHECKOUT_SITE_URL = "https://uat.checkout.pagopa.it";
 
@@ -59,24 +57,28 @@ class InfoPaymentServiceTest {
         responseBody.setCategory( "PAYMENT_DUPLICATED" );
         responseBody.detailV2( "PPT_PAGAMENTO_IN_CORSO" );
 
-        byte[] responseBodyBites = new byte[0];
+        byte[] responseBodyBytes = new byte[0];
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.writerFor( ValidationFaultPaymentProblemJsonDto.class );
         try {
-            responseBodyBites = mapper.writeValueAsBytes( responseBody );
+            responseBodyBytes = mapper.writeValueAsBytes( responseBody );
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-        WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBites , StandardCharsets.UTF_8  );
+        WebClientResponseException ex = WebClientResponseException.Conflict.create( 409, "CONFLICT", null, responseBodyBytes , StandardCharsets.UTF_8  );
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
 
-        PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("asdasda");
+        requestInnerDto.setNoticeCode("asdasda");
+
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo(Flux.just(requestInnerDto)).block(Duration.ofMillis( 3000 ));
 
         assertNotNull( result );
-        assertEquals( PaymentStatusDto.SUCCEEDED , result.getStatus() );
+        assertEquals( PaymentStatusDto.SUCCEEDED , result.get(0).getStatus() );
     }
 
     @Test
@@ -100,10 +102,14 @@ class InfoPaymentServiceTest {
 
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
 
-        PaymentInfoDto result = service.getPaymentInfo( "asdasda", "asdasda" ).block(Duration.ofMillis( 3000 ));
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("asdasda");
+        requestInnerDto.setNoticeCode("asdasda");
+
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block(Duration.ofMillis( 3000 ));
 
         assertNotNull( result );
-        assertEquals( PaymentStatusDto.IN_PROGRESS, result.getStatus() );
+        assertEquals( PaymentStatusDto.IN_PROGRESS, result.get(0).getStatus() );
     }
 
     @Test
@@ -116,12 +122,16 @@ class InfoPaymentServiceTest {
         //When
         Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( checkoutResponse );
         Mockito.when( config.getCheckoutSiteUrl() ).thenReturn(CHECKOUT_SITE_URL);
-        PaymentInfoDto result = service.getPaymentInfo( "fake_payment_id", "fakeNoticeNumber" ).block();
+
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("fake_payment_id");
+        requestInnerDto.setNoticeCode("fakeNoticeNumber");
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
 
         //Then
         assertNotNull( result );
-        assertEquals( PaymentStatusDto.REQUIRED , result.getStatus() );
-        assertEquals(CHECKOUT_SITE_URL, result.getUrl() );
+        assertEquals( PaymentStatusDto.REQUIRED , result.get(0).getStatus() );
+        assertEquals(CHECKOUT_SITE_URL, result.get(0).getUrl() );
     }
 
     @ParameterizedTest
@@ -144,13 +154,16 @@ class InfoPaymentServiceTest {
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
 
-        Mono<PaymentInfoDto> mono = service.getPaymentInfo("asdasda", "asdasda");
-        PnCheckoutServerErrorException thrown = assertThrows(
-                PnCheckoutServerErrorException.class,
-                () -> mono.block(d),
-                ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST
-        );
-        assertTrue(thrown.getMessage().contains("Checkout server error"));
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("asdasda");
+        requestInnerDto.setNoticeCode("asdasda");
+
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+
+        //Then
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.FAILURE, result.get(0).getStatus() );
+        assertEquals( DetailDto.GENERIC_ERROR, result.get(0).getDetail());
     }
 
     @ParameterizedTest
@@ -173,13 +186,44 @@ class InfoPaymentServiceTest {
 
         Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
 
-        Mono<PaymentInfoDto> mono = service.getPaymentInfo("asdasda", "asdasda");
-        PnCheckoutBadRequestException thrown = assertThrows(
-                PnCheckoutBadRequestException.class,
-                () -> mono.block(d),
-                ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND
-        );
-        assertTrue(thrown.getMessage().contains("Checkout bad request"));
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("asdasda");
+        requestInnerDto.setNoticeCode("asdasda");
+
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+
+        //Then
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.FAILURE, result.get(0).getStatus() );
+        assertEquals( DetailDto.GENERIC_ERROR, result.get(0).getDetail());
+    }
+    @Test
+    void getInfoPaymentKo_JsonProcessingException() {
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor(String.class);
+        try {
+            responseBodyBites = mapper.writeValueAsBytes("test");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        WebClientResponseException ex = WebClientResponseException.Conflict.create(HttpStatus.INTERNAL_SERVER_ERROR.value(), "KO", null, responseBodyBites, StandardCharsets.UTF_8);
+
+        Mockito.when(checkoutClient.getPaymentInfo(Mockito.anyString())).thenReturn(Mono.error(ex));
+
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("asdasda");
+        requestInnerDto.setNoticeCode("asdasda");
+
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block();
+
+        //Then
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.FAILURE, result.get(0).getStatus() );
+        assertEquals( DetailDto.GENERIC_ERROR, result.get(0).getDetail());
     }
 
     @Test

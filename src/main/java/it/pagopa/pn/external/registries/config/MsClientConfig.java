@@ -4,6 +4,8 @@ import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.InstitutionsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserGroupApi;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.AccessLevel;
@@ -64,6 +66,13 @@ public class MsClientConfig {
             return new UserGroupApi(apiClient);
         }
 
+        @Bean
+        InstitutionsApi institutionsApi() {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
+            apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
+            return new InstitutionsApi(apiClient);
+        }
+
     }
 
     @Configuration
@@ -94,6 +103,17 @@ public class MsClientConfig {
             var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.ApiClient( initWebClient( it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.ApiClient.buildWebClientBuilder() ) );
             apiClient.setBasePath( config.getDeliveryPushBaseUrl() );
             return new TimelineAndStatusApi( apiClient );
+        }
+    }
+
+    @Configuration
+    static class GpdApis extends OcpBaseClient {
+        @Bean
+        PaymentsApiApi paymentsApiApiClient(PnExternalRegistriesConfig config) {
+            it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient apiClient = new
+                    it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey()).build());
+            apiClient.setBasePath( config.getGpdApiBaseUrl() );
+            return new PaymentsApiApi( apiClient );
         }
     }
 
