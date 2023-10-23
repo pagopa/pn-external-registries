@@ -20,6 +20,7 @@
     "EnhancedWebSecurityEnabled": "true",
     "AoouoSenderID": "DUMMY",
     "CostUpdateResultTableTtlDays": "365",
-    "MountEfs": "false"
+    "MountEfs": "false",
+    "GpdApiBaseUrl": "https://api.uat.platform.pagopa.it/pn-integration/gpd/api/v1"
   }
 }
