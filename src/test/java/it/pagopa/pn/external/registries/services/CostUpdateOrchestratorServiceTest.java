@@ -66,6 +66,64 @@ class CostUpdateOrchestratorServiceTest {
     }
 
     @Test
+    void handleCostUpdateForIuvs_VALIDATION_Success() {
+        // Given
+        PaymentForRecipientInt paymentForRecipient = new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode);
+        PaymentForRecipientInt[] paymentsForRecipients = {paymentForRecipient};
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+        CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.VALIDATION; // performs an insert
+
+        // mock gpdClient
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        // mock costComponentsDao
+        CostComponentsEntity costComponentsEntity = new CostComponentsEntity(
+                costComponentEntityPk,
+                costComponentEntitySk,
+                baseCost,
+                notificationStepCost,
+                0,
+                0,
+                false
+        );
+        when(costComponentsDao.insertOrUpdate(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
+
+        // mock costUpdateResultDao
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(new CostUpdateResultEntity()));
+
+        // When
+        List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                notificationStepCost,
+                iun,
+                paymentsForRecipients,
+                eventTimestamp,
+                eventStorageTimestamp,
+                updateCostPhase
+        ).collectList().block();
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+
+        Assertions.assertEquals(0, result.get(0).getRecIndex());
+        Assertions.assertEquals(creditorTaxId, result.get(0).getCreditorTaxId());
+        Assertions.assertEquals(noticeCode, result.get(0).getNoticeCode());
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
+
+        // Verify called methods
+        verify(costComponentsDao, times(1)).insertOrUpdate(any());
+        verify(costComponentsDao, times(0)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
+        verify(costUpdateResultDao, times(1)).insertOrUpdate(any());
+    }
+
+    @Test
     void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_Success() {
         // Given
         PaymentForRecipientInt paymentForRecipient = new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode);
@@ -121,6 +179,7 @@ class CostUpdateOrchestratorServiceTest {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(1).getResult());
 
         // Verify called methods
+        verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(2)).updateNotNull(any());
         verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(2)).setNotificationCost(any(), any(), any(), any());
@@ -178,6 +237,7 @@ class CostUpdateOrchestratorServiceTest {
         }
 
         // Verify called methods
+        verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
         verify(costComponentsDao, times(0)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
@@ -236,6 +296,7 @@ class CostUpdateOrchestratorServiceTest {
         }
 
         // Verify called methods
+        verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
         verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
@@ -290,6 +351,7 @@ class CostUpdateOrchestratorServiceTest {
         }
 
         // Verify called methods
+        verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
         verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
