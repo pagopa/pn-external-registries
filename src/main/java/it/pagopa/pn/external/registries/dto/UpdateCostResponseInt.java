@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UpdateCostResponseInt {
     private int recIndex;
     private String creditorTaxId;
