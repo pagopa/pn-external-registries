@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-class UpdateCostServiceTestIT {
+class UpdateCostServiceTest {
 
     private UpdateCostService updateCostService;
 

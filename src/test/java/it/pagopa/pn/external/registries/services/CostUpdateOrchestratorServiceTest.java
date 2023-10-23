@@ -24,7 +24,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-class CostUpdateOrchestratorServiceTestIT {
+class CostUpdateOrchestratorServiceTest {
     private CostUpdateOrchestratorService costUpdateOrchestratorService;
 
     @Mock
@@ -65,7 +65,6 @@ class CostUpdateOrchestratorServiceTestIT {
         this.costUpdateOrchestratorService = new CostUpdateOrchestratorService(costComponentService, updateCostService);
     }
 
-    // test handleCostUpdateForIuvs
     @Test
     void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_Success() {
         // Given
@@ -120,6 +119,109 @@ class CostUpdateOrchestratorServiceTestIT {
         Assertions.assertEquals(creditorTaxId, result.get(1).getCreditorTaxId());
         Assertions.assertEquals(noticeCode, result.get(1).getNoticeCode());
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(1).getResult());
+    }
+
+    @Test
+    void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_InsertFailure() {
+        // it must be like the test before, but have an exception on insertStep operation
+
+        // Given
+        PaymentForRecipientInt paymentForRecipient = new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode);
+        PaymentForRecipientInt[] paymentsForRecipients = {paymentForRecipient};
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+        CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER; // performs an update
+
+        // mock gpdClient (we shouldn't call it)
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        // mock costComponentsDao
+        CostComponentsEntity costComponentsEntity = new CostComponentsEntity(
+                costComponentEntityPk,
+                costComponentEntitySk,
+                baseCost,
+                notificationStepCost,
+                0,
+                0,
+                false
+        );
+        // we want to throw an exception on insertStepCost
+        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.error(new RuntimeException()));
+        when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
+
+        // mock costUpdateResultDao (we should not call it)
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(new CostUpdateResultEntity()));
+
+        // When: we should get an exception on UpdateOrchestratorService.handleCostUpdateForIuvs
+        try {
+            costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    notificationStepCost,
+                    iun,
+                    paymentsForRecipients,
+                    eventTimestamp,
+                    eventStorageTimestamp,
+                    updateCostPhase
+            ).collectList().block();
+            Assertions.fail("We should get an exception");
+        } catch (Exception e) {
+            // Then
+            Assertions.assertEquals("java.lang.RuntimeException", e.getClass().getName());
+        }
+    }
+
+    @Test
+    void handleCostUpdateForIuvs_SEND_SIMPLE_REGISTERED_LETTER_GetFailure() {
+        // it must be like the test before, but have an exception on insertStep operation
+
+        // Given
+        PaymentForRecipientInt paymentForRecipient = new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode);
+        PaymentForRecipientInt[] paymentsForRecipients = {paymentForRecipient};
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+        CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER; // performs an update
+
+        // mock gpdClient (we shouldn't call it)
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        // mock costComponentsDao
+        CostComponentsEntity costComponentsEntity = new CostComponentsEntity(
+                costComponentEntityPk,
+                costComponentEntitySk,
+                baseCost,
+                notificationStepCost,
+                0,
+                0,
+                false
+        );
+
+        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        // we want to throw an exception on getTotalCost
+        when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.error(new RuntimeException()));
+
+        // mock costUpdateResultDao (we should not call it)
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(new CostUpdateResultEntity()));
+
+        // When: we should get an exception on UpdateOrchestratorService.handleCostUpdateForIuvs
+        try {
+            costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    notificationStepCost,
+                    iun,
+                    paymentsForRecipients,
+                    eventTimestamp,
+                    eventStorageTimestamp,
+                    updateCostPhase
+            ).collectList().block();
+            Assertions.fail("We should get an exception");
+        } catch (Exception e) {
+            // Then
+            Assertions.assertEquals("java.lang.RuntimeException", e.getClass().getName());
+        }
     }
 
     private PaymentsModelResponse newPaymentModelResponse() {
