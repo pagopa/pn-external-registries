@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -63,6 +64,63 @@ class CostUpdateOrchestratorServiceTest {
         this.costUpdateResultService = new CostUpdateResultService(costUpdateResultDao, communicationResultGroupMapper);
         this.updateCostService = new UpdateCostService(gpdClient, costUpdateResultService);
         this.costUpdateOrchestratorService = new CostUpdateOrchestratorService(costComponentService, updateCostService);
+    }
+
+    @Test
+    void handleCostUpdateForIun_SEND_SIMPLE_REGISTERED_LETTER_Success() {
+        // Given
+        int recIndex = 0;
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+        CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER;
+
+        // mock gpdClient
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        // mock costComponentsDao
+        CostComponentsEntity costComponentsEntity = new CostComponentsEntity(
+                costComponentEntityPk,
+                costComponentEntitySk,
+                baseCost,
+                notificationStepCost,
+                0,
+                0,
+                false
+        );
+        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.getItems(any()))
+                .thenReturn(Flux.just(costComponentsEntity));
+
+        // mock costUpdateResultDao
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(new CostUpdateResultEntity()));
+
+        // When
+        List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                notificationStepCost,
+                iun,
+                recIndex,
+                eventTimestamp,
+                eventStorageTimestamp,
+                updateCostPhase
+        ).collectList().block();
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+
+        Assertions.assertEquals(recIndex, result.get(0).getRecIndex());
+        Assertions.assertEquals(creditorTaxId, result.get(0).getCreditorTaxId());
+        Assertions.assertEquals(noticeCode, result.get(0).getNoticeCode());
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
+
+        // Verify called methods
+        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
     }
 
     @Test
