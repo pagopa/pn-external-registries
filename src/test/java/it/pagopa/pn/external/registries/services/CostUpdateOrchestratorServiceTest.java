@@ -36,11 +36,6 @@ class CostUpdateOrchestratorServiceTest {
     @Mock
     private GpdClient gpdClient;
 
-    private UpdateCostService updateCostService;
-    private CostComponentService costComponentService;
-
-    private CostUpdateResultService costUpdateResultService;
-
     private final CostComponentsMapper costComponentsMapper = new CostComponentsMapper();
 
     private final CommunicationResultGroupMapper communicationResultGroupMapper = new CommunicationResultGroupMapper();
@@ -60,9 +55,9 @@ class CostUpdateOrchestratorServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        this.costComponentService = new CostComponentService(costComponentsDao, costComponentsMapper);
-        this.costUpdateResultService = new CostUpdateResultService(costUpdateResultDao, communicationResultGroupMapper);
-        this.updateCostService = new UpdateCostService(gpdClient, costUpdateResultService);
+        CostComponentService costComponentService = new CostComponentService(costComponentsDao, costComponentsMapper);
+        CostUpdateResultService costUpdateResultService = new CostUpdateResultService(costUpdateResultDao, communicationResultGroupMapper);
+        UpdateCostService updateCostService = new UpdateCostService(gpdClient, costUpdateResultService);
         this.costUpdateOrchestratorService = new CostUpdateOrchestratorService(costComponentService, updateCostService);
     }
 
@@ -118,9 +113,65 @@ class CostUpdateOrchestratorServiceTest {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // Verify called methods
+        verify(costComponentsDao, times(1)).getItems(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
         verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
+    }
+
+    @Test
+    void handleCostUpdateForIun_SEND_SIMPLE_REGISTERED_LETTER_GetItemsFailure() {
+        // Given
+        int recIndex = 0;
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+        CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER;
+
+        // mock gpdClient
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        // mock costComponentsDao
+        CostComponentsEntity costComponentsEntity = new CostComponentsEntity(
+                costComponentEntityPk,
+                costComponentEntitySk,
+                baseCost,
+                notificationStepCost,
+                0,
+                0,
+                false
+        );
+        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.getItems(any()))
+                .thenReturn(Flux.error(new RuntimeException()));
+
+        // mock costUpdateResultDao
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(new CostUpdateResultEntity()));
+
+        // When
+        try {
+            costUpdateOrchestratorService.handleCostUpdateForIun(
+                    notificationStepCost,
+                    iun,
+                    recIndex,
+                    eventTimestamp,
+                    eventStorageTimestamp,
+                    updateCostPhase
+            ).collectList().block();
+            Assertions.fail("We should get an exception");
+        } catch (Exception e) {
+            // Then
+            Assertions.assertEquals("java.lang.RuntimeException", e.getClass().getName());
+        }
+
+        // Verify called methods
+        verify(costComponentsDao, times(1)).getItems(any());
+        verify(costComponentsDao, times(0)).updateNotNull(any());
+        verify(costComponentsDao, times(0)).getItem(any(), any());
+        verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
     }
 
     @Test
@@ -371,8 +422,6 @@ class CostUpdateOrchestratorServiceTest {
         CostUpdateCostPhaseInt updateCostPhase = CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER; // performs an update
 
         // mock gpdClient
-        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
-        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.error(new RuntimeException()));
 
         // mock costComponentsDao
