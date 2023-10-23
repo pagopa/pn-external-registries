@@ -1,11 +1,11 @@
 package it.pagopa.pn.external.registries.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @Data
 @EqualsAndHashCode
+@NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class UpdateCostResponseInt {
     private int recIndex;
