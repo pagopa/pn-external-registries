@@ -38,10 +38,33 @@ public class CostUpdateOrchestratorService {
     public Flux<UpdateCostResponseInt> handleCostUpdateForIun(int notificationStepCost, String iun, int recIndex,
                                                               Instant eventTimestamp, Instant eventStorageTimestamp,
                                                               CostUpdateCostPhaseInt updateCostPhase) {
-        // Method implementation
-        // ...
+        if (iun == null || iun.trim().isEmpty()) {
+            log.warn("IUN is null or empty. No cost update will be performed.");
+            return Flux.empty();
+        }
 
-        return Flux.empty();
+        log.info("Handling cost update for IUN: {}, recIndex: {}, notificationStepCost: {}, updateCostPhase: {}",
+                iun, recIndex, notificationStepCost, updateCostPhase);
+
+        // Retrieve IUVs using the provided iun and recIndex
+        return costComponentService.getIuvsForIunAndRecIndex(iun, recIndex)
+                .collectList() // collect the list of IUVs because I need to pass them all to handleCostUpdateForIuvs, accepting an array
+                .flatMapMany(iuvs -> {
+                    if (iuvs.isEmpty()) {
+                        log.warn("No IUVs found for IUN: {} and recIndex: {}. No cost update will be performed.", iun, recIndex);
+                        return Flux.empty();
+                    }
+
+                    PaymentForRecipientInt[] paymentsForRecipients = iuvs.stream()
+                            .map(iuv -> new PaymentForRecipientInt(recIndex, iuv.getCreditorTaxId(), iuv.getNoticeCode()))
+                            .toArray(PaymentForRecipientInt[]::new);
+
+                    // the actual update
+                    return handleCostUpdateForIuvs(notificationStepCost, iun, paymentsForRecipients,
+                            eventTimestamp, eventStorageTimestamp, updateCostPhase);
+                })
+                .doOnError(e -> log.error("An error occurred while processing IUVs for IUN: {} and recIndex: {}. Error: {}",
+                            iun, recIndex, e.getMessage()));
     }
 
     /**
@@ -60,9 +83,33 @@ public class CostUpdateOrchestratorService {
                                               PaymentForRecipientInt[] paymentsForRecipients,
                                               Instant eventTimestamp, Instant eventStorageTimestamp,
                                                                CostUpdateCostPhaseInt updateCostPhase) {
-        // Method implementation
-        // ...
 
-        return Flux.empty();
+        if (paymentsForRecipients == null || paymentsForRecipients.length == 0) {
+            log.warn("PaymentsForRecipients is null or empty. No cost update will be performed.");
+            return Flux.empty();
+        }
+
+        log.info("Updating the cost on GPD: iun: {}, notificationStepCost: {}, updateCostPhase: {}",
+                iun, notificationStepCost, updateCostPhase);
+
+        // the starting array
+        return Flux.fromArray(paymentsForRecipients)
+                .flatMap(paymentForRecipient ->
+                        costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
+                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
+                                .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
+                                            paymentForRecipient.getRecIndex(), e.getMessage()))
+                                .flatMap(costComponent ->
+                                        costComponentService.getTotalCost(iun, paymentForRecipient.getRecIndex(),
+                                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
+                                                .doOnError(e -> log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
+                                                            paymentForRecipient.getRecIndex(), e.getMessage()))
+                                )
+                                .flatMap(totalCost ->
+                                        updateCostService.updateCost(paymentForRecipient.getRecIndex(),
+                                                paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(),
+                                                totalCost, updateCostPhase, eventTimestamp, eventStorageTimestamp)
+                                )
+                );
     }
 }

@@ -9,6 +9,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 @DynamoDbBean
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 public class CostComponentsEntity {
     public static final String COL_PK = "pk";

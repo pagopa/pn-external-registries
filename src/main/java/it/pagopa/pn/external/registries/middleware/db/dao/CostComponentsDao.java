@@ -43,7 +43,7 @@ public class CostComponentsDao extends BaseDao {
     /**
      * getItem by pk and sk
      */
-    public Mono<CostComponentsEntity> getItem(String pk, String sk){
+    public Mono<CostComponentsEntity> getItem(String pk, String sk) {
         return Mono.fromFuture(costComponentsTable.getItem(getKeyBuild(pk, sk)));
     }
 
