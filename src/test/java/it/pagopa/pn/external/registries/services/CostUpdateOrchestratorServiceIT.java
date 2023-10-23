@@ -10,7 +10,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.Pa
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostUpdateResultDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
-import it.pagopa.pn.external.registries.middleware.db.entities.CostUpdateResultEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CommunicationResultGroupMapper;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CostComponentsMapper;
@@ -40,7 +39,7 @@ class CostUpdateOrchestratorServiceIT {
     @Autowired
     private CostComponentsDao costComponentsDao;
 
-    @Mock
+    @Autowired
     private CostUpdateResultDao costUpdateResultDao;
 
     @Mock
@@ -58,7 +57,7 @@ class CostUpdateOrchestratorServiceIT {
     @Autowired
     PnExternalRegistriesConfig pnExternalRegistriesConfig;
 
-    TestDao<CostComponentsEntity> testDao;
+    TestDao<CostComponentsEntity> costComponentsEntityTestDao;
 
     private final String iun = "iun";
     private final int recIndex = 0;
@@ -78,7 +77,7 @@ class CostUpdateOrchestratorServiceIT {
         UpdateCostService updateCostService = new UpdateCostService(gpdClient, costUpdateResultService);
         costUpdateOrchestratorService = new CostUpdateOrchestratorService(costComponentService, updateCostService);
 
-        testDao = new TestDao<>(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameCostComponents(), CostComponentsEntity.class);
+        costComponentsEntityTestDao = new TestDao<>(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameCostComponents(), CostComponentsEntity.class);
     }
 
     @Test
@@ -92,16 +91,13 @@ class CostUpdateOrchestratorServiceIT {
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
 
-        // mock costUpdateResultDao
-        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
-                .thenReturn(Mono.just(new CostUpdateResultEntity()));
-
         try {
-            testDao.delete(costComponentEntityPk, costComponentEntitySk);
+            costComponentsEntityTestDao.delete(costComponentEntityPk, costComponentEntitySk);
         }
         catch (Exception e) {
-            System.out.println("Nothing to remove");
+            System.out.println("Nothing to remove for costComponentsEntityTestDao");
         }
+        // no remove for costUpdateEntityTestDao, random UUID
 
         // VALIDATION - first insert
 
@@ -145,11 +141,12 @@ class CostUpdateOrchestratorServiceIT {
 
         // Clean-up
         try {
-            testDao.delete(costComponentEntityPk, costComponentEntitySk);
+            costComponentsEntityTestDao.delete(costComponentEntityPk, costComponentEntitySk);
         }
         catch (Exception e) {
-            System.out.println("Nothing to remove");
+            System.out.println("Nothing to remove for costComponentsEntityTestDao");
         }
+        // no remove for costUpdateEntityTestDao, random UUID
     }
 
     @Test
@@ -163,16 +160,13 @@ class CostUpdateOrchestratorServiceIT {
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
 
-        // mock costUpdateResultDao
-        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
-                .thenReturn(Mono.just(new CostUpdateResultEntity()));
-
         try {
-            testDao.delete(costComponentEntityPk, costComponentEntitySk);
+            costComponentsEntityTestDao.delete(costComponentEntityPk, costComponentEntitySk);
         }
         catch (Exception e) {
-            System.out.println("Nothing to remove");
+            System.out.println("Nothing to remove for costComponentsEntityTestDao");
         }
+        // no remove for costUpdateEntityTestDao, random UUID
 
         // VALIDATION - first insert
 
@@ -216,11 +210,12 @@ class CostUpdateOrchestratorServiceIT {
 
         // Clean-up
         try {
-            testDao.delete(costComponentEntityPk, costComponentEntitySk);
+            costComponentsEntityTestDao.delete(costComponentEntityPk, costComponentEntitySk);
         }
         catch (Exception e) {
-            System.out.println("Nothing to remove");
+            System.out.println("Nothing to remove for costComponentsEntityTestDao");
         }
+        // no remove for costUpdateEntityTestDao, random UUID
     }
 
     private PaymentsModelResponse newPaymentModelResponse() {
