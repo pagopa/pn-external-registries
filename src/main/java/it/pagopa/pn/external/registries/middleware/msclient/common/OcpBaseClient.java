@@ -14,11 +14,4 @@ public abstract class OcpBaseClient extends CommonBaseClient {
         return super.enrichBuilder(builder)
                 .defaultHeader(HEADER_API_KEY, apiKey);
     }
-
-    protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey, String requestId){
-
-        return super.enrichBuilder(builder)
-                .defaultHeader(HEADER_API_KEY, apiKey)
-                .defaultHeader(HEADER_REQUEST_ID, requestId);
-    }
 }
