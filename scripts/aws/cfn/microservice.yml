@@ -317,6 +317,16 @@ Parameters:
     Type: String
     Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
 
+  B2bWafLimit:
+    Default: 600000
+    Type: Number
+    Description: b2b waf limit
+
+  WebWafLimit:
+    Default: 600000
+    Type: Number
+    Description: web waf limit
+
   # Delivery Push to External Registries Queue
   DeliveryPushToExternalRegistriesQueueName:
     Type: String
@@ -572,7 +582,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-web'
         IntendedUsage: WEB
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
-        Limit: 600000
+        Limit: !Ref WebWafLimit
         EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
@@ -601,7 +611,7 @@ Resources:
         WAFName: !Sub '${ProjectName}-external-registries-b2b'
         IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
-        Limit: 600000
+        Limit: !Ref B2bWafLimit
 
   # Expose PN-Delivery microservice public API with API-GW for IO Backend usage
   ExternalRegistryMicroservicePublicIoAPI:
