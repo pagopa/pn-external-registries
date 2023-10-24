@@ -37,6 +37,10 @@ Parameters:
   CheckoutCartApiBaseUrl:
     Type: String
     Description: 'Checkout cart endpoint base url'
+  
+  GpdApiBaseUrl:
+    Type: String
+    Description: 'Gpd endpoint base url'
 
   IoOptInMinDays:
     Type: String
@@ -134,6 +138,27 @@ Parameters:
   OnboardInstitutionsTableArn:
     Type: String
     Description: 'ARN of dynamodb table containing OnboardInstitutionsTable information'
+
+  CostComponentsTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing CostComponents information'
+
+  CostComponentsTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing CostComponents information'
+
+  CostUpdateResultTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing CostUpdateResult information'
+
+  CostUpdateResultTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing CostUpdateResult information'
+
+  CostUpdateResultTableTtlDays:
+    Type: Number
+    Description: 'TTL in days for CostUpdateResult table'
+    Default: 365
 
   PortalUrl:
     Type: String
@@ -293,6 +318,10 @@ Parameters:
     Description: 'Parametro per elenco di Id AOO/UO con domicili/recapiti pre rilascio'
 
   # Delivery Push to External Registries Queue
+  DeliveryPushToExternalRegistriesQueueName:
+    Type: String
+    Description: Queue name
+
   DeliveryPushToExternalRegistriesQueueARN:
     Type: String
     Description: Queue ARN
@@ -379,6 +408,11 @@ Resources:
         ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_AOOUOSENDERID=${AoouoSenderID}'
         ContainerEnvEntry22: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
         ContainerEnvEntry23: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_COMPONENTS=${CostComponentsTableName}'
+        ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT=${CostUpdateResultTableName}'
+        ContainerEnvEntry26: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT_TTL_DAYS=${CostUpdateResultTableTtlDays}'
+        ContainerEnvEntry27: !Sub 'SPRING_CLOUD_FUNCTIONROUTER_QUEUES_LIST=${DeliveryPushToExternalRegistriesQueueName}'
+        ContainerEnvEntry28: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_BASE_URL=${GpdApiBaseUrl}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -387,6 +421,7 @@ Resources:
         ContainerSecret6: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_TOKEN=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:OneTrustToken:AWSCURRENT:'
         ContainerSecret7: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCarePgApiKey:AWSCURRENT:'
         ContainerSecret8: !Sub 'ASSERTION_REST_SUBSCRIPTION_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:AssertionRestSubscriptionKey:AWSCURRENT:'
+        ContainerSecret9: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:GpdApiKey:AWSCURRENT:'
         MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
         MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
@@ -424,6 +459,10 @@ Resources:
               - !Ref IOMessagesTableArn
               - !Sub "${OnboardInstitutionsTableArn}"
               - !Sub "${OnboardInstitutionsTableArn}/*"
+              - !Sub "${CostComponentsTableArn}"
+              - !Sub "${CostComponentsTableArn}/*"
+              - !Sub "${CostUpdateResultTableArn}"
+              - !Sub "${CostUpdateResultTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -603,6 +642,8 @@ Resources:
           - ',' 
           - - !Ref IOMessagesTableName
             - !Ref OnboardInstitutionsTableName
+            - !Ref CostComponentsTableName
+            - !Ref CostUpdateResultTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
