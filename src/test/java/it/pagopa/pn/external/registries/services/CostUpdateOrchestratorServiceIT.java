@@ -305,6 +305,100 @@ class CostUpdateOrchestratorServiceIT {
     }
 
     @Test
+    void VALIDATION_then_SEND_ANALOG_DOMICILE_ATTEMPT_0_ATTEMPT_1_Success() {
+        // Given
+        Instant eventTimestamp = Instant.now();
+        Instant eventStorageTimestamp = eventTimestamp.plusSeconds(1);
+
+        // mock gpdClient
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        try {
+            costComponentsEntityTestDao.delete(costComponentEntityPk, costComponentEntitySk);
+        }
+        catch (Exception e) {
+            System.out.println("Nothing to remove for costComponentsEntityTestDao");
+        }
+        // no remove for costUpdateEntityTestDao, random UUID
+
+        // VALIDATION - first insert
+
+        // When - webservice call
+        List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                baseCost,
+                iun,
+                new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
+                eventTimestamp,
+                eventStorageTimestamp,
+                CostUpdateCostPhaseInt.VALIDATION
+        ).collectList().block();
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(0, result.get(0).getRecIndex());
+        Assertions.assertEquals(creditorTaxId, result.get(0).getCreditorTaxId());
+        Assertions.assertEquals(noticeCode, result.get(0).getNoticeCode());
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
+
+        // SEND_ANALOG_DOMICILE_ATTEMPT_0 - update
+
+        // When - handler call
+        result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                notificationStepCost,
+                iun,
+                recIndex,
+                eventTimestamp,
+                eventStorageTimestamp,
+                CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0
+        ).collectList().block();
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(0, result.get(0).getRecIndex());
+        Assertions.assertEquals(creditorTaxId, result.get(0).getCreditorTaxId());
+        Assertions.assertEquals(noticeCode, result.get(0).getNoticeCode());
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
+
+        // SEND_ANALOG_DOMICILE_ATTEMPT_1 - update
+
+        // When - handler call
+        result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                notificationStepCost,
+                iun,
+                recIndex,
+                eventTimestamp,
+                eventStorageTimestamp,
+                CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_1
+        ).collectList().block();
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(0, result.get(0).getRecIndex());
+        Assertions.assertEquals(creditorTaxId, result.get(0).getCreditorTaxId());
+        Assertions.assertEquals(noticeCode, result.get(0).getNoticeCode());
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
+
+        // check that costComponentService.getTotalCost corresponds to baseCost + notificationStepCost + notificationStepCost
+        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
+                .doOnNext(totalCost -> Assertions.assertEquals(baseCost + notificationStepCost + notificationStepCost, totalCost))
+                .block();
+
+        // Clean-up
+        try {
+            costComponentsEntityTestDao.delete(costComponentEntityPk, costComponentEntitySk);
+        }
+        catch (Exception e) {
+            System.out.println("Nothing to remove for costComponentsEntityTestDao");
+        }
+        // no remove for costUpdateEntityTestDao, random UUID
+    }
+
+    @Test
     void VALIDATION_then_REQUEST_REFUSED_Success() {
         // Given
         Instant eventTimestamp = Instant.now();
