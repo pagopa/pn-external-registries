@@ -486,6 +486,7 @@ Resources:
               - sqs:SendMessageBatch
             Resource:
               - !Ref DeliveryPushInputsQueueARN
+              - !Ref DeliveryPushToExternalRegistriesQueueARN
           - Effect: Allow
             Action:
               - ssm:GetParameter
