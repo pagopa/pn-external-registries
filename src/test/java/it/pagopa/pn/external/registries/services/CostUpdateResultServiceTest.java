@@ -187,7 +187,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
 
         // failedIuv
-        Assertions.assertEquals(request.getIun(), capturedEntity.getFailedIuv());
+        Assertions.assertEquals(request.getCreditorTaxId() + request.getNoticeCode(), capturedEntity.getFailedIuv());
     }
 
     @Test
@@ -230,7 +230,7 @@ class CostUpdateResultServiceTest {
         Assertions.assertEquals("KO", capturedEntity.getCommunicationResultGroup());
 
         // failedIuv
-        Assertions.assertEquals(request.getIun(), capturedEntity.getFailedIuv());
+        Assertions.assertEquals(request.getCreditorTaxId() + request.getNoticeCode(), capturedEntity.getFailedIuv());
     }
 
     @Test

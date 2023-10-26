@@ -28,7 +28,7 @@ public class UpdateCostService {
         this.costUpdateResultService = costUpdateResultService;
     }
 
-    public Mono<UpdateCostResponseInt> updateCost(int recIndex, String creditorTaxId, String noticeCode, int notificationCost,
+    public Mono<UpdateCostResponseInt> updateCost(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
         String iuv = creditorTaxId + noticeCode;
@@ -53,7 +53,7 @@ public class UpdateCostService {
                     }
 
                     CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
-                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iuv,
+                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
                             response.getStatusCodeValue(), jsonResponse);
 
                     return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
@@ -63,7 +63,7 @@ public class UpdateCostService {
                             error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
                     CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
-                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iuv,
+                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
                             error.getRawStatusCode(), error.getResponseBodyAsString());
 
                     return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
@@ -72,7 +72,7 @@ public class UpdateCostService {
 
     private CostUpdateResultRequestInt getCostUpdateResultRequest(String creditorTaxId, String noticeCode, int notificationCost,
                                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp,
-                                                                  Instant communicationTimestamp, String requestId, String iuv, int statusCode,
+                                                                  Instant communicationTimestamp, String requestId, String iun, int statusCode,
                                                                   String jsonResponse) {
         CostUpdateResultRequestInt costUpdateResultRequestInt = new CostUpdateResultRequestInt();
 
@@ -81,7 +81,7 @@ public class UpdateCostService {
         costUpdateResultRequestInt.setUpdateCostPhase(updateCostPhase);
         costUpdateResultRequestInt.setRequestId(requestId);
         costUpdateResultRequestInt.setNotificationCost(notificationCost);
-        costUpdateResultRequestInt.setIun(iuv);
+        costUpdateResultRequestInt.setIun(iun);
         costUpdateResultRequestInt.setEventTimestamp(eventTimestamp);
         costUpdateResultRequestInt.setEventStorageTimestamp(eventStorageTimestamp);
         costUpdateResultRequestInt.setCommunicationTimestamp(communicationTimestamp);
