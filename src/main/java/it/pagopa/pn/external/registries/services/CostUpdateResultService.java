@@ -52,7 +52,9 @@ public class CostUpdateResultService {
 
         entity.setCommunicationResult(communicationResultEntity);
 
-        entity.setFailedIuv(CommunicationResultGroupInt.KO == communicationResultGroup ? request.getIun() : null);
+        String iuv = request.getCreditorTaxId() + request.getNoticeCode();
+
+        entity.setFailedIuv(CommunicationResultGroupInt.KO == communicationResultGroup ? iuv : null);
         entity.setUpdateCostPhase(request.getUpdateCostPhase().getValue());
         entity.setNotificationCost(request.getNotificationCost());
         entity.setIun(request.getIun());

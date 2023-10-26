@@ -106,7 +106,7 @@ public class CostUpdateOrchestratorService {
                                                             paymentForRecipient.getRecIndex(), e.getMessage()))
                                 )
                                 .flatMap(totalCost ->
-                                        updateCostService.updateCost(paymentForRecipient.getRecIndex(),
+                                        updateCostService.updateCost(paymentForRecipient.getRecIndex(), iun,
                                                 paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(),
                                                 totalCost, updateCostPhase, eventTimestamp, eventStorageTimestamp)
                                 )
