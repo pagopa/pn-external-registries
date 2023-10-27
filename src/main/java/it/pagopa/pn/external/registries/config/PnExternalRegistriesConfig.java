@@ -54,10 +54,17 @@ public class PnExternalRegistriesConfig {
     private String selfcarepgusergroupBaseUrl;
     private String selfcarepgusergroupUid;
 
+    private String gpdApiKey;
+    private String gpdApiBaseUrl;
+
     private String mockDataResources;
 
     private String dynamodbTableNameIOMessages;
     private String dynamodbTableNameOnboardInstitutions;
+    private String dynamodbTableNameCostComponents;
+    private String dynamodbTableNameCostUpdateResult;
+
+    private int dynamodbTableNameCostUpdateResultTtlDays;
 
     private String piattaformanotificheurlTos;
     private String piattaformanotificheurlPrivacy;

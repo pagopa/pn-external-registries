@@ -10,9 +10,7 @@ import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -33,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(LocalStackTestConfig.class)
 @Slf4j
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OnboardInstitutionFulltextSearchHelperTest {
 
     Duration d = Duration.ofMillis(3000);
@@ -49,6 +48,41 @@ class OnboardInstitutionFulltextSearchHelperTest {
 
     @Autowired
     OnboardInstitutionFulltextSearchHelper onboardInstitutionFulltextSearchHelper;
+
+    @AfterAll
+    public void clean() {
+        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOnboardInstitutions(), OnboardInstitutionEntity.class);
+
+        try {
+            ClassPathResource res = new ClassPathResource("src/test/resources/testdata/ipas.json");
+            File file = new File(res.getPath());
+            JsonNode mySchema = JsonLoader.fromFile(file);
+            ArrayNode records = (ArrayNode) mySchema.get("records");
+
+            OnboardInstitutionEntity prev = testDao.get(((ArrayNode)records.get(0)).get(0).asText(), null);
+            if (prev != null)
+            {
+                int i = 1;
+                for (JsonNode d:
+                        records) {
+                    OnboardInstitutionEntity entity = new OnboardInstitutionEntity();
+                    entity.setPk(((ArrayNode)d).get(0).asText());
+                    entity.setDescription(((ArrayNode)d).get(2).asText());
+                    entity.setCreated(Instant.now());
+                    entity.setLastUpdate(Instant.now());
+                    entity.setTaxCode(((ArrayNode)d).get(3).asText());
+                    entity.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+                    entity.setOnlyRootStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+
+                    testDao.delete(entity.getPk(),null);
+                    if (i % 100 == 0)
+                        log.info("deleted " + i + "pas");
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
     @BeforeEach
     public void beforeeach() throws IOException {
@@ -159,6 +193,8 @@ class OnboardInstitutionFulltextSearchHelperTest {
         Optional<PaSummaryDto> mypa1 = result1.stream().filter(x -> x.getId().equals(prev.getInstitutionId())).findFirst();
         assertTrue(mypa1.isPresent());
 
+        // clean
+        testDao.delete(prev.getPk(),null);
     }
 
     @Test
