@@ -97,6 +97,7 @@ public class InfoPaymentService {
             paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
             paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
             paymentInfoDto.setDetailV2(e.getMessage());
+            paymentInfoDto.setErrorCode(status.toString());
         }
         return Mono.just( paymentInfoDto );
     }
