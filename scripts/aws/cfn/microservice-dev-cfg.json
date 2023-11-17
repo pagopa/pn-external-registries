@@ -21,6 +21,6 @@
     "AoouoSenderID": "DUMMY",
     "MountEfs": "false",
     "CostUpdateResultTableTtlDays": "365",
-    "GpdApiBaseUrl": "https://api.uat.platform.pagopa.it/pn-integration/gpd/api/v1"
+    "GpdApiBaseUrl": "https://api.uat.platform.pagopa.it/pn-integration-gpd/api/v1"
   }
 }
