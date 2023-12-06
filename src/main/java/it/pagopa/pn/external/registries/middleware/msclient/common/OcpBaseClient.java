@@ -11,6 +11,7 @@ public abstract class OcpBaseClient extends CommonBaseClient {
     protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey){
 
         return super.enrichBuilder(builder)
+                .filter(new PaymentOnGoingInterceptor())
                 .defaultHeader(HEADER_API_KEY, apiKey);
     }
 }

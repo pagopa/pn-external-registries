@@ -15,13 +15,14 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Objects;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -52,7 +53,7 @@ class GpdClientTest extends MockAWSObjectsTestConfig {
     }
 
     @Test
-    void getPaymentInfo() throws JsonProcessingException {
+    void setNotificationCost200() throws JsonProcessingException {
         String creditorTaxId="77777777777";
         String noticeCode="347000000000000044";
         String requestId= "test";
@@ -81,4 +82,70 @@ class GpdClientTest extends MockAWSObjectsTestConfig {
             Assertions.assertEquals(expectedBodyResponse, responseReceived);
         }
     }
+
+    @Test
+    void setNotificationCost209() throws JsonProcessingException {
+        String creditorTaxId="77777777777";
+        String noticeCode="347000000000000044";
+        String requestId= "test";
+        Long notificationFee = 100L;
+
+        String iuv = noticeCode.substring(1);
+
+        var expectedBodyResponse = new PaymentsModelResponse()
+                .amount(100L);
+
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            final int statusCodeExpected = 209;
+
+            final String headerNameExpected = "testHeader";
+            final String headerValueExpected = "test1";
+            mockServerClient
+                    .when(request()
+                            .withMethod("PUT")
+                            .withPath("/organizations/" + creditorTaxId + "/paymentoptions/" + iuv + "/notificationfee")
+                    )
+                    .respond(response()
+                            .withStatusCode(statusCodeExpected)
+                            .withHeader(headerNameExpected,headerValueExpected)
+                            .withBody(objectMapper.writeValueAsString(expectedBodyResponse), MediaType.APPLICATION_JSON)
+                    );
+
+            ResponseEntity<PaymentsModelResponse> res = gpdClient.setNotificationCost(creditorTaxId,noticeCode,requestId, notificationFee).block();
+
+            Assertions.assertNotNull(res);
+            Assertions.assertEquals(statusCodeExpected, res.getStatusCodeValue());
+            
+            HttpHeaders headers = res.getHeaders();
+            Assertions.assertEquals(headerValueExpected, Objects.requireNonNull(headers.get(headerNameExpected)).get(0));
+            
+            PaymentsModelResponse responseReceived = res.getBody();
+            Assertions.assertEquals(expectedBodyResponse, responseReceived);
+        }
+    }
+
+    @Test
+    void setNotificationCost500() {
+        String creditorTaxId="77777777777";
+        String noticeCode="347000000000000044";
+        String requestId= "test";
+        Long notificationFee = 100L;
+
+        String iuv = noticeCode.substring(1);
+        
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient
+                    .when(request()
+                            .withMethod("PUT")
+                            .withPath("/organizations/" + creditorTaxId + "/paymentoptions/" + iuv + "/notificationfee")
+                    )
+                    .respond(response()
+                            .withStatusCode(500)
+                    );
+
+            final Mono<ResponseEntity<PaymentsModelResponse>> setNotificationCostMono = gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, notificationFee);
+            Assertions.assertThrows(WebClientResponseException.class, setNotificationCostMono::block);
+        }
+    }
+
 }
