@@ -9,7 +9,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 
 @Getter
 public class PnPaymentOngoingException extends PnInternalException {
-    private final PaymentsModelResponse response;
+    private final transient PaymentsModelResponse response;
     private final HttpHeaders headers;
     private final int statusCode;
     
