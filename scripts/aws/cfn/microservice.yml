@@ -750,7 +750,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs20.x
       FunctionName: !Ref PnExternalRegistriesTriggerLambdaName
       Description: 'It triggers the onboarding institutes written of sqs'
       MemorySize: 128
@@ -763,8 +763,8 @@ Resources:
           TABLE_NAME: !Ref OnboardInstitutionsTableName
       Code:
         ZipFile: |
-          const AWS = require('aws-sdk');
-          const dynamoDB = new AWS.DynamoDB.DocumentClient();
+          const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
+          const { marshall } = require("@aws-sdk/util-dynamodb");
           const TABLE_NAME = process.env.TABLE_NAME;
           
           exports.handler = async (event, context) => {
@@ -772,25 +772,27 @@ Resources:
             const { Records } = event;
             for (const record of Records) {
               try {
-                const body = JSON.parse(record.body, (key, value) => {if(value !== null) return value});
-  
+                const body = JSON.parse(record.body, (key, value) => { if (value !== null) return value });
+
                 //logging the incoming message body (view in cloudwatch):
                 console.log("Incoming message body from SQS :", body);
-          
-                if(body.id === body.rootId){//put will automatically update the element if exists
+                if (body.id === body.rootId) {//put will automatically update the element if exists
                   delete body.rootDescription;
                   delete body.rootIpaCode;
                   body.onlyRootStatus = body.status;
-                }else{
+                } else {
                   delete body.onlyRootStatus;
                   const params = {
                     TableName: TABLE_NAME,
                     Key: {
-                      id: body.rootId
+                      id: {
+                        S: body.rootId
+                      }
                     }
                   }
-                  let result = await dynamoDB.get(params).promise();
-                  if(!result.Item){
+                  let result = await dynamoDB.send(new GetItemCommand(params));
+                  
+                  if (!result.Item) {
                     //insert root institutions
                     let rootInstitutions = {
                       id: body.rootId,
@@ -803,25 +805,25 @@ Resources:
                       onlyRootStatus: body.status,
                       taxCode: body.taxCode,
                     }
+                    console.log(rootInstitutions)
                     const params = {
-                        TableName: TABLE_NAME,
-                        Item: rootInstitutions
+                      TableName: TABLE_NAME,
+                      Item: marshall(rootInstitutions)
                     };
-                    await dynamoDB.put(params).promise();
+                    await dynamoDB.send(new PutItemCommand(params));
+                  }
+                  delete body.rootDescription;
+                  delete body.rootIpaCode;
                 }
-                delete body.rootDescription;
-                delete body.rootIpaCode;
-              }
-  
+
                 //configure params for writing data to dynamo DB:
                 const params = {
                   TableName: TABLE_NAME,
-                  Item: body
+                  Item: marshall(body)
                 };
-
                 //write data to dynamo DB:
-                await dynamoDB.put(params).promise();
-
+                await dynamoDB.send(new PutItemCommand(params));
+  
                 //success logging to cloudwatch:
                 console.log('Successfully written to DynamoDB with id', body.id);
               } catch (error) {
