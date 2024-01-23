@@ -35,8 +35,10 @@ public class CostComponentsDao extends BaseDao {
         UpdateItemEnhancedRequest<CostComponentsEntity> updateItemEnhancedRequest = UpdateItemEnhancedRequest.builder(CostComponentsEntity.class)
                 .item(costComponentsEntity)
                 .ignoreNulls(true)
+                .conditionExpression(Expression.builder()
+                        .expression("attribute_exists(id)").build())
                 .build();
-
+        
         return Mono.fromFuture(() -> costComponentsTable.updateItem(updateItemEnhancedRequest).thenApply(item -> costComponentsEntity));
     }
 

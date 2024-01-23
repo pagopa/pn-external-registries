@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Service
 @Slf4j
 public class CostComponentService {
@@ -108,13 +110,8 @@ public class CostComponentService {
      * @return a Mono of Integer (the computed total cost)
      */
     public Mono<Integer> getTotalCost(String iun, int recIndex, String creditorTaxId, String noticeCode) {
-        String pk = iun + "##" + recIndex;
-        String sk = creditorTaxId + "##" + noticeCode;
 
-        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
-                pk, sk, iun, recIndex, creditorTaxId, noticeCode);
-
-        return costComponentsDao.getItem(pk, sk)
+        return getItem(iun, recIndex, creditorTaxId, noticeCode)
                 .map(entity -> {
                     if (Boolean.TRUE.equals(entity.getIsRefusedCancelled())) {
                         return 0;
@@ -142,6 +139,22 @@ public class CostComponentService {
                         return baseCost + simpleRegisteredLetterCost + firstAnalogCost + secondAnalogCost;
                     }
                 });
+    }
+
+    private Mono<CostComponentsEntity> getItem(String iun, int recIndex, String creditorTaxId, String noticeCode) {
+        String pk = iun + "##" + recIndex;
+        String sk = creditorTaxId + "##" + noticeCode;
+
+        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
+                pk, sk, iun, recIndex, creditorTaxId, noticeCode);
+
+        return costComponentsDao.getItem(pk, sk);
+    }
+    
+    public Mono<Boolean> existCostItem(String iun, int recIndex, String creditorTaxId, String noticeCode) {
+        return getItem(iun, recIndex, creditorTaxId, noticeCode).map(
+                Objects::nonNull //da capire cosa viene effettivamente restituito in caso di oggetto non esistente
+        );
     }
 
     /**
