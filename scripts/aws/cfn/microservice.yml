@@ -766,6 +766,7 @@ Resources:
           const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
           const { marshall } = require("@aws-sdk/util-dynamodb");
           const TABLE_NAME = process.env.TABLE_NAME;
+          const dynamoDB = new DynamoDBClient();
           
           exports.handler = async (event, context) => {
             //messages coming in from SQS are available on the 'Records' array property of the event object
