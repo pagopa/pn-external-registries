@@ -114,7 +114,7 @@ class CostUpdateOrchestratorServiceTest {
         // Verify called methods
         verify(costComponentsDao, times(1)).getItems(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
-        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
     }
 
@@ -225,7 +225,7 @@ class CostUpdateOrchestratorServiceTest {
         // Verify called methods
         verify(costComponentsDao, times(1)).insertOrUpdate(any());
         verify(costComponentsDao, times(0)).updateNotNull(any());
-        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(1)).insertOrUpdate(any());
     }
@@ -288,7 +288,7 @@ class CostUpdateOrchestratorServiceTest {
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(2)).updateNotNull(any());
-        verify(costComponentsDao, times(2)).getItem(any(), any());
+        verify(costComponentsDao, times(4)).getItem(any(), any());
         verify(gpdClient, times(2)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(2)).insertOrUpdate(any());
     }
@@ -346,7 +346,7 @@ class CostUpdateOrchestratorServiceTest {
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
-        verify(costComponentsDao, times(0)).getItem(any(), any());
+        verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
     }
@@ -402,7 +402,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
-        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(0)).updateNotNull(any());
         verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
@@ -456,7 +456,7 @@ class CostUpdateOrchestratorServiceTest {
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
         verify(costComponentsDao, times(1)).updateNotNull(any());
-        verify(costComponentsDao, times(1)).getItem(any(), any());
+        verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
     }

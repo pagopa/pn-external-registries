@@ -158,7 +158,7 @@ public class CostComponentService {
 
     public Mono<Boolean> existCostItem(String iun, int recIndex, String creditorTaxId, String noticeCode) {
         return getItem(iun, recIndex, creditorTaxId, noticeCode).map(
-                Objects::nonNull //da capire cosa viene effettivamente restituito in caso di oggetto non esistente
+                Objects::nonNull
         );
     }
 

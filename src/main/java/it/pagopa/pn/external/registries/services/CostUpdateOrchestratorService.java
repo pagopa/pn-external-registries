@@ -101,13 +101,15 @@ public class CostUpdateOrchestratorService {
                         costComponentService.existCostItem(iun, paymentForRecipient.getRecIndex(),
                                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
                                 .flatMap(existCostItem -> {
-                                    if(existCostItem){
+                                    if(existCostItem || isNotSendCostPhase(updateCostPhase) ){
                                         //Solo se l'item UpdateCost esiste, dunque sono state verificate da deliveryPush le condizioni,
-                                        // Ad esempio che la notifica non sia FLAT_RATE etc.
+                                        // Ad esempio che la notifica non sia FLAT_RATE
+                                        //Oppure se la updateCostPhase non è un invio analogico/invio di raccomandata semplice
                                         // Si procede con l'update dei costi verso GPD
                                         return updateNotificationCost(notificationStepCost, iun, eventTimestamp, eventStorageTimestamp, updateCostPhase, paymentForRecipient);
                                     } else {
-                                        //probabilmente ha senso inserire UpdateCostResponseInt con OK
+                                        log.warn("Skipped update for the cost on GPD - costItem not present : iun: {}, notificationStepCost: {}, updateCostPhase: {}",
+                                                iun, notificationStepCost, updateCostPhase);
                                         UpdateCostResponseInt responseNoUpdate = new UpdateCostResponseInt();
                                         responseNoUpdate.setCreditorTaxId(paymentForRecipient.getCreditorTaxId());
                                         responseNoUpdate.setNoticeCode(paymentForRecipient.getNoticeCode());
@@ -118,6 +120,13 @@ public class CostUpdateOrchestratorService {
                                     }
                                 })
                 );
+    }
+
+    private boolean isNotSendCostPhase(CostUpdateCostPhaseInt updateCostPhase) {
+        return switch (updateCostPhase){
+            case VALIDATION, REQUEST_REFUSED, NOTIFICATION_CANCELLED -> true;
+            default -> false;
+        };
     }
 
 
