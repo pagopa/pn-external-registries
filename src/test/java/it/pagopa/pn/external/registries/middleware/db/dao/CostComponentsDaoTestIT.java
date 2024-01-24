@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
 import java.util.List;
 
@@ -187,7 +189,7 @@ class CostComponentsDaoTestIT {
         entity.setIsRefusedCancelled(null);
         entity.setFirstAnalogCost(12);
         // update the entity
-        costComponentsDao.updateNotNull(entity).block();
+        costComponentsDao.updateNotNullIfExists(entity).block();
         CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
@@ -230,10 +232,15 @@ class CostComponentsDaoTestIT {
         entity.setSecondAnalogCost(null);
         entity.setIsRefusedCancelled(null);
         entity.setFirstAnalogCost(12);
-        // update the entity
-        costComponentsDao.updateNotNull(entity).block();
-        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
+        // Then
+        Mono<CostComponentsEntity> costComponentsEntityMono = costComponentsDao.updateNotNullIfExists(entity);
+        Assertions.assertThrows(ConditionalCheckFailedException.class ,() -> {
+            costComponentsEntityMono.block();
+        });
+
+        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
+        Assertions.assertNull(result);
         //Clean
         try {
             testDao.delete(entity.getPk(), entity.getSk());
@@ -241,13 +248,7 @@ class CostComponentsDaoTestIT {
             System.out.println("Nothing to remove");
         }
 
-        //Then all the other values should be null and the set one must be present
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(0, result.getBaseCost());
-        Assertions.assertNull(result.getSimpleRegisteredLetterCost());
-        Assertions.assertNull(result.getSecondAnalogCost());
-        Assertions.assertFalse(result.getIsRefusedCancelled());
-        Assertions.assertEquals(12, result.getFirstAnalogCost());
+
     }
 
     private CostComponentsEntity newCostComponentsEntity() {
