@@ -83,7 +83,7 @@ class CostUpdateOrchestratorServiceTest {
                 0,
                 false
         );
-        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItems(any()))
                 .thenReturn(Flux.just(costComponentsEntity));
@@ -113,7 +113,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(1)).getItems(any());
-        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
     }
@@ -140,7 +140,7 @@ class CostUpdateOrchestratorServiceTest {
                 0,
                 false
         );
-        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItems(any()))
                 .thenReturn(Flux.error(new RuntimeException()));
@@ -167,7 +167,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(1)).getItems(any());
-        verify(costComponentsDao, times(0)).updateNotNull(any());
+        verify(costComponentsDao, times(0)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(0)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
     }
@@ -224,7 +224,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(1)).insertOrUpdate(any());
-        verify(costComponentsDao, times(0)).updateNotNull(any());
+        verify(costComponentsDao, times(0)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(1)).insertOrUpdate(any());
@@ -254,7 +254,7 @@ class CostUpdateOrchestratorServiceTest {
                 0,
                 false
         );
-        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
 
         // mock costUpdateResultDao
@@ -287,7 +287,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
-        verify(costComponentsDao, times(2)).updateNotNull(any());
+        verify(costComponentsDao, times(2)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(4)).getItem(any(), any());
         verify(gpdClient, times(2)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(2)).insertOrUpdate(any());
@@ -320,7 +320,7 @@ class CostUpdateOrchestratorServiceTest {
                 false
         );
         // we want to throw an exception on insertStepCost
-        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.error(new RuntimeException()));
+        when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.error(new RuntimeException()));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
 
         // mock costUpdateResultDao (we should not call it)
@@ -345,7 +345,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
-        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
@@ -376,7 +376,7 @@ class CostUpdateOrchestratorServiceTest {
                 false
         );
 
-        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         // we want to throw an exception on getTotalCost
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.error(new RuntimeException()));
 
@@ -402,7 +402,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
-        verify(costComponentsDao, times(0)).updateNotNull(any());
+        verify(costComponentsDao, times(0)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(1)).getItem(any(), any());
         verify(gpdClient, times(0)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(0)).insertOrUpdate(any());
@@ -430,7 +430,7 @@ class CostUpdateOrchestratorServiceTest {
                 0,
                 false
         );
-        when(costComponentsDao.updateNotNull(any())).thenReturn(Mono.just(costComponentsEntity));
+        when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
 
         // mock costUpdateResultDao
@@ -455,7 +455,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // Verify called methods
         verify(costComponentsDao, times(0)).insertOrUpdate(any());
-        verify(costComponentsDao, times(1)).updateNotNull(any());
+        verify(costComponentsDao, times(1)).updateNotNullIfExists(any());
         verify(costComponentsDao, times(2)).getItem(any(), any());
         verify(gpdClient, times(1)).setNotificationCost(any(), any(), any(), any());
         verify(costUpdateResultDao, times(0)).insertOrUpdate(any());

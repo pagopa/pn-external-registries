@@ -31,12 +31,12 @@ public class CostComponentsDao extends BaseDao {
     /**
      * update from an entity, updating only the fields not set to null
      */
-    public Mono<CostComponentsEntity> updateNotNull(CostComponentsEntity costComponentsEntity) {
+    public Mono<CostComponentsEntity> updateNotNullIfExists(CostComponentsEntity costComponentsEntity) {
         UpdateItemEnhancedRequest<CostComponentsEntity> updateItemEnhancedRequest = UpdateItemEnhancedRequest.builder(CostComponentsEntity.class)
                 .item(costComponentsEntity)
                 .ignoreNulls(true)
                 .conditionExpression(Expression.builder()
-                        .expression("attribute_exists(id)").build())
+                        .expression("attribute_exists(pk) and attribute_exists(sk)").build())
                 .build();
 
         return Mono.fromFuture(() -> costComponentsTable.updateItem(updateItemEnhancedRequest).thenApply(item -> costComponentsEntity));

@@ -99,7 +99,7 @@ public class CostComponentService {
         log.info(updatingString,
                 pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
 
-        return costComponentsDao.updateNotNull(entity)
+        return costComponentsDao.updateNotNullIfExists(entity)
                 .map(costComponentsMapper::dbToInternal);
     }
 
@@ -159,7 +159,7 @@ public class CostComponentService {
     public Mono<Boolean> existCostItem(String iun, int recIndex, String creditorTaxId, String noticeCode) {
         return getItem(iun, recIndex, creditorTaxId, noticeCode).map(
                 Objects::nonNull
-        );
+        ).defaultIfEmpty(false);
     }
 
     /**

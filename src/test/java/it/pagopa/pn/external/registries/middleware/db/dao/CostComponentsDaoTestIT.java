@@ -187,7 +187,7 @@ class CostComponentsDaoTestIT {
         entity.setIsRefusedCancelled(null);
         entity.setFirstAnalogCost(12);
         // update the entity
-        costComponentsDao.updateNotNull(entity).block();
+        costComponentsDao.updateNotNullIfExists(entity).block();
         CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
@@ -231,7 +231,7 @@ class CostComponentsDaoTestIT {
         entity.setIsRefusedCancelled(null);
         entity.setFirstAnalogCost(12);
         // update the entity
-        costComponentsDao.updateNotNull(entity).block();
+        costComponentsDao.updateNotNullIfExists(entity).block();
         CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
 
         //Clean
