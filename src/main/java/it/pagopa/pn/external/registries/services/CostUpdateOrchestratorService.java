@@ -1,12 +1,15 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.PaymentForRecipientInt;
 import it.pagopa.pn.external.registries.dto.UpdateCostResponseInt;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
@@ -95,21 +98,55 @@ public class CostUpdateOrchestratorService {
         // the starting array
         return Flux.fromArray(paymentsForRecipients)
                 .flatMap(paymentForRecipient ->
-                        costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
-                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
-                                .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
-                                            paymentForRecipient.getRecIndex(), e.getMessage()))
-                                .flatMap(costComponent ->
-                                        costComponentService.getTotalCost(iun, paymentForRecipient.getRecIndex(),
-                                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
-                                                .doOnError(e -> log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
-                                                            paymentForRecipient.getRecIndex(), e.getMessage()))
-                                )
-                                .flatMap(totalCost ->
-                                        updateCostService.updateCost(paymentForRecipient.getRecIndex(), iun,
-                                                paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(),
-                                                totalCost, updateCostPhase, eventTimestamp, eventStorageTimestamp)
-                                )
+                        costComponentService.existCostItem(iun, paymentForRecipient.getRecIndex(),
+                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
+                                .flatMap(existCostItem -> {
+                                    if(existCostItem || isNotSendCostPhase(updateCostPhase) ){
+                                        //Solo se l'item UpdateCost esiste, dunque sono state verificate da deliveryPush le condizioni,
+                                        // Ad esempio che la notifica non sia FLAT_RATE
+                                        //Oppure se la updateCostPhase non è un invio analogico/invio di raccomandata semplice
+                                        // Si procede con l'update dei costi verso GPD
+                                        return updateNotificationCost(notificationStepCost, iun, eventTimestamp, eventStorageTimestamp, updateCostPhase, paymentForRecipient);
+                                    } else {
+                                        log.warn("Skipped update for the cost on GPD - costItem not present : iun: {}, notificationStepCost: {}, updateCostPhase: {}",
+                                                iun, notificationStepCost, updateCostPhase);
+                                        UpdateCostResponseInt responseNoUpdate = new UpdateCostResponseInt();
+                                        responseNoUpdate.setCreditorTaxId(paymentForRecipient.getCreditorTaxId());
+                                        responseNoUpdate.setNoticeCode(paymentForRecipient.getNoticeCode());
+                                        responseNoUpdate.setRecIndex(paymentForRecipient.getRecIndex());
+                                        responseNoUpdate.setResult(CommunicationResultGroupInt.OK);
+
+                                        return Mono.just(responseNoUpdate);
+                                    }
+                                })
                 );
     }
+
+    private boolean isNotSendCostPhase(CostUpdateCostPhaseInt updateCostPhase) {
+        return switch (updateCostPhase){
+            case VALIDATION, REQUEST_REFUSED, NOTIFICATION_CANCELLED -> true;
+            default -> false;
+        };
+    }
+
+
+    @NotNull
+    private Mono<UpdateCostResponseInt> updateNotificationCost(int notificationStepCost, String iun, Instant eventTimestamp, Instant eventStorageTimestamp, CostUpdateCostPhaseInt updateCostPhase, PaymentForRecipientInt paymentForRecipient) {
+        return costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
+                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
+                .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
+                        paymentForRecipient.getRecIndex(), e.getMessage()))
+                .flatMap(costComponent ->
+                        costComponentService.getTotalCost(iun, paymentForRecipient.getRecIndex(),
+                                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
+                                .doOnError(e -> log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
+                                        paymentForRecipient.getRecIndex(), e.getMessage()))
+                )
+                .flatMap(totalCost ->
+                        updateCostService.updateCost(paymentForRecipient.getRecIndex(), iun,
+                                paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(),
+                                totalCost, updateCostPhase, eventTimestamp, eventStorageTimestamp)
+                );
+    }
+
 }
