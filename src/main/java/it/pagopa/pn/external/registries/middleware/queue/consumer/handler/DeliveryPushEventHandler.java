@@ -41,7 +41,8 @@ public class DeliveryPushEventHandler {
 
                 log.logStartingProcess(processName);
 
-                List<UpdateCostResponseInt> listResponse = costUpdateOrchestratorService.handleCostUpdateForIun( 
+                List<UpdateCostResponseInt> listResponse = costUpdateOrchestratorService.handleCostUpdateForIun(
+                        updateNotificationCost.getVat(),
                         updateNotificationCost.getNotificationStepCost(),
                         updateNotificationCost.getIun(),
                         updateNotificationCost.getRecIndex(),

@@ -5,6 +5,7 @@ import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CostComponentsMapper;
+import it.pagopa.pn.external.registries.util.CostUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,12 +110,12 @@ public class CostComponentService {
      * @param recIndex recipient index
      * @return a Mono of Integer (the computed total cost)
      */
-    public Mono<Integer> getTotalCost(String iun, int recIndex, String creditorTaxId, String noticeCode) {
+    public Mono<Integer> getTotalCost(Integer vat, String iun, int recIndex, String creditorTaxId, String noticeCode) {
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
-        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
-                pk, sk, iun, recIndex, creditorTaxId, noticeCode);
+        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={} vat={}",
+                pk, sk, iun, recIndex, creditorTaxId, noticeCode, vat);
 
         return getItem(iun, recIndex, creditorTaxId, noticeCode)
                 .map(entity -> {
@@ -140,8 +141,13 @@ public class CostComponentService {
                         if (secondAnalogCost == null) {
                             secondAnalogCost = 0;
                         }
-
-                        return baseCost + simpleRegisteredLetterCost + firstAnalogCost + secondAnalogCost;
+                        
+                        Integer analogCost = simpleRegisteredLetterCost + firstAnalogCost + secondAnalogCost;
+                        Integer analogCostWithVat = CostUtils.getCostWithVat(vat, analogCost);
+                        Integer totalCost = baseCost + analogCostWithVat;
+                        log.info("Get cost completed: analogCost={} analogCostWithVat={} totalCost={} - iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
+                                analogCost, analogCostWithVat, totalCost, iun, recIndex, creditorTaxId, noticeCode);
+                        return totalCost;
                     }
                 });
     }

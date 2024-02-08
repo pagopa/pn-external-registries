@@ -50,7 +50,8 @@ class CostUpdateOrchestratorServiceTest {
 
     private final int baseCost = 100;
     private final int notificationStepCost = 100;
-
+    private Integer vat = 22;
+    
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -94,6 +95,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -152,6 +154,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -211,6 +214,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIun(
+                    vat,
                     notificationStepCost,
                     iun,
                     recIndex,
@@ -264,6 +268,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 notificationStepCost,
                 iun,
                 paymentsForRecipients,
@@ -322,6 +327,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                vat,
                 notificationStepCost,
                 iun,
                 paymentsForRecipients,
@@ -389,6 +395,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    vat,
                     notificationStepCost,
                     iun,
                     paymentsForRecipients,
@@ -446,6 +453,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    vat,
                     notificationStepCost,
                     iun,
                     paymentsForRecipients,
@@ -499,6 +507,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    vat,
                     notificationStepCost,
                     iun,
                     paymentsForRecipients,

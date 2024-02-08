@@ -29,7 +29,7 @@ public class CostUpdateOrchestratorService {
     /**
      * Handles the cost update for a specific IUN, retrieves IUVs and then calls
      * handleCostUpdateForIuvs to process the update.
-     *
+     * @param vat vat to apply analog costs
      * @param notificationStepCost Cost of the single workflow step
      * @param iun The IUN of the notification
      * @param recIndex Recipient for which the cost update is requested
@@ -38,7 +38,7 @@ public class CostUpdateOrchestratorService {
      * @param updateCostPhase Phase of the cost update
      * @return A Flux of UpdateCostResponseInt with the update result for each IUV
      */
-    public Flux<UpdateCostResponseInt> handleCostUpdateForIun(int notificationStepCost, String iun, int recIndex,
+    public Flux<UpdateCostResponseInt> handleCostUpdateForIun(Integer vat, int notificationStepCost, String iun, int recIndex,
                                                               Instant eventTimestamp, Instant eventStorageTimestamp,
                                                               CostUpdateCostPhaseInt updateCostPhase) {
         if (iun == null || iun.trim().isEmpty()) {
@@ -63,7 +63,7 @@ public class CostUpdateOrchestratorService {
                             .toArray(PaymentForRecipientInt[]::new);
 
                     // the actual update
-                    return handleCostUpdateForIuvs(notificationStepCost, iun, paymentsForRecipients,
+                    return handleCostUpdateForIuvs(vat, notificationStepCost, iun, paymentsForRecipients,
                             eventTimestamp, eventStorageTimestamp, updateCostPhase);
                 })
                 .doOnError(e -> log.error("An error occurred while processing IUVs for IUN: {} and recIndex: {}. Error: {}",
@@ -82,7 +82,7 @@ public class CostUpdateOrchestratorService {
      * @param updateCostPhase Phase of the cost update
      * @return A Flux of UpdateCostResponseInt with the update result for each IUV
      */
-    public Flux<UpdateCostResponseInt> handleCostUpdateForIuvs(int notificationStepCost, String iun,
+    public Flux<UpdateCostResponseInt> handleCostUpdateForIuvs(Integer vat, int notificationStepCost, String iun,
                                               PaymentForRecipientInt[] paymentsForRecipients,
                                               Instant eventTimestamp, Instant eventStorageTimestamp,
                                                                CostUpdateCostPhaseInt updateCostPhase) {
@@ -101,12 +101,12 @@ public class CostUpdateOrchestratorService {
                         costComponentService.existCostItem(iun, paymentForRecipient.getRecIndex(),
                                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
                                 .flatMap(existCostItem -> {
-                                    if(existCostItem || isNotSendCostPhase(updateCostPhase) ){
+                                    if(Boolean.TRUE.equals(existCostItem) || isNotSendCostPhase(updateCostPhase) ){
                                         //Solo se l'item UpdateCost esiste, dunque sono state verificate da deliveryPush le condizioni,
                                         // Ad esempio che la notifica non sia FLAT_RATE
                                         //Oppure se la updateCostPhase non è un invio analogico/invio di raccomandata semplice
                                         // Si procede con l'update dei costi verso GPD
-                                        return updateNotificationCost(notificationStepCost, iun, eventTimestamp, eventStorageTimestamp, updateCostPhase, paymentForRecipient);
+                                        return updateNotificationCost(vat, notificationStepCost, iun, eventTimestamp, eventStorageTimestamp, updateCostPhase, paymentForRecipient);
                                     } else {
                                         log.warn("Skipped update for the cost on GPD - costItem not present : iun: {}, notificationStepCost: {}, updateCostPhase: {}",
                                                 iun, notificationStepCost, updateCostPhase);
@@ -131,13 +131,21 @@ public class CostUpdateOrchestratorService {
 
 
     @NotNull
-    private Mono<UpdateCostResponseInt> updateNotificationCost(int notificationStepCost, String iun, Instant eventTimestamp, Instant eventStorageTimestamp, CostUpdateCostPhaseInt updateCostPhase, PaymentForRecipientInt paymentForRecipient) {
+    private Mono<UpdateCostResponseInt> updateNotificationCost(
+            Integer vat,
+            int notificationStepCost, 
+            String iun,
+            Instant eventTimestamp, 
+            Instant eventStorageTimestamp,
+            CostUpdateCostPhaseInt updateCostPhase, 
+            PaymentForRecipientInt paymentForRecipient
+    ) {
         return costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
                 .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
                         paymentForRecipient.getRecIndex(), e.getMessage()))
                 .flatMap(costComponent ->
-                        costComponentService.getTotalCost(iun, paymentForRecipient.getRecIndex(),
+                        costComponentService.getTotalCost(vat, iun, paymentForRecipient.getRecIndex(),
                                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
                                 .doOnError(e -> log.error("An error occurred while retrieving total cost for recIndex: {}. Error: {}",
                                         paymentForRecipient.getRecIndex(), e.getMessage()))

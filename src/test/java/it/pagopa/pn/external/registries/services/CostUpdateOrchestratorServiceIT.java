@@ -69,6 +69,7 @@ class CostUpdateOrchestratorServiceIT {
 
     private final int baseCost = 100;
     private final int notificationStepCost = 200;
+    private final Integer vat = 22;
 
     private CostComponentService costComponentService; // used for checking what's sent to GPD
 
@@ -105,6 +106,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -125,6 +127,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - handler call
         result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -142,8 +145,8 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to baseCost + notificationStepCost
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
-                .doOnNext(totalCost -> Assertions.assertEquals(baseCost + notificationStepCost, totalCost))
+        costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode)
+                .doOnNext(totalCost -> Assertions.assertEquals(344, totalCost))
                 .block();
 
         // Clean-up
@@ -179,6 +182,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -199,6 +203,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - handler call
         result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -216,8 +221,8 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to baseCost + notificationStepCost
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
-                .doOnNext(totalCost -> Assertions.assertEquals(baseCost + notificationStepCost, totalCost))
+        costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode)
+                .doOnNext(totalCost -> Assertions.assertEquals(344, totalCost))
                 .block();
 
         // Clean-up
@@ -253,6 +258,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -273,6 +279,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - handler call
         result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -290,8 +297,8 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to baseCost + notificationStepCost
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
-                .doOnNext(totalCost -> Assertions.assertEquals(baseCost + notificationStepCost, totalCost))
+        costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode)
+                .doOnNext(totalCost -> Assertions.assertEquals(344, totalCost))
                 .block();
 
         // Clean-up
@@ -327,6 +334,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -347,6 +355,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - handler call
         result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -367,6 +376,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - handler call
         result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -384,8 +394,9 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to baseCost + notificationStepCost + notificationStepCost
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
-                .doOnNext(totalCost -> Assertions.assertEquals(baseCost + notificationStepCost + notificationStepCost, totalCost))
+        
+        costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode)
+                .doOnNext(totalCost -> Assertions.assertEquals(588, totalCost))
                 .block();
 
         // Clean-up
@@ -421,6 +432,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -441,6 +453,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -458,7 +471,7 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to 0
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
+        costComponentService.getTotalCost(null, iun, recIndex, creditorTaxId, noticeCode)
                 .doOnNext(totalCost -> Assertions.assertEquals(0, totalCost))
                 .block();
 
@@ -495,6 +508,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -515,6 +529,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -532,7 +547,7 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to 0
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
+        costComponentService.getTotalCost(null, iun, recIndex, creditorTaxId, noticeCode)
                 .doOnNext(totalCost -> Assertions.assertEquals(0, totalCost))
                 .block();
 
@@ -569,6 +584,7 @@ class CostUpdateOrchestratorServiceIT {
 
         // When - webservice call
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 baseCost,
                 iun,
                 new PaymentForRecipientInt[] { new PaymentForRecipientInt(recIndex, creditorTaxId, noticeCode) },
@@ -586,7 +602,7 @@ class CostUpdateOrchestratorServiceIT {
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result.get(0).getResult());
 
         // check that costComponentService.getTotalCost corresponds to 0
-        costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode)
+        costComponentService.getTotalCost(null, iun, recIndex, creditorTaxId, noticeCode)
                 .doOnNext(totalCost -> Assertions.assertEquals(0, totalCost))
                 .block();
 

@@ -244,11 +244,34 @@ class CostComponentServiceTest {
         entity.setFirstAnalogCost(25);
         entity.setSecondAnalogCost(25);
         entity.setIsRefusedCancelled(false); // null is treated as false, too
+        
+        Integer vat = 22;
+        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+        
+        // When
+        Integer totalCost = costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
+
+        // Then
+        Assertions.assertNotNull(totalCost, "Total cost should not be null");
+        Assertions. assertEquals(222, totalCost, "The total cost should be 200");
+
+        verify(costComponentsDao, times(1)).getItem(pk, sk);
+    }
+
+    @Test
+    void getTotalCostTestVatNull() {
+        // Given
+        CostComponentsEntity entity = newCostComponentsEntity();
+        entity.setBaseCost(100);
+        entity.setSimpleRegisteredLetterCost(50);
+        entity.setFirstAnalogCost(25);
+        entity.setSecondAnalogCost(25);
+        entity.setIsRefusedCancelled(false); // null is treated as false, too
 
         when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
 
         // When
-        Integer totalCost = costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode).block();
+        Integer totalCost = costComponentService.getTotalCost(null, iun, recIndex, creditorTaxId, noticeCode).block();
 
         // Then
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
@@ -256,7 +279,6 @@ class CostComponentServiceTest {
 
         verify(costComponentsDao, times(1)).getItem(pk, sk);
     }
-
 
     @Test
     void existCostItemItemExistTest() {
@@ -311,11 +333,13 @@ class CostComponentServiceTest {
         entity.setFirstAnalogCost(null);
         entity.setSecondAnalogCost(null);
         entity.setIsRefusedCancelled(false);
+        
+        Integer vat = 22;
 
         when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
 
         // When
-        Integer totalCost = costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode).block();
+        Integer totalCost = costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
 
         // Then
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
@@ -334,10 +358,12 @@ class CostComponentServiceTest {
         entity.setSecondAnalogCost(25);
         entity.setIsRefusedCancelled(true);
 
+        Integer vat = 22;
+        
         when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
-
+        
         // When
-        Integer totalCost = costComponentService.getTotalCost(iun, recIndex, creditorTaxId, noticeCode).block();
+        Integer totalCost = costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
 
         // Then
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
@@ -404,20 +430,18 @@ class CostComponentServiceTest {
 
         when(costComponentsDao.getItems(pk)).thenReturn(Flux.just(entity1));
 
+        Mono<List<CostComponentsInt>> firstMonoCostComponent = costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList();
         // When
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList().block();
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, firstMonoCostComponent::block);
 
         entity1.setPk("iun");
         entity1.setSk("creditorTaxId");
 
         when(costComponentsDao.getItems(pk)).thenReturn(Flux.just(entity1));
 
+        Mono<List<CostComponentsInt>> secondMonoCostComponent = costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList();
         // When
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList().block();
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, secondMonoCostComponent::block);
     }
 
     @Test
@@ -429,10 +453,10 @@ class CostComponentServiceTest {
 
         when(costComponentsDao.getItems(pk)).thenReturn(Flux.just(entity1));
 
+        Mono<List<CostComponentsInt>> secondMonoCostComponent = costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList();
+
         // When
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            costComponentService.getIuvsForIunAndRecIndex(iun, recIndex).collectList().block();
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, secondMonoCostComponent::block);
     }
 
     private CostComponentsEntity newCostComponentsEntity() {
