@@ -44,7 +44,7 @@ class CostComponentServiceTest {
     void insertStepCost_ValidationTest() {
         // Given
         Integer notificationStepCost = 100;
-
+        
         CostComponentsEntity entity = newCostComponentsEntity();
         entity.setBaseCost(notificationStepCost);
 
@@ -55,7 +55,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.VALIDATION, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .insertStepCost(CostUpdateCostPhaseInt.VALIDATION, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, null)
                 .block();
 
         // Then
@@ -76,6 +76,7 @@ class CostComponentServiceTest {
         Assertions.assertEquals(0, capturedEntity.getSimpleRegisteredLetterCost());
         Assertions.assertEquals(0, capturedEntity.getFirstAnalogCost());
         Assertions.assertEquals(0, capturedEntity.getSecondAnalogCost());
+        Assertions.assertNull(capturedEntity.getVat());
         Assertions.assertFalse(capturedEntity.getIsRefusedCancelled());
     }
 
@@ -94,7 +95,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.REQUEST_REFUSED, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .insertStepCost(CostUpdateCostPhaseInt.REQUEST_REFUSED, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, null)
                 .block(); // replace REQUEST_REFUSED with NOTIFICATION_CANCELLED to test the other case: the behavior is the same
 
         // Then
@@ -115,6 +116,7 @@ class CostComponentServiceTest {
         Assertions.assertEquals(0, capturedEntity.getSimpleRegisteredLetterCost());
         Assertions.assertEquals(0, capturedEntity.getFirstAnalogCost());
         Assertions.assertEquals(0, capturedEntity.getSecondAnalogCost());
+        Assertions.assertNull(capturedEntity.getVat());
         Assertions.assertTrue(capturedEntity.getIsRefusedCancelled());
     }
 
@@ -122,7 +124,7 @@ class CostComponentServiceTest {
     void insertStepCost_SendSimpleRegisteredLetterTest() {
         // Given
         Integer notificationStepCost = 100;
-
+        Integer vat = 22;
         CostComponentsEntity entity = newCostComponentsEntity();
         entity.setSimpleRegisteredLetterCost(notificationStepCost);
 
@@ -133,7 +135,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, vat)
                 .block();
 
         // Then
@@ -152,6 +154,7 @@ class CostComponentServiceTest {
         CostComponentsEntity capturedEntity = captor.getValue();
         Assertions.assertNull(capturedEntity.getBaseCost());
         Assertions.assertEquals(notificationStepCost, capturedEntity.getSimpleRegisteredLetterCost());
+        Assertions.assertEquals(vat, capturedEntity.getVat());
         Assertions.assertNull(capturedEntity.getFirstAnalogCost());
         Assertions.assertNull(capturedEntity.getSecondAnalogCost());
         Assertions.assertNull(capturedEntity.getIsRefusedCancelled());
@@ -161,7 +164,8 @@ class CostComponentServiceTest {
     void insertStepCost_SendAnalogDomicileAttempt0Test() {
         // Given
         Integer notificationStepCost = 100;
-
+        Integer vat = 22;
+        
         CostComponentsEntity entity = newCostComponentsEntity();
         entity.setFirstAnalogCost(notificationStepCost);
 
@@ -172,7 +176,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, 22)
                 .block();
 
         // Then
@@ -192,6 +196,7 @@ class CostComponentServiceTest {
         Assertions.assertNull(capturedEntity.getBaseCost());
         Assertions.assertNull(capturedEntity.getSimpleRegisteredLetterCost());
         Assertions.assertEquals(notificationStepCost, capturedEntity.getFirstAnalogCost());
+        Assertions.assertEquals(vat, capturedEntity.getVat());
         Assertions.assertNull(capturedEntity.getSecondAnalogCost());
         Assertions.assertNull(capturedEntity.getIsRefusedCancelled());
     }
@@ -200,7 +205,8 @@ class CostComponentServiceTest {
     void insertStepCost_SendAnalogDomicileAttempt1Test() {
         // Given
         Integer notificationStepCost = 150;
-
+        Integer vat = 22;
+        
         CostComponentsEntity entity = newCostComponentsEntity();
         entity.setSecondAnalogCost(notificationStepCost);
 
@@ -211,7 +217,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_1, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost)
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_1, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, 22)
                 .block();
 
         // Then
@@ -231,6 +237,7 @@ class CostComponentServiceTest {
         Assertions.assertNull(capturedEntity.getBaseCost());
         Assertions.assertNull(capturedEntity.getSimpleRegisteredLetterCost());
         Assertions.assertNull(capturedEntity.getFirstAnalogCost());
+        Assertions.assertEquals(vat, capturedEntity.getVat());
         Assertions.assertEquals(notificationStepCost, capturedEntity.getSecondAnalogCost());
         Assertions.assertNull(capturedEntity.getIsRefusedCancelled());
     }

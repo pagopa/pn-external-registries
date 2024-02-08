@@ -28,7 +28,7 @@ public class CostComponentService {
     }
 
     public Mono<CostComponentsInt> insertStepCost(CostUpdateCostPhaseInt updateCostPhase, String iun, int recIndex,
-                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost) {
+                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost, Integer vat) {
         final String insertString = "inserting cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
         final String updatingString = "updating cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
 
@@ -51,7 +51,7 @@ public class CostComponentService {
         entity.setFirstAnalogCost(null);
         entity.setSecondAnalogCost(null);
         entity.setIsRefusedCancelled(null);
-
+        
         switch (updateCostPhase) {
             case VALIDATION:
                 entity.setBaseCost(notificationStepCost);
@@ -72,7 +72,7 @@ public class CostComponentService {
                 entity.setFirstAnalogCost(0);
                 entity.setSecondAnalogCost(0);
                 entity.setIsRefusedCancelled(true);
-
+            
                 log.info(insertString,
                         pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
 
@@ -81,14 +81,17 @@ public class CostComponentService {
 
             case SEND_SIMPLE_REGISTERED_LETTER:
                 entity.setSimpleRegisteredLetterCost(notificationStepCost);
+                entity.setVat(vat);
                 break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_0:
                 entity.setFirstAnalogCost(notificationStepCost);
+                entity.setVat(vat);
                 break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_1:
                 entity.setSecondAnalogCost(notificationStepCost);
+                entity.setVat(vat);
                 break;
 
             default:

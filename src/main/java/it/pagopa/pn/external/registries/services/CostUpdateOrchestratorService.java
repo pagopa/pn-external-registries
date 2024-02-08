@@ -141,7 +141,7 @@ public class CostUpdateOrchestratorService {
             PaymentForRecipientInt paymentForRecipient
     ) {
         return costComponentService.insertStepCost(updateCostPhase, iun, paymentForRecipient.getRecIndex(),
-                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost)
+                        paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode(), notificationStepCost, vat)
                 .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
                         paymentForRecipient.getRecIndex(), e.getMessage()))
                 .flatMap(costComponent ->
