@@ -19,6 +19,7 @@ public class CostComponentsEntity {
     public static final String COL_FIRST_ANALOG_COST = "firstAnalogCost";
     public static final String COL_SECOND_ANALOG_COST = "secondAnalogCost";
     public static final String COL_IS_REFUSED_CANCELLED = "isRefusedCancelled";
+    public static final String COL_VAT = "vat";
 
     @Setter @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PK)}))
     private String pk; // iun + "##" + recIndex
@@ -33,7 +34,9 @@ public class CostComponentsEntity {
     private Integer firstAnalogCost = null;
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_SECOND_ANALOG_COST)}))
     private Integer secondAnalogCost = null;
-
     @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_IS_REFUSED_CANCELLED)}))
     private Boolean isRefusedCancelled = false;
+    @Setter @Getter(onMethod=@__({@DynamoDbAttribute(COL_VAT)}))
+    private Integer vat = null;
+
 }

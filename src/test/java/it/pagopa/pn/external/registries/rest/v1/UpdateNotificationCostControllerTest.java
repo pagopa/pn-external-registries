@@ -67,7 +67,9 @@ class UpdateNotificationCostControllerTest {
 
         final List<UpdateCostResponseInt> listUpdateCostResponse = getUpdateCostResponseInts(dto1, dto2);
     
-        when(service.handleCostUpdateForIuvs(Mockito.eq(request.getNotificationStepCost()),
+        when(service.handleCostUpdateForIuvs(
+                        Mockito.isNull(),
+                        Mockito.eq(request.getNotificationStepCost()),
                         Mockito.eq(request.getIun()),
                         Mockito.any(),
                         Mockito.eq(request.getEventTimestamp().toInstant()),

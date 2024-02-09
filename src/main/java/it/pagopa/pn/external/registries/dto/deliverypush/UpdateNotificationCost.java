@@ -14,6 +14,7 @@ public class UpdateNotificationCost {
     private String iun;
     private int recIndex;
     private int notificationStepCost;
+    private Integer vat;
     private Instant eventTimestamp;
     private Instant eventStorageTimestamp;
     private AnalogUpdateCostPhase updateCostPhase;

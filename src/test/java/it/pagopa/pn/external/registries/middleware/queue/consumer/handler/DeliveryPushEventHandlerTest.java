@@ -50,6 +50,7 @@ class DeliveryPushEventHandlerTest {
         List<UpdateCostResponseInt> updateCostResponseList = Collections.singletonList(response1);
         
         Mockito.when(costUpdateOrchestratorService.handleCostUpdateForIun(
+                updateNotificationCost.getVat(),
                 updateNotificationCost.getNotificationStepCost(),
                 updateNotificationCost.getIun(),
                 updateNotificationCost.getRecIndex(),
@@ -78,6 +79,7 @@ class DeliveryPushEventHandlerTest {
         List<UpdateCostResponseInt> updateCostResponseList = Collections.singletonList(response1);
 
         Mockito.when(costUpdateOrchestratorService.handleCostUpdateForIun(
+                updateNotificationCost.getVat(),
                 updateNotificationCost.getNotificationStepCost(),
                 updateNotificationCost.getIun(),
                 updateNotificationCost.getRecIndex(),
@@ -106,6 +108,7 @@ class DeliveryPushEventHandlerTest {
         List<UpdateCostResponseInt> updateCostResponseList = Collections.singletonList(response1);
 
         Mockito.when(costUpdateOrchestratorService.handleCostUpdateForIun(
+                updateNotificationCost.getVat(),
                 updateNotificationCost.getNotificationStepCost(),
                 updateNotificationCost.getIun(),
                 updateNotificationCost.getRecIndex(),

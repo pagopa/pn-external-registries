@@ -50,7 +50,8 @@ class CostUpdateOrchestratorServiceTest {
 
     private final int baseCost = 100;
     private final int notificationStepCost = 100;
-
+    private Integer vat = 22;
+    
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -81,7 +82,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
         when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
@@ -94,6 +96,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -139,7 +142,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
         //when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.empty());
@@ -152,6 +156,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIun(
+                vat,
                 notificationStepCost,
                 iun,
                 recIndex,
@@ -197,7 +202,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
         when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
@@ -211,6 +217,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIun(
+                    vat,
                     notificationStepCost,
                     iun,
                     recIndex,
@@ -253,7 +260,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                null
         );
         when(costComponentsDao.insertOrUpdate(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
@@ -264,6 +272,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                null,
                 notificationStepCost,
                 iun,
                 paymentsForRecipients,
@@ -311,7 +320,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
         when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
@@ -322,6 +332,7 @@ class CostUpdateOrchestratorServiceTest {
 
         // When
         List<UpdateCostResponseInt> result = costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                vat,
                 notificationStepCost,
                 iun,
                 paymentsForRecipients,
@@ -376,7 +387,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
         // we want to throw an exception on insertStepCost
         when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.error(new RuntimeException()));
@@ -389,6 +401,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    vat,
                     notificationStepCost,
                     iun,
                     paymentsForRecipients,
@@ -432,7 +445,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
 
         when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
@@ -446,6 +460,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    vat,
                     notificationStepCost,
                     iun,
                     paymentsForRecipients,
@@ -487,7 +502,8 @@ class CostUpdateOrchestratorServiceTest {
                 notificationStepCost,
                 0,
                 0,
-                false
+                false,
+                vat
         );
         when(costComponentsDao.updateNotNullIfExists(any())).thenReturn(Mono.just(costComponentsEntity));
         when(costComponentsDao.getItem(any(), any())).thenReturn(Mono.just(costComponentsEntity));
@@ -499,6 +515,7 @@ class CostUpdateOrchestratorServiceTest {
         // When
         try {
             costUpdateOrchestratorService.handleCostUpdateForIuvs(
+                    vat,
                     notificationStepCost,
                     iun,
                     paymentsForRecipients,

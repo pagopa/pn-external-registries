@@ -29,7 +29,9 @@ public class UpdateNotificationCostController implements UpdateNotificationCostA
     public Mono<ResponseEntity<UpdateNotificationCostResponseDto>> updateNotificationCost(Mono<UpdateNotificationCostRequestDto> updateNotificationCostRequestDto, final ServerWebExchange exchange) {
         return updateNotificationCostRequestDto.flatMap( res ->{
             final PaymentForRecipientInt[] paymentArray = getPaymentInfoForRecipient(res);
-            return service.handleCostUpdateForIuvs(res.getNotificationStepCost(), 
+            return service.handleCostUpdateForIuvs(
+                        null,
+                            res.getNotificationStepCost(), 
                             res.getIun(),
                             paymentArray,
                             res.getEventTimestamp().toInstant(),

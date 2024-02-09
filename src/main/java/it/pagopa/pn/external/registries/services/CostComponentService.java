@@ -5,6 +5,7 @@ import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
 import it.pagopa.pn.external.registries.middleware.db.mapper.CostComponentsMapper;
+import it.pagopa.pn.external.registries.util.CostUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class CostComponentService {
     }
 
     public Mono<CostComponentsInt> insertStepCost(CostUpdateCostPhaseInt updateCostPhase, String iun, int recIndex,
-                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost) {
+                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost, Integer vat) {
         final String insertString = "inserting cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
         final String updatingString = "updating cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
 
@@ -50,7 +51,7 @@ public class CostComponentService {
         entity.setFirstAnalogCost(null);
         entity.setSecondAnalogCost(null);
         entity.setIsRefusedCancelled(null);
-
+        
         switch (updateCostPhase) {
             case VALIDATION:
                 entity.setBaseCost(notificationStepCost);
@@ -71,7 +72,7 @@ public class CostComponentService {
                 entity.setFirstAnalogCost(0);
                 entity.setSecondAnalogCost(0);
                 entity.setIsRefusedCancelled(true);
-
+            
                 log.info(insertString,
                         pk, sk, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, updateCostPhase);
 
@@ -80,14 +81,17 @@ public class CostComponentService {
 
             case SEND_SIMPLE_REGISTERED_LETTER:
                 entity.setSimpleRegisteredLetterCost(notificationStepCost);
+                entity.setVat(vat);
                 break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_0:
                 entity.setFirstAnalogCost(notificationStepCost);
+                entity.setVat(vat);
                 break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_1:
                 entity.setSecondAnalogCost(notificationStepCost);
+                entity.setVat(vat);
                 break;
 
             default:
@@ -109,12 +113,12 @@ public class CostComponentService {
      * @param recIndex recipient index
      * @return a Mono of Integer (the computed total cost)
      */
-    public Mono<Integer> getTotalCost(String iun, int recIndex, String creditorTaxId, String noticeCode) {
+    public Mono<Integer> getTotalCost(Integer vat, String iun, int recIndex, String creditorTaxId, String noticeCode) {
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
-        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
-                pk, sk, iun, recIndex, creditorTaxId, noticeCode);
+        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={} vat={}",
+                pk, sk, iun, recIndex, creditorTaxId, noticeCode, vat);
 
         return getItem(iun, recIndex, creditorTaxId, noticeCode)
                 .map(entity -> {
@@ -140,8 +144,13 @@ public class CostComponentService {
                         if (secondAnalogCost == null) {
                             secondAnalogCost = 0;
                         }
-
-                        return baseCost + simpleRegisteredLetterCost + firstAnalogCost + secondAnalogCost;
+                        
+                        Integer analogCost = simpleRegisteredLetterCost + firstAnalogCost + secondAnalogCost;
+                        Integer analogCostWithVat = CostUtils.getCostWithVat(vat, analogCost);
+                        Integer totalCost = baseCost + analogCostWithVat;
+                        log.info("Get cost completed: analogCost={} analogCostWithVat={} totalCost={} - iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
+                                analogCost, analogCostWithVat, totalCost, iun, recIndex, creditorTaxId, noticeCode);
+                        return totalCost;
                     }
                 });
     }
