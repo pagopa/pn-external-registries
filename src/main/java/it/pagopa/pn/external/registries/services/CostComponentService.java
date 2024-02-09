@@ -113,7 +113,7 @@ public class CostComponentService {
      * @param recIndex recipient index
      * @return a Mono of Integer (the computed total cost)
      */
-    public Mono<Integer> getTotalCost(Integer vat, String iun, int recIndex, String creditorTaxId, String noticeCode) {
+    public Mono<Integer> getTotalCost(Integer vat, String iun, int recIndex, String creditorTaxId, String noticeCode) { 
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
