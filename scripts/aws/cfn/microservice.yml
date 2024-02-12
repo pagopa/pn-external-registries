@@ -46,6 +46,10 @@ Parameters:
     Type: String
     Description: 'Numero di giorni cuscinetto per evitare di inviare troppi optin all utente'
 
+  IoRemoteContentCfgId:
+    Type: String
+    Description: 'Identificativo di configurazione per inviare messaggi su IO'
+
   IsLollipopActive:
     Type: String
     Description: 'lollipop authorization activation flag'
@@ -423,6 +427,7 @@ Resources:
         ContainerEnvEntry26: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT_TTL_DAYS=${CostUpdateResultTableTtlDays}'
         ContainerEnvEntry27: !Sub 'SPRING_CLOUD_FUNCTIONROUTER_QUEUES_LIST=${DeliveryPushToExternalRegistriesQueueName}'
         ContainerEnvEntry28: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_BASE_URL=${GpdApiBaseUrl}'
+        ContainerEnvEntry29: !Sub 'PN_EXTERNAL_REGISTRY_IOREMOTECONTENTCFGID=${IoRemoteContentCfgId}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'

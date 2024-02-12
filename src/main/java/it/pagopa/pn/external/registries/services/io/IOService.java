@@ -161,6 +161,7 @@ public class IOService {
                    .originalSender( sendMessageRequestDto.getSenderDenomination() )
                    .originalReceiptDate(requestAcceptedDate)
                    .summary( sendMessageRequestDto.getSubject() )
+                   .configurationId( cfg.getIoRemoteContentCfgId() )
             );
 
             assert content.getThirdPartyData() != null;

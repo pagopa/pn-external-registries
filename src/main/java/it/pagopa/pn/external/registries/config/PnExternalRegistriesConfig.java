@@ -42,6 +42,7 @@ public class PnExternalRegistriesConfig {
     private String ioactApiKey;
     private String ioBaseUrl;
     private List<String> ioWhitelist;
+    private String ioRemoteContentCfgId;
 
     private boolean enableIoMessage;
     private boolean enableIoActivationMessage;

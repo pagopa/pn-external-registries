@@ -44,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class IOServiceTest {
 
+    public static final String IO_REMOTE_CONTENT_CFG_ID = "01HMVMHCZZ8D0VTFWMRHBM5D6F";
     @InjectMocks
     private IOService service;
 
@@ -192,6 +193,7 @@ class IOServiceTest {
 
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getIoRemoteContentCfgId() ).thenReturn( IO_REMOTE_CONTENT_CFG_ID );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( ioMessagesDao.save(Mockito.any(IOMessagesEntity.class)) ).thenReturn(Mono.empty());
@@ -252,6 +254,7 @@ class IOServiceTest {
 
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getIoRemoteContentCfgId() ).thenReturn( IO_REMOTE_CONTENT_CFG_ID );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( ioSentMessageService.sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(Mono.empty());
