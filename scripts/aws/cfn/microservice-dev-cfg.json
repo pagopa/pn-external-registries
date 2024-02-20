@@ -22,6 +22,7 @@
     "MountEfs": "false",
     "CostUpdateResultTableTtlDays": "365",
     "GpdApiBaseUrl": "https://api.uat.platform.pagopa.it/pn-integration-gpd/api/v1",
-    "IoRemoteContentCfgId": "01HMVMHCZZ8D0VTFWMRHBM5D6F"
+    "IoRemoteContentCfgId": "01HMVMHCZZ8D0VTFWMRHBM5D6F",
+    "SendPortalUrl": "https://notifichedigitali.pagopa.it"
   }
 }

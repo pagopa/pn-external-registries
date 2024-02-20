@@ -394,6 +394,7 @@ public class IOService {
     {
         // per ora si fa una semplice sostituzione cablata sui nomi delle variabili
         return markdown
+                .replace("${piattaformaNotificheURLCittadini}", cfg.getPiattaformanotificheurlCittadini())
                 .replace("${piattaformaNotificheURLTOS}", cfg.getPiattaformanotificheurlTos())
                 .replace("${piattaformaNotificheURLPrivacy}", cfg.getPiattaformanotificheurlPrivacy());
     }

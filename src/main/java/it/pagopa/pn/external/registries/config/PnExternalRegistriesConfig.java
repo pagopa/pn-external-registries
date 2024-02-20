@@ -67,6 +67,7 @@ public class PnExternalRegistriesConfig {
 
     private int dynamodbTableNameCostUpdateResultTtlDays;
 
+    private String piattaformanotificheurlCittadini;
     private String piattaformanotificheurlTos;
     private String piattaformanotificheurlPrivacy;
 

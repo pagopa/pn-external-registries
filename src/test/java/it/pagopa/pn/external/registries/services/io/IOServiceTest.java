@@ -374,6 +374,7 @@ class IOServiceTest {
         //When
         Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlCittadini() ).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
         Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
@@ -609,6 +610,7 @@ class IOServiceTest {
         Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlCittadini() ).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
         Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
