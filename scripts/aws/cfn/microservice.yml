@@ -167,7 +167,12 @@ Parameters:
 
   PortalUrl:
     Type: String
-    Description: 'Url del portale della da inserire negli avvisi a IO'
+    Description: 'Url del portale cittadini da inserire negli avvisi a IO'
+
+  SendPortalUrl:
+    Type: String
+    Description: 'Url del portale SEND da inserire negli avvisi verso appIO'
+    Default: 'https://notifichedigitali.pagopa.it'
 
   DeliveryPushInputsQueueName:
     Type: String
@@ -429,6 +434,7 @@ Resources:
         ContainerEnvEntry27: !Sub 'SPRING_CLOUD_FUNCTIONROUTER_QUEUES_LIST=${DeliveryPushToExternalRegistriesQueueName}'
         ContainerEnvEntry28: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_BASE_URL=${GpdApiBaseUrl}'
         ContainerEnvEntry29: !Sub 'PN_EXTERNAL_REGISTRY_IO_REMOTE_CONTENT_CFG_ID=${IoRemoteContentCfgId}'
+        ContainerEnvEntry30: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_CITTADINI=${SendPortalUrl}/cittadini'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'

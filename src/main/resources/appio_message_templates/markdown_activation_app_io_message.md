@@ -8,32 +8,11 @@ en:
         text: "Activate the service"
         action: "ioit://services/service-detail?serviceId=01G40DWQGKY5GRWSNM4303VNRP&activate=true"
 ---
-Da oggi, potrai ricevere direttamente in app le raccomandate che di solito ti vengono inviate in cartaceo!
+Ciao,
+hai ricevuto su SEND una notifica, ovvero una **comunicazione a valore legale** emessa in via ufficiale da un'amministrazione.
 
-### Quali sono i vantaggi?
+Per poter visualizzare i documenti notificati e pagare eventuali spese direttamente in app, **attiva il servizio SEND - Notifiche digitali** dal pulsante che vedi qui sotto. In questo modo, eviterai di ricevere la raccomandata cartacea.
 
-- **Niente più raccomandate di carta:** le comunicazioni importanti diventano immediate e digitali;
+SEND è uno strumento che rende l’invio di notifiche da parte della Pubblica Amministrazione sicuro, efficiente ed economico. Per saperne di più e per ricevere assistenza, [visita questo sito](${piattaformaNotificheURLCittadini}).
 
-- **Risparmia sui costi**: con l'invio digitale, diminuiscono i costi di notificazione;
-
-- **Più tempo per te**: niente più attese per il ritiro;
-
-- **Proteggi l'ambiente**: meno carta e meno emissioni per il trasporto;
-
-- **Risparmia spazio**: non servirà più conservare i documenti stampati.
-
-### Cos'è una notifica?
-Una notifica è una **comunicazione a valore legale**, emessa in via ufficiale da un'amministrazione.
-Aprire su IO un messaggio inviato dal servizio "Notifiche digitali" di SEND equivale a firmare la ricevuta di ritorno di una
-raccomandata tradizionale.
-
-### Perché dovrei attivare il servizio?
-Perché IO è integrata a SEND e, tramite il servizio "Notifiche digitali",
-ti invierà un messaggio ogni volta che ricevi una notifica.
-Potrai leggerla, visualizzare gli allegati e pagare eventuali spese direttamente in app.
-
-Se non hai una PEC nei registri pubblici o non l’hai fornita su SEND e apri su IO un messaggio 
-inviato da questo servizio entro 5 giorni (120 ore) dal suo invio, non riceverai la notifica tramite raccomandata.
-
-Premendo "Attiva il servizio" dichiari di avere letto e compreso i
-[Termini e condizioni d'uso](${piattaformaNotificheURLTOS} ) e [l'Informativa privacy](${piattaformaNotificheURLPrivacy}).
+Premendo “Attiva il servizio” accetti i [Termini e condizioni d'uso](${piattaformaNotificheURLTOS}) e confermi di avere letto l’[Informativa privacy](${piattaformaNotificheURLPrivacy}).

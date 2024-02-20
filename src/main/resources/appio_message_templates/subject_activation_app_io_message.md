@@ -1,1 +1,1 @@
-Vuoi ricevere le notifiche digitali?
+Hai ricevuto una comunicazione a valore legale
