@@ -81,6 +81,8 @@ public class PnExternalRegistriesConfig {
 
     private String onetrustToken;
     private String onetrustBaseUrl;
+    private Integer onetrustRetryMaxAttempts;
+    private Integer onetrustReadTimeoutMillis;
 
     private List<String> aoouosenderid;
 

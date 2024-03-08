@@ -3,6 +3,8 @@ package it.pagopa.pn.external.registries.middleware.msclient.onetrust;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import lombok.CustomLog;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -60,6 +62,18 @@ public class OneTrustClient extends CommonBaseClient {
                     log.logInvokationResultDownstreamFailed(ONE_TRUST, elabExceptionMessage(throwable));
                     log.error(String.format("Error from OnTrust with privacyNoticeId: %s", privacyNoticeId), throwable);
                 });
+    }
+
+    @Autowired
+    @Override
+    public void setRetryMaxAttempts(@Value("${pn.external-registry.onetrust-retry-max-attempts}") int retryMaxAttempts) {
+        super.setRetryMaxAttempts(retryMaxAttempts);
+    }
+
+    @Autowired
+    @Override
+    public void setReadTimeoutMillis(@Value("${pn.external-registry.onetrust-read-timeout-millis}") int readTimeoutMillis) {
+        super.setReadTimeoutMillis(readTimeoutMillis);
     }
 
 }
