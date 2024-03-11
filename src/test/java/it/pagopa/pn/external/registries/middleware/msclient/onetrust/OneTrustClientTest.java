@@ -2,41 +2,42 @@ package it.pagopa.pn.external.registries.middleware.msclient.onetrust;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import io.netty.handler.timeout.ReadTimeoutException;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.Delay;
 import org.mockserver.model.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 import static it.pagopa.pn.external.registries.middleware.msclient.onetrust.OneTrustClient.PRIVACY_NOTICES_URL;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-class OneTrustClientTest {
+@SpringBootTest(properties = {
+        "pn.external-registry.onetrust-base-url=http://localhost:9999",
+        "pn.external-registry.onetrust-token=token-12345"
+})
+class OneTrustClientTest extends MockAWSObjectsTestConfig {
 
     private static ClientAndServer mockServer;
+
+    @Autowired
     private OneTrustClient client;
 
-
-    @BeforeEach
-    void setup() {
-        PnExternalRegistriesConfig cfg = Mockito.mock(PnExternalRegistriesConfig.class);
-        Mockito.when( cfg.getOnetrustBaseUrl() ).thenReturn( "http://localhost:9999" );
-        Mockito.when( cfg.getOnetrustToken() ).thenReturn( "token-12345" );
-        this.client = new OneTrustClient(cfg);
-        this.client.init();
-    }
 
     @BeforeAll
     public static void startMockServer() {
@@ -90,6 +91,34 @@ class OneTrustClientTest {
         Mono<PrivacyNoticeOneTrustResponse> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("z0da531e-8370-4373-8bd2-61ddc89e7fa6");
         StepVerifier.create(actualResponse)
                 .expectError(WebClientResponseException.InternalServerError.class)
+                .verify();
+
+    }
+
+    //testo il read timeout impostato da pn.external-registry.onetrust-read-timeout-millis o
+    // PN_EXTERNAL_REGISTRY_ONETRUST_READ_TIMEOUT_MILLIS
+    @Test
+    void getPrivacyNoticeVersionByPrivacyNoticeIdKOReadTimeout() {
+
+
+        new MockServerClient("localhost", 9999)
+                .when(request()
+                        .withMethod("GET")
+                        .withPath(PRIVACY_NOTICES_URL.replace("{privacyNoticeId}", "read-timeout"))
+                        .withQueryStringParameter("date", LocalDate.now().plusDays(1).toString())
+                        .withHeader(HttpHeaders.AUTHORIZATION, "Bearer " + "token-12345"))
+                .respond(response()
+                        .withDelay(Delay.delay(TimeUnit.SECONDS, 5))
+                        .withBody(oneTrustResponse())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200));
+
+        Mono<PrivacyNoticeOneTrustResponse> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("read-timeout");
+        StepVerifier.create(actualResponse)
+                .expectErrorMatches(throwable ->
+                    throwable instanceof WebClientRequestException wex
+                            && wex.getMostSpecificCause() instanceof ReadTimeoutException
+                )
                 .verify();
 
     }
