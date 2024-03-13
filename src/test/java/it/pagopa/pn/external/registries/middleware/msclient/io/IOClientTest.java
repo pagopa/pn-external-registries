@@ -85,6 +85,42 @@ class IOOptInTest extends MockAWSObjectsTestConfig {
     }
 
     @Test
+    void getProfileByPOSTNotFound() {
+        //Given
+        LimitedProfile responseDto = new LimitedProfile()
+            .preferredLanguages(Collections.singletonList( "it_IT" ))
+            .senderAllowed( true );
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( LimitedProfile.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( responseDto );
+        } catch ( JsonProcessingException e ){
+            e.printStackTrace();
+        }
+
+
+        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000A" );
+
+        new MockServerClient( "localhost", 9999 )
+            .when( request()
+                .withMethod( "POST" )
+                .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
+                .withPath( "/profiles" ))
+            .respond( response()
+                .withStatusCode( 404 ));
+
+        //When
+        LimitedProfile limitedProfile = client.getProfileByPOST( fiscalCodePayload ).block();
+
+        //Then
+        Assertions.assertNotNull( limitedProfile );
+    }
+
+    @Test
     void submitMessageforUserWithFiscalCodeInBody() {
         //Given
         MessageContent messageContent = new MessageContent()
