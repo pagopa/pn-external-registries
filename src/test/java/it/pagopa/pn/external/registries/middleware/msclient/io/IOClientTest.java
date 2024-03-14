@@ -17,6 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Collections;
+import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
+import reactor.core.publisher.Mono;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -114,10 +116,10 @@ class IOOptInTest extends MockAWSObjectsTestConfig {
                 .withStatusCode( 404 ));
 
         //When
-        LimitedProfile limitedProfile = client.getProfileByPOST( fiscalCodePayload ).block();
+        Mono<LimitedProfile> getProfile = client.getProfileByPOST(fiscalCodePayload);
 
         //Then
-        Assertions.assertNotNull( limitedProfile );
+        Assertions.assertThrows(NotFound.class, ()->getProfile.block());
     }
 
     @Test
