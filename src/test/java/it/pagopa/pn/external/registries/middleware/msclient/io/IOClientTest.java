@@ -6,8 +6,10 @@ import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.*;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -32,20 +34,20 @@ import static org.mockserver.model.HttpResponse.response;
         "pn.external-registry.io-api-key=fake_api_key",
         "pn.external-registry.ioact-api-key=fake_api_key_activation"
 })
-class IOOptInTest extends MockAWSObjectsTestConfig {
+class IOClientTest extends MockAWSObjectsTestConfig {
 
     @Autowired
     private IOOptInClient client;
 
     private static ClientAndServer mockServer;
 
-    @BeforeAll
-    public static void startMockServer() {
+    @BeforeEach
+    public void startMockServer() {
         mockServer = startClientAndServer(9999);
     }
 
-    @AfterAll
-    public static void stopMockServer() {
+    @AfterEach
+    public void stopMockServer() {
         mockServer.stop();
     }
 
