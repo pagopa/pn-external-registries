@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.*;
+import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -89,23 +90,8 @@ class IOOptInTest extends MockAWSObjectsTestConfig {
     @Test
     void getProfileByPOSTNotFound() {
         //Given
-        LimitedProfile responseDto = new LimitedProfile()
-            .preferredLanguages(Collections.singletonList( "it_IT" ))
-            .senderAllowed( true );
-
-        byte[] responseBodyBites = new byte[0];
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writerFor( LimitedProfile.class );
-        try {
-            responseBodyBites = mapper.writeValueAsBytes( responseDto );
-        } catch ( JsonProcessingException e ){
-            e.printStackTrace();
-        }
-
-
         FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000A" );
+        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000B" );
 
         new MockServerClient( "localhost", 9999 )
             .when( request()
@@ -116,10 +102,10 @@ class IOOptInTest extends MockAWSObjectsTestConfig {
                 .withStatusCode( 404 ));
 
         //When
-        Mono<LimitedProfile> getProfile = client.getProfileByPOST(fiscalCodePayload);
+        Mono<LimitedProfile> getProfileRequest = client.getProfileByPOST(fiscalCodePayload);
 
         //Then
-        Assertions.assertThrows(NotFound.class, ()->getProfile.block());
+        Assertions.assertThrows(NotFound.class, ()->getProfileRequest.block(Duration.ofSeconds(5)));
     }
 
     @Test
