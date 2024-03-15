@@ -14,6 +14,7 @@ import lombok.CustomLog;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -75,7 +76,11 @@ class IOClient extends OcpBaseClient {
         }
 
         return ioApi.getProfileByPOST( payload ).doOnError(throwable -> {
-            log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
+            if (throwable instanceof NotFound){
+                log.logInvokationResultDownstreamNotFound(IO, elabExceptionMessage(throwable));
+            }else {
+                log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
+            }
         });
     }
 

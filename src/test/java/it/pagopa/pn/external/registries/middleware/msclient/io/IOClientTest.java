@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.*;
+import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -17,6 +20,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Collections;
+import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound;
+import reactor.core.publisher.Mono;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -29,20 +34,20 @@ import static org.mockserver.model.HttpResponse.response;
         "pn.external-registry.io-api-key=fake_api_key",
         "pn.external-registry.ioact-api-key=fake_api_key_activation"
 })
-class IOOptInTest extends MockAWSObjectsTestConfig {
+class IOClientTest extends MockAWSObjectsTestConfig {
 
     @Autowired
     private IOOptInClient client;
 
     private static ClientAndServer mockServer;
 
-    @BeforeAll
-    public static void startMockServer() {
+    @BeforeEach
+    public void startMockServer() {
         mockServer = startClientAndServer(9999);
     }
 
-    @AfterAll
-    public static void stopMockServer() {
+    @AfterEach
+    public void stopMockServer() {
         mockServer.stop();
     }
 
@@ -82,6 +87,27 @@ class IOOptInTest extends MockAWSObjectsTestConfig {
 
         //Then
         Assertions.assertNotNull( limitedProfile );
+    }
+
+    @Test
+    void getProfileByPOSTNotFound() {
+        //Given
+        FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
+        fiscalCodePayload.setFiscalCode( "EEEEEE00E00E000B" );
+
+        new MockServerClient( "localhost", 9999 )
+            .when( request()
+                .withMethod( "POST" )
+                .withHeader("Ocp-Apim-Subscription-Key", "fake_api_key_activation")
+                .withPath( "/profiles" ))
+            .respond( response()
+                .withStatusCode( 404 ));
+
+        //When
+        Mono<LimitedProfile> getProfileRequest = client.getProfileByPOST(fiscalCodePayload);
+
+        //Then
+        Assertions.assertThrows(NotFound.class, ()->getProfileRequest.block(Duration.ofSeconds(5)));
     }
 
     @Test
