@@ -261,6 +261,22 @@ class InfoPaymentServiceTest {
                 .expectError(PnNotFoundException.class)
                 .verify();
     }
+    @Test
+    void checkoutCartKo422() {
+        final String RETURN_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETURN_URL);
+        CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
+
+        Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
+            .thenReturn(Mono.just(ResponseEntity.status(422).build()));
+
+        Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
+
+        StepVerifier.create(response)
+            .expectSubscription()
+            .expectError(PnNotFoundException.class)
+            .verify();
+    }
 
     @Test
     void checkoutCartKoBadRequest() {

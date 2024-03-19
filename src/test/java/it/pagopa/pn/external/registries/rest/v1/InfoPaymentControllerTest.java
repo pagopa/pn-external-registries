@@ -5,13 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import it.pagopa.pn.external.registries.services.InfoPaymentService;
 import it.pagopa.pn.external.registries.services.SendPaymentNotificationService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
@@ -36,6 +39,9 @@ class InfoPaymentControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @MockBean
+    private CheckoutClient checkoutClient;
 
     @Test
     void getPaymentInfoSuccess() {
@@ -136,6 +142,33 @@ class InfoPaymentControllerTest {
                 .body(BodyInserters.fromPublisher(Mono.just(paymentRequestDto), PaymentRequestDto.class))
                 .exchange()
                 .expectStatus().isNotFound();
+
+        Mockito.verify(service, Mockito.times(1)).checkoutCart(paymentRequestDto);
+    }
+
+    @Test
+    void checkoutCartKo422() {
+        final String url = "/ext-registry/pagopa/v1/checkout-cart";
+        final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
+            .paymentNotice(new PaymentNoticeDto()
+                .noticeNumber("302012387654312384")
+                .amount(1500)
+                .fiscalCode("77777777777")
+                .description("description")
+                .companyName("companyName"))
+            .returnUrl(RETUNR_URL);
+
+//        Mockito.when( service.checkoutCart(paymentRequestDto)).thenThrow(new PnNotFoundException("", "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND));
+
+        Mockito.when(checkoutClient.checkoutCart(Mockito.any()))
+            .thenReturn(Mono.just(ResponseEntity.status(422).build()));
+
+        webTestClient.post()
+            .uri(url)
+            .body(BodyInserters.fromPublisher(Mono.just(paymentRequestDto), PaymentRequestDto.class))
+            .exchange()
+            .expectStatus().isNotFound();
 
         Mockito.verify(service, Mockito.times(1)).checkoutCart(paymentRequestDto);
     }
