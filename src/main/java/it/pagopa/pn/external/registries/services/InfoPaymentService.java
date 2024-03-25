@@ -160,6 +160,11 @@ public class InfoPaymentService {
         if(httpResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
             throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
         }
+
+        if(httpResponse.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY){
+            throw new PnUnprocessableEntityException("Unprocessable Entity", ERROR_CODE_UNPROCESSABLE_ENTITY);
+        }
+
         throw new PnNotFoundException("Checkout postPayment status response " + httpResponse.getStatusCode(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
     }
 

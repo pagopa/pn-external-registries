@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnUnprocessableEntityException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.ValidationFaultPaymentProblemJsonDto;
@@ -274,7 +275,7 @@ class InfoPaymentServiceTest {
 
         StepVerifier.create(response)
             .expectSubscription()
-            .expectError(PnNotFoundException.class)
+            .expectError(PnUnprocessableEntityException.class)
             .verify();
     }
 

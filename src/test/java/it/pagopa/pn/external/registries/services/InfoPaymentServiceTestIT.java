@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -31,7 +32,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-public class InfoPaymentServiceTestIT {
+class InfoPaymentServiceTestIT {
     private final Duration d = Duration.ofMillis(3000);
 
     @Autowired
@@ -51,8 +52,6 @@ public class InfoPaymentServiceTestIT {
 
     @Test
     void checkoutCartKo422() {
-//        Mockito.when(checkoutClient.checkoutCart(Mockito.any()))
-//            .thenReturn(Mono.just(ResponseEntity.status(422).build()));
 
         Mockito.when(defaultApiClientCartCheckout.postCartsWithHttpInfo(Mockito.any())).thenReturn(Mono.just(ResponseEntity.status(422).build()));
 
@@ -67,12 +66,11 @@ public class InfoPaymentServiceTestIT {
                 .companyName("companyName"))
             .returnUrl(RETURN_URL);
 
-        webTestClient.post()
+        var code = webTestClient.post()
             .uri(url)
             .body(BodyInserters.fromPublisher(Mono.just(paymentRequestDto), PaymentRequestDto.class))
             .exchange()
-            .expectStatus().isNotFound();
+            .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
 
-        //assertNotNull(res.block(d));
     }
 }
