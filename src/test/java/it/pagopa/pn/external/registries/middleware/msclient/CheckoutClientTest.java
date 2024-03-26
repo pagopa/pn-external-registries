@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.test.StepVerifier;
 
 import java.net.URI;
@@ -125,4 +126,63 @@ class CheckoutClientTest extends MockAWSObjectsTestConfig {
                 .verifyComplete();
     }
 
+    @Test
+    void checkoutCartKO422() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CartRequestDto cartRequestDto = new CartRequestDto()
+            .paymentNotices(List.of(new PaymentNoticeDto()
+                .noticeNumber("302012387654312384")
+                .amount(1500)
+                .fiscalCode("77777777777")))
+            .returnUrls(new CartRequestReturnUrlsDto()
+                .returnOkUrl(URI.create("https://localhost:433/ok"))
+                .returnErrorUrl(URI.create("https://localhost:433/error"))
+                .returnCancelUrl(URI.create("https://localhost:433/cancel")));
+
+        new MockServerClient("localhost", 9999)
+            .when(request()
+                .withMethod("POST")
+                .withPath("/carts")
+                .withBody(objectMapper.writeValueAsString(cartRequestDto))
+            )
+            .respond(response()
+                .withStatusCode(422)
+                .withHeader(HttpHeaders.LOCATION, "https://localhost:433/ok")
+                .withHeader(HttpHeaders.CONNECTION, "keep-alive")
+                .withHeader(HttpHeaders.CONTENT_LENGTH, "0"));
+
+        StepVerifier.create(client.checkoutCart(cartRequestDto))
+            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException.UnprocessableEntity)
+            .verify();
+    }
+
+    @Test
+    void checkoutCartKO404() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CartRequestDto cartRequestDto = new CartRequestDto()
+            .paymentNotices(List.of(new PaymentNoticeDto()
+                .noticeNumber("302012387654312384")
+                .amount(1500)
+                .fiscalCode("77777777777")))
+            .returnUrls(new CartRequestReturnUrlsDto()
+                .returnOkUrl(URI.create("https://localhost:433/ok"))
+                .returnErrorUrl(URI.create("https://localhost:433/error"))
+                .returnCancelUrl(URI.create("https://localhost:433/cancel")));
+
+        new MockServerClient("localhost", 9999)
+            .when(request()
+                .withMethod("POST")
+                .withPath("/carts")
+                .withBody(objectMapper.writeValueAsString(cartRequestDto))
+            )
+            .respond(response()
+                .withStatusCode(404)
+                .withHeader(HttpHeaders.LOCATION, "https://localhost:433/ok")
+                .withHeader(HttpHeaders.CONNECTION, "keep-alive")
+                .withHeader(HttpHeaders.CONTENT_LENGTH, "0"));
+
+        StepVerifier.create(client.checkoutCart(cartRequestDto))
+            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException.NotFound)
+            .verify();
+    }
 }
