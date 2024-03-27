@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnUnprocessableEntityException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.ValidationFaultPaymentProblemJsonDto;
@@ -263,13 +264,31 @@ class InfoPaymentServiceTest {
     }
 
     @Test
+    void checkoutCartKo422() {
+        final String RETURN_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
+        PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETURN_URL);
+        CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
+
+        Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
+        .thenReturn(Mono.error(WebClientResponseException.create(422, "UnprocessableEntity REQUEST", new HttpHeaders(), "Test for 422 response".getBytes(),null)));
+
+        Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
+
+        StepVerifier.create(response)
+            .expectSubscription()
+            .expectError(PnUnprocessableEntityException.class)
+            .verify();
+    }
+
+    @Test
     void checkoutCartKoBadRequest() {
         final String RETUNR_URL = "https://portale.dev.pn.pagopa.it/notifiche/24556b11-c871-414e-92af-2583b481ffda/NMGY-QWAH-XGLK-202212-G-1/dettaglio";
         PaymentRequestDto paymentRequestDto = buildPaymentRequestDto(RETUNR_URL);
         CartRequestDto cartRequestDto = service.toCartRequestDto(paymentRequestDto);
 
+        HttpHeaders headers = new HttpHeaders();
         Mockito.when(checkoutClient.checkoutCart(cartRequestDto))
-                .thenReturn(Mono.just(ResponseEntity.status(400).build()));
+            .thenReturn(Mono.error(WebClientResponseException.create(400, "BAD REQUEST", headers, "Test for bad request".getBytes(),null)));
 
         Mono<PaymentResponseDto> response = service.checkoutCart(paymentRequestDto);
 

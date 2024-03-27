@@ -5,13 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
+import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import it.pagopa.pn.external.registries.services.InfoPaymentService;
 import it.pagopa.pn.external.registries.services.SendPaymentNotificationService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
@@ -36,6 +39,9 @@ class InfoPaymentControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @MockBean
+    private CheckoutClient checkoutClient;
 
     @Test
     void getPaymentInfoSuccess() {

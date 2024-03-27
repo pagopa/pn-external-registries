@@ -148,18 +148,24 @@ public class InfoPaymentService {
                 .doOnNext(voidResponseEntity -> log.info("Response Status from checkout for noticeNumber {}: {}",
                         paymentRequestDto.getPaymentNotice().getNoticeNumber(), voidResponseEntity.getStatusCode()))
                 .map( this::manageCheckoutResponse)
-                .doOnError(throwable -> log.error(String.format("Error in checkoutCart with noticeNumber %s",
+            .onErrorResume(error -> {
+                if (error instanceof WebClientResponseException.UnprocessableEntity){
+                    throw new PnUnprocessableEntityException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
+                } else  if (error instanceof  WebClientResponseException.BadRequest){
+                    throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
+                } else {
+                    throw new PnNotFoundException("Checkout error: " + error.getMessage(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
+                }
+
+            })
+            .doOnError(throwable -> log.error(String.format("Error in checkoutCart with noticeNumber %s",
                         paymentRequestDto.getPaymentNotice().getNoticeNumber()), throwable));
     }
-
     private PaymentResponseDto manageCheckoutResponse(ResponseEntity<Void> httpResponse) {
         if(httpResponse.getStatusCode().value() == 302) {
             return buildPaymentResponseDto(httpResponse.getHeaders().getLocation());
         }
 
-        if(httpResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
-            throw new PnCheckoutBadRequestException("Checkout bad request", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
-        }
         throw new PnNotFoundException("Checkout postPayment status response " + httpResponse.getStatusCode(), "", ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
     }
 
