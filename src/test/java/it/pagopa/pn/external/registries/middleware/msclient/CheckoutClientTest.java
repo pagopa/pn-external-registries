@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.*;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -43,13 +45,13 @@ class CheckoutClientTest extends MockAWSObjectsTestConfig {
     private static ClientAndServer mockServer;
 
 
-    @BeforeAll
-    public static void startMockServer() {
+    @BeforeEach
+    public void startMockServer() {
         mockServer = startClientAndServer(9999);
     }
 
-    @AfterAll
-    public static void stopMockServer() {
+    @AfterEach
+    public void stopMockServer() {
         mockServer.stop();
     }
 
