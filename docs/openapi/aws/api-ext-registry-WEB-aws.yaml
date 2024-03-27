@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: P6HiWiVIkbA4JUq8FyemOEE3IZTXXFHfQTWQhxN0sWQ=
+  version: 1jdOMXJG1SlPzpbXDys5z0ZgKPkq8sMfDm+FJsBrZPA=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -530,6 +530,16 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '404':
           description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
