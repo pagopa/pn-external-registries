@@ -299,6 +299,37 @@ class InfoPaymentServiceTest {
     }
 
 
+    @Test
+    void getInfoPaymentPaymentUnavailable() {
+
+        ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
+        responseBody.setCategory( "DOMAIN_UNKNOWN" );
+        responseBody.setDetailV2( "PAA_SYSTEM_ERROR" );
+        responseBody.setDetail("PAYMENT_UNAVAILABLE");
+
+        byte[] responseBodyBites = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writerFor( ValidationFaultPaymentProblemJsonDto.class );
+        try {
+            responseBodyBites = mapper.writeValueAsBytes( responseBody );
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        WebClientResponseException ex = WebClientResponseException.InternalServerError.create( 502, "502", null, responseBodyBites , StandardCharsets.UTF_8  );
+
+        Mockito.when( checkoutClient.getPaymentInfo( Mockito.anyString() ) ).thenReturn( Mono.error( ex ) );
+
+        PaymentInfoRequestDto requestInnerDto = new PaymentInfoRequestDto();
+        requestInnerDto.setCreditorTaxId("asdasda");
+        requestInnerDto.setNoticeCode("asdasda");
+
+        List<PaymentInfoV21Dto> result = service.getPaymentInfo( Flux.just(requestInnerDto) ).block(Duration.ofMillis( 3000 ));
+
+        assertNotNull( result );
+        assertEquals( PaymentStatusDto.FAILURE, result.get(0).getStatus() );
+    }
 
     private PaymentRequestDto buildPaymentRequestDto(String returnUrl) {
         return new PaymentRequestDto()

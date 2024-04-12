@@ -89,11 +89,18 @@ public class InfoPaymentService {
             paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
             paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
             paymentInfoDto.setDetailV2(String.format(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber));
-        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException e) {
-            log.error(
+        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException | PnCheckoutNotFoundException e) {
+            if (e instanceof PnCheckoutServerErrorException){
+                log.error(
                     "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
                     status, paTaxId, noticeNumber, e
-            );
+                );
+            } else {
+                log.warn(
+                    "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
+                    status, paTaxId, noticeNumber, e
+                );
+            }
             paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
             paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
             paymentInfoDto.setDetailV2(e.getMessage());
@@ -117,7 +124,7 @@ public class InfoPaymentService {
                     ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_BAD_REQUEST);
         }
         if (HttpStatus.NOT_FOUND.equals(status)) {
-            throw new PnCheckoutBadRequestException(
+            throw new PnCheckoutNotFoundException(
                     "Node cannot find the services needed to process this request in its configuration." +
                             "This error is most likely to occur when submitting a non-existing RPT id",
                     ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_NOT_FOUND);
