@@ -1,7 +1,7 @@
 ---
 it:
     cta_1:
-        text: "Attiva il servizio"
+        text: "Attiva per leggere la notifica"
         action: "ioit://services/service-detail?serviceId=01G40DWQGKY5GRWSNM4303VNRP&activate=true"
 en:
     cta_1:
@@ -9,10 +9,9 @@ en:
         action: "ioit://services/service-detail?serviceId=01G40DWQGKY5GRWSNM4303VNRP&activate=true"
 ---
 Ciao,
-hai ricevuto su SEND una notifica, ovvero una **comunicazione a valore legale** emessa in via ufficiale da un'amministrazione.
+hai ricevuto una notifica da SEND - Servizio Notifiche digitali, ovvero una **comunicazione a valore legale** emessa in via ufficiale da un'amministrazione.
 
-Per poter visualizzare i documenti notificati e pagare eventuali spese direttamente in app, **attiva il servizio SEND - Notifiche digitali** dal pulsante che vedi qui sotto. In questo modo, eviterai di ricevere la raccomandata cartacea.
+Per leggere i documenti e pagare eventuali spese direttamente su IO, **attiva il servizio** premendo il pulsante qui sotto. In questo modo, eviterai di ricevere la raccomandata cartacea.
 
-SEND è uno strumento che rende l’invio di notifiche da parte della Pubblica Amministrazione sicuro, efficiente ed economico. Per saperne di più e per ricevere assistenza, [visita questo sito](${piattaformaNotificheURLCittadini}).
+Premendo “Attiva per leggere la notifica” accetti i [Termini e condizioni d'uso](${piattaformaNotificheURLTOS}) e confermi di avere letto l’[Informativa privacy](${piattaformaNotificheURLPrivacy}).
 
-Premendo “Attiva il servizio” accetti i [Termini e condizioni d'uso](${piattaformaNotificheURLTOS}) e confermi di avere letto l’[Informativa privacy](${piattaformaNotificheURLPrivacy}).
