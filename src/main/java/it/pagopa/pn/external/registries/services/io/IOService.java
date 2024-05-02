@@ -134,20 +134,14 @@ public class IOService {
             FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
             MessageContent content = new MessageContent();
 
-            String ioSubject = sendMessageRequestDto.getSubject();
-
-            String truncatedIoSubject = ioSubject;
-            if(ioSubject.length() > 120){
-                truncatedIoSubject = ioSubject.substring(0, 120);
-            }
-
             log.info("Get profile by post iun={}", sendMessageRequestDto.getIun());
             fiscalCodePayload.setFiscalCode(sendMessageRequestDto.getRecipientTaxID());
             if (sendMessageRequestDto.getDueDate()!=null) {
                 DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 content.setDueDate( fmt.format(sendMessageRequestDto.getDueDate() ));
             }
-            content.setSubject( truncatedIoSubject );
+            // ora il subject è deciso da ext-registry
+            content.setSubject(enrichWithIun(cfg.getAppIoTemplate().getSubjectCourtesyAppIoMessage(), sendMessageRequestDto.getIun()));
             content.setMarkdown( localeIsIT?cfg.getAppIoTemplate().getMarkdownUpgradeAppIoITMessage():cfg.getAppIoTemplate().getMarkdownUpgradeAppIoENMessage());
 
             String requestAcceptedDate = null;
@@ -388,6 +382,11 @@ public class IOService {
                 .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM))
                 .replace(SENDER_DENOMINATION_PLACEHOLDER, responseDto.getMessageParams().get(SENDER_DENOMINATION_PARAM))
                 .replace(SUBJECT_PLACEHOLDER, responseDto.getMessageParams().get(SUBJECT_PARAM)));
+    }
+
+
+    private String enrichWithIun(String message, String iun) {
+        return message.replace(IUN_PLACEHOLDER, iun);
     }
 
     private String composeFinalMarkdown(String markdown)
