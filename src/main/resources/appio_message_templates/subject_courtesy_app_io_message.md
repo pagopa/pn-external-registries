@@ -1,1 +1,1 @@
-Hai ricevuto una comunicazione a valore legale - IUN: {{iun}}
+Comunicazione a valore legale da {{senderDenomination}}

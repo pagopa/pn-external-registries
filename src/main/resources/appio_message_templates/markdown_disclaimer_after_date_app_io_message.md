@@ -6,6 +6,4 @@ tramite altri canali digitali o tramite raccomandata.
 
 __Mittente__: {{senderDenomination}}
 
-__Oggetto__: {{subject}}
-
 __Codice IUN__: {{iun}}
