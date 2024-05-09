@@ -5,7 +5,7 @@ it:
         action: "ioit://services/service-detail?serviceId=01G40DWQGKY5GRWSNM4303VNRP&activate=true"
 en:
     cta_1:
-        text: "Activate to read notification"
+        text: "Enable to read notification"
         action: "ioit://services/service-detail?serviceId=01G40DWQGKY5GRWSNM4303VNRP&activate=true"
 ---
 Ciao,
