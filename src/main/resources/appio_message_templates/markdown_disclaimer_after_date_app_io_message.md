@@ -6,7 +6,5 @@ Premendo “Continua”, la notifica risulterà legalmente recapitata a te, a me
 Mittente <br />
 __{{senderDenomination}}__
 
----
-
 Codice IUN <br />
 __{{iun}}__
