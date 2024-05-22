@@ -1,9 +1,12 @@
-Se premi “Continua” la notifica risulterà legalmente recapitata, a meno che ciò non sia già avvenuto su IO, 
-tramite altri canali digitali o tramite raccomandata.
+Premendo “Continua”, la notifica risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata cartacea da più di 10 giorni.
 
 <br />
 <br />
 
-__Mittente__: {{senderDenomination}}
+Mittente <br />
+__{{senderDenomination}}__
 
-__Codice IUN__: {{iun}}
+---
+
+Codice IUN <br />
+__{{iun}}__

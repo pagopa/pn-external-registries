@@ -1,9 +1,12 @@
-Se premi “Continua” la notifica risulterà legalmente recapitata, a meno che ciò non sia già avvenuto tramite altri canali.
-Apri il messaggio **entro le {{ora}} del {{data}}** per non riceverla anche tramite raccomandata e risparmiare sui costi di invio.
+Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il messaggio **entro il {{data}} alle {{ora}}**, non riceverai la notifica tramite raccomandata cartacea.
 
 <br />
 <br />
 
-__Mittente__: {{senderDenomination}}
+Mittente <br />
+__{{senderDenomination}}__
 
-__Codice IUN__: {{iun}}
+---
+
+Codice IUN <br />
+__{{iun}}__
