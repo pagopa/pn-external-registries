@@ -3,8 +3,8 @@ Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se a
 <br />
 <br />
 
-Mittente <br />
-__{{senderDenomination}}__
+__Mittente__ <br />
+{{senderDenomination}}
 
-Codice IUN <br />
-__{{iun}}__
+__Codice IUN__ <br />
+{{iun}}
