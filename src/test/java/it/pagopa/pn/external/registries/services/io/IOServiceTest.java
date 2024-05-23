@@ -194,6 +194,7 @@ class IOServiceTest {
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
         Mockito.when( cfg.getIoRemoteContentCfgId() ).thenReturn( IO_REMOTE_CONTENT_CFG_ID );
+        Mockito.when( appIoTemplate.getSubjectCourtesyAppIoMessage() ).thenReturn( "Comunicazione a valore legale da {{senderDenomination}}" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( ioMessagesDao.save(Mockito.any(IOMessagesEntity.class)) ).thenReturn(Mono.empty());
@@ -206,9 +207,8 @@ class IOServiceTest {
         ArgumentCaptor<NewMessage> newMessageCaptor = ArgumentCaptor.forClass(NewMessage.class);
         Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
         NewMessage newMessage = newMessageCaptor.getValue();
-        String ioSubject = messageRequestDto.getSubject();
         
-        Assertions.assertEquals(ioSubject, newMessage.getContent().getSubject());
+        Assertions.assertEquals("Comunicazione a valore legale da PaMilano", newMessage.getContent().getSubject());
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
@@ -254,6 +254,7 @@ class IOServiceTest {
 
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( appIoTemplate.getSubjectCourtesyAppIoMessage() ).thenReturn( "Comunicazione a valore legale da {{senderDenomination}}" );
         Mockito.when( cfg.getIoRemoteContentCfgId() ).thenReturn( IO_REMOTE_CONTENT_CFG_ID );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
@@ -270,7 +271,7 @@ class IOServiceTest {
         NewMessage newMessage = newMessageCaptor.getValue();
         String ioSubject = messageRequestDto.getSubject();
 
-        Assertions.assertEquals(ioSubject, newMessage.getContent().getSubject());
+        Assertions.assertEquals("Comunicazione a valore legale da PaMilano", newMessage.getContent().getSubject());
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
@@ -300,27 +301,26 @@ class IOServiceTest {
                 .creditorTaxId( "creditorTaxId" )
                 .dueDate( OffsetDateTime.ofInstant( Instant.now(), ZoneId.of( "UTC" ) ) )
                 .iun( "iun" )
-                .senderDenomination("PaMilano")
+                .senderDenomination("1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111" +
+                        "1111111111")
                 .noticeNumber( "noticeNumber" )
                 .recipientTaxID( "recipientTaxId" )
                 .recipientInternalID("PF-123456")
                 .recipientIndex(0)
                 .creditorTaxId( "creditorTaxId" )
-                .subject( 
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" +
-                        "1111111111" )
+                .subject("a subject")
                 .requestAcceptedDate(OffsetDateTime.now());
         
         assert messageRequestDto.getSenderDenomination().length() + messageRequestDto.getSubject().length() > 120;
@@ -329,6 +329,7 @@ class IOServiceTest {
         //When
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( appIoTemplate.getSubjectCourtesyAppIoMessage() ).thenReturn( "Comunicazione a valore legale da {{senderDenomination}}" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when(ioMessagesDao.save(Mockito.any(IOMessagesEntity.class))).thenReturn(Mono.empty());
@@ -342,7 +343,7 @@ class IOServiceTest {
         Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
         NewMessage newMessage = newMessageCaptor.getValue();
         String ioSubject = messageRequestDto.getSubject();
-        String ioSubjectTruncated = ioSubject.substring(0, 120);
+        String ioSubjectTruncated = ("Comunicazione a valore legale da " + messageRequestDto.getSenderDenomination()).substring(0, 120);
 
         Assertions.assertEquals(ioSubjectTruncated, newMessage.getContent().getSubject());
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
@@ -520,6 +521,7 @@ class IOServiceTest {
 
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
                 .subject("subject 123 123 123 123 123")
+                .senderDenomination("PaMilano")
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
@@ -532,6 +534,7 @@ class IOServiceTest {
         Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
         Mockito.when( cfg.isEnableIoMessage() ).thenReturn( true );
         Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( appIoTemplate.getSubjectCourtesyAppIoMessage() ).thenReturn( "Comunicazione a valore legale da {{senderDenomination}}" );
         Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
         Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );

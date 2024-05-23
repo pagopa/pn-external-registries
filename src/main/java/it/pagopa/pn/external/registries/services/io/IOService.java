@@ -134,7 +134,8 @@ public class IOService {
             FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
             MessageContent content = new MessageContent();
 
-            String ioSubject = sendMessageRequestDto.getSubject();
+            // ora il subject è deciso da ext-registry
+            String ioSubject = enrichWithSenderDenomination(cfg.getAppIoTemplate().getSubjectCourtesyAppIoMessage(), sendMessageRequestDto.getSenderDenomination());
 
             String truncatedIoSubject = ioSubject;
             if(ioSubject.length() > 120){
@@ -388,6 +389,11 @@ public class IOService {
                 .replace(IUN_PLACEHOLDER, responseDto.getMessageParams().get(IUN_PARAM))
                 .replace(SENDER_DENOMINATION_PLACEHOLDER, responseDto.getMessageParams().get(SENDER_DENOMINATION_PARAM))
                 .replace(SUBJECT_PLACEHOLDER, responseDto.getMessageParams().get(SUBJECT_PARAM)));
+    }
+
+
+    private String enrichWithSenderDenomination(String message, String senderDenomination) {
+        return message.replace(SENDER_DENOMINATION_PLACEHOLDER, senderDenomination);
     }
 
     private String composeFinalMarkdown(String markdown)
