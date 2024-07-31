@@ -117,6 +117,14 @@ public class InfoPaController implements InfoPaApi {
     }
 
     @Override
+    public Mono<ResponseEntity<Flux<InstitutionResourcePNDto>>> getUserInstitutions(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
+        log.debug("getPaInstitutions - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
+        return infoSelfcareInstitutionsService.listUserInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
+                .collectList()
+                .map(institutionResourceDtos -> ResponseEntity.ok(Flux.fromIterable(institutionResourceDtos)));
+    }
+
+    @Override
     public Mono<ResponseEntity<Flux<ProductResourcePNDto>>> getInstitutionProducts(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, String institutionId, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
         log.debug("getPaInstitutions - institutionId={} xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", institutionId, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
 

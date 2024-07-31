@@ -1,12 +1,52 @@
 package it.pagopa.pn.external.registries.mapper;
 
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserProductResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.*;
 
 public class InstitutionsToInstitutionPNDtoMapper {
 
     private InstitutionsToInstitutionPNDtoMapper() {
 
+    }
+
+    public static InstitutionResourcePNDto toDto(UserInstitutionResourceDto resource) {
+        InstitutionResourcePNDto dto = new InstitutionResourcePNDto();
+        dto.setDescription(resource.getInstitutionDescription());
+        if (StringUtils.hasText(resource.getInstitutionId())) {
+            dto.setId(UUID.fromString(resource.getInstitutionId()));
+        }
+        if (!CollectionUtils.isEmpty(resource.getProducts())) {
+            dto.setStatus(retrieveMaxStatus(resource.getProducts()));
+            dto.setUserProductRoles(retrieveListOfRole(resource.getProducts()));
+        }
+        if (StringUtils.hasText(resource.getInstitutionRootName())) {
+            RootParentResourcePNDto rootParentResourcePNDto = new RootParentResourcePNDto();
+            rootParentResourcePNDto.setDescription(resource.getInstitutionRootName());
+            dto.setRootParent(rootParentResourcePNDto);
+        }
+        return dto;
+    }
+
+    private static List<String> retrieveListOfRole(List<UserProductResourceDto> products) {
+        return products.stream()
+                .map(UserProductResourceDto::getProductRole)
+                .filter(StringUtils::hasText)
+                .toList();
+    }
+
+    private static String retrieveMaxStatus(List<UserProductResourceDto> products) {
+        List<UserProductResourceDto.StatusEnum> status = products.stream()
+                .map(UserProductResourceDto::getStatus)
+                .filter(Objects::nonNull)
+                .toList();
+
+        return Collections.min(status).name();
     }
 
     public static InstitutionResourcePNDto toDto(InstitutionResourceDto resource) {

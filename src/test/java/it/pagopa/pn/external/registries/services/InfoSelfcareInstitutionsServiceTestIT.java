@@ -4,6 +4,8 @@ import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserProductResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourcePNDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
@@ -153,6 +155,43 @@ class InfoSelfcareInstitutionsServiceTestIT {
         assertEquals("Comune di Milano", res.get(0).getName());
         assertEquals("Comune di Verona", res.get(1).getName());
     }
+
+    @Test
+    void listUserInstitutionByCurrentUser() {
+        //GIVEN
+        String user = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        UUID institutionId1 = UUID.randomUUID();
+        UUID institutionId2 = UUID.randomUUID();
+
+        List<UserInstitutionResourceDto> list = new ArrayList<>();
+        UserInstitutionResourceDto dto = new UserInstitutionResourceDto();
+        dto.setInstitutionId(institutionId1.toString());
+        List<UserProductResourceDto> userProductRoles = new ArrayList<>();
+        UserProductResourceDto productResourceDto = new UserProductResourceDto();
+        productResourceDto.setProductRole("admin");
+        productResourceDto.setStatus(UserProductResourceDto.StatusEnum.ACTIVE);
+        userProductRoles.add(productResourceDto);
+        dto.setProducts(userProductRoles);
+        list.add(dto);
+        dto.setInstitutionId(institutionId2.toString());
+        list.add(dto);
+        Mockito.when(selfcarePaInstitutionClient.getUserInstitutions(user)).thenReturn(Flux.fromIterable(list));
+        List<String> header = new ArrayList<>();
+        // WHEN
+        List<InstitutionResourcePNDto> res = service.listUserInstitutionByCurrentUser(user, "", "WEB", header, "PA").collectList().block();
+
+        //THEN
+        assertNotNull(res);
+        assertEquals(2, res.size());
+        res.forEach(x -> {
+            if (x.getId().equals(institutionId1)) {
+                assertEquals(institutionId1, x.getId());
+            } else {
+                assertEquals(institutionId2, x.getId());
+            }
+        });
+    }
+
 
     @Test
     void listInstitutionByCurrentUser() {
