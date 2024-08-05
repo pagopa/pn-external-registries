@@ -1,0 +1,107 @@
+openapi: 3.0.1
+info:
+  title: PN External Registries B2B Internal API
+  version: v1
+  description: API per recuperare informazioni sulle Pubbliche Amministrazioni che utilizzano PN
+  license:
+    name: Licenza PagoPA PN
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: InfoPA
+    description: Informazioni sulla Pubblica Amministrazione
+paths:
+  '/ext-registry-b2b/pa/v1/activated-on-pn':
+    get:
+      operationId: listOnboardedPa
+      summary: Restituisce l'elenco delle PA che utilizzano PN
+      description: Utilizzare questa API per implementare la scelta delle PA nelle pagine di domicilio e creazione delle deleghe.
+      tags:
+        - InfoPA
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: '#/components/parameters/cxRoleAuthFleet'
+        - name: paNameFilter
+          description: Se valorizzato, indica il prefisso della denominazione della PA
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaNameFilter'
+        - name: id
+          description: Se valorizzato, indica gli ID delle PA di cui si vuole conoscere la denominazione
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: Richiesta riuscita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaSummariesList'
+        '400':
+          description: Input non valido
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+components:
+  schemas:
+    cxRoleAuthFleet:
+      name: x-pagopa-pn-cx-role
+      in: header
+      description: Ruolo (estratto dal token di Self Care)
+      required: false
+      schema:
+        type: string
+        maxLength: 64
+        # ASCII printable chars
+        pattern: ^[ -~ ]*$
+    SelfCarePaId:
+      title: ID PA usato da Self Care
+      description: Un ID unico che identifica una Pubblica Amministrazione
+      type: string
+      minLength: 1
+      maxLength: 50
+      # ASCII printable characters
+      pattern: ^[ -~ ]*$
+    PaNameFilter:
+      title: Caratteri ammessi per il campo di denominazione della PA
+      type: string
+      minLength: 3
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
+    PaSummary:
+      title: PA in breve
+      description: PA con informazioni minime
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+    PaSummariesList:
+      title: Elenco sintetico delle PA
+      description: Contiene un elenco di PA con informazioni minime
+      type: array
+      items:
+        $ref: '#/components/schemas/PaSummary'
