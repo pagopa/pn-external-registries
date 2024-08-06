@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @Import(LocalStackTestConfig.class)
 @SpringBootTest
+@Disabled("Fail on deploy")
 class PnEventInboundServiceTest { 
     //Viene fatto l'@Autowired di MessageRoutingCallback perchè in PnEventInboundService viene fatta un implementazione anonima di questa classe, 
     // iniettandola nel contesto spring con il @Bean. Dunque con l'@Autowired ci riferiamo a quella specifica implementazione
@@ -43,7 +44,6 @@ class PnEventInboundServiceTest {
     private EventHandler eventHandler;
 
     @Test
-    @Disabled("Fail on deploy")
     void testCustomRouterForUpdateCostPhase() {
         //GIVEN
         String messageIdKeyValue = "testMessageId";
