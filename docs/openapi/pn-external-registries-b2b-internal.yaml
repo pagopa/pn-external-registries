@@ -23,11 +23,11 @@ paths:
       #      security:                                                                # ONLY EXTERNAL
       #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       parameters:
-        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
-        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'
-        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'
-        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
-        - $ref: '#/components/parameters/cxRoleAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'               # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'             # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'           # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                # NO EXTERNAL
+        - $ref: '#/components/parameters/cxRoleAuthFleet'                             # NO EXTERNAL
         - name: paNameFilter
           description: Se valorizzato, indica il prefisso della denominazione della PA
           in: query
@@ -105,3 +105,11 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PaSummary'
+
+#  securitySchemes:                                      # ONLY EXTERNAL
+#    bearerAuth:                                         # ONLY EXTERNAL
+#      type: http                                        # ONLY EXTERNAL
+#      scheme: bearer                                    # ONLY EXTERNAL
+#      bearerFormat: JWT                                 # ONLY EXTERNAL
+#security:                                               # ONLY EXTERNAL
+# - bearerAuth: []                                       # ONLY EXTERNAL
