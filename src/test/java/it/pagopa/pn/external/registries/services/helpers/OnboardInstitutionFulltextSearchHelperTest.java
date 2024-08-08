@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled("Fail on deploy")
 class OnboardInstitutionFulltextSearchHelperTest {
 
     Duration d = Duration.ofMillis(3000);
