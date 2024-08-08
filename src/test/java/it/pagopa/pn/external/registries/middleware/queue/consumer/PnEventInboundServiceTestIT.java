@@ -2,17 +2,11 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer;
 
 import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
-import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
-import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.DeliveryPushEventHandler;
 import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.EventHandler;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -33,7 +26,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @Import(LocalStackTestConfig.class)
 @SpringBootTest
-class PnEventInboundServiceTest {
+class PnEventInboundServiceTestIT {
     //Viene fatto l'@Autowired di MessageRoutingCallback perchè in PnEventInboundService viene fatta un implementazione anonima di questa classe, 
     // iniettandola nel contesto spring con il @Bean. Dunque con l'@Autowired ci riferiamo a quella specifica implementazione
     @Autowired
