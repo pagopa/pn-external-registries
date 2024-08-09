@@ -22,6 +22,8 @@ paths:
         - InfoPA
       #      security:                                                                # ONLY EXTERNAL
       #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      x-api-permissions:
+        - 'BASE'
       parameters:
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'               # NO EXTERNAL
         - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'             # NO EXTERNAL
