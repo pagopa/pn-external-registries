@@ -13,11 +13,11 @@ tags:
   - name: InfoPA
     description: Informazioni sulla Pubblica Amministrazione
 paths:
-  '/ext-registry-b2b/pa/v1/activated-on-pn':
+  '/ext-registry/pa/v1/activated-on-pn':
     get:
       operationId: listOnboardedPa
-      summary: Restituisce l'elenco delle PA che utilizzano PN
-      description: Utilizzare questa API per implementare la scelta delle PA nelle pagine di domicilio e creazione delle deleghe.
+      summary: List PA that use PN
+      description: Use with API to implement PA choose in domicile and mandate creation pages.
       tags:
         - InfoPA
       #      security:                                                                # ONLY EXTERNAL
@@ -62,7 +62,7 @@ paths:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
-  schemas:
+  parameters:
     cxRoleAuthFleet:
       name: x-pagopa-pn-cx-role
       in: header
@@ -73,23 +73,25 @@ components:
         maxLength: 64
         # ASCII printable chars
         pattern: ^[ -~ ]*$
+
+  schemas:
     SelfCarePaId:
-      title: ID PA usato da Self Care
-      description: Un ID unico che identifica una Pubblica Amministrazione
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
       type: string
       minLength: 1
       maxLength: 50
       # ASCII printable characters
       pattern: ^[ -~ ]*$
     PaNameFilter:
-      title: Caratteri ammessi per il campo di denominazione della PA
+      title: Admitted character for PA denomination field
       type: string
       minLength: 3
       maxLength: 250
       pattern: ^([\x20-\xFF]{1,250})$
     PaSummary:
       title: PA in breve
-      description: PA con informazioni minime
+      description: PA with minimal information
       type: object
       required:
         - id
@@ -101,7 +103,7 @@ components:
           type: string
     PaSummariesList:
       title: Elenco sintetico delle PA
-      description: Contiene un elenco di PA con informazioni minime
+      description: Contains a list of PA with minimal information
       type: array
       items:
         $ref: '#/components/schemas/PaSummary'
