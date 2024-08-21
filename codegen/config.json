@@ -33,6 +33,7 @@
         }
     ],
     "openapiBundlePresenceCheck": [
-        "pn-selfcare-external-v1-bundle.yaml"
+        "pn-selfcare-external-v1-bundle.yaml",
+        "pn-selfcare-external-v1-filtered-bundle.yaml"
     ]
 }

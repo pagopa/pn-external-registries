@@ -1,0 +1,114 @@
+openapi: 3.0.1
+info:
+  title: PN External Registries B2B Internal API
+  version: v1
+  description: API per recuperare informazioni sulle Pubbliche Amministrazioni che utilizzano PN
+  license:
+    name: Licenza PagoPA PN
+    url: http://pn.pagopa.it
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: InfoPA
+    description: Informazioni sulla Pubblica Amministrazione
+paths:
+  '/ext-registry/pa/v1/activated-on-pn':
+    get:
+      operationId: listOnboardedPa
+      summary: List PA that use PN
+      description: Use with API to implement PA choose in domicile and mandate creation pages.
+      tags:
+        - InfoPA
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      x-api-permissions:
+        - 'BASE'
+      parameters:
+        - name: paNameFilter
+          description: Se valorizzato, indica il prefisso della denominazione della PA
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaNameFilter'
+        - name: id
+          description: Se valorizzato, indica gli ID delle PA di cui si vuole conoscere la denominazione
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: Richiesta riuscita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaSummariesList'
+        '400':
+          description: Input non valido
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+components:
+  parameters:
+    cxRoleAuthFleet:
+      name: x-pagopa-pn-cx-role
+      in: header
+      description: Ruolo (estratto dal token di Self Care)
+      required: false
+      schema:
+        type: string
+        maxLength: 64
+        # ASCII printable chars
+        pattern: ^[ -~ ]*$
+
+  schemas:
+    SelfCarePaId:
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
+      type: string
+      minLength: 1
+      maxLength: 50
+      # ASCII printable characters
+      pattern: ^[ -~ ]*$
+    PaNameFilter:
+      title: Admitted character for PA denomination field
+      type: string
+      minLength: 3
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
+    PaSummary:
+      title: PA in breve
+      description: PA with minimal information
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+    PaSummariesList:
+      title: Elenco sintetico delle PA
+      description: Contains a list of PA with minimal information
+      type: array
+      items:
+        $ref: '#/components/schemas/PaSummary'
+
+  securitySchemes:                                      # ONLY EXTERNAL
+    bearerAuth:                                         # ONLY EXTERNAL
+      type: http                                        # ONLY EXTERNAL
+      scheme: bearer                                    # ONLY EXTERNAL
+      bearerFormat: JWT                                 # ONLY EXTERNAL
+security:                                               # ONLY EXTERNAL
+ - bearerAuth: []                                       # ONLY EXTERNAL
