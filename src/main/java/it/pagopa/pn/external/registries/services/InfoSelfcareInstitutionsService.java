@@ -60,13 +60,6 @@ public class InfoSelfcareInstitutionsService {
             .map(InstitutionsToInstitutionPNDtoMapper::toDto);
   }
 
-  public Flux<InstitutionResourcePNDto> listUserInstitutionByCurrentUser(String xPagopaPnUid, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails) {
-    log.info("listInstitutionByCurrentUser - xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
-    return selfcarePaInstitutionClient.getUserInstitutions(xPagopaPnUid)
-            .map(InstitutionsToInstitutionPNDtoMapper::toDto);
-  }
-
-
   public Flux<ProductResourcePNDto> listProductsByInstitutionAndCurrentUser(String institutionId, String xPagopaPnUid, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails) {
     log.info("listProductsByInstitutionAndCurrentUser - institutionId={} xPagopaPnUid={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", institutionId, xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
     return selfcarePaInstitutionClient.getInstitutionProducts(institutionId, xPagopaPnUid)
