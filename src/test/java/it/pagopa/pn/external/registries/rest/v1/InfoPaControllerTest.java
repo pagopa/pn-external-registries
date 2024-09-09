@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.rest.v1;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
+import it.pagopa.pn.external.registries.services.InfoSelfcareUserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ class InfoPaControllerTest {
 
     @MockBean
     private InfoSelfcareInstitutionsService svcInst;
+
+    @MockBean
+    private InfoSelfcareUserService svcUser;
 
     @Test
     void getOnePa() {
@@ -219,6 +223,49 @@ class InfoPaControllerTest {
                 .exchange()
                 .expectStatus().isOk().expectBodyList(InstitutionResourcePNDto.class).hasSize(2);
     }
+
+    @Test
+    void getUserInstitutions() {
+
+        // Given
+        String url = "/ext-registry/pa/v1/user-institutions";
+
+        List<InstitutionResourcePNDto> res = new ArrayList<>();
+        InstitutionResourcePNDto dto = new InstitutionResourcePNDto();
+        dto.setAddress("Via vittorio veneto, 23");
+        dto.setDescription("Comune di Milano");
+        dto.setDigitalAddress("xxx@cert.xxx.it");
+        dto.setExternalId("00431230123");
+        dto.setId(UUID.randomUUID());
+        dto.setInstitutionType(InstitutionResourcePNDto.InstitutionTypeEnum.PA);
+        dto.setZipCode("12345");
+        dto.setTaxCode("00431230123");
+        dto.setStatus("ACTIVE");
+        List<String> userProductRoles = new ArrayList<>();
+        userProductRoles.add("admin");
+        dto.setUserProductRoles(userProductRoles);
+        res.add(dto);
+        dto.setId(UUID.randomUUID());
+        res.add(dto);
+
+
+        // When
+        Mockito.when(svcUser.listUserInstitutionByCurrentUser(Mockito.anyString(),Mockito.anyString(),Mockito.anyString(),Mockito.anyList(),Mockito.anyString()))
+                .thenReturn(Flux.fromIterable(res));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .header( PN_PAGOPA_GROUPS, "")
+                .header( PN_PAGOPA_USER_ID, "internaluserid1234")
+                .header( PN_PAGOPA_UID, "PA-internaluserid1234")
+                .header( PN_PAGOPA_SRC_CH, "WEB")
+                .header( PN_PAGOPA_USER_TYPE, "PA")
+                .header( PN_PAGOPA_SRC_CH_TYPE, "PA")
+                .exchange()
+                .expectStatus().isOk().expectBodyList(InstitutionResourcePNDto.class).hasSize(2);
+    }
+
 
     @Test
     void getInstitutionProducts() {

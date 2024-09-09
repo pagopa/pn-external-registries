@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OnboardInstitutionFulltextSearchHelperTest {
+class OnboardInstitutionFulltextSearchHelperTestIT {
 
     Duration d = Duration.ofMillis(3000);
 

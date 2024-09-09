@@ -4,6 +4,8 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.Info
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
+import it.pagopa.pn.external.registries.services.InfoSelfcareUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,15 +18,12 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class InfoPaController implements InfoPaApi {
 
     private final InfoSelfcareGroupsService infoSelfcareGroupsService;
     private final InfoSelfcareInstitutionsService infoSelfcareInstitutionsService;
-
-    public InfoPaController(InfoSelfcareInstitutionsService infoSelfcareInstitutionsService, InfoSelfcareGroupsService infoSelfcareGroupsService) {
-        this.infoSelfcareGroupsService = infoSelfcareGroupsService;
-        this.infoSelfcareInstitutionsService = infoSelfcareInstitutionsService;
-    }
+    private final InfoSelfcareUserService infoSelfcareUserService;
 
     @Override
     public Mono<ResponseEntity<Flux<PaSummaryDto>>> getManyPa(List<String> ids,  final ServerWebExchange exchange) {
@@ -112,6 +111,14 @@ public class InfoPaController implements InfoPaApi {
     public Mono<ResponseEntity<Flux<InstitutionResourcePNDto>>> getInstitutions(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
         log.debug("getPaInstitutions - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
         return infoSelfcareInstitutionsService.listInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
+                .collectList()
+                .map(institutionResourceDtos -> ResponseEntity.ok(Flux.fromIterable(institutionResourceDtos)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<InstitutionResourcePNDto>>> getUserInstitutions(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails, ServerWebExchange exchange) {
+        log.debug("getPaInstitutions - xPagopaPnUid={} xPagopaPnCxType={} xPagopaPnCxId={} xPagopaPnSrcCh={} xPagopaPnCxGroups={} xPagopaPnSrcChDetails={}", xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails);
+        return infoSelfcareUserService.listUserInstitutionByCurrentUser(xPagopaPnUid, xPagopaPnCxId, xPagopaPnSrcCh, xPagopaPnCxGroups, xPagopaPnSrcChDetails)
                 .collectList()
                 .map(institutionResourceDtos -> ResponseEntity.ok(Flux.fromIterable(institutionResourceDtos)));
     }
