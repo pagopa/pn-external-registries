@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePgInstitutionClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,9 @@ class InfoSelfcareUserServiceTest {
 
     @MockBean
     private SelfcarePgInstitutionClient selfcarePgInstitutionClient;
+
+    @MockBean
+    private SelfcarePaInstitutionClient selfcarePaInstitutionClient;
 
     @Test
     void getPgUserData(){
