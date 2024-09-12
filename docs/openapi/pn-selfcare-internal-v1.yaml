@@ -299,6 +299,42 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry/pa/v1/user-institutions':
+    get:
+      operationId: getUserInstitutions
+      summary: Retrieve user's institutions of current user defined in Self Care
+      description: >
+        Retrieves all the onboarded institutions related to the provided user and the product using selfcare API
+      tags:
+        - InfoPA
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      parameters: # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'        # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'     # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'       # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'   # NO EXTERNAL
+        - $ref: '#/components/parameters/headerSourceChannel'                 # NO EXTERNAL
+        - $ref: '#/components/parameters/headerSourceChannelDetails'          # NO EXTERNAL
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
   '/ext-registry/pa/v1/institutions/{id}/products':
     get:
       operationId: getInstitutionProducts

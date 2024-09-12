@@ -3,7 +3,6 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto.ProbableSchedulingAnalogDateResponse;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.PaymentsModelResponse;
 import it.pagopa.pn.external.registries.middleware.msclient.gpd.GpdClient;
 import org.junit.jupiter.api.*;
@@ -55,8 +54,7 @@ class GpdClientTest extends MockAWSObjectsTestConfig {
         String noticeCode="347000000000000044";
         String requestId= "test";
         Long notificationFee = 100L;
-        
-        String iuv = noticeCode.substring(1);
+
 
         var expectedBodyResponse = new PaymentsModelResponse()
                 .amount(100L);
@@ -65,7 +63,7 @@ class GpdClientTest extends MockAWSObjectsTestConfig {
             mockServerClient
                     .when(request()
                             .withMethod("PUT")
-                            .withPath("/organizations/" + creditorTaxId + "/paymentoptions/" + iuv + "/notificationfee")
+                            .withPath("/organizations/" + creditorTaxId + "/paymentoptions/" + noticeCode + "/notificationfee")
                     )
                     .respond(response()
                             .withStatusCode(200)
@@ -87,8 +85,6 @@ class GpdClientTest extends MockAWSObjectsTestConfig {
         String requestId= "test";
         Long notificationFee = 100L;
 
-        String iuv = noticeCode.substring(1);
-
         var expectedBodyResponse = new PaymentsModelResponse()
                 .amount(100L);
 
@@ -100,7 +96,7 @@ class GpdClientTest extends MockAWSObjectsTestConfig {
             mockServerClient
                     .when(request()
                             .withMethod("PUT")
-                            .withPath("/organizations/" + creditorTaxId + "/paymentoptions/" + iuv + "/notificationfee")
+                            .withPath("/organizations/" + creditorTaxId + "/paymentoptions/" + noticeCode + "/notificationfee")
                     )
                     .respond(response()
                             .withStatusCode(statusCodeExpected)
