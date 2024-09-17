@@ -43,6 +43,22 @@ public class InfoSelfcareGroupsService {
                 .map(UserGroupToPaGroupDtoMapper::toDto);
     }
 
+    public Flux<PgGroupDto> getPgUserGroups(String xPagopaPnUid,
+                                        String xPagopaPnCxId,
+                                        PgGroupStatusDto statusFilter) {
+        log.info("getPgGroups - xPagopaPnUid={} xPagopaPnCxId={} statusFilter={}",
+                xPagopaPnUid, xPagopaPnCxId, statusFilter);
+        String institutionId = xPagopaPnCxId;
+        if (xPagopaPnCxId.startsWith("PG-")) {
+            institutionId = xPagopaPnCxId.replaceFirst("PG-", "");
+        }
+        return selfcarePgUserGroupClient.getUserGroups(institutionId, xPagopaPnUid)
+                .map(PageOfUserGroupResourceDto::getContent)
+                .flatMapMany(Flux::fromIterable)
+                .filter(g -> statusFilter == null || statusFilter.getValue().equals(g.getStatus().getValue()))
+                .map(UserGroupToPgGroupDtoMapper::toDto);
+    }
+
     public Flux<PgGroupDto> getPgGroups(String xPagopaPnUid,
                                         String xPagopaPnCxId,
                                         List<String> xPagopaPnCxGroups,
@@ -53,7 +69,7 @@ public class InfoSelfcareGroupsService {
         if (xPagopaPnCxId.startsWith("PG-")) {
             institutionId = xPagopaPnCxId.replaceFirst("PG-", "");
         }
-        return selfcarePgUserGroupClient.getUserGroups(institutionId)
+        return selfcarePgUserGroupClient.getUserGroups(institutionId, null)
                 .map(PageOfUserGroupResourceDto::getContent)
                 .flatMapMany(Flux::fromIterable)
                 .filter(g -> statusFilter == null || statusFilter.getValue().equals(g.getStatus().getValue()))
