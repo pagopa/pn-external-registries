@@ -22,7 +22,7 @@ Parameters:
     Type: String
     Description: 'The DNS name used for WEB rest API.'
 
-  ApiB2BPgDnsName:
+  PgApiDnsName:
     Type: String
     Description: 'The DNS name used for B2B PG rest API.'
   
@@ -59,7 +59,7 @@ Parameters:
     Type: String
     Description: 'lollipop authorization activation flag'
     AllowedValues: [ true, false ]
-    Default: "false"
+    Default: false
 
   LollipopExpectedLcOriginalUrl:
     Type: String
@@ -113,7 +113,7 @@ Parameters:
 
   MountEfs:
     Type: String
-    Default: false
+    Default: "false"
     AllowedValues:
          - "true"
          - "false"
@@ -650,7 +650,7 @@ Resources:
       Parameters:
         MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
         IntendedUsage: B2BPG
-        DnsName: !Ref ApiB2BPgDnsName
+        DnsName: !Ref PgApiDnsName
         ProjectName: !Ref ProjectName
         ServiceApiPath: 'ext-registry'
         NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
