@@ -1,0 +1,518 @@
+openapi: 3.0.1
+info:
+  x-api-id: api-external-selfcare-b2b-pa
+  x-summary: API B2B per recuperare i gruppi delle Pubbliche Amministrazioni
+  title: API di integrazione con self care
+  version: 1.0.0
+  description: Api di integrazione al sistema Self Care
+  contact:
+    email: pn-supporto-enti@pagopa.it
+  license:
+    name: Licenza di PN
+    url: https://notifichedigitali.pagopa.it/pubbliche-amministrazioni/index.html
+  termsOfService: https://notifichedigitali.pagopa.it/pubbliche-amministrazioni/index.html
+servers:
+  - url: https://placeholder
+    description: placeholder
+tags:
+  - name: SelfCare
+    description: Integrazione verso portale selfcare
+paths:
+  /ext-registry-b2b/pa/v1/groups:
+    get:
+      operationId: getGroupsB2B
+      summary: Retrieve group of current user defined in Self Care
+      description: |
+        PA can use groups to better organize work in its organization. Return the PaGroupList of the current user, or if the user isn't in some group, all the groups of the current PA
+      tags:
+        - InfoPA
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /status:
+    get:
+      summary: healthCheck path
+      description: health check path per verificare lo stato del micro servizio
+      tags:
+        - HealthCheck
+      operationId: status
+      responses:
+        '200':
+          description: Ok
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    InstitutionResourceList:
+      title: InstitutionResourceList
+      description: Contains the list of institution defined in SelfCare PA
+      type: array
+      items:
+        $ref: '#/components/schemas/InstitutionResourcePN'
+    InstitutionResourcePN:
+      title: InstitutionResourcePN
+      type: object
+      properties:
+        address:
+          type: string
+          description: Institution's physical address
+        aooParentCode:
+          type: string
+          description: AOO unit parent institution Code
+        assistanceContacts:
+          $ref: '#/components/schemas/AssistanceContactsResourcePN'
+        companyInformations:
+          $ref: '#/components/schemas/CompanyInformationsResourcePN'
+        description:
+          type: string
+          description: Institution's legal name
+        digitalAddress:
+          type: string
+          description: Institution's digitalAddress
+        dpoData:
+          $ref: '#/components/schemas/DpoDataResourcePN'
+        externalId:
+          type: string
+          description: Institution's unique external identifier
+        id:
+          type: string
+          description: Institution's unique internal Id
+          format: uuid
+        institutionType:
+          enum:
+            - GSP
+            - PA
+            - PG
+            - PSP
+            - PT
+            - SCP
+          type: string
+          description: Institution's type
+        origin:
+          type: string
+          description: Institution data origin
+        originId:
+          type: string
+          description: Institution's details origin Id
+        rootParent:
+          $ref: '#/components/schemas/RootParentResourcePN'
+        pspData:
+          $ref: '#/components/schemas/PspDataResourcePN'
+        recipientCode:
+          type: string
+          description: Billing recipient code
+        status:
+          type: string
+          description: Institution onboarding status
+        subunitCode:
+          type: string
+          description: Institutions AOO/UO unit Code
+        subunitType:
+          type: string
+          description: Institutions AOO/UO unit type
+        taxCode:
+          type: string
+          description: Institution's taxCode
+        userProductRoles:
+          type: array
+          items:
+            type: string
+          description: Logged user's roles on product
+        zipCode:
+          type: string
+          description: Institution's zipCode
+    CompanyInformationsResourcePN:
+      title: CompanyInformationsResourcePN
+      type: object
+      properties:
+        businessRegisterPlace:
+          type: string
+          description: Institution's business register place
+        rea:
+          type: string
+          description: Institution's REA
+        shareCapital:
+          type: string
+          description: Institution's share capital value
+    DpoDataResourcePN:
+      title: DpoDataResourcePN
+      type: object
+      properties:
+        address:
+          type: string
+          description: DPO's address
+        email:
+          type: string
+          description: DPO's email
+          format: email
+          example: email@example.com
+        pec:
+          type: string
+          description: DPO's PEC
+          format: email
+          example: email@example.com
+    AssistanceContactsResourcePN:
+      title: AssistanceContactsResourcePN
+      type: object
+      properties:
+        supportEmail:
+          type: string
+          description: Institution's support email contact
+        supportPhone:
+          type: string
+          description: Institution's support phone contact
+    RootParentResourcePN:
+      title: RootParentResourcePN
+      type: object
+      properties:
+        description:
+          type: string
+          description: swagger.external_api.institutions.model.parentDescription
+        id:
+          type: string
+          description: Institution's unique internal Id
+    PspDataResourcePN:
+      title: PspDataResourcePN
+      type: object
+      properties:
+        abiCode:
+          type: string
+          description: PSP's ABI code
+        businessRegisterNumber:
+          type: string
+          description: PSP's Business Register number
+        legalRegisterName:
+          type: string
+          description: PSP's legal register name
+        legalRegisterNumber:
+          type: string
+          description: PSP's legal register number
+        vatNumberGroup:
+          type: boolean
+          description: PSP's Vat Number group
+          example: false
+    PaNameFilter:
+      title: Admitted character for PA denomination field
+      type: string
+      minLength: 3
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
+    PaSummary:
+      title: PA in short
+      description: PA with minimal information
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+    PaSummariesList:
+      title: Brief list of PAs
+      description: Contains a list of PA with minimal information
+      type: array
+      items:
+        $ref: '#/components/schemas/PaSummary'
+    PaInfo:
+      title: PA Info by IPA
+      description: Denomination, fiscal code, pec, email, tel, www site, ...
+      type: object
+      required:
+        - id
+        - name
+        - taxId
+        - generalContacts
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+          minLength: 1
+        taxId:
+          description: codice fiscale
+          type: string
+          minLength: 1
+        ipaCode:
+          description: codice IPA
+          type: string
+          minLength: 1
+        sdiCode:
+          description: codice SDI
+          type: string
+          minLength: 1
+        agreementDate:
+          description: data sottoscrizione accordo
+          example: '2022-07-27T12:22:33.444Z'
+          type: string
+          format: date-time
+        generalContacts:
+          $ref: '#/components/schemas/PaContacts'
+    PaContacts:
+      title: Contact Information
+      description: pec, email, tel, www site, ...
+      type: object
+      properties:
+        pec:
+          type: string
+          format: email
+          minLength: 1
+        email:
+          type: string
+          format: email
+          minLength: 1
+        tel:
+          type: string
+          pattern: ^\\+?([0-9]|-)*
+          minLength: 1
+          maxLength: 20
+        web:
+          type: string
+          format: uri
+          pattern: http.*
+          minLength: 1
+        registeredOffice:
+          type: string
+          description: sede legale
+          minLength: 1
+    PaGroupList:
+      title: Groups defined in Self Care
+      description: Contains the list of groups defined in SelfCare
+      type: array
+      items:
+        $ref: '#/components/schemas/PaGroup'
+    PaGroup:
+      title: Group defined in Self Care
+      description: Contains the name list of groups defined in SelfCare
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PaGroupStatus'
+    PaGroupStatus:
+      title: Status of group defined in Self Care
+      description: Contains the name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+    PgGroupList:
+      title: Groups defined in Self Care PG (Notifiche digitali)
+      description: Contains the list of groups defined in SelfCare PG (Notifiche digitali)
+      type: array
+      items:
+        $ref: '#/components/schemas/PgGroup'
+    PgGroup:
+      title: Group defined in Self Care PG (Notifiche digitali)
+      description: Contains the name list of groups defined in SelfCare PG (Notifiche digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PgGroupStatus'
+    PgGroupStatus:
+      title: Status of group defined in Self Care PG (Notifiche digitali)
+      description: Contains the status of groups defined in SelfCare PG (Notifiche digitali)
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+    SelfCarePaId:
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
+      type: string
+      minLength: 1
+      maxLength: 50
+      pattern: ^[ -~ ]*$
+    ProductResourceList:
+      title: ProductResourceList
+      description: Contains the list of products related institution and current user
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductResourcePN'
+    ProductResourcePN:
+      title: ProductResourcePN
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Date the products was activated/created
+          format: date-time
+        depictImageUrl:
+          type: string
+          description: Product's depiction image url
+        description:
+          type: string
+          description: Product's description
+        id:
+          type: string
+          description: Product's unique identifier
+        identityTokenAudience:
+          type: string
+          description: Product's identity token audience
+        logo:
+          type: string
+          description: Product's logo url
+        logoBgColor:
+          pattern: ^#0-9A-F6$
+          type: string
+          description: Product logo's background color
+        parentId:
+          type: string
+          description: Root parent of the sub product
+        roleManagementURL:
+          type: string
+          description: Url of the utilities management
+        roleMappings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ProductRoleInfoResPN'
+          description: Mappings between Party's and Product's role
+        title:
+          type: string
+          description: Product's title
+        urlBO:
+          type: string
+          description: URL that redirects to the back-office section where is possible to manage the product
+        urlPublic:
+          type: string
+          description: URL that redirects to the public information webpage of the product
+    ProductRoleInfoResPN:
+      title: ProductRoleInfoResPN
+      required:
+        - multiroleAllowed
+        - roles
+      type: object
+      properties:
+        multiroleAllowed:
+          type: boolean
+          description: Flag indicating if a User can have more than one product role
+          example: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRolePN'
+          description: Available product roles
+    ProductRolePN:
+      title: ProductRolePN
+      required:
+        - code
+        - description
+        - label
+      type: object
+      properties:
+        code:
+          type: string
+          description: Product role internal code
+        description:
+          type: string
+          description: Product role description
+        label:
+          type: string
+          description: Product role label
+    ProblemError:
+      properties:
+        code:
+          description: Internal code of the error, in human-readable format
+          example: PN_PARAMETER_TOO_LONG | PN_PARAMETER_TOO_SHORT | PN_DUPLICATE_ENTRY | etc...
+          type: string
+        element:
+          description: Parameter or request body field name for validation error
+          example: body.order.item[2].quantity
+          type: string
+        detail:
+          description: A human readable explanation specific to this occurrence of the problem.
+          example: Parameter not valid
+          maxLength: 1024
+          type: string
+      required:
+        - code
+    Problem:
+      properties:
+        type:
+          description: URI reference of type definition
+          type: string
+        status:
+          description: The HTTP status code generated by the origin server for this occurrence of the problem.
+          type: integer
+          format: int32
+          example: 503
+          maximum: 600
+          minimum: 100
+          exclusiveMaximum: true
+        title:
+          description: A short, summary of the problem type. Written in english and readable
+          example: Service Unavailable
+          maxLength: 64
+          pattern: ^[ -~]{0,64}$
+          type: string
+        detail:
+          description: A human readable explanation of the problem.
+          example: Request took too long to complete.
+          maxLength: 4096
+          pattern: ^.{0,4096}$
+          type: string
+        traceId:
+          description: Internal support identifier associated to error
+          example: 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        timestamp:
+          description: date and time referred to UTC
+          example: '2022-07-27T12:22:33.444Z'
+          type: string
+          format: date-time
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ProblemError'
+      required:
+        - status
+        - errors
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

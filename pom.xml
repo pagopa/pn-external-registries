@@ -14,7 +14,7 @@
     <name>pn-external-registries</name>
     <description>TODO</description>
     <properties>
-        <pagopa.codegen.version>v01.03.00</pagopa.codegen.version>
+        <pagopa.codegen.version>v01.06.01</pagopa.codegen.version>
     </properties>
     
     <scm>

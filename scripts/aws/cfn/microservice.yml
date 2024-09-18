@@ -14,13 +14,17 @@ Parameters:
     Type: String
     Description: ARN of alarm topic
 
-  ApiDnsName:
-    Type: String
-    Description: 'The DNS name used for B2B rest API.'
-
   WebApiDnsName:
     Type: String
     Description: 'The DNS name used for WEB rest API.'
+
+  ApiDnsName:
+    Type: String
+    Description: 'The DNS name used for B2B PG rest API.'
+
+  DestApiDnsName:
+    Type: String
+    Description: 'The DNS name used for B2B PG rest API.'
   
   CorsAllowedDomains:
     Type: String
@@ -55,7 +59,7 @@ Parameters:
     Type: String
     Description: 'lollipop authorization activation flag'
     AllowedValues: [ true, false ]
-    Default: "false"
+    Default: false
 
   LollipopExpectedLcOriginalUrl:
     Type: String
@@ -109,7 +113,7 @@ Parameters:
 
   MountEfs:
     Type: String
-    Default: false
+    Default: "false"
     AllowedValues:
          - "true"
          - "false"
@@ -638,6 +642,34 @@ Resources:
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
         Limit: !Ref B2bWafLimit
 
+  # Expose PN-external-registries microservice public API with API-GW for B2B usage
+  ExternalRegistryMicroserviceB2BPGAPI:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
+      Parameters:
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
+        IntendedUsage: B2BPG
+        DnsName: !Ref DestApiDnsName
+        ProjectName: !Ref ProjectName
+        ServiceApiPath: 'ext-registry'
+        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
+        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn
+        OpenApiBucketName: !Ref MicroserviceBucketName
+        OpenApiBucketKey: !Sub ${MicroserviceBucketBaseKey}/docs/openapi/aws/api-ext-registry-B2BPG-aws.yaml
+
+  ExternalRegistryMicroserviceB2BPGApiWaf:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
+      Parameters:
+        WAFName: !Sub '${ProjectName}-external-registries-b2b-pg'
+        IntendedUsage: B2B
+        APIGatewayARNs: !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.APIGatewayARN
+        Limit: !Ref B2bWafLimit
+
   # Expose PN-Delivery microservice public API with API-GW for IO Backend usage
   ExternalRegistryMicroservicePublicIoAPI:
     Type: AWS::CloudFormation::Stack
@@ -683,10 +715,12 @@ Resources:
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiStageArn
+            - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiStageArn
         RestApiNames: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiName
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
+            - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiName
         LambdaArns: !Join
           - ','
           - - !GetAtt PnExternalRegistriesInsertTriggerLambda.Arn
@@ -698,8 +732,10 @@ Resources:
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
+            - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
+            - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiLatencyAlarmArn
             - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
             - !Ref DeliveryPushToExternalRegistriesQueueAgeAlarmARN
         LogGroupsNames: !Join
