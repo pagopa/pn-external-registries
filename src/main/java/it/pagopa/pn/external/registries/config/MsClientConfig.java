@@ -73,6 +73,14 @@ public class MsClientConfig {
             return new InstitutionsApi(apiClient);
         }
 
+        @Bean
+        InstitutionsApi institutionsPgApi() {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
+            apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
+            return new InstitutionsApi(apiClient);
+        }
+
+
     }
 
     @Configuration

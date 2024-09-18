@@ -91,6 +91,73 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry-private/pg/v1/user-groups':
+    get:
+      operationId: getPgUserGroupsPrivate
+      summary: Retrieve selfcare groups related to user
+      description: >
+        PG can use groups to better organize work in its organization.
+        Retrieve selfcare groups related to user
+      tags:
+        - internal-only
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry-private/pg/v1/user':
+    get:
+      operationId: getPgUsersPrivate
+      summary: Retrieve user data on selfcare given userId, organization and product
+      description: >
+        Return user data on selfcare to get user role for SEND
+      tags:
+        - internal-only
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PgUser'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
   /ext-registry-private/privacynotice/{consentsType}/{portalType}:
     get:
       operationId: findPrivacyNoticeVersion
@@ -136,6 +203,40 @@ paths:
 
 components:
   schemas:
+    PgUser:
+      title: User defined in Self Care PG (Notifiche digitali)
+      description: Contains the user defined in SelfCare PG (Notifiche digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        institutionDescription:
+          type: string
+        institutionId:
+          type: string
+        institutionRootName:
+          type: string
+        userId:
+          type: string
+        product:
+          $ref: '#/components/schemas/UserProductResourceDto'
+    UserProductResourceDto:
+      type: object
+      properties:
+        createdAt:
+          type: string
+        productId:
+          type: string
+        productRole:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        tokenId:
+          type: string
+        updatedAt:
+          type: string
     PrivacyNoticeVersionResponse:
       description: The response that contains the version of a privacy notice for a particular privacy notice id
       type: object
