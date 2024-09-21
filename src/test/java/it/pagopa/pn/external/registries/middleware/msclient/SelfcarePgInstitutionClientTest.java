@@ -2,12 +2,11 @@ package it.pagopa.pn.external.registries.middleware.msclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.PageOfUserGroupResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserGroupResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -17,10 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -38,8 +37,8 @@ class SelfcarePgInstitutionClientTest extends MockAWSObjectsTestConfig {
     private SelfcarePgInstitutionClient client;
 
 
-    @BeforeAll
-    public static void startMockServer() {
+    @BeforeEach
+    public void startMockServer() {
         mockServer = ClientAndServer.startClientAndServer(9999);
     }
 
@@ -76,6 +75,21 @@ class SelfcarePgInstitutionClientTest extends MockAWSObjectsTestConfig {
 
             // Then
             assertNotNull(response);
+        }
+    }
+
+    @Test
+    void retrieveUserInstitutionTestFailsWhenDoesntFindData() {
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request()
+                            .withMethod("GET")
+                            .withPath("/users"))
+                    .respond(response()
+                            .withBody("[]".getBytes(StandardCharsets.UTF_8))
+                            .withContentType(MediaType.APPLICATION_JSON)
+                            .withStatusCode(200));
+
+            assertThrows(PnInternalException.class, () -> client.retrieveUserInstitution("uid", "cxId").block());
         }
     }
 }

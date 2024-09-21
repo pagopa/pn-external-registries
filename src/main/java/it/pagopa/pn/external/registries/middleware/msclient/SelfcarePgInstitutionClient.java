@@ -26,6 +26,8 @@ public class SelfcarePgInstitutionClient {
         return institutionsPgApi.getUserInstitutionsUsingGET(institutionId, userIdForAuth, null, UserProductResourceDto.StatusEnum.ACTIVE.name() , null, null, null,null)
                 .doOnNext(institutionsResponseDto -> log.info("getInstitutions result: {}", institutionsResponseDto))
                 .collectList()
+                .filter(userInstitutionResourceDtos -> !userInstitutionResourceDtos.isEmpty())
+                .switchIfEmpty(Mono.error(new PnInternalException("Error getting institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR)))
                 .map(userInstitutionResourceDtos -> userInstitutionResourceDtos.get(0))
                 .onErrorResume(WebClientResponseException.class, x -> {
                     log.logInvokationResultDownstreamFailed(SELFCARE_PA, CommonBaseClient.elabExceptionMessage(x));

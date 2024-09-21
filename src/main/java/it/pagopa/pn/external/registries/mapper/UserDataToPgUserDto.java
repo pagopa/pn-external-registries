@@ -21,8 +21,7 @@ public class UserDataToPgUserDto {
         dto.setInstitutionDescription(resourceDto.getInstitutionDescription());
         dto.setInstitutionRootName(resourceDto.getInstitutionRootName());
         dto.setId(resourceDto.getId());
-        if(!CollectionUtils.isEmpty(resourceDto.getProducts())
-                && resourceDto.getProducts().size() == 1){
+        if(!CollectionUtils.isEmpty(resourceDto.getProducts())){
             dto.setProduct(toUserProductResourceDtoDto(resourceDto.getProducts().get(0)));
         }
         return dto;
