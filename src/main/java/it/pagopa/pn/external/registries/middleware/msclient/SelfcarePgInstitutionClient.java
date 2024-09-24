@@ -21,8 +21,9 @@ public class SelfcarePgInstitutionClient {
 
     private final InstitutionsApi institutionsPgApi;
 
-    public Mono<UserInstitutionResourceDto> retrieveUserInstitution(String userIdForAuth, String institutionId){
-        log.info("Retrieving user institutions for userId {}", userIdForAuth);
+    public Mono<UserInstitutionResourceDto> retrieveUserInstitution(String userIdForAuth, String cxId){
+        String institutionId = cxId.replace("PG-", "");
+        log.info("Retrieving user institutions for userId {}, and institutionId {}", userIdForAuth, institutionId);
         return institutionsPgApi.getUserInstitutionsUsingGET(institutionId, userIdForAuth, null, UserProductResourceDto.StatusEnum.ACTIVE.name() , null, null, null,null)
                 .doOnNext(institutionsResponseDto -> log.info("getInstitutions result: {}", institutionsResponseDto))
                 .collectList()
