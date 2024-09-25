@@ -244,6 +244,8 @@ components:
           type: string
         surname:
           type: string
+        taxCode:
+          type: string
     PgUser:
       title: User defined in Self Care PG (Notifiche digitali)
       description: Contains the user defined in SelfCare PG (Notifiche digitali)

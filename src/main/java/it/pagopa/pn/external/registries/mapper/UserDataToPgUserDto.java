@@ -34,6 +34,7 @@ public class UserDataToPgUserDto {
         pgUserDetailDto.setId(userResponseDto.getId());
         pgUserDetailDto.setName(userResponseDto.getName());
         pgUserDetailDto.setSurname(userResponseDto.getSurname());
+        pgUserDetailDto.setTaxCode(userResponseDto.getTaxCode());
         return pgUserDetailDto;
     }
 
