@@ -90,7 +90,7 @@ public class InfoInternalController implements InternalOnlyApi {
     public Mono<ResponseEntity<PgUserDetailDto>> getPgUsersDetailsPrivate(String xPagopaPnUid,
                                                              String xPagopaPnCxId,
                                                              final ServerWebExchange exchange) {
-        log.debug("getPgGroups - xPagopaPnUid={} xPagopaPnCxId={}", xPagopaPnUid, xPagopaPnCxId);
+        log.debug("getPgUsersDetailsPrivate - xPagopaPnUid={} xPagopaPnCxId={}", xPagopaPnUid, xPagopaPnCxId);
 
         return infoSelfcareUserService.getPgUserDetails(xPagopaPnUid, xPagopaPnCxId)
                 .map(ResponseEntity::ok);
