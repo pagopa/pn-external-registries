@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaGroupDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgUserDetailDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgUserDto;
 import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import it.pagopa.pn.external.registries.services.InfoSelfcareUserService;
@@ -131,6 +132,46 @@ class InfoInternalControllerTest {
                 .expectStatus()
                 .isOk()
                 .expectBodyList(PgUserDto.class);
+    }
+
+    @Test
+    void getPgUsersDetailsPrivateReturnsUserDetails() {
+        // Given
+        String url = "/ext-registry-private/pg/v1/user-details";
+        PgUserDetailDto userDetailDto = new PgUserDetailDto();
+        userDetailDto.setId("id1");
+
+        // When
+        when(svcUser.getPgUserDetails("uid", "cxId")).thenReturn(Mono.just(userDetailDto));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .header(X_PAGOPA_PN_CX_ID, "cxId")
+                .header(X_PAGOPA_PN_UID, "uid")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(PgUserDetailDto.class)
+                .isEqualTo(userDetailDto);
+    }
+
+    @Test
+    void getPgUsersDetailsPrivateHandlesInternalServerError() {
+        // Given
+        String url = "/ext-registry-private/pg/v1/user-details";
+
+        // When
+        when(svcUser.getPgUserDetails("uid", "cxId")).thenReturn(Mono.error(new RuntimeException("Internal Server Error")));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .header(X_PAGOPA_PN_CX_ID, "cxId")
+                .header(X_PAGOPA_PN_UID, "uid")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
     }
 
 }

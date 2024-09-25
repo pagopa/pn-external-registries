@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserResponseDto;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,6 +91,65 @@ class SelfcarePgInstitutionClientTest extends MockAWSObjectsTestConfig {
                             .withStatusCode(200));
 
             assertThrows(PnInternalException.class, () -> client.retrieveUserInstitution("uid", "cxId").block());
+        }
+    }
+
+    @Test
+    void retrieveUserDetailReturnsUserResponse() {
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setId("uid");
+        userResponseDto.setTaxCode("taxCode");
+
+        byte[] responseBytes = new byte[0];
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            responseBytes = mapper.writeValueAsBytes(userResponseDto);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request()
+                            .withMethod("GET")
+                            .withPath("/users/"+userResponseDto.getId()))
+                    .respond(response()
+                            .withBody(responseBytes)
+                            .withContentType(MediaType.APPLICATION_JSON)
+                            .withStatusCode(200));
+            // When
+            UserResponseDto response = client.retrieveUserDetail("uid", "cxId").block();
+
+            // Then
+            assertNotNull(response);
+        }
+    }
+
+    @Test
+    void retrieveUserDetailFailsWhenDoesntFindData() {
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request()
+                            .withMethod("GET")
+                            .withPath("/user-info"))
+                    .respond(response()
+                            .withBody("[]".getBytes(StandardCharsets.UTF_8))
+                            .withContentType(MediaType.APPLICATION_JSON)
+                            .withStatusCode(200));
+
+            assertThrows(PnInternalException.class, () -> client.retrieveUserDetail("uid", "cxId").block());
+        }
+    }
+
+    @Test
+    void retrieveUserDetailHandlesWebClientResponseException() {
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request()
+                            .withMethod("GET")
+                            .withPath("/user-info"))
+                    .respond(response()
+                            .withStatusCode(500));
+
+            assertThrows(PnInternalException.class, () -> client.retrieveUserDetail("uid", "cxId").block());
         }
     }
 }

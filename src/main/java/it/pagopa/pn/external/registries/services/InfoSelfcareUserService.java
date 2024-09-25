@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourcePNDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgUserDetailDto;
 import it.pagopa.pn.external.registries.mapper.InstitutionsToInstitutionPNDtoMapper;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class InfoSelfcareUserService {
 
     public Mono<PgUserDto> getPgUserData(String xPagopaPnUid, String xPagopaPnCxId) {
         return selfcarePgInstitutionClient.retrieveUserInstitution(xPagopaPnUid, xPagopaPnCxId)
+                .map(UserDataToPgUserDto::toDto);
+    }
+
+    public Mono<PgUserDetailDto> getPgUserDetails(String xPagopaPnUid, String xPagopaPnCxId) {
+        return selfcarePgInstitutionClient.retrieveUserDetail(xPagopaPnUid, xPagopaPnCxId)
                 .map(UserDataToPgUserDto::toDto);
     }
 }

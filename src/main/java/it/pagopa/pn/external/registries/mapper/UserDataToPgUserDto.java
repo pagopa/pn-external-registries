@@ -2,6 +2,8 @@ package it.pagopa.pn.external.registries.mapper;
 
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserProductResourceDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgUserDetailDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgUserDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.UserProductResourceDtoDto;
 import org.springframework.util.CollectionUtils;
@@ -26,6 +28,17 @@ public class UserDataToPgUserDto {
         }
         return dto;
     }
+
+    public static PgUserDetailDto toDto(UserResponseDto userResponseDto){
+        PgUserDetailDto pgUserDetailDto = new PgUserDetailDto();
+        pgUserDetailDto.setId(userResponseDto.getId());
+        pgUserDetailDto.setName(userResponseDto.getName());
+        pgUserDetailDto.setSurname(userResponseDto.getSurname());
+        pgUserDetailDto.setTaxCode(userResponseDto.getTaxCode());
+        return pgUserDetailDto;
+    }
+
+
 
     private static UserProductResourceDtoDto toUserProductResourceDtoDto(UserProductResourceDto product) {
         UserProductResourceDtoDto dto = new UserProductResourceDtoDto();
