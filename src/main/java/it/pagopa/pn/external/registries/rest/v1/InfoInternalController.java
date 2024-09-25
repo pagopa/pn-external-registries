@@ -77,6 +77,29 @@ public class InfoInternalController implements InternalOnlyApi {
     }
 
     /**
+     * GET /ext-registry-private/pg/v1/user-details : Retrieve user data on selfcare given userId, organization and product
+     * Return user data on selfcare to get user role for SEND
+     *
+     * @param xPagopaPnUid      User Identifier (required)
+     * @param xPagopaPnCxId     Customer/Receiver Identifier (required)
+     * @return OK (status code 200)
+     * or Invalid input (status code 400)
+     * or Internal Server Error (status code 500)
+     */
+    @Override
+    public Mono<ResponseEntity<PgUserDetailDto>> getPgUsersDetailsPrivate(String xPagopaPnUid,
+                                                             String xPagopaPnCxId,
+                                                             final ServerWebExchange exchange) {
+        log.debug("getPgGroups - xPagopaPnUid={} xPagopaPnCxId={}", xPagopaPnUid, xPagopaPnCxId);
+
+        return infoSelfcareUserService.getPgUserDetails(xPagopaPnUid, xPagopaPnCxId)
+                .map(ResponseEntity::ok);
+    }
+
+
+
+
+    /**
      * GET /ext-registry/pg/v1/groups : Retrieve group of current user defined in Self Care
      * PG can use groups to better organize work in its organization. Return the PgGroupList of the current user, or if the user isn&#39;t in some group, all the groups of the current PG
      *

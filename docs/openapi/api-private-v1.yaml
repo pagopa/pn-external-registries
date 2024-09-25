@@ -158,6 +158,36 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry-private/pg/v1/user-details':
+    get:
+      operationId: getPgUsersDetailsPrivate
+      summary: Retrieve user data on selfcare given userId, organization and product
+      description: >
+        Return user data on selfcare to get user role for SEND
+      tags:
+        - internal-only
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PgUserDetail'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
   /ext-registry-private/privacynotice/{consentsType}/{portalType}:
     get:
       operationId: findPrivacyNoticeVersion
@@ -203,6 +233,17 @@ paths:
 
 components:
   schemas:
+    PgUserDetail:
+      title: User detail defined in Self Care PG (Notifiche digitali)
+      description: Contains the user data in SelfCare PG (Notifiche digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
     PgUser:
       title: User defined in Self Care PG (Notifiche digitali)
       description: Contains the user defined in SelfCare PG (Notifiche digitali)
