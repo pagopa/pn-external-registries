@@ -27,7 +27,7 @@
         {
             "intendedUsage": "B2BPG",
             "openapiFiles": [
-                "pn-selfcare-internal-v1.yaml",
+
                 "pn-external-registries-b2b-internal.yaml"
             ],
             "servicePath": "ext-registry"
