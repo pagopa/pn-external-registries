@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: naxsaxyHIqsYmjo/J71HUSAdIl70JH/C4toGFLTmWoY=
+  version: BrAdOicm/5HdZZ+sdbSPcsQUxGi6CuYKj+iyEBHfqSQ=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -20,18 +20,18 @@ paths:
         pages.
       tags:
         - InfoPA
-      x-api-permissions:
-        - BASE
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
       parameters:
         - name: paNameFilter
-          description: Se valorizzato, indica il prefisso della denominazione della PA
+          description: Se valorizzato indica il prefisso della denominazione della PA
           in: query
           required: false
           schema:
             $ref: '#/components/schemas/PaNameFilter'
         - name: id
           description: >-
-            Se valorizzato, indica gli ID delle PA di cui si vuole conoscere la
+            Se valorizzato indica gli id delle PA di cui si vuole la
             denominazione
           in: query
           required: false
@@ -41,13 +41,13 @@ paths:
               $ref: '#/components/schemas/SelfCarePaId'
       responses:
         '200':
-          description: Richiesta riuscita
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaSummariesList'
         '400':
-          description: Input non valido
+          description: Invalid input
           content:
             application/problem+json:
               schema:
@@ -58,8 +58,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-      security:
-        - pn-auth-fleet_b2bAuthorizer_openapi: []
       x-amazon-apigateway-integration:
         uri: >-
           http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/activated-on-pn
@@ -90,6 +88,404 @@ paths:
         connectionType: VPC_LINK
         timeoutInMillis: 29000
         type: http_proxy
+  /pa/v1/groups:
+    get:
+      operationId: getGroups
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PA can use groups to better organize work in its organization. Return
+        the PaGroupList of the current user, or if the user isn't in some group,
+        all the groups of the current PA
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      parameters:
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pa/v1/groups API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pg/v1/groups:
+    get:
+      operationId: getPgGroups
+      summary: Retrieve group of current user defined in Self Care
+      description: >
+        PG can use groups to better organize work in its organization. Return
+        the PgGroupList of the current user, or if the user isn't in some group,
+        all the groups of the current PG
+      tags:
+        - InfoPG
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      parameters:
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pg/v1/groups API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pa/v1/institutions:
+    get:
+      operationId: getInstitutions
+      summary: Retrieve institutions of current user defined in Self Care
+      description: >
+        Retrieves all the onboarded institutions related to the provided user
+        and the product using selfcare API
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+      parameters: []
+    options:
+      operationId: Options for /pa/v1/institutions API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pa/v1/user-institutions:
+    get:
+      operationId: getUserInstitutions
+      summary: Retrieve user's institutions of current user defined in Self Care
+      description: >
+        Retrieves all the onboarded institutions related to the provided user
+        and the product using selfcare API
+      tags:
+        - InfoPA
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/user-institutions
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+      parameters: []
+    options:
+      operationId: Options for /pa/v1/user-institutions API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/user-institutions
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pa/v1/institutions/{id}/products:
+    get:
+      operationId: getInstitutionProducts
+      summary: Retrieve all active products for given institution and user
+      description: >
+        etrieve all active products for given institution and user using
+        SelfCare API
+      tags:
+        - InfoPA
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      parameters:
+        - name: id
+          description: The identifier of one PA
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResourceList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions/{id}/products
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+          integration.request.path.id: method.request.path.id
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pa/v1/institutions/{id}/products API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pa/v1/institutions/{id}/products
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.path.id: method.request.path.id
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+  /pg/v1/user-groups:
+    get:
+      operationId: getPgUserGroupsPrivate
+      summary: Retrieve selfcare groups related to user
+      description: >
+        PG can use groups to better organize work in its organization. Retrieve
+        selfcare groups related to user
+      tags:
+        - InfoPG
+      x-api-permissions:
+        - BASE
+      parameters:
+        - $ref: '#/components/parameters/cxIdAuthFleet'
+        - $ref: '#/components/parameters/uidAuthFleet'
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/user-groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pg/v1/user-groups API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/user-groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
 components:
   parameters:
     cxRoleAuthFleet:
@@ -101,14 +497,173 @@ components:
         type: string
         maxLength: 64
         pattern: ^[ -~ ]*$
+    cxIdAuthFleet:
+      name: x-pagopa-pn-cx-id
+      in: header
+      description: Customer/Receiver Identifier
+      required: true
+      schema:
+        type: string
+        pattern: ^[ -~]*$
+        maxLength: 64
+    uidAuthFleet:
+      name: x-pagopa-pn-uid
+      in: header
+      description: User Identifier
+      required: true
+      schema:
+        type: string
+        pattern: ^[ -~]*$
+        maxLength: 64
   schemas:
-    SelfCarePaId:
-      title: The PA id used by self care
-      description: An unique ID that identify a Public Administration
-      type: string
-      minLength: 1
-      maxLength: 50
-      pattern: ^[ -~ ]*$
+    InstitutionResourceList:
+      title: InstitutionResourceList
+      description: Contains the list of institution defined in SelfCare PA
+      type: array
+      items:
+        $ref: '#/components/schemas/InstitutionResourcePN'
+    InstitutionResourcePN:
+      title: InstitutionResourcePN
+      type: object
+      properties:
+        address:
+          type: string
+          description: Institution's physical address
+        aooParentCode:
+          type: string
+          description: AOO unit parent institution Code
+        assistanceContacts:
+          $ref: '#/components/schemas/AssistanceContactsResourcePN'
+        companyInformations:
+          $ref: '#/components/schemas/CompanyInformationsResourcePN'
+        description:
+          type: string
+          description: Institution's legal name
+        digitalAddress:
+          type: string
+          description: Institution's digitalAddress
+        dpoData:
+          $ref: '#/components/schemas/DpoDataResourcePN'
+        externalId:
+          type: string
+          description: Institution's unique external identifier
+        id:
+          type: string
+          description: Institution's unique internal Id
+          format: uuid
+        institutionType:
+          enum:
+            - GSP
+            - PA
+            - PG
+            - PSP
+            - PT
+            - SCP
+          type: string
+          description: Institution's type
+        origin:
+          type: string
+          description: Institution data origin
+        originId:
+          type: string
+          description: Institution's details origin Id
+        rootParent:
+          $ref: '#/components/schemas/RootParentResourcePN'
+        pspData:
+          $ref: '#/components/schemas/PspDataResourcePN'
+        recipientCode:
+          type: string
+          description: Billing recipient code
+        status:
+          type: string
+          description: Institution onboarding status
+        subunitCode:
+          type: string
+          description: Institutions AOO/UO unit Code
+        subunitType:
+          type: string
+          description: Institutions AOO/UO unit type
+        taxCode:
+          type: string
+          description: Institution's taxCode
+        userProductRoles:
+          type: array
+          items:
+            type: string
+          description: Logged user's roles on product
+        zipCode:
+          type: string
+          description: Institution's zipCode
+    CompanyInformationsResourcePN:
+      title: CompanyInformationsResourcePN
+      type: object
+      properties:
+        businessRegisterPlace:
+          type: string
+          description: Institution's business register place
+        rea:
+          type: string
+          description: Institution's REA
+        shareCapital:
+          type: string
+          description: Institution's share capital value
+    DpoDataResourcePN:
+      title: DpoDataResourcePN
+      type: object
+      properties:
+        address:
+          type: string
+          description: DPO's address
+        email:
+          type: string
+          description: DPO's email
+          format: email
+          example: email@example.com
+        pec:
+          type: string
+          description: DPO's PEC
+          format: email
+          example: email@example.com
+    AssistanceContactsResourcePN:
+      title: AssistanceContactsResourcePN
+      type: object
+      properties:
+        supportEmail:
+          type: string
+          description: Institution's support email contact
+        supportPhone:
+          type: string
+          description: Institution's support phone contact
+    RootParentResourcePN:
+      title: RootParentResourcePN
+      type: object
+      properties:
+        description:
+          type: string
+          description: swagger.external_api.institutions.model.parentDescription
+        id:
+          type: string
+          description: Institution's unique internal Id
+    PspDataResourcePN:
+      title: PspDataResourcePN
+      type: object
+      properties:
+        abiCode:
+          type: string
+          description: PSP's ABI code
+        businessRegisterNumber:
+          type: string
+          description: PSP's Business Register number
+        legalRegisterName:
+          type: string
+          description: PSP's legal register name
+        legalRegisterNumber:
+          type: string
+          description: PSP's legal register number
+        vatNumberGroup:
+          type: boolean
+          description: PSP's Vat Number group
+          example: false
     PaNameFilter:
       title: Admitted character for PA denomination field
       type: string
@@ -133,6 +688,220 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PaSummary'
+    PaInfo:
+      title: PA Info by IPA
+      description: Denomination, fiscal code, pec, email, tel, www site, ...
+      type: object
+      required:
+        - id
+        - name
+        - taxId
+        - generalContacts
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+          minLength: 1
+        taxId:
+          description: codice fiscale
+          type: string
+          minLength: 1
+        ipaCode:
+          description: codice IPA
+          type: string
+          minLength: 1
+        sdiCode:
+          description: codice SDI
+          type: string
+          minLength: 1
+        agreementDate:
+          description: data sottoscrizione accordo
+          example: '2022-07-27T12:22:33.444Z'
+          type: string
+          format: date-time
+        generalContacts:
+          $ref: '#/components/schemas/PaContacts'
+    PaContacts:
+      title: Contact Information
+      description: pec, email, tel, www site, ...
+      type: object
+      properties:
+        pec:
+          type: string
+          format: email
+          minLength: 1
+        email:
+          type: string
+          format: email
+          minLength: 1
+        tel:
+          type: string
+          pattern: ^\\+?([0-9]|-)*
+          minLength: 1
+          maxLength: 20
+        web:
+          type: string
+          format: uri
+          pattern: http.*
+          minLength: 1
+        registeredOffice:
+          type: string
+          description: sede legale
+          minLength: 1
+    PaGroupList:
+      title: Groups defined in Self Care
+      description: Contains the list of groups defined in SelfCare
+      type: array
+      items:
+        $ref: '#/components/schemas/PaGroup'
+    PaGroup:
+      title: Group defined in Self Care
+      description: Contains the name list of groups defined in SelfCare
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PaGroupStatus'
+    PaGroupStatus:
+      title: Status of group defined in Self Care
+      description: Contains the name list of groups defined in SelfCare
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+    PgGroupList:
+      title: Groups defined in Self Care PG (Notifiche digitali)
+      description: Contains the list of groups defined in SelfCare PG (Notifiche digitali)
+      type: array
+      items:
+        $ref: '#/components/schemas/PgGroup'
+    PgGroup:
+      title: Group defined in Self Care PG (Notifiche digitali)
+      description: >-
+        Contains the name list of groups defined in SelfCare PG (Notifiche
+        digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PgGroupStatus'
+    PgGroupStatus:
+      title: Status of group defined in Self Care PG (Notifiche digitali)
+      description: >-
+        Contains the status of groups defined in SelfCare PG (Notifiche
+        digitali)
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+    SelfCarePaId:
+      title: The PA id used by self care
+      description: An unique ID that identify a Public Administration
+      type: string
+      minLength: 1
+      maxLength: 50
+      pattern: ^[ -~ ]*$
+    ProductResourceList:
+      title: ProductResourceList
+      description: Contains the list of products related institution and current user
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductResourcePN'
+    ProductResourcePN:
+      title: ProductResourcePN
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Date the products was activated/created
+          format: date-time
+        depictImageUrl:
+          type: string
+          description: Product's depiction image url
+        description:
+          type: string
+          description: Product's description
+        id:
+          type: string
+          description: Product's unique identifier
+        identityTokenAudience:
+          type: string
+          description: Product's identity token audience
+        logo:
+          type: string
+          description: Product's logo url
+        logoBgColor:
+          pattern: ^#0-9A-F6$
+          type: string
+          description: Product logo's background color
+        parentId:
+          type: string
+          description: Root parent of the sub product
+        roleManagementURL:
+          type: string
+          description: Url of the utilities management
+        roleMappings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ProductRoleInfoResPN'
+          description: Mappings between Party's and Product's role
+        title:
+          type: string
+          description: Product's title
+        urlBO:
+          type: string
+          description: >-
+            URL that redirects to the back-office section where is possible to
+            manage the product
+        urlPublic:
+          type: string
+          description: URL that redirects to the public information webpage of the product
+    ProductRoleInfoResPN:
+      title: ProductRoleInfoResPN
+      required:
+        - multiroleAllowed
+        - roles
+      type: object
+      properties:
+        multiroleAllowed:
+          type: boolean
+          description: Flag indicating if a User can have more than one product role
+          example: false
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRolePN'
+          description: Available product roles
+    ProductRolePN:
+      title: ProductRolePN
+      required:
+        - code
+        - description
+        - label
+      type: object
+      properties:
+        code:
+          type: string
+          description: Product role internal code
+        description:
+          type: string
+          description: Product role description
+        label:
+          type: string
+          description: Product role label
     ProblemError:
       properties:
         code:
@@ -213,8 +982,12 @@ components:
         identitySource: method.request.header.Authorization
         type: request
 tags:
+  - name: SelfCare
+    description: Integrazione verso portale selfcare
   - name: InfoPA
     description: Informazioni sulla Pubblica Amministrazione
+  - name: InfoPG
+    description: Informazioni sulla Persona Giuridica
 x-amazon-apigateway-gateway-responses:
   DEFAULT_5XX:
     responseParameters:
