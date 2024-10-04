@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: PN External Registries B2B Internal API
   version: v1
-  description: API per recuperare informazioni sulle Pubbliche Amministrazioni che utilizzano PN
+  description: API per recuperare informazioni sulle Pubbliche Amministrazioni e Persone Giuridiche che utilizzano PN
   license:
     name: Licenza PagoPA PN
     url: http://pn.pagopa.it
@@ -12,6 +12,8 @@ servers:
 tags:
   - name: InfoPA
     description: Informazioni sulla Pubblica Amministrazione
+  - name: InfoPG
+    description: Informazioni sulla Persona Giuridica
 paths:
   '/ext-registry/pa/v1/activated-on-pn':
     get:
@@ -53,6 +55,45 @@ paths:
                 $ref: '#/components/schemas/PaSummariesList'
         '400':
           description: Input non valido
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry/pg/v1/user-groups':
+    get:
+      operationId: getPgUserGroupsPrivate
+      summary: Retrieve selfcare groups related to user
+      description: >
+        PG can use groups to better organize work in its organization.
+        Retrieve selfcare groups related to user
+      tags:
+        - InfoPG
+      x-api-permissions:
+        - 'BASE'
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
           content:
             application/problem+json:
               schema:
