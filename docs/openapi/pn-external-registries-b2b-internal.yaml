@@ -74,11 +74,13 @@ paths:
         Retrieve selfcare groups related to user
       tags:
         - InfoPG
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
       x-api-permissions:
         - 'BASE'
       parameters:
-        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
-        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                      # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                       # NO EXTERNAL
         - name: statusFilter
           description: Se valorizzato indica di tornare solo i gruppi nello stato passato
           in: query
