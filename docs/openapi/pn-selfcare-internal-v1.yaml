@@ -75,6 +75,45 @@ paths:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
+  '/ext-registry/pg/v1/user-groups':                                                         # NO EXTERNAL
+    get:                                                                                     # NO EXTERNAL
+      operationId: getPgUserGroupsPrivate                                                    # NO EXTERNAL
+      summary: Retrieve selfcare groups related to user                                      # NO EXTERNAL
+      tags:                                                                                  # NO EXTERNAL
+        - InfoPG                                                                             # NO EXTERNAL
+      #      security:                                                                       # NO EXTERNAL
+      #        - bearerAuth: [ ]                                                             # NO EXTERNAL
+      x-api-permissions:                                                                     # NO EXTERNAL
+        - 'BASE'                                                                             # NO EXTERNAL
+      parameters:                                                                            # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                      # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                       # NO EXTERNAL
+        - name: statusFilter                                                                 # NO EXTERNAL
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato    # NO EXTERNAL
+          in: query                                                                          # NO EXTERNAL
+          required: false                                                                    # NO EXTERNAL
+          schema:                                                                            # NO EXTERNAL
+            $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupStatus'           # NO EXTERNAL
+      responses:                                                                             # NO EXTERNAL
+        '200':                                                                               # NO EXTERNAL
+          description: OK                                                                    # NO EXTERNAL
+          content:                                                                           # NO EXTERNAL
+            application/json:                                                                # NO EXTERNAL
+              schema:                                                                        # NO EXTERNAL
+                $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupList'         # NO EXTERNAL
+        '400':                                                                               # NO EXTERNAL
+          description: Invalid input                                                         # NO EXTERNAL
+          content:                                                                           # NO EXTERNAL
+            application/problem+json:                                                        # NO EXTERNAL
+              schema:                                                                        # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                         # NO EXTERNAL
+        '500':                                                                               # NO EXTERNAL
+          description: Internal Server Error                                                 # NO EXTERNAL
+          content:                                                                           # NO EXTERNAL
+            application/problem+json:                                                        # NO EXTERNAL
+              schema:                                                                        # NO EXTERNAL
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'                         # NO EXTERNAL
+
   '/ext-registry-private/pa/v1/activated-on-pn':                                                # NO EXTERNAL
     get:                                                                                        # NO EXTERNAL
       operationId: getManyPa                                                                    # NO EXTERNAL

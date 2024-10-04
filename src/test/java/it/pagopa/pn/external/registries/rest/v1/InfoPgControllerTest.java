@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 @WebFluxTest(controllers = {InfoPgController.class})
 class InfoPgControllerTest {
 
-    public static final String PN_PAGOPA_USER_ID = "x-pagopa-pn-cx-id";
+    public static final String PN_PAGOPA_CX_ID = "x-pagopa-pn-cx-id";
     public static final String PN_PAGOPA_UID = "x-pagopa-pn-uid";
     public static final String PN_PAGOPA_GROUPS = "x-pagopa-pn-cx-groups";
 
@@ -46,11 +46,37 @@ class InfoPgControllerTest {
         // Then
         webTestClient.get()
                 .uri(url)
-                .header(PN_PAGOPA_USER_ID, "userId")
+                .header(PN_PAGOPA_CX_ID, "userId")
                 .header(PN_PAGOPA_UID, "uid")
                 .header(PN_PAGOPA_GROUPS, "")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(PgGroupDto.class).hasSize(2);
+    }
+
+    @Test
+    void getPgUserGroup(){
+        String url = "/ext-registry/pg/v1/user-groups";
+
+        PgGroupDto dto1 = new PgGroupDto();
+        dto1.setId("id1");
+        dto1.setName("name1");
+        PgGroupDto dto2 = new PgGroupDto();
+        dto2.setId("id2");
+        dto2.setName("name2");
+
+        // When
+        when(svc.getPgUserGroups("uid", "cxId", null)).thenReturn(Flux.fromIterable(List.of(dto1, dto2)));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .header(PN_PAGOPA_CX_ID, "cxId")
+                .header(PN_PAGOPA_UID, "uid")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(PgGroupDto.class)
+                .hasSize(2);
     }
 }
