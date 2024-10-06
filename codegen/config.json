@@ -27,7 +27,6 @@
         {
             "intendedUsage": "B2BPG",
             "openapiFiles": [
-
                 "pn-external-registries-b2b-internal.yaml"
             ],
             "servicePath": "ext-registry"
