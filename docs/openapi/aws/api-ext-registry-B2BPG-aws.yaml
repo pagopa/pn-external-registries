@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: naxsaxyHIqsYmjo/J71HUSAdIl70JH/C4toGFLTmWoY=
+  version: WSNVDCNBU2VmxmrEZWyXl1zq3vrXNI28nr+wtQH+Zdo=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -14,10 +14,10 @@ paths:
   /pa/v1/activated-on-pn:
     get:
       operationId: listOnboardedPa
-      summary: List PA that use PN
+      summary: Elenca le PA che utilizzano PN
       description: >-
-        Use with API to implement PA choose in domicile and mandate creation
-        pages.
+        Utilizzato per ottenere la lista delle PA registrate su PN e associare
+        il codice univoco dell'ente al Nome
       tags:
         - InfoPA
       x-api-permissions:
@@ -90,6 +90,76 @@ paths:
         connectionType: VPC_LINK
         timeoutInMillis: 29000
         type: http_proxy
+  /pg/v1/user-groups:
+    get:
+      operationId: getPgUserGroupsPrivate
+      summary: Restituisce i gruppi associati all'utente che fa la richiesta
+      description: >
+        Le PG possono usare i gruppi per meglio organizzare il lavoro nella loro
+        oranizazzione. Questo endpoint permette di ottenere i gruppi associati
+        all'utente che fa la richiesta
+      tags:
+        - InfoPG
+      x-api-permissions:
+        - BASE
+      parameters:
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security:
+        - pn-auth-fleet_b2bAuthorizer_openapi: []
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/user-groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters:
+          integration.request.header.x-pagopa-pn-cx-id: context.authorizer.cx_id
+          integration.request.header.x-pagopa-pn-cx-role: context.authorizer.cx_role
+          integration.request.header.x-pagopa-pn-uid: context.authorizer.uid
+          integration.request.header.x-pagopa-pn-jti: context.authorizer.cx_jti
+          integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
+          integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
+          integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
+    options:
+      operationId: Options for /pg/v1/user-groups API CORS
+      x-amazon-apigateway-integration:
+        uri: >-
+          http://${stageVariables.ApplicationLoadBalancerDomain}:8080/${stageVariables.ServiceApiPath}/pg/v1/user-groups
+        connectionId: ${stageVariables.NetworkLoadBalancerLink}
+        httpMethod: ANY
+        requestParameters: {}
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        timeoutInMillis: 29000
+        type: http_proxy
 components:
   parameters:
     cxRoleAuthFleet:
@@ -103,8 +173,8 @@ components:
         pattern: ^[ -~ ]*$
   schemas:
     SelfCarePaId:
-      title: The PA id used by self care
-      description: An unique ID that identify a Public Administration
+      title: Id associato alla PA
+      description: Un ID univoco che identifica una Publica Amministrazione
       type: string
       minLength: 1
       maxLength: 50
@@ -117,7 +187,7 @@ components:
       pattern: ^([\x20-\xFF]{1,250})$
     PaSummary:
       title: PA in breve
-      description: PA with minimal information
+      description: Le informazioni di base di una PA
       type: object
       required:
         - id
@@ -129,7 +199,9 @@ components:
           type: string
     PaSummariesList:
       title: Elenco sintetico delle PA
-      description: Contains a list of PA with minimal information
+      description: >-
+        Contiene una lista delle PA. Ogni elemento della lista ha le
+        informazioni sintetiche della PA corrispondente
       type: array
       items:
         $ref: '#/components/schemas/PaSummary'
@@ -199,6 +271,37 @@ components:
       required:
         - status
         - errors
+    PgGroupStatus:
+      title: Status of group defined in Self Care PG (Notifiche digitali)
+      description: >-
+        Contains the status of groups defined in SelfCare PG (Notifiche
+        digitali)
+      type: string
+      enum:
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+    PgGroup:
+      title: Group defined in Self Care PG (Notifiche digitali)
+      description: >-
+        Contains the name list of groups defined in SelfCare PG (Notifiche
+        digitali)
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PgGroupStatus'
+    PgGroupList:
+      title: Groups defined in Self Care PG (Notifiche digitali)
+      description: Contains the list of groups defined in SelfCare PG (Notifiche digitali)
+      type: array
+      items:
+        $ref: '#/components/schemas/PgGroup'
   responses: {}
   securitySchemes:
     pn-auth-fleet_b2bAuthorizer_openapi:
@@ -215,6 +318,8 @@ components:
 tags:
   - name: InfoPA
     description: Informazioni sulla Pubblica Amministrazione
+  - name: InfoPG
+    description: Informazioni sulla Persona Giuridica
 x-amazon-apigateway-gateway-responses:
   DEFAULT_5XX:
     responseParameters:

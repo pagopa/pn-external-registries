@@ -1289,6 +1289,104 @@ components:
         checkoutUrl:
           type: string
           description: The Checkout callback URL
+    UpdateNotificationCostRequest:
+      title: Update notification cost information
+      type: object
+      required:
+        - notificationStepCost
+        - iun
+        - paymentsInfoForRecipients
+        - updateCostPhase
+      properties:
+        notificationStepCost:
+          type: number
+          description: Single notification step cost (euro-cent)
+        iun:
+          description: Notification Unique identifier
+          type: string
+        paymentsInfoForRecipients:
+          type: array
+          description: Payment information for recipient
+          items:
+            $ref: '#/components/schemas/PaymentsInfoForRecipient'
+        eventTimestamp:
+          type: string
+          description: event timestamp
+          format: date-time
+        eventStorageTimestamp:
+          type: string
+          description: event storage timestamp
+          format: date-time
+        updateCostPhase:
+          type: string
+          enum:
+            - VALIDATION
+            - REQUEST_REFUSED
+            - NOTIFICATION_CANCELLED
+    PaymentsInfoForRecipient:
+      title: Payment information for recipient
+      type: object
+      required:
+        - recIndex
+        - creditorTaxId
+        - noticeCode
+      properties:
+        recIndex:
+          type: number
+          description: recipient index
+        creditorTaxId:
+          description: Payment PA fiscal code
+          example: '77777777777'
+          type: string
+          maxLength: 11
+          minLength: 11
+        noticeCode:
+          description: Payment notice number  numero avviso
+          example: '302000100000019421'
+          type: string
+          maxLength: 18
+          minLength: 18
+    UpdateNotificationCostResponse:
+      title: Update notification cost response
+      type: object
+      required:
+        - updateResults
+      properties:
+        updateResults:
+          type: array
+          description: Update notification cost results
+          items:
+            $ref: '#/components/schemas/UpdateNotificationCostResult'
+    UpdateNotificationCostResult:
+      title: Update notification cost results
+      type: object
+      required:
+        - recIndex
+        - creditorTaxId
+        - noticeCode
+        - result
+      properties:
+        recIndex:
+          type: number
+          description: recipient index
+        creditorTaxId:
+          description: Payment PA fiscal code
+          example: '77777777777'
+          type: string
+          maxLength: 11
+          minLength: 11
+        noticeCode:
+          description: Payment notice number  numero avviso
+          example: '302000100000019421'
+          type: string
+          maxLength: 18
+          minLength: 18
+        result:
+          type: string
+          enum:
+            - OK
+            - KO
+            - RETRY
     paTaxId:
       description: Payment PA fiscal code
       example: '77777777777'
