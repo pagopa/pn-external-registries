@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: rpdQRMMg6sZExbrk+CHX3bAF0ziFk9r2xa+hYfii834=
+  version: WSNVDCNBU2VmxmrEZWyXl1zq3vrXNI28nr+wtQH+Zdo=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -14,10 +14,10 @@ paths:
   /pa/v1/activated-on-pn:
     get:
       operationId: listOnboardedPa
-      summary: List PA that use PN
+      summary: Elenca le PA che utilizzano PN
       description: >-
-        Use with API to implement PA choose in domicile and mandate creation
-        pages.
+        Utilizzato per ottenere la lista delle PA registrate su PN e associare
+        il codice univoco dell'ente al Nome
       tags:
         - InfoPA
       x-api-permissions:
@@ -93,10 +93,11 @@ paths:
   /pg/v1/user-groups:
     get:
       operationId: getPgUserGroupsPrivate
-      summary: Retrieve selfcare groups related to user
+      summary: Restituisce i gruppi associati all'utente che fa la richiesta
       description: >
-        PG can use groups to better organize work in its organization. Retrieve
-        selfcare groups related to user
+        Le PG possono usare i gruppi per meglio organizzare il lavoro nella loro
+        oranizazzione. Questo endpoint permette di ottenere i gruppi associati
+        all'utente che fa la richiesta
       tags:
         - InfoPG
       x-api-permissions:
@@ -172,8 +173,8 @@ components:
         pattern: ^[ -~ ]*$
   schemas:
     SelfCarePaId:
-      title: The PA id used by self care
-      description: An unique ID that identify a Public Administration
+      title: Id associato alla PA
+      description: Un ID univoco che identifica una Publica Amministrazione
       type: string
       minLength: 1
       maxLength: 50
@@ -186,7 +187,7 @@ components:
       pattern: ^([\x20-\xFF]{1,250})$
     PaSummary:
       title: PA in breve
-      description: PA with minimal information
+      description: Le informazioni di base di una PA
       type: object
       required:
         - id
@@ -198,7 +199,9 @@ components:
           type: string
     PaSummariesList:
       title: Elenco sintetico delle PA
-      description: Contains a list of PA with minimal information
+      description: >-
+        Contiene una lista delle PA. Ogni elemento della lista ha le
+        informazioni sintetiche della PA corrispondente
       type: array
       items:
         $ref: '#/components/schemas/PaSummary'
