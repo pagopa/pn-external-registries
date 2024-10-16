@@ -1,0 +1,171 @@
+openapi: 3.0.1
+info:
+  title: PN External Registries B2B API for PG
+  version: v1
+  description: >- 
+    API per recuperare, da sorgenti esterne le informazioni su:
+      - Pubbliche Amministrazioni censite in PN
+      - gruppi associati ad un utente (utile nella gestione delle notifiche)
+  license:
+    name: Licenza PagoPA PN
+    url: http://pn.pagopa.it
+servers:
+  - url: https://api.prod.notifichedigitali.it
+    description: Ambiente di produzione
+  - url: https://api.uat.notifichedigitali.it
+    description: Ambiente di UAT
+  - url: https://api.test.notifichedigitali.it
+    description: Ambiente di test
+  - url: https://api.dev.notifichedigitali.it
+    description: Ambiente di sviluppo
+tags:
+  - name: InfoPA
+    description: Informazioni sulla Pubblica Amministrazione
+  - name: InfoPG
+    description: Informazioni sulla Persona Giuridica
+paths:
+  '/ext-registry/pa/v1/activated-on-pn':
+    get:
+      operationId: listOnboardedPa
+      summary: Elenca le PA che utilizzano PN
+      description: Utilizzato per ottenere la lista delle PA registrate su PN e associare il codice univoco dell'ente al Nome
+      tags:
+        - InfoPA
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      x-api-permissions:
+        - 'BASE'
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'               # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'             # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'           # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                # NO EXTERNAL
+        - $ref: '#/components/parameters/cxRoleAuthFleet'                             # NO EXTERNAL
+        - name: paNameFilter
+          description: Se valorizzato, indica il prefisso della denominazione della PA
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaNameFilter'
+        - name: id
+          description: Se valorizzato, indica gli ID delle PA di cui si vuole conoscere la denominazione
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SelfCarePaId'
+      responses:
+        '200':
+          description: Richiesta riuscita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaSummariesList'
+        '400':
+          description: Input non valido
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  '/ext-registry/pg/v1/user-groups':
+    get:
+      operationId: getPgUserGroupsPrivate
+      summary: Restituisce i gruppi associati all'utente che fa la richiesta
+      description: >
+        Le PG possono usare i gruppi per meglio organizzare il lavoro nella loro oranizazzione.
+        Questo endpoint permette di ottenere i gruppi associati all'utente che fa la richiesta
+      tags:
+        - InfoPG
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      x-api-permissions:
+        - 'BASE'
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'                      # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                       # NO EXTERNAL
+        - name: statusFilter
+          description: Se valorizzato indica di tornare solo i gruppi nello stato passato
+          in: query
+          required: false
+          schema:
+            $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'pn-selfcare-internal-v1.yaml#/components/schemas/PgGroupList'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+components:
+  parameters:
+    cxRoleAuthFleet:
+      name: x-pagopa-pn-cx-role
+      in: header
+      description: Ruolo (estratto dal token di Self Care)
+      required: false
+      schema:
+        type: string
+        maxLength: 64
+        # ASCII printable chars
+        pattern: ^[ -~ ]*$
+
+  schemas:
+    SelfCarePaId:
+      title: Id associato alla PA 
+      description: Un ID univoco che identifica una Publica Amministrazione
+      type: string
+      minLength: 1
+      maxLength: 50
+      # ASCII printable characters
+      pattern: ^[ -~ ]*$
+    PaNameFilter:
+      title: Admitted character for PA denomination field
+      type: string
+      minLength: 3
+      maxLength: 250
+      pattern: ^([\x20-\xFF]{1,250})$
+    PaSummary:
+      title: PA in breve
+      description: Le informazioni di base di una PA
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SelfCarePaId'
+        name:
+          type: string
+    PaSummariesList:
+      title: Elenco sintetico delle PA
+      description: Contiene una lista delle PA. Ogni elemento della lista ha le informazioni sintetiche della PA corrispondente
+      type: array
+      items:
+        $ref: '#/components/schemas/PaSummary'
+
+#  securitySchemes:                                      # ONLY EXTERNAL
+#    bearerAuth:                                         # ONLY EXTERNAL
+#      type: http                                        # ONLY EXTERNAL
+#      scheme: bearer                                    # ONLY EXTERNAL
+#      bearerFormat: JWT                                 # ONLY EXTERNAL
+#security:                                               # ONLY EXTERNAL
+# - bearerAuth: []                                       # ONLY EXTERNAL

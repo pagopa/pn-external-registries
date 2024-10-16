@@ -23,9 +23,17 @@
                 "pn-from-io-b2b-internal-v1.yaml"
             ],
             "servicePath": "ext-registry-private"
+        },
+        {
+            "intendedUsage": "B2BPG",
+            "openapiFiles": [
+                "pn-external-registries-b2b-internal.yaml"
+            ],
+            "servicePath": "ext-registry"
         }
     ],
     "openapiBundlePresenceCheck": [
-        "pn-selfcare-external-v1-bundle.yaml"
+        "pn-selfcare-external-v1-bundle.yaml",
+        "pn-selfcare-external-v1-filtered-bundle.yaml"
     ]
 }

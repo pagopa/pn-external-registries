@@ -6,6 +6,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.a
 import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.InstitutionsApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserGroupApi;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.AccessLevel;
@@ -72,6 +73,21 @@ public class MsClientConfig {
             apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
             return new InstitutionsApi(apiClient);
         }
+
+        @Bean
+        InstitutionsApi institutionsPgApi() {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
+            apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
+            return new InstitutionsApi(apiClient);
+        }
+
+        @Bean
+        UserApi userPgApi() {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
+            apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
+            return new UserApi(apiClient);
+        }
+
 
     }
 

@@ -147,7 +147,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(List.of(groupDto));
 
-        when(selfcarePgUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePgUserGroupClient.getUserGroups(id, null)).thenReturn(Mono.just(response));
 
         // When
         List<PgGroupDto> res = service.getPgGroups(id, id, null, null).collectList().block(d);
@@ -165,7 +165,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(Collections.emptyList());
 
-        when(selfcarePgUserGroupClient.getUserGroups(id.replace("PG-", ""))).thenReturn(Mono.just(response));
+        when(selfcarePgUserGroupClient.getUserGroups(id.replace("PG-", ""), null)).thenReturn(Mono.just(response));
 
         // When
         List<PgGroupDto> res = service.getPgGroups(id, id, null, null).collectList().block(d);
@@ -193,7 +193,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(List.of(groupDto1, groupDto2));
 
-        when(selfcarePgUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePgUserGroupClient.getUserGroups(id, null)).thenReturn(Mono.just(response));
 
         // When
         List<PgGroupDto> res = service.getPgGroups(id, id, List.of(id), null).collectList().block(d);
@@ -227,7 +227,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(List.of(groupDto1, groupDto2, groupDto3));
 
-        when(selfcarePgUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePgUserGroupClient.getUserGroups(id,null)).thenReturn(Mono.just(response));
 
         // When
         List<PgGroupDto> res = service.getPgGroups(id, id, List.of(id, id + "3"), PgGroupStatusDto.ACTIVE).collectList().block(d);
@@ -235,6 +235,80 @@ class InfoSelfcareGroupsServiceTest {
         // Then
         assertNotNull(res);
         assertEquals(1, res.size());
+        assertEquals(groupDto1.getName(), res.get(0).getName());
+    }
+
+    @Test
+    void getPgUserGroups() {
+        // Given
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+        UserGroupResourceDto groupDto = new UserGroupResourceDto();
+        groupDto.setId(id);
+        groupDto.setName("gruppo1");
+        groupDto.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(List.of(groupDto));
+
+        when(selfcarePgUserGroupClient.getUserGroups(id, id)).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgUserGroups(id, id, null).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertEquals(groupDto.getName(), res.get(0).getName());
+    }
+
+    @Test
+    void testPgUserGroupsCxIdPrefix() {
+        // Given
+        String id = "PG-d0d28367-1695-4c50-a260-6fda526e9aab";
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(Collections.emptyList());
+
+        when(selfcarePgUserGroupClient.getUserGroups(id.replace("PG-", ""), id)).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgUserGroups(id, id, null).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertTrue(res.isEmpty());
+    }
+
+    @Test
+    void getPgUserGroupsFilteredActive() {
+        // Given
+        String id = "d0d28367-1695-4c50-a260-6fda526e9aab";
+
+        UserGroupResourceDto groupDto1 = new UserGroupResourceDto();
+        groupDto1.setId(id);
+        groupDto1.setName("gruppo1");
+        groupDto1.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        UserGroupResourceDto groupDto2 = new UserGroupResourceDto();
+        groupDto2.setId(id + "2");
+        groupDto2.setName("gruppo2");
+        groupDto2.setStatus(UserGroupResourceDto.StatusEnum.ACTIVE);
+
+        UserGroupResourceDto groupDto3 = new UserGroupResourceDto();
+        groupDto3.setId(id + "3");
+        groupDto3.setName("gruppo3");
+        groupDto3.setStatus(UserGroupResourceDto.StatusEnum.SUSPENDED);
+
+        PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
+        response.setContent(List.of(groupDto1, groupDto2, groupDto3));
+
+        when(selfcarePgUserGroupClient.getUserGroups(id,id)).thenReturn(Mono.just(response));
+
+        // When
+        List<PgGroupDto> res = service.getPgUserGroups(id, id, PgGroupStatusDto.ACTIVE).collectList().block(d);
+
+        // Then
+        assertNotNull(res);
+        assertEquals(2, res.size());
         assertEquals(groupDto1.getName(), res.get(0).getName());
     }
 }

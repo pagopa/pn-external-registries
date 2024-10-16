@@ -72,7 +72,7 @@ class SelfcarePgUserGroupClientTest extends MockAWSObjectsTestConfig {
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
             // When
-            PageOfUserGroupResourceDto response = client.getUserGroups("id").block();
+            PageOfUserGroupResourceDto response = client.getUserGroups("id", null).block();
 
             // Then
             assertNotNull(response);
