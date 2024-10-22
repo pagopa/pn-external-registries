@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class InfoLanguageServiceTest {
@@ -52,6 +51,21 @@ class InfoLanguageServiceTest {
         assertEquals(languages, response.getAdditionalLanguages(), "Languages should match");
     }
 
+    @Test
+    void testGetAdditionalLang_EmptyPaId() {
+        // Given
+        String paId = "";
 
+        // When
+        Mono<AdditionalLanguagesDto> response = infoLanguageService.get(paId);
+
+        // Then
+        response
+                .doOnError(error -> {
+                    assertTrue(error instanceof IllegalArgumentException, "Error should be IllegalArgumentException");
+                    assertEquals("paId is empty", error.getMessage(), "Error message should match");
+                })
+                .subscribe();
+    }
 
 }
