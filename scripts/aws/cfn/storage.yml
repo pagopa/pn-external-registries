@@ -136,6 +136,26 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
+  SenderConfigurationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-SenderConfiguration'
+      AttributeDefinitions:
+        - AttributeName: 'hashKey'
+          AttributeType: 'S'
+        - AttributeName: 'sortKey'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'hashKey'
+          KeyType: 'HASH'
+        - AttributeName: 'sortKey'
+          KeyType: 'RANGE'
+      BillingMode: 'PAY_PER_REQUEST'
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
   PnExternalRegistriesLogGroup:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Retain
@@ -189,6 +209,13 @@ Outputs:
   CostUpdateResultTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${CostUpdateResultTable.Arn}'
+
+  SenderConfigurationTableName:
+    Description: Dynamo Name used by application to access the key-value store
+    Value: !Ref SenderConfigurationTable
+  SenderConfigurationTableArn:
+    Description: ARM Dynamo Name used by application to access the key-value store
+    Value: !Sub '${SenderConfigurationTable.Arn}'
 
   # Log group exports
   EcsLogGroup:
