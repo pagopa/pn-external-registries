@@ -18,7 +18,7 @@ public class InfoLanguageController implements AdditionalLangApi {
     private final InfoLanguageService infoLanguageService;
 
     /**
-     * GET /ext-registry-private/pa/v1/info-lang/{paId}
+     * GET /ext-registry-private/pa/v1/additional-lang/{paId}
      * Utilizzato per ottenere informazioni riguardanti la lingua aggiuntiva scelta dalla pa
      *
      * @param paId Indica l&#39;institution id (required)
@@ -28,8 +28,7 @@ public class InfoLanguageController implements AdditionalLangApi {
      */
     @Override
     public Mono<ResponseEntity<AdditionalLanguagesDto>> getAdditionalLang(String paId, final ServerWebExchange exchange) {
-        log.debug("getAdditionalLang paId={}", paId);
-        return infoLanguageService.get(paId)
+        return infoLanguageService.retrievePaAdditionalLang(paId)
                 .map(additionalLanguagesDto ->  ResponseEntity.ok().body(additionalLanguagesDto));
     }
 
