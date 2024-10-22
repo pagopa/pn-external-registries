@@ -10,5 +10,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class LangConfig {
+
+    public static final String COL_ADDITIONAL_LANGS = "additionalLangs";
+
     private List<String> additionalLangs;
 }

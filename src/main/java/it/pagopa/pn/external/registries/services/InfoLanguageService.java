@@ -1,39 +1,50 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.dto.AllowedAdditionalLanguages;
+import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AdditionalLanguagesDto;
 import it.pagopa.pn.external.registries.mapper.LanguageDetailEntityToAdditionalLanguagesDtoMapper;
 import it.pagopa.pn.external.registries.middleware.db.dao.SenderConfigurationDao;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
+import software.amazon.awssdk.utils.CollectionUtils;
 
-import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PANOTFOUND;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
+import static it.pagopa.pn.external.registries.middleware.db.entities.LanguageDetailEntity.buildPk;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class InfoLanguageService {
 
+    public static final String ADDITIONAL_LANG_NOTFOUND = "Non è stata trovata nessuna lingua aggiuntiva configurata per la PA";
+    public static final String REQUIRED_ADDITIONAL_LANG = "La lingua aggiuntiva è obbligatoria";
     private final SenderConfigurationDao senderConfigurationDao;
 
-    public Mono<AdditionalLanguagesDto> get(String paId) {
-        if (!StringUtils.hasText(paId)) {
-            log.error("getlanguage - paId is empty");
-            return Mono.error(new IllegalArgumentException("paId is empty"));
-        }
-        log.info("getlanguage - paId={}", paId);
-        return senderConfigurationDao.getSenderConfiguration(paId)
-                .switchIfEmpty(Mono.error(new PnPANotFoundException(ERROR_CODE_EXTERNALREGISTRIES_PANOTFOUND)))
+    public Mono<AdditionalLanguagesDto> retrievePaAdditionalLang(String paId) {
+        log.info("start retrieving additional languages for PA: [{}]", paId);
+        return senderConfigurationDao.getSenderConfiguration(buildPk(paId), SenderConfigurationType.LANG)
+                .switchIfEmpty(Mono.error(new PnInternalException(ADDITIONAL_LANG_NOTFOUND, 404, ERROR_CODE_EXTERNALREGISTRIES_PACONFIGNOTFOUND)))
                 .map(LanguageDetailEntityToAdditionalLanguagesDtoMapper::toDto);
     }
 
     public Mono<AdditionalLanguagesDto> createOrUpdateLang(AdditionalLanguagesDto additionalLanguagesDto) {
-        log.info("updateLang - lang={} - paId{}", additionalLanguagesDto.getAdditionalLanguages(), additionalLanguagesDto.getPaId());
-        return senderConfigurationDao.createOrUpdateLang(additionalLanguagesDto.getPaId(), additionalLanguagesDto.getAdditionalLanguages())
-                .map(LanguageDetailEntityToAdditionalLanguagesDtoMapper::toDto);
+        log.info("start putting additional lang for PA: [{}]", additionalLanguagesDto.getPaId());
+        if(CollectionUtils.isNullOrEmpty(additionalLanguagesDto.getAdditionalLanguages())){
+            return Mono.error(new PnInternalException(REQUIRED_ADDITIONAL_LANG, 400, ERROR_CODE_EXTERNALREGISTRIES_REQUIRED_ADDITIONAL_LANGS));
+        }
+        if(Arrays.stream(AllowedAdditionalLanguages.values()).map(AllowedAdditionalLanguages::name).noneMatch(additionalLanguagesDto.getAdditionalLanguages()::contains)){
+            return Mono.error(new PnInternalException(String.format("Lingua aggiuntiva non valida, i valori accettati sono %s",
+                    Arrays.stream(AllowedAdditionalLanguages.values()).map(Enum::name).collect(Collectors.joining(","))), 400, ERROR_CODE_EXTERNALREGISTRIES_INVALID_ADDITIONAL_LANGS));
+        }
+        return senderConfigurationDao.createOrUpdateLang(buildPk(additionalLanguagesDto.getPaId()), SenderConfigurationType.LANG, additionalLanguagesDto.getAdditionalLanguages())
+                .map(languageDetailEntity -> additionalLanguagesDto);
     }
 
 }

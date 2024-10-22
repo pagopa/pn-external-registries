@@ -5,27 +5,23 @@ import it.pagopa.pn.external.registries.middleware.db.entities.LangConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.LanguageDetailEntity;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class LanguageDetailEntityToAdditionalLanguagesDtoMapperTest {
 
     @Test
     void toDto() {
-        // Given
         LanguageDetailEntity entity = new LanguageDetailEntity();
-        entity.setHashKey("testPaId");
-        List<String> languagesList = new ArrayList<>();
-        languagesList.add("DE");
-        LangConfig langConfig = new LangConfig();
-        langConfig.setAdditionalLangs(languagesList);
-        entity.setValue(langConfig);
+        entity.setHashKey("CFG_testPaId");
+        LangConfig languagesMap = new LangConfig();
+        languagesMap.setAdditionalLangs(Collections.singletonList("DE"));
+        entity.setValue(languagesMap);
 
-        // When
         AdditionalLanguagesDto dto = LanguageDetailEntityToAdditionalLanguagesDtoMapper.toDto(entity);
 
-        // Then
         assertNotNull(dto);
         assertEquals("testPaId", dto.getPaId());
         assertEquals(Collections.singletonList("DE"), dto.getAdditionalLanguages());

@@ -1,5 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AdditionalLanguagesDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.SenderConfigurationDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.LangConfig;
@@ -9,12 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 class InfoLanguageServiceTest {
@@ -32,48 +35,38 @@ class InfoLanguageServiceTest {
 
     @Test
     void testGetAdditionalLang_200_OK() {
-        // Given
-        List<String> langsList = new ArrayList<>();
-        langsList.add("DE");
-
-        LangConfig languages = new LangConfig();
-        languages.setAdditionalLangs(langsList);
         String paId = "testPaId";
+        List<String> languages = new ArrayList<>();
+        languages.add("DE");
         LanguageDetailEntity entity = new LanguageDetailEntity();
-        entity.setHashKey(paId);
-        entity.setValue(languages);
+        entity.setHashKey(LanguageDetailEntity.buildPk(paId));
+        LangConfig langConfig = new LangConfig();
+        langConfig.setAdditionalLangs(languages);
+        entity.setValue(langConfig);
 
-        when(senderConfigurationDao.getSenderConfiguration(paId)).thenReturn(Mono.just(entity));
+        when(senderConfigurationDao.getSenderConfiguration("CFG_" + paId, SenderConfigurationType.LANG))
+                .thenReturn(Mono.just(entity));
 
-        // When
-        AdditionalLanguagesDto response = infoLanguageService.get(paId).block();
+        AdditionalLanguagesDto response = infoLanguageService.retrievePaAdditionalLang(paId).block();
 
-        // Then
-        assertNotNull(response, "Response should not be null");
-        assertEquals(paId, response.getPaId(), "PaId should match");
-        assertEquals(langsList, response.getAdditionalLanguages(), "Languages should match");
+        assertNotNull(response);
+        assertEquals(paId, response.getPaId());
+        assertEquals(languages, response.getAdditionalLanguages());
     }
 
     @Test
-    void testGetAdditionalLang_EmptyPaId() {
-        // Given
-        String paId = "";
+    void testGetAdditionalLang_ConfigNotFound() {
+        when(senderConfigurationDao.getSenderConfiguration("CFG_paId", SenderConfigurationType.LANG))
+                .thenReturn(Mono.empty());
 
-        // When
-        Mono<AdditionalLanguagesDto> response = infoLanguageService.get(paId);
+        StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
+                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .verify();
 
-        // Then
-        response
-                .doOnError(error -> {
-                    assertTrue(error instanceof IllegalArgumentException, "Error should be IllegalArgumentException");
-                    assertEquals("paId is empty", error.getMessage(), "Error message should match");
-                })
-                .subscribe();
     }
 
     @Test
     void testCreateOrUpdateLang_200_OK() {
-        // Given
 
         List<String> langsList = new ArrayList<>();
         langsList.add("DE");
@@ -89,17 +82,47 @@ class InfoLanguageServiceTest {
 
         LanguageDetailEntity entity = new LanguageDetailEntity();
         entity.setHashKey(paId);
+        entity.setSortKey(SenderConfigurationType.LANG.name());
         entity.setValue(languages);
 
-        when(senderConfigurationDao.createOrUpdateLang(any(), any())).thenReturn(Mono.just(entity));
+        when(senderConfigurationDao.createOrUpdateLang("CFG_"+paId, SenderConfigurationType.LANG, langsList))
+               .thenReturn(Mono.just(paId));
 
-        // When
-        AdditionalLanguagesDto response = infoLanguageService.createOrUpdateLang(request).block();
+        StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
+                .expectNext(request)
+                .verifyComplete();
+    }
 
-        // Then
-        assertNotNull(response, "Response should not be null");
-        assertEquals(request.getPaId(), response.getPaId(), "PaId should match");
-        assertEquals(langsList, response.getAdditionalLanguages(), "Languages should match");
+    @Test
+    void testCreateOrUpdateLang_WithoutAdditionalLangs() {
+
+
+        String paId = "testPaId";
+        AdditionalLanguagesDto request = new AdditionalLanguagesDto();
+        request.setPaId(paId);
+        request.setAdditionalLanguages(null);
+
+
+        StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
+                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .verify();
+    }
+
+    @Test
+    void testCreateOrUpdateLang_WithInvalidAdditionalLangs() {
+
+        List<String> langsList = new ArrayList<>();
+        langsList.add("INVALID");
+
+        String paId = "testPaId";
+        AdditionalLanguagesDto request = new AdditionalLanguagesDto();
+        request.setPaId(paId);
+        request.setAdditionalLanguages(langsList);
+
+
+        StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
+                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .verify();
     }
 
 }

@@ -28,7 +28,7 @@ public class InfoLanguageController implements AdditionalLangApi {
      */
     @Override
     public Mono<ResponseEntity<AdditionalLanguagesDto>> getAdditionalLang(String paId, final ServerWebExchange exchange) {
-        return infoLanguageService.get(paId)
+        return infoLanguageService.retrievePaAdditionalLang(paId)
                 .map(additionalLanguagesDto ->  ResponseEntity.ok().body(additionalLanguagesDto));
     }
 
@@ -43,7 +43,6 @@ public class InfoLanguageController implements AdditionalLangApi {
      */
     @Override
     public Mono<ResponseEntity<AdditionalLanguagesDto>> putAdditionalLang(Mono<AdditionalLanguagesDto> additionalLanguagesDto,  final ServerWebExchange exchange) {
-        log.debug("putAdditionalLang additionalLanguagesDto={}", additionalLanguagesDto);
         return additionalLanguagesDto
                 .flatMap(infoLanguageService::createOrUpdateLang)
                 .map(additionalLangDto -> ResponseEntity.ok().body(additionalLangDto));
