@@ -2,7 +2,7 @@ package it.pagopa.pn.external.registries.rest.v1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.AdditionalLangException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AdditionalLanguagesDto;
 import it.pagopa.pn.external.registries.services.InfoLanguageService;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ class InfoLanguageControllerTest {
         expectedResponse.setAdditionalLanguages(languages);
 
         when(infoLanguageService.retrievePaAdditionalLang(paId))
-                .thenReturn(Mono.error(new PnInternalException(ADDITIONAL_LANG_NOTFOUND, 404, ERROR_CODE_EXTERNALREGISTRIES_PACONFIGNOTFOUND)));
+                .thenReturn(Mono.error(new AdditionalLangException(ADDITIONAL_LANG_NOTFOUND, 404, ERROR_CODE_EXTERNALREGISTRIES_PACONFIGNOTFOUND)));
 
         webTestClient.get()
                 .uri(url, paId)

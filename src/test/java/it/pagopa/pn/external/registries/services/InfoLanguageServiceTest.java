@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
+import it.pagopa.pn.external.registries.exceptions.AdditionalLangException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AdditionalLanguagesDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.SenderConfigurationDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.LangConfig;
@@ -60,7 +60,7 @@ class InfoLanguageServiceTest {
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
-                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
                 .verify();
 
     }
@@ -104,7 +104,7 @@ class InfoLanguageServiceTest {
 
 
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
-                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
                 .verify();
     }
 
@@ -121,7 +121,7 @@ class InfoLanguageServiceTest {
 
 
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
-                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
                 .verify();
     }
 
