@@ -253,6 +253,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdditionalLanguages'
+        '404':
+          description: PA configuration not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '400':
           description: Invalid input
           content:
