@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_DIGITALDOMICILENOTFOUND;
+
 @Slf4j
 @Service
 public class InfoSelfcareInstitutionsService {
@@ -42,7 +44,7 @@ public class InfoSelfcareInstitutionsService {
   public Mono<PaInfoDto> getOnePa(String id) throws PnRuntimeException {
     log.info("getOnePa - id={}", id);
     return onboardInstitutionsDao.get(id)
-            .switchIfEmpty(Mono.error(new PnPANotFoundException()))
+            .switchIfEmpty(Mono.error(new PnPANotFoundException(ERROR_CODE_EXTERNALREGISTRIES_DIGITALDOMICILENOTFOUND)))
             .map(OnboardInstitutionEntityToPaInfoDto::toDto);
   }
 
