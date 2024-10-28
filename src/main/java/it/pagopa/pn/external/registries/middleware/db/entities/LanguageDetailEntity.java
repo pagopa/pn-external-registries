@@ -19,13 +19,13 @@ public class LanguageDetailEntity {
 
 
     public static final String COL_PK = "hashKey";
-    private static final String COL_SK = "sortKey";
-    private static final String COL_CREATED_AT = "createdAt";
-    private static final String COL_UPDATED_AT = "updatedAt";
+    public static final String COL_SK = "sortKey";
+    public static final String COL_CREATED_AT = "createdAt";
+    public static final String COL_UPDATED_AT = "updatedAt";
 
-    private static final String HASH_KEY_PREFIX = "CFG-";
+    private static final String HASH_KEY_PREFIX = "CFG_";
     public static final String SORT_KEY_VALUE = "LANG";
-    private static final String COL_VALUE = HASH_KEY_PREFIX + SORT_KEY_VALUE;
+    public static final String COL_VALUE = HASH_KEY_PREFIX + SORT_KEY_VALUE;
 
 
     @Setter

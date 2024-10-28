@@ -2,16 +2,15 @@ package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
-import it.pagopa.pn.external.registries.middleware.db.entities.LangConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.LanguageDetailEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
-import java.time.Instant;
-import java.util.Collections;
+import java.util.List;
 
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
@@ -20,27 +19,18 @@ class SenderConfigurationDaoTestIT {
     @Autowired
     private SenderConfigurationDao senderConfigurationDao;
 
+    @Autowired
+    private DynamoDbAsyncClient dynamoDbAsyncClient;
+
     @Test
-    void getPaLangConfiguration() {
-        LanguageDetailEntity entity = newLanguageDetailEntity();
+    void insertSecondPaLangConfigurationAndGet() {
 
-        senderConfigurationDao.putItem(entity).block();
-        LanguageDetailEntity result = senderConfigurationDao.getSenderConfiguration("testPaId", SenderConfigurationType.LANG).block();
+        senderConfigurationDao.createOrUpdateLang("CFG_testPaId", SenderConfigurationType.LANG, List.of("DE")).block();
+        senderConfigurationDao.createOrUpdateLang("CFG_testPaId", SenderConfigurationType.LANG, List.of("FR")).block();
 
+        LanguageDetailEntity result = senderConfigurationDao.getSenderConfiguration("CFG_testPaId", SenderConfigurationType.LANG).block();
         Assertions.assertNotNull(result);
-        Assertions.assertEquals("CFG-testPaId", result.getHashKey());
-        Assertions.assertEquals(entity.getValue(), result.getValue());
-    }
-
-    private LanguageDetailEntity newLanguageDetailEntity() {
-        LanguageDetailEntity entity = new LanguageDetailEntity();
-        entity.setHashKey(LanguageDetailEntity.buildPk("testPaId"));
-        entity.setSortKey("LANG");
-        LangConfig langConfig = new LangConfig();
-        langConfig.setAdditionalLangs(Collections.singletonList("DE"));
-        entity.setValue(langConfig);
-        entity.setCreatedAt(Instant.now());
-        entity.setUpdatedAt(Instant.now());
-        return entity;
+        Assertions.assertEquals(List.of("FR"), result.getValue().getAdditionalLangs());
+        Assertions.assertNotEquals(result.getCreatedAt(), result.getUpdatedAt());
     }
 }

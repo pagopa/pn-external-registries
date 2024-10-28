@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -71,5 +72,49 @@ class InfoLanguageControllerTest {
                 .uri(url, paId)
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    void putAdditionalLang() throws JsonProcessingException {
+        // Given
+        String url = "/ext-registry-private/pa/v1/additional-lang";
+
+        List<String> languages = new ArrayList<>();
+        languages.add("DE");
+
+        AdditionalLanguagesDto request = new AdditionalLanguagesDto();
+        request.setPaId("testPaId");
+        request.setAdditionalLanguages(languages);
+
+        AdditionalLanguagesDto expectedResponse = new AdditionalLanguagesDto();
+        expectedResponse.setPaId("testPaId");
+        expectedResponse.setAdditionalLanguages(languages);
+
+        when(infoLanguageService.createOrUpdateLang(request)).thenReturn(Mono.just(expectedResponse));
+
+        // Then
+        webTestClient.put()
+                .uri(url)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().json(objectMapper.writeValueAsString(expectedResponse));
+    }
+
+    @Test
+    void putAdditionalLangWithoutPaId(){
+        String url = "/ext-registry-private/pa/v1/additional-lang";
+
+        List<String> languages = new ArrayList<>();
+        languages.add("DE");
+
+        AdditionalLanguagesDto request = new AdditionalLanguagesDto();
+        request.setAdditionalLanguages(languages);
+
+        webTestClient.put()
+                .uri(url)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }

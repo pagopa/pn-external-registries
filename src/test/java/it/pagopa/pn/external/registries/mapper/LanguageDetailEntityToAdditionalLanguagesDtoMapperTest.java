@@ -15,7 +15,7 @@ class LanguageDetailEntityToAdditionalLanguagesDtoMapperTest {
     @Test
     void toDto() {
         LanguageDetailEntity entity = new LanguageDetailEntity();
-        entity.setHashKey("CFG-testPaId");
+        entity.setHashKey("CFG_testPaId");
         LangConfig languagesMap = new LangConfig();
         languagesMap.setAdditionalLangs(Collections.singletonList("DE"));
         entity.setValue(languagesMap);

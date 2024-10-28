@@ -33,4 +33,20 @@ public class InfoLanguageController implements AdditionalLangApi {
                 .map(additionalLanguagesDto ->  ResponseEntity.ok().body(additionalLanguagesDto));
     }
 
+    /**
+     * PUT /ext-registry-private/pa/v1/additional-lang
+     * Allows the configuration of a new additional language for pa
+     *
+     * @param additionalLanguagesDto  (optional)
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
+    @Override
+    public Mono<ResponseEntity<AdditionalLanguagesDto>> putAdditionalLang(Mono<AdditionalLanguagesDto> additionalLanguagesDto,  final ServerWebExchange exchange) {
+        return additionalLanguagesDto
+                .flatMap(infoLanguageService::createOrUpdateLang)
+                .map(additionalLangDto -> ResponseEntity.ok().body(additionalLangDto));
+    }
+
 }
