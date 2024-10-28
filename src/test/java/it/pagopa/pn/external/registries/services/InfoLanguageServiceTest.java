@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.services;
 
-import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
 import it.pagopa.pn.external.registries.exceptions.AdditionalLangException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AdditionalLanguagesDto;
@@ -45,7 +44,7 @@ class InfoLanguageServiceTest {
         langConfig.setAdditionalLangs(languages);
         entity.setValue(langConfig);
 
-        when(senderConfigurationDao.getSenderConfiguration(paId, SenderConfigurationType.LANG))
+        when(senderConfigurationDao.getSenderConfiguration("CFG_" + paId, SenderConfigurationType.LANG))
                 .thenReturn(Mono.just(entity));
 
         AdditionalLanguagesDto response = infoLanguageService.retrievePaAdditionalLang(paId).block();
@@ -57,7 +56,7 @@ class InfoLanguageServiceTest {
 
     @Test
     void testGetAdditionalLang_ConfigNotFound() {
-        when(senderConfigurationDao.getSenderConfiguration("paId", SenderConfigurationType.LANG))
+        when(senderConfigurationDao.getSenderConfiguration("CFG_paId", SenderConfigurationType.LANG))
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
@@ -86,7 +85,7 @@ class InfoLanguageServiceTest {
         entity.setSortKey(SenderConfigurationType.LANG.name());
         entity.setValue(languages);
 
-        when(senderConfigurationDao.createOrUpdateLang("CFG-"+paId, SenderConfigurationType.LANG, langsList))
+        when(senderConfigurationDao.createOrUpdateLang("CFG_"+paId, SenderConfigurationType.LANG, langsList))
                 .thenReturn(Mono.just(paId));
 
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
