@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
 import java.util.List;
 
@@ -18,19 +19,11 @@ class SenderConfigurationDaoTestIT {
     @Autowired
     private SenderConfigurationDao senderConfigurationDao;
 
-    @Test
-    void insertAndGetPaLangConfiguration() {
-
-        senderConfigurationDao.createOrUpdateLang("CFG_testPaId", SenderConfigurationType.LANG, List.of("DE")).block();
-        LanguageDetailEntity result = senderConfigurationDao.getSenderConfiguration("CFG_testPaId", SenderConfigurationType.LANG).block();
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals("CFG_testPaId", result.getHashKey());
-        Assertions.assertEquals(List.of("DE"), result.getValue().getAdditionalLangs());
-    }
+    @Autowired
+    private DynamoDbAsyncClient dynamoDbAsyncClient;
 
     @Test
-    void insertSecondPaLangConfiguration() {
+    void insertSecondPaLangConfigurationAndGet() {
 
         senderConfigurationDao.createOrUpdateLang("CFG_testPaId", SenderConfigurationType.LANG, List.of("DE")).block();
         senderConfigurationDao.createOrUpdateLang("CFG_testPaId", SenderConfigurationType.LANG, List.of("FR")).block();

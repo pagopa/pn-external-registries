@@ -61,7 +61,7 @@ class InfoLanguageServiceTest {
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
-                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
+                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
                 .verify();
 
     }
@@ -86,7 +86,7 @@ class InfoLanguageServiceTest {
         entity.setSortKey(SenderConfigurationType.LANG.name());
         entity.setValue(languages);
 
-        when(senderConfigurationDao.createOrUpdateLang("CFG_"+paId, SenderConfigurationType.LANG, langsList))
+        when(senderConfigurationDao.createOrUpdateLang("CFG-"+paId, SenderConfigurationType.LANG, langsList))
                 .thenReturn(Mono.just(paId));
 
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))

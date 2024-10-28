@@ -33,17 +33,17 @@ public class SenderConfigurationDao extends BaseDao {
     DynamoDbAsyncClient dynamoDbAsyncClient;
     public static final String QUERY_IF_NOT_EXISTS = " = if_not_exists(";
 
-    public SenderConfigurationDao(DynamoDbEnhancedAsyncClient dynamoDbAsyncClient,
-                             PnExternalRegistriesConfig pnExternalRegistriesConfig) {
-        this.senderConfigurationTable = dynamoDbAsyncClient.table(pnExternalRegistriesConfig.getDynamodbTableNameSenderConfiguration(), TableSchema.fromBean(LanguageDetailEntity.class));
+    public SenderConfigurationDao(DynamoDbEnhancedAsyncClient dynamoDbEnahnced,
+                                  DynamoDbAsyncClient dynamoDbAsyncClient,
+                                  PnExternalRegistriesConfig pnExternalRegistriesConfig) {
+        this.senderConfigurationTable = dynamoDbEnahnced.table(pnExternalRegistriesConfig.getDynamodbTableNameSenderConfiguration(), TableSchema.fromBean(LanguageDetailEntity.class));
+        this.dynamoDbAsyncClient = dynamoDbAsyncClient;
     }
-
-    public Mono<LanguageDetailEntity> getSenderConfiguration(String paId, SenderConfigurationType configType){
+    public Mono<LanguageDetailEntity> getSenderConfiguration(String hashKey, SenderConfigurationType configType){
         Key key = Key.builder()
-                .partitionValue(buildPk(paId))
+                .partitionValue(hashKey)
                 .sortValue(configType.name())
                 .build();
-        log.info("KEY: {}", key);
         return Mono.fromFuture(senderConfigurationTable.getItem(key));
     }
 
