@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
 import it.pagopa.pn.external.registries.exceptions.AdditionalLangException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AdditionalLanguagesDto;
@@ -44,7 +45,7 @@ class InfoLanguageServiceTest {
         langConfig.setAdditionalLangs(languages);
         entity.setValue(langConfig);
 
-        when(senderConfigurationDao.getSenderConfiguration("CFG_" + paId, SenderConfigurationType.LANG))
+        when(senderConfigurationDao.getSenderConfiguration(paId, SenderConfigurationType.LANG))
                 .thenReturn(Mono.just(entity));
 
         AdditionalLanguagesDto response = infoLanguageService.retrievePaAdditionalLang(paId).block();
@@ -56,11 +57,11 @@ class InfoLanguageServiceTest {
 
     @Test
     void testGetAdditionalLang_ConfigNotFound() {
-        when(senderConfigurationDao.getSenderConfiguration("CFG_paId", SenderConfigurationType.LANG))
+        when(senderConfigurationDao.getSenderConfiguration("paId", SenderConfigurationType.LANG))
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
-                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
+                .expectErrorMatches(throwable -> throwable instanceof PnInternalException)
                 .verify();
 
     }
@@ -86,7 +87,7 @@ class InfoLanguageServiceTest {
         entity.setValue(languages);
 
         when(senderConfigurationDao.createOrUpdateLang("CFG_"+paId, SenderConfigurationType.LANG, langsList))
-               .thenReturn(Mono.just(paId));
+                .thenReturn(Mono.just(paId));
 
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
                 .expectNext(request)
@@ -124,5 +125,6 @@ class InfoLanguageServiceTest {
                 .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
                 .verify();
     }
+
 
 }

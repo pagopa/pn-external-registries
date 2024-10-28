@@ -19,11 +19,12 @@ public class InfoLanguageController implements AdditionalLangApi {
 
     /**
      * GET /ext-registry-private/pa/v1/additional-lang/{paId}
-     * Utilizzato per ottenere informazioni riguardanti la lingua aggiuntiva scelta dalla pa
+     * Retrieve the additional language info chosen by pa
      *
-     * @param paId Indica l&#39;institution id (required)
-     * @return Richiesta riuscita (status code 200)
-     *         or Input non valido (status code 400)
+     * @param paId An unique ID that identify a Public Administration (required)
+     * @return OK (status code 200)
+     *         or PA configuration not found (status code 404)
+     *         or Invalid input (status code 400)
      *         or Internal Server Error (status code 500)
      */
     @Override
