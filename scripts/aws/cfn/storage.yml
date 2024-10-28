@@ -153,8 +153,11 @@ Resources:
       BillingMode: 'PAY_PER_REQUEST'
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
+      # Kinesis CDC source
+      KinesisStreamSpecification:
+        StreamArn: !Ref CdcKinesisSourceStreamArn
       StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
+        StreamViewType: NEW_IMAGE
 
   PnExternalRegistriesLogGroup:
     Type: AWS::CloudFormation::Stack
