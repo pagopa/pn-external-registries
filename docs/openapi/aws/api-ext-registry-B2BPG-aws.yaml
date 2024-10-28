@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: WSNVDCNBU2VmxmrEZWyXl1zq3vrXNI28nr+wtQH+Zdo=
+  version: PXhtBJEPTsn6bO3MXa/j8/QV97jGO9YS5U+lfLNwpkg=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -316,6 +316,8 @@ components:
         identitySource: method.request.header.Authorization
         type: request
 tags:
+  - name: HealthCheck
+    description: Invocazioni per sapere lo stato del microservizio
   - name: InfoPA
     description: Informazioni sulla Pubblica Amministrazione
   - name: InfoPG

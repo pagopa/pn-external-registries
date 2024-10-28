@@ -1,11 +1,14 @@
 openapi: 3.0.1
 info:
   title: API di integrazione con IO
-  version: v1
   description: Api di integrazione IO
+  contact:
+    email: pn@pagopa.it
   license:
-    name: PagoPA PN license
-    url: http://pn.pagopa.it
+    name: Licenza di PN
+    url: https://da-definire/
+  version: "1.0.0"
+
 servers:
   - url: https://placeholder
     description: placeholder

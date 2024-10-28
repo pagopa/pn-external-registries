@@ -1,11 +1,14 @@
 openapi: 3.0.1
 info:
   title: PN External Registries B2B API for PG
-  version: v1
+  termsOfService: https://da-definire/
   description: >- 
     API per recuperare, da sorgenti esterne le informazioni su:
       - Pubbliche Amministrazioni censite in PN
       - gruppi associati ad un utente (utile nella gestione delle notifiche)
+  contact:
+    email: pn@pagopa.it
+  version: "1.0.0"
   license:
     name: Licenza PagoPA PN
     url: http://pn.pagopa.it
@@ -19,11 +22,28 @@ servers:
   - url: https://api.dev.notifichedigitali.it
     description: Ambiente di sviluppo
 tags:
+  - name: HealthCheck
+    description: >-
+      Invocazioni per sapere lo stato del microservizio
   - name: InfoPA
     description: Informazioni sulla Pubblica Amministrazione
   - name: InfoPG
     description: Informazioni sulla Persona Giuridica
 paths:
+  "/status":
+    get:
+      summary: healthCheck path
+      description: healtCheck path per verificare lo stato del microservizio
+      tags:
+        - HealthCheck
+      operationId: status
+      x-api-permissions:
+        - "BASE"
+      responses:
+        "200":
+          description: Ok
+        "500":
+          description: Internal Server Error
   '/ext-registry/pa/v1/activated-on-pn':
     get:
       operationId: listOnboardedPa
