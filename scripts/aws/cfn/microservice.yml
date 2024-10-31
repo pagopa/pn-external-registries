@@ -179,6 +179,14 @@ Parameters:
     Description: 'TTL in days for CostUpdateResult table'
     Default: 365
 
+  SenderConfigurationTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing SenderConfiguration information'
+
+  SenderConfigurationTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing SenderConfiguration information'
+
   PortalUrl:
     Type: String
     Description: 'Url del portale cittadini da inserire negli avvisi a IO'
@@ -451,6 +459,7 @@ Resources:
         ContainerEnvEntry30: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_CITTADINI=${SendPortalUrl}/cittadini'
         ContainerEnvEntry31: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_READ_TIMEOUT_MILLIS=${OneTrustReadTimeoutMillis}'
         ContainerEnvEntry32: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_RETRY_MAX_ATTEMPTS=${OneTrustRetryMaxAttempts}'
+        ContainerEnvEntry33: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_SENDER_CONFIGURATION=${SenderConfigurationTableName}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -501,6 +510,8 @@ Resources:
               - !Sub "${CostComponentsTableArn}/*"
               - !Sub "${CostUpdateResultTableArn}"
               - !Sub "${CostUpdateResultTableArn}/*"
+              - !Sub "${SenderConfigurationTableArn}"
+              - !Sub "${SenderConfigurationTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -711,6 +722,7 @@ Resources:
             - !Ref OnboardInstitutionsTableName
             - !Ref CostComponentsTableName
             - !Ref CostUpdateResultTableName
+            - !Ref SenderConfigurationTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
