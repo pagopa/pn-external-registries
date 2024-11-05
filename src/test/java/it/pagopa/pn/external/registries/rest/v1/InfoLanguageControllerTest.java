@@ -54,27 +54,6 @@ class InfoLanguageControllerTest {
     }
 
     @Test
-    void getAdditionalLangNotFOund() {
-        String url = "/ext-registry-private/pa/v1/additional-lang/{paId}";
-        String paId = "testPaId";
-
-        List<String> languages = new ArrayList<>();
-        languages.add("DE");
-
-        AdditionalLanguagesDto expectedResponse = new AdditionalLanguagesDto();
-        expectedResponse.setPaId(paId);
-        expectedResponse.setAdditionalLanguages(languages);
-
-        when(infoLanguageService.retrievePaAdditionalLang(paId))
-                .thenReturn(Mono.error(new PnInternalException(ADDITIONAL_LANG_NOTFOUND, 404, ERROR_CODE_EXTERNALREGISTRIES_PACONFIGNOTFOUND)));
-
-        webTestClient.get()
-                .uri(url, paId)
-                .exchange()
-                .expectStatus().isNotFound();
-    }
-
-    @Test
     void putAdditionalLang() throws JsonProcessingException {
         // Given
         String url = "/ext-registry-private/pa/v1/additional-lang";

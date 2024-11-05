@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,11 +57,25 @@ class InfoLanguageServiceTest {
 
     @Test
     void testGetAdditionalLang_ConfigNotFound() {
+        AdditionalLanguagesDto additionalLanguagesDto = new AdditionalLanguagesDto();
+        additionalLanguagesDto.setPaId("paId");
+        additionalLanguagesDto.setAdditionalLanguages(Collections.emptyList());
         when(senderConfigurationDao.getSenderConfiguration("CFG_paId", SenderConfigurationType.LANG))
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
-                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
+                .expectNext(additionalLanguagesDto)
+                .verifyComplete();
+
+    }
+
+    @Test
+    void testGetAdditionalLang_Exception() {
+        when(senderConfigurationDao.getSenderConfiguration("CFG_paId", SenderConfigurationType.LANG))
+                .thenReturn(Mono.error(new RuntimeException()));
+
+        StepVerifier.create(infoLanguageService.retrievePaAdditionalLang("paId"))
+                .expectErrorMatches(throwable -> throwable instanceof RuntimeException)
                 .verify();
 
     }
