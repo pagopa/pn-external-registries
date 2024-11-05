@@ -31,7 +31,8 @@ public class InfoLanguageService {
         log.info("start retrieving additional languages for PA: [{}]", paId);
         return senderConfigurationDao.getSenderConfiguration(buildPk(paId), SenderConfigurationType.LANG)
                 .switchIfEmpty(Mono.error(new AdditionalLangException(ADDITIONAL_LANG_NOTFOUND, 404, ERROR_CODE_EXTERNALREGISTRIES_PACONFIGNOTFOUND)))
-                .map(LanguageDetailEntityToAdditionalLanguagesDtoMapper::toDto);
+                .map(LanguageDetailEntityToAdditionalLanguagesDtoMapper::toDto)
+                .onErrorReturn(AdditionalLangException.class, LanguageDetailEntityToAdditionalLanguagesDtoMapper.toEmptyDto(paId));
     }
 
     public Mono<AdditionalLanguagesDto> createOrUpdateLang(AdditionalLanguagesDto additionalLanguagesDto) {

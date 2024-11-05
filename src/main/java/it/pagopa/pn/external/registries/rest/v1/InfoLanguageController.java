@@ -23,7 +23,6 @@ public class InfoLanguageController implements AdditionalLangApi {
      *
      * @param paId An unique ID that identify a Public Administration (required)
      * @return OK (status code 200)
-     *         or PA configuration not found (status code 404)
      *         or Invalid input (status code 400)
      *         or Internal Server Error (status code 500)
      */

@@ -17,4 +17,11 @@ public class LanguageDetailEntityToAdditionalLanguagesDtoMapper {
                 .map(LangConfig::getAdditionalLangs).orElse(Collections.emptyList()));
         return dto;
     }
+
+    public static AdditionalLanguagesDto toEmptyDto(String paId) {
+        AdditionalLanguagesDto dto = new AdditionalLanguagesDto();
+        dto.setPaId(LanguageDetailEntity.getPaId(paId));
+        dto.setAdditionalLanguages(Collections.emptyList());
+        return dto;
+    }
 }
