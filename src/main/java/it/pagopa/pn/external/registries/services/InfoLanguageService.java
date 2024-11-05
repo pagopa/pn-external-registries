@@ -24,7 +24,6 @@ import static it.pagopa.pn.external.registries.middleware.db.entities.LanguageDe
 public class InfoLanguageService {
 
     public static final String ADDITIONAL_LANG_NOTFOUND = "Non è stata trovata nessuna lingua aggiuntiva configurata per la PA";
-    public static final String REQUIRED_ADDITIONAL_LANG = "La lingua aggiuntiva è obbligatoria";
     private final SenderConfigurationDao senderConfigurationDao;
 
     public Mono<AdditionalLanguagesDto> retrievePaAdditionalLang(String paId) {
@@ -38,7 +37,9 @@ public class InfoLanguageService {
     public Mono<AdditionalLanguagesDto> createOrUpdateLang(AdditionalLanguagesDto additionalLanguagesDto) {
         log.info("start putting additional lang for PA: [{}]", additionalLanguagesDto.getPaId());
         if(CollectionUtils.isNullOrEmpty(additionalLanguagesDto.getAdditionalLanguages())){
-            return Mono.error(new AdditionalLangException(REQUIRED_ADDITIONAL_LANG, 400, ERROR_CODE_EXTERNALREGISTRIES_REQUIRED_ADDITIONAL_LANGS));
+            log.info("deleting additional lang for PA: [{}]", additionalLanguagesDto.getPaId());
+            return senderConfigurationDao.deleteSenderConfiguration(buildPk(additionalLanguagesDto.getPaId()), SenderConfigurationType.LANG)
+                    .map(hashKey -> additionalLanguagesDto);
         }
         if(Arrays.stream(AllowedAdditionalLanguages.values()).map(AllowedAdditionalLanguages::name).noneMatch(additionalLanguagesDto.getAdditionalLanguages()::contains)){
             return Mono.error(new AdditionalLangException(String.format("Lingua aggiuntiva non valida, i valori accettati sono %s",

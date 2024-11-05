@@ -9,6 +9,7 @@ import it.pagopa.pn.external.registries.middleware.db.entities.LanguageDetailEnt
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -19,7 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class InfoLanguageServiceTest {
 
@@ -106,21 +107,27 @@ class InfoLanguageServiceTest {
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
                 .expectNext(request)
                 .verifyComplete();
+
+        Mockito.verify(senderConfigurationDao, times(0)).deleteSenderConfiguration("CFG_"+paId, SenderConfigurationType.LANG);
+        Mockito.verify(senderConfigurationDao, times(1)).createOrUpdateLang("CFG_"+paId, SenderConfigurationType.LANG, langsList);
     }
 
     @Test
-    void testCreateOrUpdateLang_WithoutAdditionalLangs() {
-
-
+    void testDeleteLang_200_OK() {
         String paId = "testPaId";
         AdditionalLanguagesDto request = new AdditionalLanguagesDto();
         request.setPaId(paId);
-        request.setAdditionalLanguages(null);
+        request.setAdditionalLanguages(Collections.emptyList());
 
+        when(senderConfigurationDao.deleteSenderConfiguration("CFG_"+paId, SenderConfigurationType.LANG))
+                .thenReturn(Mono.just(paId));
 
         StepVerifier.create(infoLanguageService.createOrUpdateLang(request))
-                .expectErrorMatches(throwable -> throwable instanceof AdditionalLangException)
-                .verify();
+                .expectNext(request)
+                .verifyComplete();
+
+        Mockito.verify(senderConfigurationDao, times(1)).deleteSenderConfiguration("CFG_"+paId, SenderConfigurationType.LANG);
+        Mockito.verify(senderConfigurationDao, times(0)).createOrUpdateLang(any(), any(), any());
     }
 
     @Test

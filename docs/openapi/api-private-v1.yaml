@@ -268,7 +268,7 @@ paths:
   '/ext-registry-private/pa/v1/additional-lang':
     put:
       operationId: putAdditionalLang
-      description: Allows the configuration of a new additional language for pa
+      description: Allows the configuration of a new additional language for pa, or delete configuration of an existing additional language if received empty array
       tags:
         - additional-lang
       requestBody:

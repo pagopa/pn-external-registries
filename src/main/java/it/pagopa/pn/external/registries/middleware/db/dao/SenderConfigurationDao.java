@@ -58,6 +58,14 @@ public class SenderConfigurationDao extends BaseDao {
                 .thenReturn(hashKey);
     }
 
+    public Mono<String> deleteSenderConfiguration(String hashKey, SenderConfigurationType senderConfigurationType) {
+        return Mono.fromFuture(senderConfigurationTable.deleteItem(Key.builder()
+                        .partitionValue(hashKey)
+                        .sortValue(senderConfigurationType.name())
+                        .build()))
+                .thenReturn(hashKey);
+    }
+
     private Map<String, AttributeValue> constructexpressionAttributeValuesMap(List<String> values, SenderConfigurationType configType) {
         Map<String, AttributeValue> attributeValueMap = new HashMap<>();
         if(SenderConfigurationType.LANG.equals(configType) && !CollectionUtils.isNullOrEmpty(values)) {
