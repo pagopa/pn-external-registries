@@ -550,6 +550,7 @@ Resources:
       Description: RSA-2048 key to generate session token
       KeySpec: RSA_2048
       KeyUsage: SIGN_VERIFY
+      EnableKeyRotation: true
       KeyPolicy:
         Version: 2012-10-17
         Statement:
@@ -579,6 +580,7 @@ Resources:
       Description: RSA-2048 key to generate session token
       KeySpec: RSA_2048
       KeyUsage: SIGN_VERIFY
+      EnableKeyRotation: true
       KeyPolicy:
         Version: 2012-10-17
         Statement:
