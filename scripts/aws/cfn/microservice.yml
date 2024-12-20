@@ -253,6 +253,10 @@ Parameters:
     Type: String
     Description: 'Ecs log group name'
 
+  EcsCheckoutLogGroup:
+    Type: String
+    Description: 'Ecs checkout log group name'
+
   PnExternalRegistriesTriggerLambdaName:
     Type: String
     Description: 'PnExternalRegistriesTriggerLambdaName'
@@ -402,6 +406,85 @@ Conditions:
 
 Resources:
 
+  # PN-External-Registry Checkout microservice
+  ExternalRegistryCheckoutMicroservice:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/ecs-service.yaml"
+      Parameters:
+        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries-checkout'
+        CpuValue: !Ref CpuValue
+        MemoryAmount: !Ref MemoryAmount
+        HealthCheckTimeout: !Ref HealthCheckTimeout
+        HealthCheckInterval: !Ref HealthCheckInterval
+        HealthyThresholdCount: !Ref HealthyThresholdCount
+        UnhealthyThresholdCount: !Ref UnhealthyThresholdCount
+        AutoscalingStrategy: REST-API
+        AutoscalingThreshold: !Ref AutoscalingThreshold
+        AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
+        MinTasksNumber: !Ref MinTasksNumber
+        MaxTasksNumber: !Ref MaxTasksNumber
+        EfsFilesystem: !Ref FargateEFSFileSystemID
+        MountEfs: !Ref MountEfs
+        WireTapLogActivation: !Ref WireTapLogActivation
+        AutoscalingDataPointN: !Ref AutoscalingDataPointN
+        AutoscalingDataPointM: !Ref AutoscalingDataPointM
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        ContainerImageURI: !Sub '${ContainerImageUri}'
+        ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
+        ContainerEnvEntry2: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
+        ContainerEnvEntry3: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_BASE_URL=${CheckoutApiBaseUrl}'
+        ContainerEnvEntry4: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_SITE_URL=${CheckoutSiteUrl}'
+        ContainerEnvEntry5: 'PN_EXTERNAL_REGISTRY_MOCK_DATA_RESOURCES={{resolve:ssm:MockPaList}}'
+        ContainerEnvEntry6: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_BASE_URL=${SelfcareUsergroupBaseUrl}'
+        ContainerEnvEntry7: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_I_O_MESSAGES=${IOMessagesTableName}'
+        ContainerEnvEntry8: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_TOS=${PortalUrl}/termini-di-servizio'
+        ContainerEnvEntry9: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_PRIVACY=${PortalUrl}/informativa-privacy'
+        ContainerEnvEntry10: !Sub 'PN_EXTERNAL_REGISTRY_TOPICS_DELIVERY_PUSH_INPUT=${DeliveryPushInputsQueueName}'
+        ContainerEnvEntry11: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_CART_API_BASE_URL=${CheckoutCartApiBaseUrl}'
+        ContainerEnvEntry12: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_ONBOARD_INSTITUTIONS=${OnboardInstitutionsTableName}'
+        ContainerEnvEntry13: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_BASE_URL=${OneTrustURL}'
+        ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
+        ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_BASE_URL=${SelfcarePgUsergroupBaseUrl}'
+        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_PUSH_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
+        ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
+        ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
+        ContainerEnvEntry21: !Sub 'PN_EXTERNAL_REGISTRY_AOOUOSENDERID=${AoouoSenderID}'
+        ContainerEnvEntry22: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry23: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry24: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_COMPONENTS=${CostComponentsTableName}'
+        ContainerEnvEntry25: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT=${CostUpdateResultTableName}'
+        ContainerEnvEntry26: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_COST_UPDATE_RESULT_TTL_DAYS=${CostUpdateResultTableTtlDays}'
+        #ContainerEnvEntry27: !Sub 'SPRING_CLOUD_FUNCTIONROUTER_QUEUES_LIST=${DeliveryPushToExternalRegistriesQueueName}'
+        ContainerEnvEntry28: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_BASE_URL=${GpdApiBaseUrl}'
+        ContainerEnvEntry29: !Sub 'PN_EXTERNAL_REGISTRY_IO_REMOTE_CONTENT_CFG_ID=${IoRemoteContentCfgId}'
+        ContainerEnvEntry30: !Sub 'PN_EXTERNAL_REGISTRY_PIATTAFORMANOTIFICHEURL_CITTADINI=${SendPortalUrl}/cittadini'
+        ContainerEnvEntry31: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_READ_TIMEOUT_MILLIS=${OneTrustReadTimeoutMillis}'
+        ContainerEnvEntry32: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_RETRY_MAX_ATTEMPTS=${OneTrustRetryMaxAttempts}'
+        ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
+        ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
+        ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
+        ContainerSecret4: !Sub 'PN_EXTERNAL_REGISTRY_IO_WHITELIST=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoWhiteList:AWSCURRENT:'
+        ContainerSecret5: !Sub 'PN_EXTERNAL_REGISTRY_IOACT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoActApiKey:AWSCURRENT:'
+        ContainerSecret6: !Sub 'PN_EXTERNAL_REGISTRY_ONETRUST_TOKEN=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:OneTrustToken:AWSCURRENT:'
+        ContainerSecret7: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCarePgApiKey:AWSCURRENT:'
+        ContainerSecret8: !Sub 'ASSERTION_REST_SUBSCRIPTION_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:AssertionRestSubscriptionKey:AWSCURRENT:'
+        ContainerSecret9: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:GpdApiKey:AWSCURRENT:'
+        MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
+        MappedPaths: '/ext-registry/pagopa/*'
+        ECSClusterName: !Ref ECSClusterName
+        Subnets: !Ref VpcEgressSubnetsIds
+        VpcId: !Ref VpcId
+        EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
+        LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
+        LoadbalancerRulePriority: !Ref MicroserviceNumber
+        TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
+        AlbSecurityGroup: !Ref AlbSecurityGroup
+        EcsLogGroup: !Ref EcsCheckoutLogGroup
+        LogAlarmStrategyV1: !Ref LogAlarmStrategy
+
   # PN-External-Registry microservice
   ExternalRegistryMicroservice:
     Type: AWS::CloudFormation::Stack
@@ -476,12 +559,11 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadbalancerRulePriority: !Ref MicroserviceNumber
+        LoadbalancerRulePriority: 98
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsLogGroup
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
-
 
 
   ExternalRegistryMicroserviceTaskManagedPolicy:
@@ -596,34 +678,6 @@ Resources:
       AliasName: !Sub 'alias/${ProjectName}-PdndAnpr-authentication-token-key'
       TargetKeyId: !Ref PdndAnprSessionTokenSigningKey
 
-  # Expose PN-external-registries microservice public API with API-GW for WEB usage
-  ExternalRegistryMicroservicePublicWebAPI:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-expose-service-openapi.yaml"
-      Parameters:
-        MicroServiceUniqueName: !Sub '${ProjectName}-external-registries'
-        IntendedUsage: WEB
-        DnsName: !Ref WebApiDnsName
-        ProjectName: !Ref ProjectName
-        ServiceApiPath: 'ext-registry'
-        NetworkLoadBalancerLink: !Ref NetworkLoadBalancerLink
-        ApplicationLoadBalancerDomain: !Ref ApplicationLoadBalancerDomain
-        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
-        CloudwatchLogKinesisStreamArn: !Ref LogsKinesisSourceStreamArn
-        OpenApiBucketName: !Ref MicroserviceBucketName
-        OpenApiBucketKey: !Sub ${MicroserviceBucketBaseKey}/docs/openapi/aws/api-ext-registry-WEB-aws.yaml
-
-  ExternalRegistryMicroservicePublicWebApiWaf:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/api-gw-waf-acl.yaml"
-      Parameters:
-        WAFName: !Sub '${ProjectName}-external-registries-web'
-        IntendedUsage: WEB
-        APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.APIGatewayARN
-        Limit: !Ref WebWafLimit
-        EnhancedWebSecurityEnabled: !Ref EnhancedWebSecurityEnabled
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroservicePublicB2BAPI:
@@ -725,13 +779,11 @@ Resources:
             - !Ref SenderConfigurationTableName
         RestApiStageArns: !Join
           - ','
-          - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiStageArn
+          - - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiStageArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiStageArn
-            - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiStageArn
         RestApiNames: !Join
           - ','
-          - - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiName
-            - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
+          - - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiName
             - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiName
         LambdaArns: !Join
           - ','
@@ -739,13 +791,12 @@ Resources:
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushToExternalRegistriesQueueARN
+            - !Ref KafkaBridgeOnboardingQueueARN
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
-            - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiErrorAlarmArn
             - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiErrorAlarmArn
-            - !GetAtt ExternalRegistryMicroservicePublicWebAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.RestApiLatencyAlarmArn
             - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiLatencyAlarmArn
             - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
@@ -753,6 +804,19 @@ Resources:
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-external-registries'
+
+  ExternalRegistriesCheckoutMicroserviceCloudWatchDashboard:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/microservice-cloudwatch-dashboard.yaml"
+      Parameters:
+        DashboardName: !Sub "${ProjectName}-external-registries-checkout"
+        AlarmArns: !Join
+          - ','
+          - - !GetAtt ExternalRegistryCheckoutMicroservice.Outputs.FatalLogsMetricAlarmArn
+        LogGroupsNames: !Join
+          - ','
+          - - !Sub '/aws/ecs/${ProjectName}-external-registries-checkout'
 
   # Lambda function role - this lambda needs to be triggered from a SQS queue and writes to a DynamoDB table
   PnExternalRegistriesInsertTriggerLambdaRole:
