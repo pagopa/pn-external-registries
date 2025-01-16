@@ -503,7 +503,7 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadbalancerRulePriority: !Ref MicroserviceNumber
+        LoadbalancerRulePriority: 98
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsCheckoutLogGroup
@@ -581,13 +581,13 @@ Resources:
         ContainerSecret8: !Sub 'ASSERTION_REST_SUBSCRIPTION_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:AssertionRestSubscriptionKey:AWSCURRENT:'
         ContainerSecret9: !Sub 'PN_EXTERNAL_REGISTRY_GPD_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:GpdApiKey:AWSCURRENT:'
         MicroServiceSecretPrefix: pn-ExternalRegistries-Secrets
-        MappedPaths: '/ext-registry/*,/ext-registry-private/*,/ext-registry-b2b/*'
+        MappedPaths: '/ext-registry/pa/*,/ext-registry/pg/*,/ext-registry-private/*,/ext-registry-b2b/*'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Ref VpcEgressSubnetsIds
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadbalancerRulePriority: 98
+        LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsLogGroup
