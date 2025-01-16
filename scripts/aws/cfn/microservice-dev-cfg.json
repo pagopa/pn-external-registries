@@ -15,7 +15,7 @@
     "IsLollipopActive": "false",
     "LollipopExpectedLcOriginalUrl": "^https://api-app.io.pagopa.it/api/v1/third-party-messages/[a-zA-Z0-9]{26}/precondition$",
     "LollipopEnableConsumerLogging": "true",
-    "PnCronAnalyzer": "* */1 * * * *",
+    "PnCronAnalyzer": "-",
     "WireTapLogActivation": "false",
     "EnhancedWebSecurityEnabled": "true",
     "AoouoSenderID": "DUMMY",
