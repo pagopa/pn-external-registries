@@ -170,6 +170,17 @@ Resources:
         LogGroupRetention: !Ref LogRetention
         LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
 
+  PnExternalRegistriesCheckoutLogGroup:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/log-group.yaml"
+      Parameters:
+        LogGroupName: !Sub '${ProjectName}-external-registries-checkout'
+        LogGroupRetention: !Ref LogRetention
+        LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
+
   PnExternalRegistriesInsertTriggerLogGroup:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Retain
@@ -223,5 +234,7 @@ Outputs:
   # Log group exports
   EcsLogGroup:
     Value: !GetAtt PnExternalRegistriesLogGroup.Outputs.LogGroupName
+  EcsCheckoutLogGroup:
+    Value: !GetAtt PnExternalRegistriesCheckoutLogGroup.Outputs.LogGroupName
   PnExternalRegistriesTriggerLambdaName:
     Value: !Sub "${ProjectName}-external-registries-trigger-lambda"
