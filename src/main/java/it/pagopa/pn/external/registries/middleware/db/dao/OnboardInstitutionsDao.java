@@ -3,6 +3,8 @@ package it.pagopa.pn.external.registries.middleware.db.dao;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.BaseDao;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +33,7 @@ import static it.pagopa.pn.external.registries.middleware.db.entities.OnboardIns
 public class OnboardInstitutionsDao extends BaseDao {
 
     DynamoDbAsyncTable<OnboardInstitutionEntity> onboardInstitutionsTable;
-    private DynamoDbEnhancedAsyncClient dynamoDbAsyncClient;
+    private final DynamoDbEnhancedAsyncClient dynamoDbAsyncClient;
 
     public OnboardInstitutionsDao(DynamoDbEnhancedAsyncClient dynamoDbAsyncClient,
                                   PnExternalRegistriesConfig pnExternalRegistriesConfig) {
@@ -65,6 +67,71 @@ public class OnboardInstitutionsDao extends BaseDao {
          return Flux.merge(
             Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestACTIVE).flatMapIterable(Page::items)),
                  Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestDELETED).flatMapIterable(Page::items)));
+    }
+
+    public Flux<OnboardInstitutionEntity> getNewerWithChildren(Instant mostRecent) {
+        final Instant finalMostRecent = (mostRecent != null) ? mostRecent : Instant.EPOCH;
+
+        log.debug("getNewerWithChildren mostRecent={}", finalMostRecent);
+        QueryEnhancedRequest queryRequestACTIVE = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.sortGreaterThan(
+                        Key.builder().partitionValue(OnboardInstitutionEntity.STATUS_ACTIVE).sortValue(finalMostRecent.toString()).build()
+                ))
+                .build();
+
+        QueryEnhancedRequest queryRequestCLOSED = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.sortGreaterThan(
+                        Key.builder().partitionValue(OnboardInstitutionEntity.STATUS_CLOSED).sortValue(finalMostRecent.toString()).build()
+                ))
+                .build();
+
+        return Flux.merge(
+                        Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryRequestACTIVE))
+                                .flatMapIterable(Page::items)
+                                .filter(entity -> !entity.getRootId().equals(entity.getPk()))
+                                .map(entity -> Key.builder().partitionValue(entity.getPk()).build()),
+
+                        Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryRequestCLOSED))
+                                .flatMapIterable(Page::items)
+                                .filter(entity -> !entity.getRootId().equals(entity.getPk()))
+                                .map(entity -> Key.builder().partitionValue(entity.getPk()).build())
+                )
+                .collectList()
+                .flatMapMany(initialKeys -> {
+                    if (initialKeys.isEmpty()) {
+                        return Flux.empty();
+                    } else {
+                        return retrieveChildren(finalMostRecent, initialKeys);
+                    }
+                });
+    }
+
+    private Flux<OnboardInstitutionEntity> retrieveChildren(Instant mostRecent, List<Key> unprocessedKeys) {
+        final Instant finalMostRecent = mostRecent != null ? mostRecent : Instant.EPOCH;
+        if (unprocessedKeys.isEmpty()) {
+            return Flux.empty();
+        }
+
+        log.info("Unprocessed keys, size={}", unprocessedKeys.size());
+        ReadBatch.Builder<OnboardInstitutionEntity> batchBuilder = ReadBatch.builder(OnboardInstitutionEntity.class)
+                .mappedTableResource(onboardInstitutionsTable);
+
+        unprocessedKeys.forEach(batchBuilder::addGetItem);
+        return Mono.from(dynamoDbAsyncClient.batchGetItem(BatchGetItemEnhancedRequest.builder()
+                        .readBatches(batchBuilder.build())
+                        .build()))
+                .flatMapMany(batchResult -> {
+                    List<OnboardInstitutionEntity> results = batchResult.resultsForTable(onboardInstitutionsTable);
+                    List<Key> newUnprocessedKeys = batchResult.unprocessedKeysForTable(onboardInstitutionsTable);
+
+                    List<OnboardInstitutionEntity> filteredResults = results.stream()
+                            .filter(entity -> !entity.getRootId().equals(entity.getPk()))
+                            .filter(entity -> entity.getLastUpdate().isAfter(finalMostRecent))
+                            .toList();
+
+                    return Flux.fromIterable(filteredResults)
+                            .concatWith(retrieveChildren(finalMostRecent, newUnprocessedKeys));
+                });
     }
 
     public Flux<OnboardInstitutionEntity> filterOutRootIds(List<String> ids){
