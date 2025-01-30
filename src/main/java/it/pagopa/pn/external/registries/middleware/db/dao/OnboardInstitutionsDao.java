@@ -3,8 +3,6 @@ package it.pagopa.pn.external.registries.middleware.db.dao;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.BaseDao;
-
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
