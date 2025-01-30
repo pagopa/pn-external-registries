@@ -2,21 +2,21 @@ package it.pagopa.pn.external.registries.services;
 
 
 import it.pagopa.pn.commons.exceptions.PnRuntimeException;
+//import it.pagopa.pn.external.registries.dto.PageablePaSummaryResponseDto;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
-import it.pagopa.pn.external.registries.mapper.InstitutionsToInstitutionPNDtoMapper;
+import it.pagopa.pn.external.registries.mapper.*;
 import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.RootSenderIdResponseDto;
-import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaInfoDto;
-import it.pagopa.pn.external.registries.mapper.OnboardInstitutionEntityToPaSummaryDto;
-import it.pagopa.pn.external.registries.mapper.ProductToProductPNDtoMapper;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
-import it.pagopa.pn.external.registries.services.helpers.OnboardInstitutionFulltextSearchHelper;
+import it.pagopa.pn.external.registries.services.helpers.impl.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -52,6 +52,18 @@ public class InfoSelfcareInstitutionsService {
 
     log.info("listOnboardedPaByName - paNameFilter={}", paNameFilter);
     return onboardInstitutionFulltextSearchHelper.fullTextSearch(paNameFilter);
+  }
+
+  public Mono<PaSummaryExtendedResponseDto> extendedListOnboardedPaByName(String paNameFilter, Integer page, Integer size, Boolean onlySons) {
+    Pageable pageable = PageRequest.of(page - 1, size);
+    if (paNameFilter == null)
+      paNameFilter = "";
+
+    log.info("pagedListOnboardedPaByName - paNameFilter={} - page={} - size={} - onlySons={}", paNameFilter, page, size, onlySons);
+    return onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(paNameFilter, onlySons)
+            .collectList()
+            .map(list -> OnboardInstitutionEntityToPaSummaryExtendedDtoMapper.toPaginationPaSummaryExtended(pageable, list))
+            .map(OnboardInstitutionEntityToPaSummaryExtendedDtoMapper::toPageableResponseExtended);
   }
 
   public Flux<InstitutionResourcePNDto> listInstitutionByCurrentUser(String xPagopaPnUid, String xPagopaPnCxId, String xPagopaPnSrcCh, List<String> xPagopaPnCxGroups, String xPagopaPnSrcChDetails) {
