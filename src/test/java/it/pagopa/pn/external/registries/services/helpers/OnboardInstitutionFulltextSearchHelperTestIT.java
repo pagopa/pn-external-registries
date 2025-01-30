@@ -9,6 +9,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSu
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
+import it.pagopa.pn.external.registries.services.helpers.impl.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

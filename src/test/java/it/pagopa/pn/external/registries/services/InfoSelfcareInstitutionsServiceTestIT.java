@@ -13,7 +13,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.Root
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
-import it.pagopa.pn.external.registries.services.helpers.OnboardInstitutionFulltextSearchHelper;
+import it.pagopa.pn.external.registries.services.helpers.impl.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
