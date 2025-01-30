@@ -8,7 +8,7 @@ import it.pagopa.pn.external.registries.services.InfoSelfcareUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -71,6 +71,25 @@ public class InfoPaController implements InfoPaApi {
                     .collectList()
                     .map(paSummaryDtos -> ResponseEntity.ok(Flux.fromIterable(paSummaryDtos)));
         }
+    }
+
+    /**
+     * GET /ext-registry/pa/v2/activated-on-pn : List PA that use PN
+     * Use with API to implement PA choose in domicile and mandate creation pages.
+     *
+     * @param paNameFilter Se valorizzato indica il nome o parte di esso da ricercare (optional)
+     * @param page Indica il numero della pagina (default: 1)
+     * @param size Indica la quantità di elementi per pagina (default: 1)
+     * @param onlySons Indica se restituire soltanto i figli
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
+    @Override
+    public Mono<ResponseEntity<PaSummaryExtendedResponseDto>> extendedListOnboardedPa(String paNameFilter, Integer page, Integer size, Boolean onlySons, ServerWebExchange exchange) {
+        log.debug("extendedListOnboardedPa - paNameFilter={} page={} size={} onlySons={}", paNameFilter, page, size, onlySons);
+        return infoSelfcareInstitutionsService.extendedListOnboardedPaByName(paNameFilter, page, size, onlySons)
+                .map(ResponseEntity::ok);
     }
 
     /**
