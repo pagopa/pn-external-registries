@@ -54,13 +54,13 @@ public class InfoSelfcareInstitutionsService {
     return onboardInstitutionFulltextSearchHelper.fullTextSearch(paNameFilter);
   }
 
-  public Mono<PaSummaryExtendedResponseDto> extendedListOnboardedPaByName(String paNameFilter, Integer page, Integer size, Boolean onlySons) {
+  public Mono<PaSummaryExtendedResponseDto> extendedListOnboardedPaByName(String paNameFilter, Boolean onlyChildren, Integer page, Integer size) {
     Pageable pageable = PageRequest.of(page - 1, size);
     if (paNameFilter == null)
       paNameFilter = "";
 
-    log.info("pagedListOnboardedPaByName - paNameFilter={} - page={} - size={} - onlySons={}", paNameFilter, page, size, onlySons);
-    return onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(paNameFilter, onlySons)
+    log.info("pagedListOnboardedPaByName - paNameFilter={} - onlyChildren={} - page={} - size={}", paNameFilter, onlyChildren, page, size);
+    return onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(paNameFilter, onlyChildren)
             .collectList()
             .map(list -> OnboardInstitutionEntityToPaSummaryExtendedDtoMapper.toPaginationPaSummaryExtended(pageable, list))
             .map(OnboardInstitutionEntityToPaSummaryExtendedDtoMapper::toPageableResponseExtended);

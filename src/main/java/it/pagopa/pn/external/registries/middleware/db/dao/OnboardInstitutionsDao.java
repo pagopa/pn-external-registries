@@ -67,10 +67,10 @@ public class OnboardInstitutionsDao extends BaseDao {
                  Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestDELETED).flatMapIterable(Page::items)));
     }
 
-    public Flux<OnboardInstitutionEntity> getNewerWithChildren(Instant mostRecent) {
+    public Flux<OnboardInstitutionEntity> getNewerChildren(Instant mostRecent) {
         final Instant finalMostRecent = (mostRecent != null) ? mostRecent : Instant.EPOCH;
 
-        log.debug("getNewerWithChildren mostRecent={}", finalMostRecent);
+        log.debug("getNewerChildren mostRecent={}", finalMostRecent);
         QueryEnhancedRequest queryRequestACTIVE = QueryEnhancedRequest.builder()
                 .queryConditional(QueryConditional.sortGreaterThan(
                         Key.builder().partitionValue(OnboardInstitutionEntity.STATUS_ACTIVE).sortValue(finalMostRecent.toString()).build()

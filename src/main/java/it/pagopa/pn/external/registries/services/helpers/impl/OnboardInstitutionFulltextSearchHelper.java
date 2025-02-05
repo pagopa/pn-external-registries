@@ -30,7 +30,7 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
 
     private final Map<String, PaSummaryDtoForSearch> institutionsCache = new ConcurrentHashMap<>();
 
-    private final Map<String, PaSummaryExtendedDtoForSearch> institutionsExtendedCache = new ConcurrentHashMap<>();
+    private final Map<String, PaSummaryExtendedDtoForSearch> institutionsChildrenCache = new ConcurrentHashMap<>();
 
     private final int maxSearchResults;
 
@@ -56,7 +56,7 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
         try {
             log.info("updating institutions cache");
             updateInstitutionsCache();
-            updateInstitutionsSonsCache();
+            updateInstitutionsChildrenCache();
         } catch (Exception e) {
             log.error("Cannot update pa", e);
         }
@@ -121,17 +121,17 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
     }
 
     @Override
-    public Flux<PaSummaryExtendedDto> extendedFullTextSearch(String query, Boolean onlySons) {
+    public Flux<PaSummaryExtendedDto> extendedFullTextSearch(String query, Boolean onlyChildren) {
         String fquery;
         if(query != null) {
             fquery = query.toLowerCase();
         } else
             fquery = "";
-        return Flux.fromIterable(searchExtended(fquery, onlySons));
+        return Flux.fromIterable(searchExtended(fquery, onlyChildren));
     }
 
     @NotNull
-    private List<PaSummaryExtendedDto> searchExtended(String fquery, Boolean onlySons) {
+    private List<PaSummaryExtendedDto> searchExtended(String fquery, Boolean onlyChildren) {
         return institutionsCache.values().stream()
                 .filter(parent -> fquery.isEmpty() || parent.getDenominationForSearch().contains(fquery))
                 .map(parent -> {
@@ -144,13 +144,13 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
                 .collect(Collectors.toList());
     }
 
-    private void updateInstitutionsSonsCache() {
+    private void updateInstitutionsChildrenCache() {
         Map<String, PaSummaryExtendedDtoForSearch> tempLocalCache = new ConcurrentHashMap<>();
         Map<String, Boolean> tempLocalCacheToRemove = new ConcurrentHashMap<>();
         AtomicBoolean atleastOneUpdate = new AtomicBoolean(false);
         List<Instant> timestamps = new ArrayList<>();
 
-        onboardInstitutionsDao.getNewerWithChildren(extendedMostRecentUpdate)
+        onboardInstitutionsDao.getNewerChildren(extendedMostRecentUpdate)
                 .doOnNext(entity -> {
                     atleastOneUpdate.set(true);
                     timestamps.add(entity.getLastUpdate());
@@ -171,14 +171,14 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
             Optional<Instant> mostRecent =timestamps.stream().max(Comparator.comparing(instant -> instant));
             mostRecent.ifPresent(onboardInstitutionEntity -> this.extendedMostRecentUpdate = mostRecent.get());
 
-            this.institutionsExtendedCache.putAll(tempLocalCache);
+            this.institutionsChildrenCache.putAll(tempLocalCache);
             if (!tempLocalCacheToRemove.isEmpty()) {
                 for (String paId: tempLocalCacheToRemove.keySet()) {
-                    this.institutionsExtendedCache.remove(paId);
+                    this.institutionsChildrenCache.remove(paId);
                 }
             }
 
-            log.info("update loaded institutions added={} removed={} total={}", tempLocalCache.size(), tempLocalCacheToRemove.size(), institutionsExtendedCache.size());
+            log.info("update loaded institutions added={} removed={} total={}", tempLocalCache.size(), tempLocalCacheToRemove.size(), institutionsChildrenCache.size());
         }
         else {
             log.info("update loaded, nothing to update");

@@ -23,7 +23,7 @@ public class OnboardInstitutionEntityToPaSummaryExtendedDtoMapper {
         PaSummaryExtendedDto dto = new PaSummaryExtendedDto();
         dto.setId(entity.getInstitutionId());
         dto.setName(entity.getDescription());
-        dto.setExtendedList(new ArrayList<>());
+        dto.setChildrenList(new ArrayList<>());
         return  dto;
     }
 
@@ -48,7 +48,7 @@ public class OnboardInstitutionEntityToPaSummaryExtendedDtoMapper {
 
         if (pageModel.getContent().size() == 1 && pageModel.getContent().get(0).getId() == null) {
             PaSummaryExtendedDto summaryDto = new PaSummaryExtendedDto();
-            summaryDto.setExtendedList(pageModel.getContent().get(0).getExtendedList());
+            summaryDto.setChildrenList(pageModel.getContent().get(0).getChildrenList());
             responseDto.setContent(List.of(summaryDto));
         } else {
             responseDto.setContent(pageModel.getContent());

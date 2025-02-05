@@ -74,21 +74,21 @@ public class InfoPaController implements InfoPaApi {
     }
 
     /**
-     * GET /ext-registry/pa/v2/activated-on-pn : List PA that use PN
+     * GET /ext-registry/pa/v2/activated-on-pn : List all PA and relative children that use PN
      * Use with API to implement PA choose in domicile and mandate creation pages.
      *
      * @param paNameFilter Se valorizzato indica il nome o parte di esso da ricercare (optional)
+     * @param onlyChildren Indica se restituire soltanto i figli
      * @param page Indica il numero della pagina (default: 1)
      * @param size Indica la quantità di elementi per pagina (default: 1)
-     * @param onlySons Indica se restituire soltanto i figli
      * @return OK (status code 200)
      *         or Invalid input (status code 400)
      *         or Internal Server Error (status code 500)
      */
     @Override
-    public Mono<ResponseEntity<PaSummaryExtendedResponseDto>> extendedListOnboardedPa(String paNameFilter, Integer page, Integer size, Boolean onlySons, ServerWebExchange exchange) {
-        log.debug("extendedListOnboardedPa - paNameFilter={} page={} size={} onlySons={}", paNameFilter, page, size, onlySons);
-        return infoSelfcareInstitutionsService.extendedListOnboardedPaByName(paNameFilter, page, size, onlySons)
+    public Mono<ResponseEntity<PaSummaryExtendedResponseDto>> extendedListOnboardedPa(String paNameFilter, Boolean onlyChildren, Integer page, Integer size, ServerWebExchange exchange) {
+        log.debug("extendedListOnboardedPa - paNameFilter={} onlyChildren={} page={} size={}", paNameFilter, onlyChildren, page, size);
+        return infoSelfcareInstitutionsService.extendedListOnboardedPaByName(paNameFilter, onlyChildren, page, size)
                 .map(ResponseEntity::ok);
     }
 
