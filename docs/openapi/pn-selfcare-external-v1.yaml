@@ -77,7 +77,7 @@ paths:
   '/ext-registry/pa/v2/activated-on-pn':
     get:
       operationId: extendedListOnboardedPa
-      summary: List PA that use PN
+      summary: List all PA and relative children that use PN
       description: Use with API to implement PA choose in domicile and mandate creation pages.
       tags:
         - InfoPA
@@ -90,6 +90,16 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/PaNameFilter'
+        - name: onlyChildren
+          description: >
+            Se valorizzato a `true`, restituisce solo i figli delle PA, 
+            altrimenti restituisce tutti i risultati. 
+            Default: false.
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
         - name: page
           description: >
             Numero della pagina da visualizzare. 
@@ -110,16 +120,6 @@ paths:
             type: integer
             minimum: 1
             default: 1
-        - name: onlySons
-          description: >
-            Se valorizzato a `true`, restituisce solo i figli delle PA, 
-            altrimenti restituisce tutti i risultati. 
-            Default: false.
-          in: query
-          required: false
-          schema:
-            type: boolean
-            default: false
       responses:
         '200':
           description: OK
@@ -521,7 +521,7 @@ components:
       required:
         - id
         - name
-        - extendedList
+        - childrenList
       properties:
         id:
           type: string
@@ -529,7 +529,7 @@ components:
         name:
           type: string
           description: Nome dell'entità
-        extendedList:
+        childrenList:
           type: array
           description: Lista delle informazioni estese (figli)
           items:
