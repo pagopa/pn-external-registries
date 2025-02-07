@@ -10,10 +10,10 @@ import org.springframework.data.domain.Sort;
 public class PageableDtoAdapter {
 
     /**
-     * Converte un oggetto {@link Pageable} di Spring in un oggetto {@link PageableDto}.
+     * Converts an object {@link Pageable} of Spring in an object {@link PageableDto}.
      *
-     * @param pageable l'oggetto {@link Pageable} di Spring da convertire
-     * @return un oggetto {@link PageableDto} che rappresenta la paginazione
+     * @param pageable the object {@link Pageable} of Spring to convert
+     * @return an object {@link PageableDto} which represents the pagination
      */
     public static PageableDto toPageableDto(Pageable pageable) {
         if (pageable == null) {
@@ -36,10 +36,10 @@ public class PageableDtoAdapter {
     }
 
     /**
-     * Converte un oggetto {@link Sort} di Spring in un oggetto {@link SortDto}.
+     * Converts an object {@link Sort} of Spring in an object {@link SortDto}.
      *
-     * @param sort l'oggetto {@link Sort} di Spring da convertire
-     * @return un oggetto {@link SortDto} che rappresenta l'ordinamento
+     * @param sort the object {@link Sort} of Spring to convert
+     * @return an object {@link SortDto} which represents the order
      */
     private static SortDto toSortDto(Sort sort) {
         if (sort == null || sort.isUnsorted()) {
