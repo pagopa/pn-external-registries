@@ -2,17 +2,13 @@ package it.pagopa.pn.external.registries.services;
 
 
 import it.pagopa.pn.commons.exceptions.PnRuntimeException;
-//import it.pagopa.pn.external.registries.dto.PageablePaSummaryResponseDto;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.mapper.*;
-import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.RootSenderIdResponseDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
-import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
+import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import it.pagopa.pn.external.registries.services.helpers.impl.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +50,22 @@ public class InfoSelfcareInstitutionsService {
     return onboardInstitutionFulltextSearchHelper.fullTextSearch(paNameFilter);
   }
 
+  /**
+   * Retrieves a paginated list of onboarded public administrations (PA) that match the given name filter.
+   * This method supports pagination and filtering based on whether only child institutions should be included.
+   *
+   * The method works as follows:
+   * - Calls the {@code extendedFullTextSearch} method of the helper class to perform a full-text search on onboarded institutions.
+   * - Buffers the results in chunks of the specified {@code size} per page.
+   * - Retrieves the requested page using {@code elementAt(page - 1, List.of())}, returning an empty list if the page does not exist.
+   * - Converts the list of results into a paginated response using a mapper.
+   *
+   * @param paNameFilter The name or part of the name of the institution to filter (optional, can be empty).
+   * @param onlyChildren If {@code true}, retrieves only child institutions; otherwise, retrieves both parents and children.
+   * @param page The page number to retrieve (1-based index).
+   * @param size The number of elements per page.
+   * @return A {@link Mono} emitting a {@link PaSummaryExtendedResponseDto} containing the paginated list of results.
+   */
   public Mono<PaSummaryExtendedResponseDto> extendedListOnboardedPaByName(String paNameFilter, Boolean onlyChildren, Integer page, Integer size) {
     Pageable pageable = PageRequest.of(page - 1, size);
     if (paNameFilter == null)
@@ -61,7 +73,8 @@ public class InfoSelfcareInstitutionsService {
 
     log.info("pagedListOnboardedPaByName - paNameFilter={} - onlyChildren={} - page={} - size={}", paNameFilter, onlyChildren, page, size);
     return onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(paNameFilter, onlyChildren)
-            .collectList()
+            .buffer(size)
+            .elementAt(page - 1, List.of())
             .map(list -> OnboardInstitutionEntityToPaSummaryExtendedDtoMapper.toPaginationPaSummaryExtended(pageable, list))
             .map(OnboardInstitutionEntityToPaSummaryExtendedDtoMapper::toPageableResponseExtended);
   }
