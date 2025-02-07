@@ -8,7 +8,7 @@ import it.pagopa.pn.external.registries.services.InfoSelfcareUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -77,10 +77,10 @@ public class InfoPaController implements InfoPaApi {
      * GET /ext-registry/pa/v2/activated-on-pn : List all PA and relative children that use PN
      * Use with API to implement PA choose in domicile and mandate creation pages.
      *
-     * @param paNameFilter Se valorizzato indica il nome o parte di esso da ricercare (optional)
-     * @param onlyChildren Indica se restituire soltanto i figli
-     * @param page Indica il numero della pagina (default: 1)
-     * @param size Indica la quantità di elementi per pagina (default: 1)
+     * @param paNameFilter If valued, indicates the name or part of it to search for (optional)
+     * @param onlyChildren Indicate whether to return only children
+     * @param page Indicates the page number (default: 1)
+     * @param size Indicates the quantity of items per page (default: 1)
      * @return OK (status code 200)
      *         or Invalid input (status code 400)
      *         or Internal Server Error (status code 500)
