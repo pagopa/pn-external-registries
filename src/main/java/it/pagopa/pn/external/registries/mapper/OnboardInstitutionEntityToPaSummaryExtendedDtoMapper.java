@@ -1,23 +1,25 @@
 package it.pagopa.pn.external.registries.mapper;
 
-import it.pagopa.pn.external.registries.paging.adapter.PageableDtoAdapter;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryExtendedDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryExtendedResponseDto;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
+import it.pagopa.pn.external.registries.paging.adapter.PageableDtoAdapter;
 import it.pagopa.pn.external.registries.paging.model.PageModel;
 import org.springframework.data.domain.Pageable;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class OnboardInstitutionEntityToPaSummaryExtendedDtoMapper {
     private OnboardInstitutionEntityToPaSummaryExtendedDtoMapper() {}
 
     /**
-     * Converte un'istanza di {@link OnboardInstitutionEntity} in un oggetto di tipo {@link PaSummaryExtendedDto}.
-     * Questo metodo estrae l'ID e la descrizione dell'entità e li mappa in un nuovo DTO.
+     * Converts an instance of {@link OnboardInstitutionEntity} in an object of type {@link PaSummaryExtendedDto}.
+     * This method extracts the entity ID and description and maps them to a new DTO.
      *
-     * @param entity l'istanza di {@link OnboardInstitutionEntity} da convertire.
-     * @return un oggetto {@link PaSummaryExtendedDto} contenente i dati estratti dall'entità.
+     * @param entity the instance of {@link OnboardInstitutionEntity} to convert.
+     * @return an object {@link PaSummaryExtendedDto} containing data extracted from the entity.
      */
     public static PaSummaryExtendedDto toDto(OnboardInstitutionEntity entity) {
         PaSummaryExtendedDto dto = new PaSummaryExtendedDto();
@@ -28,11 +30,11 @@ public class OnboardInstitutionEntityToPaSummaryExtendedDtoMapper {
     }
 
     /**
-     * Converte un {@link PageModel} di {@link PaSummaryExtendedDto} in un oggetto paginato
+     * Convert a {@link PageModel} of {@link PaSummaryExtendedDto} in a paginated object
      * {@link PaSummaryExtendedResponseDto}.
      *
-     * @param pageModel Il modello di paginazione contenente gli elementi da restituire.
-     * @return Un oggetto {@link PaSummaryExtendedResponseDto} con il formato corretto.
+     * @param pageModel The pagination model containing the elements to be returned.
+     * @return An object {@link PaSummaryExtendedResponseDto} with the correct format.
      */
     public static PaSummaryExtendedResponseDto toPageableResponseExtended(PageModel<PaSummaryExtendedDto> pageModel) {
         PaSummaryExtendedResponseDto responseDto = new PaSummaryExtendedResponseDto();
@@ -58,12 +60,12 @@ public class OnboardInstitutionEntityToPaSummaryExtendedDtoMapper {
     }
 
     /**
-     * Converte una lista di {@link PaSummaryExtendedDto} in un oggetto paginato di tipo {@link PageModel}.
-     * Questo metodo permette di gestire la paginazione dei risultati in base ai parametri forniti.
+     * Converts a list of {@link PaSummaryExtendedDto} in a paginated object of type {@link PageModel}.
+     * This method allows you to manage the pagination of the results based on the parameters provided.
      *
-     * @param pageable l'oggetto {@link Pageable} che definisce il numero di elementi per pagina e l'offset.
-     * @param list la lista di {@link PaSummaryExtendedDto} da paginare.
-     * @return un oggetto {@link PageModel} contenente la porzione paginata della lista.
+     * @param pageable the object {@link Pageable} which defines the number of elements per page and the offset.
+     * @param list a list of {@link PaSummaryExtendedDto} to paginate.
+     * @return an object {@link PageModel} containing the paginated portion of the list.
      */
     public static PageModel<PaSummaryExtendedDto> toPaginationPaSummaryExtended(Pageable pageable, List<PaSummaryExtendedDto> list){
         return PageModel.builder(list, pageable);
