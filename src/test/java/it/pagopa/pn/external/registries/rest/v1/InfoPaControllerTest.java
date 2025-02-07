@@ -4,6 +4,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.services.InfoSelfcareGroupsService;
 import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
 import it.pagopa.pn.external.registries.services.InfoSelfcareUserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +120,90 @@ class InfoPaControllerTest {
                 .expectStatus().isOk().expectBodyList(PaSummaryDto.class).hasSize(1);
     }
 
+    @Test
+    void extendedListOnboardedPa() {
+        // Given
+        String url = "/ext-registry/pa/v2/activated-on-pn?page={page}&size={size}"
+                .replace("{page}", "1")
+                .replace("{size}", "10");
+
+        PaSummaryExtendedResponseDto responseDto = getPaSummaryExtendedResponseDto();
+
+        // When
+        Mockito.when(svcInst.extendedListOnboardedPaByName(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(Mono.just(responseDto));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PaSummaryExtendedResponseDto.class)
+                .value(resp -> {
+                    Assertions.assertNotNull(resp);
+                    Assertions.assertEquals(2, resp.getContent().size());
+                    Assertions.assertEquals("Regione Lazio", resp.getContent().get(0).getName());
+                    Assertions.assertEquals("Consiglio Regionale del Lazio", resp.getContent().get(1).getName());
+                });
+    }
+
+    @Test
+    void extendedListOnboardedPa_withNameFilter() {
+        // Given
+        String url = "/ext-registry/pa/v2/activated-on-pn?paNameFilter={paNameFilter}&page={page}&size={size}"
+                .replace("{paNameFilter}", "Lazio")
+                .replace("{page}", "1")
+                .replace("{size}", "10");
+
+        PaSummaryExtendedResponseDto responseDto = getPaSummaryExtendedResponseDto();
+        responseDto.getContent().remove(1);
+
+        // When
+        Mockito.when(svcInst.extendedListOnboardedPaByName(Mockito.eq("Lazio"), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(Mono.just(responseDto));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PaSummaryExtendedResponseDto.class)
+                .value(resp -> {
+                    Assertions.assertNotNull(resp);
+                    Assertions.assertEquals(1, resp.getContent().size());
+                    Assertions.assertEquals("Regione Lazio", resp.getContent().get(0).getName());
+                });
+    }
+
+    @Test
+    void extendedListOnboardedPa_onlyChildren() {
+        // Given
+        String url = "/ext-registry/pa/v2/activated-on-pn?onlyChildren={onlyChildren}&page={page}&size={size}"
+                .replace("{onlyChildren}", "1")
+                .replace("{page}", "1")
+                .replace("{size}", "10");
+
+        PaSummaryExtendedResponseDto responseDto = getPaSummaryExtendedResponseDto();
+        responseDto.getContent().remove(0);
+
+        // When
+        Mockito.when(svcInst.extendedListOnboardedPaByName(Mockito.any(), Mockito.eq(true), Mockito.any(), Mockito.any()))
+                .thenReturn(Mono.just(responseDto));
+
+        // Then
+        webTestClient.get()
+                .uri(url)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PaSummaryExtendedResponseDto.class)
+                .value(resp -> {
+                    Assertions.assertNotNull(resp);
+                    Assertions.assertEquals("Consiglio Regionale del Lazio", resp.getContent().get(0).getName());
+                    Assertions.assertEquals(1, resp.getContent().size());
+                    Assertions.assertEquals("18346279", resp.getContent().get(0).getChildrenList().get(0).getId());
+                    Assertions.assertEquals("Ufficio tributi Roma", resp.getContent().get(0).getChildrenList().get(0).getName());
+                });
+    }
 
     @Test
     void getGroups() {
@@ -302,5 +387,32 @@ class InfoPaControllerTest {
                 .header( PN_PAGOPA_SRC_CH_TYPE, "PA")
                 .exchange()
                 .expectStatus().isOk().expectBodyList(ProductResourcePNDto.class).hasSize(2);
+    }
+
+    private PaSummaryExtendedResponseDto getPaSummaryExtendedResponseDto() {
+        PaSummaryExtendedResponseDto responseDto = new PaSummaryExtendedResponseDto();
+        responseDto.setTotalPages(1L);
+        responseDto.setTotalElements(2L);
+
+        List<PaSummaryExtendedDto> content = new ArrayList<>();
+
+        PaSummaryExtendedDto father1 = new PaSummaryExtendedDto();
+        father1.setId("123456789");
+        father1.setName("Regione Lazio");
+
+        PaSummaryExtendedDto father2 = new PaSummaryExtendedDto();
+        father2.setId("987654321");
+        father2.setName("Consiglio Regionale del Lazio");
+
+        PaSummaryExtendedInfoDto child = new PaSummaryExtendedInfoDto();
+        child.setId("18346279");
+        child.setName("Ufficio tributi Roma");
+        father2.setChildrenList(List.of(child));
+
+        content.add(father1);
+        content.add(father2);
+
+        responseDto.setContent(content);
+        return responseDto;
     }
 }
