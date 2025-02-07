@@ -711,6 +711,7 @@ components:
       minLength: 3
       maxLength: 250
       pattern: ^([\x20-\xFF]{1,250})$
+      default: "default"
     PaSummary:
       title: PA in short
       description: PA with minimal information
