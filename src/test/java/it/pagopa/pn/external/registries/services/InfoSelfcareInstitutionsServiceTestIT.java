@@ -2,14 +2,10 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.exceptions.PnPANotFoundException;
+import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.InstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.ProductResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourcePNDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaInfoDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.ProductResourcePNDto;
-import it.pagopa.pn.external.registries.exceptions.PnRootIdNotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.RootSenderIdResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
@@ -32,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
@@ -116,6 +113,110 @@ class InfoSelfcareInstitutionsServiceTestIT {
         //THEN
         assertNotNull(res);
         assertEquals("Comune di Milano", res.get(0).getName());
+    }
+
+    @Test
+    void extendedListOnboardedPaByName() {
+        // GIVEN
+        String filter = "";
+        Boolean onlyChildren = false;
+        Integer page = 1;
+        Integer size = 10;
+
+        List<PaSummaryExtendedDto> entities = createPaSummaryExtendedDto(
+                List.of("123456789", "987654321"),
+                List.of("Regione Lazio", "Consiglio Regionale del Lazio")
+        );
+
+        Mockito.when(onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(filter, onlyChildren))
+                .thenReturn(Flux.fromIterable(entities));
+
+        // WHEN
+        PaSummaryExtendedResponseDto result = service.extendedListOnboardedPaByName(filter, onlyChildren, page, size).block();
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+        assertEquals("Regione Lazio", result.getContent().get(0).getName());
+        assertEquals("Consiglio Regionale del Lazio", result.getContent().get(1).getName());
+    }
+
+    @Test
+    void extendedListOnboardedPaByName_withNameFilter() {
+        // GIVEN
+        String filter = "Lazio";
+        Boolean onlyChildren = false;
+        Integer page = 1;
+        Integer size = 10;
+
+        List<PaSummaryExtendedDto> entities = createPaSummaryExtendedDto(
+                List.of("123456789"),
+                List.of("Regione Lazio")
+        );
+
+        Mockito.when(onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(filter, onlyChildren))
+                .thenReturn(Flux.fromIterable(entities));
+
+        // WHEN
+        PaSummaryExtendedResponseDto result = service.extendedListOnboardedPaByName(filter, onlyChildren, page, size).block();
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals("Regione Lazio", result.getContent().get(0).getName());
+    }
+
+    @Test
+    void extendedListOnboardedPaByName_onlyChildren() {
+        // GIVEN
+        String filter = "";
+        Boolean onlyChildren = true;
+        Integer page = 1;
+        Integer size = 10;
+
+        List<PaSummaryExtendedDto> entities = createPaSummaryExtendedDto(
+                List.of("987654321"),
+                List.of("Consiglio Regionale del Lazio")
+        );
+
+        Mockito.when(onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(filter, onlyChildren))
+                .thenReturn(Flux.fromIterable(entities));
+
+        // WHEN
+        PaSummaryExtendedResponseDto result = service.extendedListOnboardedPaByName(filter, onlyChildren, page, size).block();
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals("Consiglio Regionale del Lazio", result.getContent().get(0).getName());
+    }
+
+    @Test
+    void extendedListOnboardedPaByName_pagination() {
+        // GIVEN
+        String filter = "";
+        Boolean onlyChildren = false;
+        Integer size = 1;
+
+        List<PaSummaryExtendedDto> entitiesPage1 = createPaSummaryExtendedDto(
+                List.of("123456789"),
+                List.of("Regione Lazio")
+        );
+
+        List<PaSummaryExtendedDto> entitiesPage2 = createPaSummaryExtendedDto(
+                List.of("987654321"),
+                List.of("Consiglio Regionale del Lazio")
+        );
+
+        Mockito.when(onboardInstitutionFulltextSearchHelper.extendedFullTextSearch(filter, onlyChildren))
+                .thenReturn(Flux.fromIterable(entitiesPage1)
+                        .concatWith(Flux.fromIterable(entitiesPage2)));
+
+        // THEN
+        PaSummaryExtendedResponseDto resultPage = service.extendedListOnboardedPaByName(filter, onlyChildren, 1, size).block();
+        assertNotNull(resultPage);
+        assertEquals(1, resultPage.getContent().size());
+        assertEquals("Regione Lazio", resultPage.getContent().get(0).getName());
     }
 
     @Test
@@ -307,4 +408,14 @@ class InfoSelfcareInstitutionsServiceTestIT {
         assertEquals(risultatiList.get(0), paNotRoot.getInstitutionId());
     }
 
+    private List<PaSummaryExtendedDto> createPaSummaryExtendedDto(List<String> ids, List<String> names) {
+        List<PaSummaryExtendedDto> entities = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i++) {
+            PaSummaryExtendedDto entity = new PaSummaryExtendedDto();
+            entity.setId(ids.get(i));
+            entity.setName(names.get(i));
+            entities.add(entity);
+        }
+        return entities;
+    }
 }
