@@ -120,7 +120,7 @@ paths:
           schema:
             type: integer
             minimum: 1
-            default: 1
+            default: 10
       responses:
         '200':
           description: OK
@@ -711,7 +711,6 @@ components:
       minLength: 3
       maxLength: 250
       pattern: ^([\x20-\xFF]{1,250})$
-      default: "default"
     PaSummary:
       title: PA in short
       description: PA with minimal information

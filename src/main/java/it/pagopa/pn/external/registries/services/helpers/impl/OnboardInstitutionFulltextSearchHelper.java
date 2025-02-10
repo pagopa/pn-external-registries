@@ -129,10 +129,10 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
 
     /**
      * Performs a full-text search on PA entities using the local cache.
-     * If search is set to "onlyChildren", it will return only children of PAs.
+     * If search is set to "onlyChildren", it will return only children of PA.
      *
      * @param toQuery The search text that will be matched against the PA names. If null, it will be considered an empty string.
-     * @param onlyChildren If true, returns only the children of the PAs; if false, returns both the parents and their children.
+     * @param onlyChildren If true, returns only the children of the PA; if false, returns both the parents and their children.
      * @return A {@link Flux} of {@link PaSummaryExtendedDto} containing filtered search results.
      */
     @Override
@@ -146,12 +146,12 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
     }
 
     /**
-     * Performs an extended search of PAs based on a `query` search filter.
-     * If the `onlyChildren` parameter is set to `true`, returns only the children of the PAs;
+     * Performs an extended search of PA based on a `query` search filter.
+     * If the `onlyChildren` parameter is set to `true`, returns only the children of the PA;
      * otherwise, returns both parents and their children.
      *
-     * @param query The search text to match against PA names. If empty, returns all PAs.
-     * @param onlyChildren If `true`, returns only the children of the PAs; if `false`, returns both the parents and their children.
+     * @param query The search text to match against PA names. If empty, returns all PA.
+     * @param onlyChildren If `true`, returns only the children of the PA; if `false`, returns both the parents and their children.
      * @return A {@link Flux} of {@link PaSummaryExtendedDto} containing the search results.
      */
     private Flux<PaSummaryExtendedDto> searchExtended(String query, Boolean onlyChildren) {
@@ -167,7 +167,7 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
      * The method extracts the PA children from the local cache, applies the search filter if present,
      * sorts the results and returns a single object {@link PaSummaryExtendedDto} containing the list of children found.
      *
-     * @param query The search text to filter the names of the children of the PAs. If empty, returns all children.
+     * @param query The search text to filter the names of the children of the PA. If empty, returns all children.
      * @return A {@link Mono} containing a {@link PaSummaryExtendedDto} with the list of children.
      */
     private Mono<PaSummaryExtendedDto> getChildren(String query) {
@@ -188,12 +188,12 @@ public class OnboardInstitutionFulltextSearchHelper implements PaExtendedFullTex
     }
 
     /**
-     * Retrieves a list of PAs that have at least one associated child,
+     * Retrieves a list of PA that have at least one associated child,
      * applying a search filter on the names. The method returns a stream of objects
      * {@link PaSummaryExtendedDto}, containing the PA data and the related lists of children.
      *
-     * @param query The search text to filter PA names. If empty, returns all PAs.
-     * @return A {@link Flux} of {@link PaSummaryExtendedDto} containing the PAs with their filtered children.
+     * @param query The search text to filter PA names. If empty, returns all PA.
+     * @return A {@link Flux} of {@link PaSummaryExtendedDto} containing the PA with their filtered children.
      */
     private Flux<PaSummaryExtendedDto> getParentsAndChildren(String query) {
         return Flux.fromIterable(institutionsCache.values())
