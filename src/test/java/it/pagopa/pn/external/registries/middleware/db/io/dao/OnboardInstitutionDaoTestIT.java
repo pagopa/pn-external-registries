@@ -13,11 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
