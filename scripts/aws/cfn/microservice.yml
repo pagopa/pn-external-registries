@@ -503,7 +503,12 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadbalancerRulePriority: 98
+        LoadbalancerRulePriority:
+          Fn::Transform:
+            Name: GenerateLBPriorityIdMacro
+            Parameters:
+              msNumber: !Ref MicroserviceNumber
+              index: 2
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsCheckoutLogGroup
@@ -587,7 +592,12 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadbalancerRulePriority: !Ref MicroserviceNumber
+        LoadbalancerRulePriority:
+          Fn::Transform:
+            Name: GenerateLBPriorityIdMacro
+            Parameters:
+              msNumber: !Ref MicroserviceNumber
+              index: 1
         TaskRoleManagedPolicyArn: !Ref ExternalRegistryMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsLogGroup
