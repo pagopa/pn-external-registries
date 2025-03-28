@@ -98,8 +98,8 @@ components:
           description: The markdown content to be rendered in App
           example: |
             Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il 
-            messaggio entro il 28-04-2023 alle 08:41, non riceverai la notifica tramite 
-            raccomandata cartacea.
+            messaggio entro il 28-04-2023 alle 08:41, eviterai di ricevere la raccomandata i 
+            cui costi di invio saranno eventualmente calcolati in fase di pagamento.            
             minlength: 1
       required:
         - messageCode
