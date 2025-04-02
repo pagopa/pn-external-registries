@@ -14,7 +14,7 @@ hai ricevuto una **notifica SEND**, cioè una comunicazione a valore legale emes
 
 Per leggere la notifica in app, **attiva ora il servizio SEND**.
 
-Se non accedi in digitale alla comunicazione **entro 5 giorni**, riceverai la raccomandata e, al momento del pagamento, verranno aggiunti eventuali costi di stampa e invio.
+Se non accedi in digitale alla comunicazione **entro 5 giorni**, riceverai una raccomandata i cui costi saranno calcolati in fase di pagamento.
 
 Se attivi il servizio dopo, dovrai consultare questa comunicazione tramite altri canali, ma riceverai in app le notifiche SEND future.
 
