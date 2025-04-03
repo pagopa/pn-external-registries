@@ -57,18 +57,18 @@ public class InfoPaymentService {
     private PaymentInfoV21Dto apiResponseToPaymentInfoV21InnerDtoV2(PaymentRequestsGetResponseDto paymentInfoResponse, PaymentInfoRequestDto request) {
         return new PaymentInfoV21Dto()
                 .status(PaymentStatusDto.REQUIRED)
-                .amount(paymentInfoResponse.getImportoSingoloVersamento())
+                .amount(paymentInfoResponse.getAmount())
                 .url(config.getCheckoutSiteUrl())
                 .creditorTaxId(request.getCreditorTaxId())
                 .noticeCode(request.getNoticeCode())
-                .causaleVersamento(paymentInfoResponse.getCausaleVersamento() != null ? paymentInfoResponse.getCausaleVersamento() : null)
+                .causaleVersamento(paymentInfoResponse.getDescription() != null ? paymentInfoResponse.getDescription() : null)
                 .dueDate(paymentInfoResponse.getDueDate() != null ? paymentInfoResponse.getDueDate() : null);
     }
 
     private Mono<PaymentInfoV21Dto> fromCheckoutToPn(String paTaxId, String noticeNumber, HttpStatus status, String checkoutResult) {
         log.info( checkoutResult );
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentStatusFaultPaymentProblemJsonDto result;
+        PaymentStatusConflictDto result;
 
         PaymentInfoV21Dto paymentInfoDto = new PaymentInfoV21Dto();
         paymentInfoDto.setCreditorTaxId(paTaxId);
@@ -77,11 +77,11 @@ public class InfoPaymentService {
         try {
             checkoutStatusManagement(status);
 
-            result = objectMapper.readValue( checkoutResult, PaymentStatusFaultPaymentProblemJsonDto.class );
+            result = objectMapper.readValue( checkoutResult, PaymentStatusConflictDto.class );
             if (result != null) {
-                DetailDto detailDto = DetailDto.fromValue(result.getCategory());
+                DetailDto detailDto = DetailDto.fromValue(result.getFaultCodeCategory().getValue());
                 paymentInfoDto.setDetail(detailDto);
-                paymentInfoDto.setDetailV2(result.getDetailV2());
+                paymentInfoDto.setDetailV2(result.getFaultCodeDetail().getValue());
                 paymentInfoDto.setStatus(getPaymentStatus(detailDto));
             }
         } catch (JsonProcessingException e) {

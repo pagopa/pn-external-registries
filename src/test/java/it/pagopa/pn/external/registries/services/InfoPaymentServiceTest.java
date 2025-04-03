@@ -6,10 +6,9 @@ import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnUnprocessableEntityException;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.ValidationFaultPaymentProblemJsonDto;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.*;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentNoticeDto;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,9 +53,9 @@ class InfoPaymentServiceTest {
     @Test
     void getInfoPaymentConflict() {
 
-        ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
-        responseBody.setCategory( "PAYMENT_DUPLICATED" );
-        responseBody.detailV2( "PPT_PAGAMENTO_IN_CORSO" );
+        PaymentStatusConflictDto responseBody = new PaymentStatusConflictDto();
+        responseBody.setFaultCodeCategory(FaultStatusConflictCategoryDto.DUPLICATED);
+        responseBody.setFaultCodeDetail( PaymentConflictStatusFaultDto.PPT_PAGAMENTO_IN_CORSO);
 
         byte[] responseBodyBytes = new byte[0];
 
@@ -85,9 +84,9 @@ class InfoPaymentServiceTest {
     @Test
     void getInfoPaymentConflictOnGoing() {
 
-        ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
-        responseBody.setCategory( "PAYMENT_ONGOING" );
-        responseBody.detailV2( "PPT_PAGAMENTO_IN_CORSO" );
+        PaymentStatusConflictDto responseBody = new PaymentStatusConflictDto();
+        responseBody.setFaultCodeCategory(FaultStatusConflictCategoryDto.ONGOING);
+        responseBody.setFaultCodeDetail( PaymentConflictStatusFaultDto.PAA_PAGAMENTO_IN_CORSO);
 
         byte[] responseBodyBites = new byte[0];
 
@@ -117,7 +116,7 @@ class InfoPaymentServiceTest {
     void getInfoPaymentOk() {
         //Given
         PaymentRequestsGetResponseDto paymentResponse = new PaymentRequestsGetResponseDto();
-        paymentResponse.setImportoSingoloVersamento( 120 );
+        paymentResponse.setAmount( 120 );
         Mono<PaymentRequestsGetResponseDto> checkoutResponse = Mono.just( paymentResponse );
 
         //When
