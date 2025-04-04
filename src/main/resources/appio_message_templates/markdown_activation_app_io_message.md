@@ -12,9 +12,7 @@ Ciao,
 
 hai ricevuto una **notifica SEND**, cioè una comunicazione a valore legale emessa da un’amministrazione.
 
-Per leggere la notifica in app, **attiva ora il servizio SEND**.
-
-Se non accedi in digitale alla comunicazione **entro 5 giorni**, riceverai una raccomandata i cui costi saranno calcolati in fase di pagamento.
+Per leggere la notifica in app, **attiva il servizio SEND entro 5 giorni**: eviterai una raccomandata e i relativi costi.
 
 Se attivi il servizio dopo, dovrai consultare questa comunicazione tramite altri canali, ma riceverai in app le notifiche SEND future.
 
