@@ -167,7 +167,7 @@ public class CostComponentService {
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
-        log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
+        log.info("GetItemStrong: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
                 pk, sk, iun, recIndex, creditorTaxId, noticeCode);
 
         return costComponentsDao.getItemStrong(pk, sk);
