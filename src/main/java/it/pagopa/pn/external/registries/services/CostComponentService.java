@@ -155,7 +155,12 @@ public class CostComponentService {
                                 analogCost, analogCostWithVat, totalCost, iun, recIndex, creditorTaxId, noticeCode);
                         return totalCost;
                     }
-                }).switchIfEmpty(Mono.error(new PnInternalException("Get total cost cannot be null",ERROR_CODE_EXTERNALREGISTRIES_TOTAL_COST_CANNOT_BE_NULL)));
+                })
+                .switchIfEmpty(Mono.error(() -> {
+                    String message = String.format("Get total cost cannot be null - iun=%s creditorTaxId=%s noticeCode=%s", iun, creditorTaxId, noticeCode);
+                    log.error(message);
+                    throw new PnInternalException(message, ERROR_CODE_EXTERNALREGISTRIES_TOTAL_COST_CANNOT_BE_NULL);
+                }));
     }
 
     private Mono<CostComponentsEntity> getItemStrong(String iun, int recIndex, String creditorTaxId, String noticeCode) {

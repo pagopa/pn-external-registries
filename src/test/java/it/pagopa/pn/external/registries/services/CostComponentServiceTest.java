@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
@@ -264,6 +265,26 @@ class CostComponentServiceTest {
 
         verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
+
+    @Test
+    void getTotalCostTestEmpty() {
+        // Given
+        CostComponentsEntity entity = newCostComponentsEntity();
+        entity.setBaseCost(100);
+        entity.setSimpleRegisteredLetterCost(50);
+        entity.setFirstAnalogCost(25);
+        entity.setSecondAnalogCost(25);
+        entity.setIsRefusedCancelled(false); // null is treated as false, too
+
+        Integer vat = 22;
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.empty());
+
+        // When
+        Assertions.assertThrows(PnInternalException.class, () -> {
+            costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
+        });
+    }
+
 
     @Test
     void getTotalCostTestVatNull() {
