@@ -180,7 +180,8 @@ components:
             messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
               risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
-              {{ora}}, non riceverai la notifica tramite raccomandata cartacea."
+              {{ora}}, eviterai di ricevere la raccomandata, i cui costi saranno eventualmente 
+              calcolati in fase di pagamento."
 
             - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo
             messaggio contiene una 
