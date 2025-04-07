@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
@@ -13,6 +14,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_TOTAL_COST_CANNOT_BE_NULL;
 
 @Service
 @Slf4j
@@ -120,7 +123,7 @@ public class CostComponentService {
         log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={} vat={}",
                 pk, sk, iun, recIndex, creditorTaxId, noticeCode, vat);
 
-        return getItem(iun, recIndex, creditorTaxId, noticeCode)
+        return getItemStrong(iun, recIndex, creditorTaxId, noticeCode)
                 .map(entity -> {
                     if (Boolean.TRUE.equals(entity.getIsRefusedCancelled())) {
                         return 0;
@@ -152,21 +155,21 @@ public class CostComponentService {
                                 analogCost, analogCostWithVat, totalCost, iun, recIndex, creditorTaxId, noticeCode);
                         return totalCost;
                     }
-                });
+                }).switchIfEmpty(Mono.error(new PnInternalException("Get total cost cannot be null",ERROR_CODE_EXTERNALREGISTRIES_TOTAL_COST_CANNOT_BE_NULL)));
     }
 
-    private Mono<CostComponentsEntity> getItem(String iun, int recIndex, String creditorTaxId, String noticeCode) {
+    private Mono<CostComponentsEntity> getItemStrong(String iun, int recIndex, String creditorTaxId, String noticeCode) {
         String pk = iun + "##" + recIndex;
         String sk = creditorTaxId + "##" + noticeCode;
 
         log.info("Getting total cost: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}",
                 pk, sk, iun, recIndex, creditorTaxId, noticeCode);
 
-        return costComponentsDao.getItem(pk, sk);
+        return costComponentsDao.getItemStrong(pk, sk);
     }
 
     public Mono<Boolean> existCostItem(String iun, int recIndex, String creditorTaxId, String noticeCode) {
-        return getItem(iun, recIndex, creditorTaxId, noticeCode).map(
+        return getItemStrong(iun, recIndex, creditorTaxId, noticeCode).map(
                 Objects::nonNull
         ).defaultIfEmpty(false);
     }

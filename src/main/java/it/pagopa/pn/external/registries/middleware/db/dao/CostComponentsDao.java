@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
 
@@ -45,8 +46,12 @@ public class CostComponentsDao extends BaseDao {
     /**
      * getItem by pk and sk
      */
-    public Mono<CostComponentsEntity> getItem(String pk, String sk) {
-        return Mono.fromFuture(costComponentsTable.getItem(getKeyBuild(pk, sk)));
+    public Mono<CostComponentsEntity> getItemStrong(String pk, String sk) {
+        return Mono.fromFuture(costComponentsTable.getItem(
+                GetItemEnhancedRequest.builder()
+                        .key(getKeyBuild(pk,sk))
+                        .consistentRead(true).build())
+        );
     }
 
     /**
