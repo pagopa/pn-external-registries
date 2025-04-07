@@ -72,7 +72,8 @@ components:
             - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
               risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
-              {{ora}}, non riceverai la notifica tramite raccomandata cartacea."
+              {{ora}}, eviterai di ricevere  la raccomandata, i cui costi saranno eventualmente 
+              calcolati in fase di pagamento."
             
             - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
@@ -97,9 +98,7 @@ components:
           type: string
           description: The markdown content to be rendered in App
           example: |
-            Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il 
-            messaggio entro il 28-04-2023 alle 08:41, non riceverai la notifica tramite 
-            raccomandata cartacea.
+            Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Se apri il messaggio entro il 28-04-2023 alle 08:41, eviterai di ricevere la raccomandata, i cui costi saranno eventualmente calcolati in fase di pagamento.
             minlength: 1
       required:
         - messageCode
