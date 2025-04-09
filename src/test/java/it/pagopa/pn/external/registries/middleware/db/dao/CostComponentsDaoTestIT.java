@@ -49,7 +49,7 @@ class CostComponentsDaoTestIT {
         costComponentsDao.insertOrUpdate(entity).block();
 
         //When
-        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
+        CostComponentsEntity result = costComponentsDao.getItemStrong(entity.getPk(), entity.getSk()).block();
 
         //Clean
         try {
@@ -78,7 +78,7 @@ class CostComponentsDaoTestIT {
         costComponentsDao.insertOrUpdate(entity).block();
 
         //When
-        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
+        CostComponentsEntity result = costComponentsDao.getItemStrong(entity.getPk(), entity.getSk()).block();
 
         //Clean
         try {
@@ -190,7 +190,7 @@ class CostComponentsDaoTestIT {
         entity.setFirstAnalogCost(12);
         // update the entity
         costComponentsDao.updateNotNullIfExists(entity).block();
-        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
+        CostComponentsEntity result = costComponentsDao.getItemStrong(entity.getPk(), entity.getSk()).block();
 
         //Clean
         try {
@@ -239,7 +239,7 @@ class CostComponentsDaoTestIT {
             costComponentsEntityMono.block();
         });
 
-        CostComponentsEntity result = costComponentsDao.getItem(entity.getPk(), entity.getSk()).block();
+        CostComponentsEntity result = costComponentsDao.getItemStrong(entity.getPk(), entity.getSk()).block();
         Assertions.assertNull(result);
         //Clean
         try {
