@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.services;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.middleware.db.dao.CostComponentsDao;
@@ -253,7 +254,7 @@ class CostComponentServiceTest {
         entity.setIsRefusedCancelled(false); // null is treated as false, too
         
         Integer vat = 22;
-        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.just(entity));
         
         // When
         Integer totalCost = costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
@@ -262,8 +263,28 @@ class CostComponentServiceTest {
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
         Assertions. assertEquals(222, totalCost, "The total cost should be 200");
 
-        verify(costComponentsDao, times(1)).getItem(pk, sk);
+        verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
+
+    @Test
+    void getTotalCostTestEmpty() {
+        // Given
+        CostComponentsEntity entity = newCostComponentsEntity();
+        entity.setBaseCost(100);
+        entity.setSimpleRegisteredLetterCost(50);
+        entity.setFirstAnalogCost(25);
+        entity.setSecondAnalogCost(25);
+        entity.setIsRefusedCancelled(false); // null is treated as false, too
+
+        Integer vat = 22;
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.empty());
+
+        // When
+        Assertions.assertThrows(PnInternalException.class, () -> {
+            costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
+        });
+    }
+
 
     @Test
     void getTotalCostTestVatNull() {
@@ -275,7 +296,7 @@ class CostComponentServiceTest {
         entity.setSecondAnalogCost(25);
         entity.setIsRefusedCancelled(false); // null is treated as false, too
 
-        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.just(entity));
 
         // When
         Integer totalCost = costComponentService.getTotalCost(null, iun, recIndex, creditorTaxId, noticeCode).block();
@@ -284,7 +305,7 @@ class CostComponentServiceTest {
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
         Assertions. assertEquals(200, totalCost, "The total cost should be 200");
 
-        verify(costComponentsDao, times(1)).getItem(pk, sk);
+        verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
 
     @Test
@@ -297,7 +318,7 @@ class CostComponentServiceTest {
         entity.setSecondAnalogCost(25);
         entity.setIsRefusedCancelled(false); // null is treated as false, too
 
-        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.just(entity));
 
         // When
         Boolean result = costComponentService.existCostItem(iun, recIndex, creditorTaxId, noticeCode).block();
@@ -306,7 +327,7 @@ class CostComponentServiceTest {
         Assertions.assertNotNull(result, "existCostItem not be null");
         Assertions. assertEquals(true, result, "existCostItem is true");
 
-        verify(costComponentsDao, times(1)).getItem(pk, sk);
+        verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
 
     @Test
@@ -319,7 +340,7 @@ class CostComponentServiceTest {
         entity.setSecondAnalogCost(25);
         entity.setIsRefusedCancelled(false); // null is treated as false, too
 
-        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.empty());
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.empty());
 
         // When
         Boolean result = costComponentService.existCostItem(iun, recIndex, creditorTaxId, noticeCode).block();
@@ -328,7 +349,7 @@ class CostComponentServiceTest {
         Assertions.assertNotNull(result, "existCostItem not be null");
         Assertions. assertEquals(false, result, "existCostItem is true");
 
-        verify(costComponentsDao, times(1)).getItem(pk, sk);
+        verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
 
     @Test
@@ -343,7 +364,7 @@ class CostComponentServiceTest {
         
         Integer vat = 22;
 
-        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.just(entity));
 
         // When
         Integer totalCost = costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
@@ -352,7 +373,7 @@ class CostComponentServiceTest {
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
         Assertions. assertEquals(0, totalCost, "The total cost should be 0");
 
-        verify(costComponentsDao, times(1)).getItem(pk, sk);
+        verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
 
     @Test
@@ -367,7 +388,7 @@ class CostComponentServiceTest {
 
         Integer vat = 22;
         
-        when(costComponentsDao.getItem(pk, sk)).thenReturn(Mono.just(entity));
+        when(costComponentsDao.getItemStrong(pk, sk)).thenReturn(Mono.just(entity));
         
         // When
         Integer totalCost = costComponentService.getTotalCost(vat, iun, recIndex, creditorTaxId, noticeCode).block();
@@ -376,7 +397,7 @@ class CostComponentServiceTest {
         Assertions.assertNotNull(totalCost, "Total cost should not be null");
         Assertions.assertEquals(0, totalCost, "The total cost should be 0");
 
-        verify(costComponentsDao, times(1)).getItem(pk, sk);
+        verify(costComponentsDao, times(1)).getItemStrong(pk, sk);
     }
 
     @Test

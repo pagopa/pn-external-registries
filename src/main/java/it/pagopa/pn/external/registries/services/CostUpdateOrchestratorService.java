@@ -102,6 +102,7 @@ public class CostUpdateOrchestratorService {
                                         paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode())
                                 .flatMap(existCostItem -> {
                                     if(Boolean.TRUE.equals(existCostItem) || isNotSendCostPhase(updateCostPhase) ){
+                                        log.info("Need to update cost item, costItemAlreadyExists={} updateCostPhase={} - : iun: {}, creditorTaxId={} noticeCode={}", existCostItem, updateCostPhase, iun, paymentForRecipient.getCreditorTaxId(), paymentForRecipient.getNoticeCode());
                                         //Solo se l'item UpdateCost esiste, dunque sono state verificate da deliveryPush le condizioni,
                                         // Ad esempio che la notifica non sia FLAT_RATE
                                         //Oppure se la updateCostPhase non è un invio analogico/invio di raccomandata semplice
