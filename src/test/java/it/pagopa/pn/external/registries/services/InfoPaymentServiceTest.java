@@ -167,8 +167,8 @@ class InfoPaymentServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = { 400, 404})
-    void getInfoPaymentKo_400(int statusCode) {
+    @ValueSource(ints = {401,400,404})
+    void getInfoPaymentKo(int statusCode) {
         ValidationFaultPaymentProblemJsonDto responseBody = new ValidationFaultPaymentProblemJsonDto();
         responseBody.setCategory("GENERIC_ERROR");
 

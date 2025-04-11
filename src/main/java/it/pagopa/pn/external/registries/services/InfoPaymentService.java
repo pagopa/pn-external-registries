@@ -8,7 +8,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.d
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentNoticeDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.msclient.CheckoutClient;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.List;
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.*;
 
 @Service
-@Slf4j
+@CustomLog
 public class InfoPaymentService {
     public static final String JSON_PROCESSING_ERROR_MSG = "Unable to map response from checkout to paymentInfoDto paTaxId=%s noticeCode=%s";
     private final CheckoutClient checkoutClient;
@@ -89,24 +89,39 @@ public class InfoPaymentService {
             paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
             paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
             paymentInfoDto.setDetailV2(String.format(JSON_PROCESSING_ERROR_MSG, paTaxId, noticeNumber));
-        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException | PnCheckoutNotFoundException e) {
+        } catch (PnCheckoutBadRequestException | PnCheckoutServerErrorException | PnCheckoutNotFoundException | PnCheckoutUnauthorizedException  e) {
             if (e instanceof PnCheckoutServerErrorException){
                 log.error(
                     "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
                     status, paTaxId, noticeNumber, e
                 );
-            } else {
+            }
+            else if (e instanceof PnCheckoutUnauthorizedException){
+                log.fatal("Authorization failure while retrieving payment info. " +
+                                "paTaxId={}, noticeNumber={}",
+                        paTaxId, noticeNumber, e);
+            }
+            else {
                 log.warn(
                     "Get checkout payment error status code={}, paTaxId={} noticenumber={}",
                     status, paTaxId, noticeNumber, e
                 );
             }
-            paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
-            paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
-            paymentInfoDto.setDetailV2(e.getMessage());
-            paymentInfoDto.setErrorCode(status.toString());
+           buildPaymentInfoError(e, paymentInfoDto, status);
         }
         return Mono.just( paymentInfoDto );
+    }
+
+    private void buildPaymentInfoError(Exception e, PaymentInfoV21Dto paymentInfoDto, HttpStatus status) {
+        paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
+        paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
+        paymentInfoDto.setDetailV2(e.getMessage());
+
+        if (e instanceof PnCheckoutUnauthorizedException) {
+            paymentInfoDto.setErrorCode(e.getMessage());
+        } else {
+            paymentInfoDto.setErrorCode(status.toString());
+        }
     }
 
     private PaymentStatusDto getPaymentStatus(DetailDto detail) {
@@ -143,6 +158,11 @@ public class InfoPaymentService {
             throw new PnCheckoutServerErrorException(
                     "Timeout from PagoPA services",
                     ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_GATEWAY_TIMEOUT);
+        }
+        if(HttpStatus.UNAUTHORIZED.equals(status)) {
+            throw new PnCheckoutUnauthorizedException(
+                    "Downstream checkout not available",
+                    ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_UNAUTHORIZED);
         }
     }
 
