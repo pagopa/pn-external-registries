@@ -113,16 +113,13 @@ public class InfoPaymentService {
     }
 
     private void buildPaymentInfoError(Exception e, PaymentInfoV21Dto paymentInfoDto, HttpStatus status) {
-        if(e instanceof PnCheckoutUnauthorizedException){
-            paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
-            paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
-            paymentInfoDto.setDetailV2(e.getMessage());
+        paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
+        paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
+        paymentInfoDto.setDetailV2(e.getMessage());
+
+        if (e instanceof PnCheckoutUnauthorizedException) {
             paymentInfoDto.setErrorCode(e.getMessage());
-        }
-        else {
-            paymentInfoDto.setDetail(DetailDto.GENERIC_ERROR);
-            paymentInfoDto.setStatus(PaymentStatusDto.FAILURE);
-            paymentInfoDto.setDetailV2(e.getMessage());
+        } else {
             paymentInfoDto.setErrorCode(status.toString());
         }
     }
@@ -164,7 +161,7 @@ public class InfoPaymentService {
         }
         if(HttpStatus.UNAUTHORIZED.equals(status)) {
             throw new PnCheckoutUnauthorizedException(
-                    "EC services are not available",
+                    "Downstream checkout not available",
                     ERROR_CODE_EXTERNALREGISTRIES_CHECKOUT_UNAUTHORIZED);
         }
     }
