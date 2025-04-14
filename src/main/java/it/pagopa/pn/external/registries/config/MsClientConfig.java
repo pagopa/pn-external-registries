@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.config;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.PaymentRequestsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.InstitutionsApi;
@@ -23,10 +24,10 @@ public class MsClientConfig {
     static class CheckoutApis extends OcpBaseClient {
 
         @Bean
-        DefaultApi defaultApiClient(PnExternalRegistriesConfig config) {
+        PaymentRequestsApi defaultApiClient(PnExternalRegistriesConfig config) {
             ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getCheckoutApiKey()).build());
             apiClient.setBasePath( config.getCheckoutApiBaseUrl() );
-            return new DefaultApi( apiClient );
+            return new PaymentRequestsApi( apiClient );
         }
 
         //checkout ha una base-url diversa per il carrello

@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.PaymentRequestsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.CartRequestDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.PaymentRequestsGetResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
@@ -16,18 +17,18 @@ import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.CHECKOUT;
 @CustomLog
 public class CheckoutClient extends OcpBaseClient {
 
-    private final DefaultApi defaultApiClient;
+    private final PaymentRequestsApi paymentRequestsApi;
     private final DefaultApi defaultApiClientCartCheckout; //checkout ha una base-url diversa per il carrello
 
     //inject by name
-    public CheckoutClient(DefaultApi defaultApiClient, DefaultApi defaultApiClientCartCheckout) {
-        this.defaultApiClient = defaultApiClient;
+    public CheckoutClient(PaymentRequestsApi paymentRequestsApi, DefaultApi defaultApiClientCartCheckout) {
+        this.paymentRequestsApi = paymentRequestsApi;
         this.defaultApiClientCartCheckout = defaultApiClientCartCheckout;
     }
 
-    public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptIdFromString) throws WebClientResponseException {
+    public Mono<PaymentRequestsGetResponseDto> getPaymentInfo(String rptId) throws WebClientResponseException {
         log.logInvokingExternalDownstreamService(CHECKOUT, "getPaymentInfo");
-        return defaultApiClient.getPaymentInfo( rptIdFromString )
+        return paymentRequestsApi.getPaymentRequestInfo( rptId )
                 .doOnError(throwable -> log.logInvokationResultDownstreamFailed(CHECKOUT, elabExceptionMessage(throwable)));
     }
 

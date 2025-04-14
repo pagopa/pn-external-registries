@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.*;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
@@ -59,12 +57,8 @@ class CheckoutClientTest extends MockAWSObjectsTestConfig {
     void getPaymentInfo() {
 
         PaymentRequestsGetResponseDto responseDto = new PaymentRequestsGetResponseDto()
-                .importoSingoloVersamento( 1200 )
-                .causaleVersamento( "f3cf08a09e1b11ec877559d3b4798277" )
-                .enteBeneficiario(new EnteBeneficiarioDto()
-                        .identificativoUnivocoBeneficiario( "77777777777" )
-                        .denominazioneBeneficiario( "companyName" )
-                        .denomUnitOperBeneficiario( "officeName" ));
+                .amount( 1200 )
+                .description( "f3cf08a09e1b11ec877559d3b4798277" );
 
         byte[] responseBodyBites = new byte[0];
 
@@ -90,7 +84,7 @@ class CheckoutClientTest extends MockAWSObjectsTestConfig {
 
         //Then
         Assertions.assertNotNull( response );
-        Assertions.assertEquals( 1200 , response.getImportoSingoloVersamento() );
+        Assertions.assertEquals( 1200 , response.getAmount() );
     }
 
     @Test
