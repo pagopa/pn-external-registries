@@ -107,7 +107,7 @@ components:
         - messageParams
 
   parameters:
-    cxIdAuthFleet: # NO EXTERNAL
+    cxIdAuthFleet:                                                  # NO EXTERNAL
       $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet' # NO EXTERNAL
     cxTaxIdAuthFleet:
       $ref: 'remote-refs.yaml#/components/parameters/cxTaxIdAuthFleet'
