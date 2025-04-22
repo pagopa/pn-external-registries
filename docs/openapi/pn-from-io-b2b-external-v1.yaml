@@ -21,16 +21,16 @@ paths:
       tags:
         - FromIOMessage
       parameters:
-        - $ref: "#/components/parameters/cxTaxIdAuthFleet" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopOriginalUrl" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopOriginalMethod" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopPublicKey" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopAssertionRef" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopAssertionType" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopAuthJwt" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopUserId" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopSignatureInput" # ONLY EXTERNAL
-        - $ref: "#/components/parameters/lollipopSignature" # ONLY EXTERNAL
+        - $ref: '#/components/parameters/cxTaxIdAuthFleet' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopOriginalUrl' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopOriginalMethod' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopPublicKey' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopAssertionRef' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopAssertionType' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopAuthJwt' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopUserId' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopSignatureInput' # ONLY EXTERNAL
+        - $ref: '#/components/parameters/lollipopSignature' # ONLY EXTERNAL
         - name: iun
           in: path
           required: true
@@ -38,24 +38,24 @@ paths:
             type: string
             description: L'Identificativo Univoco Notifica assegnato da PN
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PreconditionContent"
-        "400":
+                $ref: '#/components/schemas/PreconditionContent'
+        '400':
           description: Invalid input
           content:
             application/problem+json:
               schema:
-                $ref: "remote-refs.yaml#/components/schemas/Problem"
-        "500":
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: "remote-refs.yaml#/components/schemas/Problem"
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
 components:
   schemas:
@@ -84,14 +84,7 @@ components:
             Coppie chiave valore degli elementi da sostituire nei template del messaggio. Per PN
             sarà presente al più cinque campi: data, con formattazione DD-MM-YYYY (in UTC), ora con formattazione hh:mm,
             iun, senderDenomination e subject (oggetto della notifica)
-          example:
-            {
-              "data": "28-04-2023",
-              "ora": "08:41",
-              "iun": "aIun",
-              "senderDenomination": "Comune di Milano",
-              "subject": "Oggetto notifica",
-            }
+          example: { "data": "28-04-2023", "ora": "08:41", "iun": "aIun", "senderDenomination": "Comune di Milano", "subject": "Oggetto notifica" }
           type: object
           additionalProperties:
             type: string
@@ -114,26 +107,26 @@ components:
 
   parameters:
     cxTaxIdAuthFleet:
-      $ref: "remote-refs.yaml#/components/parameters/cxTaxIdAuthFleet"
+      $ref: 'remote-refs.yaml#/components/parameters/cxTaxIdAuthFleet'
 
     ############################################################################################
     ###                     HEADER DI AUTENTICAZIONE LOLLIPOP                               ###
     ############################################################################################
     lollipopOriginalUrl: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopOriginalUrl" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopOriginalUrl' # ONLY EXTERNAL
     lollipopOriginalMethod: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopOriginalMethod" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopOriginalMethod' # ONLY EXTERNAL
     lollipopPublicKey: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopPublicKey" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopPublicKey' # ONLY EXTERNAL
     lollipopAssertionRef: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopAssertionRef" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopAssertionRef' # ONLY EXTERNAL
     lollipopAssertionType: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopAssertionType" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopAssertionType' # ONLY EXTERNAL
     lollipopAuthJwt: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopAuthJwt" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopAuthJwt' # ONLY EXTERNAL
     lollipopUserId: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopUserId" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopUserId' # ONLY EXTERNAL
     lollipopSignatureInput: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopSignatureInput" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopSignatureInput' # ONLY EXTERNAL
     lollipopSignature: # ONLY EXTERNAL
-      $ref: "remote-refs.yaml#/components/parameters/lollipopSignature" # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopSignature' # ONLY EXTERNAL
