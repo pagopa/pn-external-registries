@@ -72,7 +72,7 @@ components:
           example: >
             Premendo “Continua”, la notifica risulterà legalmente recapitata a
             te. Se apri il messaggio entro il 28-04-2023 alle 08:41, eviterai di ricevere 
-            la raccomandata,  i cui eventuali costi saranno calcolati in fase di pagamento.
+            la raccomandata, i cui eventuali costi saranno calcolati in fase di pagamento.
 
             minlength: 1
       required:
