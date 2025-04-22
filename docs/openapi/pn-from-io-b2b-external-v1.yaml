@@ -66,8 +66,7 @@ components:
         messageCode:
           example: BOTTOM_PRE_ANALOG_WORKFLOW
           description: |
-            Il codice di uno dei messaggi censiti dal servizio, per pn: 
-
+            Il codice di uno dei messaggi censiti dal servizio, per pn:
             - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
               risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
