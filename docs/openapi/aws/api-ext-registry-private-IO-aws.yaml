@@ -19,16 +19,16 @@ paths:
       tags:
         - FromIOMessage
       parameters:
-        - $ref: '#/components/parameters/cxTaxIdAuthFleet'
-        - $ref: '#/components/parameters/lollipopOriginalUrl'
-        - $ref: '#/components/parameters/lollipopOriginalMethod'
-        - $ref: '#/components/parameters/lollipopPublicKey'
-        - $ref: '#/components/parameters/lollipopAssertionRef'
-        - $ref: '#/components/parameters/lollipopAssertionType'
-        - $ref: '#/components/parameters/lollipopAuthJwt'
-        - $ref: '#/components/parameters/lollipopUserId'
-        - $ref: '#/components/parameters/lollipopSignatureInput'
-        - $ref: '#/components/parameters/lollipopSignature'
+        - $ref: "#/components/parameters/cxTaxIdAuthFleet"
+        - $ref: "#/components/parameters/lollipopOriginalUrl"
+        - $ref: "#/components/parameters/lollipopOriginalMethod"
+        - $ref: "#/components/parameters/lollipopPublicKey"
+        - $ref: "#/components/parameters/lollipopAssertionRef"
+        - $ref: "#/components/parameters/lollipopAssertionType"
+        - $ref: "#/components/parameters/lollipopAuthJwt"
+        - $ref: "#/components/parameters/lollipopUserId"
+        - $ref: "#/components/parameters/lollipopSignatureInput"
+        - $ref: "#/components/parameters/lollipopSignature"
         - name: iun
           in: path
           required: true
@@ -36,24 +36,24 @@ paths:
             type: string
             description: L'Identificativo Univoco Notifica assegnato da PN
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PreconditionContent'
-        '400':
+                $ref: "#/components/schemas/PreconditionContent"
+        "400":
           description: Invalid input
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-        '500':
+                $ref: "#/components/schemas/Problem"
+        "500":
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
       security:
         - pn-auth-fleet_IoAuthorizer_openapi: []
         - api_key_openapi: []
@@ -70,7 +70,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''IO'''
+          integration.request.header.x-pagopa-pn-src-ch: "'IO'"
           integration.request.path.iun: method.request.path.iun
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
@@ -180,8 +180,7 @@ components:
             messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
               risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
-              {{ora}}, eviterai di ricevere la raccomandata, i cui costi saranno eventualmente 
-              calcolati in fase di pagamento."
+              {{ora}}, eviterai di ricevere la raccomandata, i cui eventuali costi saranno calcolati in fase di pagamento."
 
             - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo
             messaggio contiene una 
@@ -200,7 +199,7 @@ components:
             iun, senderDenomination e subject (oggetto della notifica)
           example:
             data: 28-04-2023
-            ora: '08:41'
+            ora: "08:41"
             iun: aIun
             senderDenomination: Comune di Milano
             subject: Oggetto notifica
@@ -220,7 +219,7 @@ components:
             te. Se apri il 
 
             messaggio entro il 28-04-2023 alle 08:41, eviterai di ricevere la raccomandata, 
-            i cui costi saranno eventualmente calcolati in fase di pagamento.
+            i cui eventuali costi saranno calcolati in fase di pagamento.
 
             minlength: 1
       required:
@@ -281,14 +280,14 @@ components:
           type: string
         timestamp:
           description: date and time referred to UTC
-          example: '2022-07-27T12:22:33.444Z'
+          example: "2022-07-27T12:22:33.444Z"
           type: string
           format: date-time
         errors:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/ProblemError'
+            $ref: "#/components/schemas/ProblemError"
       required:
         - status
         - errors
@@ -317,13 +316,13 @@ tags:
 x-amazon-apigateway-gateway-responses:
   DEFAULT_5XX:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
   DEFAULT_4XX:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
   BAD_REQUEST_PARAMETERS:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
     responseTemplates:
       application/json: >-
         {"status": 400, "title": "VALIDATION ERROR", "traceId":
@@ -331,7 +330,7 @@ x-amazon-apigateway-gateway-responses:
         "detail": "Validation errors: $context.error.validationErrorString" } ]}
   BAD_REQUEST_BODY:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
     responseTemplates:
       application/json: >-
         {"status": 400, "title": "VALIDATION ERROR", "traceId":
