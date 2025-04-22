@@ -67,12 +67,12 @@ components:
           example: BOTTOM_PRE_ANALOG_WORKFLOW
           description: |
             Il codice di uno dei messaggi censiti dal servizio, per pn:
+
             - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
               risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
               {{ora}}, eviterai di ricevere la raccomandata, i cui eventuali costi saranno 
               calcolati in fase di pagamento."
-
             - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
               comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
               risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata 
@@ -112,20 +112,20 @@ components:
     ###                     HEADER DI AUTENTICAZIONE LOLLIPOP                               ###
     ############################################################################################
     lollipopOriginalUrl: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopOriginalUrl'                                       # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopOriginalUrl'                           # ONLY EXTERNAL
     lollipopOriginalMethod: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopOriginalMethod'                                    # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopOriginalMethod'                        # ONLY EXTERNAL
     lollipopPublicKey: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopPublicKey'                                         # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopPublicKey'                             # ONLY EXTERNAL
     lollipopAssertionRef: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopAssertionRef'                                      # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopAssertionRef'                          # ONLY EXTERNAL
     lollipopAssertionType: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopAssertionType'                                     # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopAssertionType'                         # ONLY EXTERNAL
     lollipopAuthJwt: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopAuthJwt'                                           # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopAuthJwt'                               # ONLY EXTERNAL
     lollipopUserId: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopUserId'                                            # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopUserId'                                # ONLY EXTERNAL
     lollipopSignatureInput: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopSignatureInput'                                    # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopSignatureInput'                        # ONLY EXTERNAL
     lollipopSignature: # ONLY EXTERNAL
-      $ref: 'remote-refs.yaml#/components/parameters/lollipopSignature'                                         # ONLY EXTERNAL
+      $ref: 'remote-refs.yaml#/components/parameters/lollipopSignature'                             # ONLY EXTERNAL
