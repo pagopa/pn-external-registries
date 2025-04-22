@@ -57,7 +57,7 @@ components:
             ora con formattazione hh:mm
           example:
             data: 28-04-2023
-            ora: "08:41"
+            ora: '08:41'
           type: object
           additionalProperties:
             type: string
@@ -101,13 +101,13 @@ tags:
 x-amazon-apigateway-gateway-responses:
   DEFAULT_5XX:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
   DEFAULT_4XX:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
   BAD_REQUEST_PARAMETERS:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
     responseTemplates:
       application/json: >-
         {"status": 400, "title": "VALIDATION ERROR", "traceId":
@@ -115,7 +115,7 @@ x-amazon-apigateway-gateway-responses:
         "detail": "Validation errors: $context.error.validationErrorString" } ]}
   BAD_REQUEST_BODY:
     responseParameters:
-      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
     responseTemplates:
       application/json: >-
         {"status": 400, "title": "VALIDATION ERROR", "traceId":
