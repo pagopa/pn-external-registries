@@ -22,16 +22,16 @@ paths:
         - FromIOMessage
       parameters:
         - $ref: '#/components/parameters/cxIdAuthFleet' # NO EXTERNAL
-        #        - $ref: '#/components/parameters/cxTaxIdAuthFleet'                                       # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopOriginalUrl'                                    # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopOriginalMethod'                                 # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopPublicKey'                                      # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopAssertionRef'                                   # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopAssertionType'                                  # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopAuthJwt'                                        # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopUserId'                                         # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopSignatureInput'                                 # ONLY EXTERNAL
-        #        - $ref: '#/components/parameters/lollipopSignature'                                      # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/cxTaxIdAuthFleet'                               # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopOriginalUrl'                            # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopOriginalMethod'                         # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopPublicKey'                              # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopAssertionRef'                           # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopAssertionType'                          # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopAuthJwt'                                # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopUserId'                                 # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopSignatureInput'                         # ONLY EXTERNAL
+        #        - $ref: '#/components/parameters/lollipopSignature'                              # ONLY EXTERNAL
         - name: iun
           in: path
           required: true
