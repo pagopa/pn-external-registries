@@ -91,7 +91,8 @@ public class PnExternalRegistriesConfig {
     public static class AppIoTemplate{
         private String markdownUpgradeAppIoENMessage;
         private String markdownUpgradeAppIoITMessage;
-        private String markdownActivationAppIoMessage;
+        private String markdownActivationAppIoAnalogMessage;
+        private String markdownActivationAppIoDigitalMessage;
         private String subjectActivationAppIoMessage;
         private String subjectCourtesyAppIoMessage;
         private String markdownDisclaimerAfterDateAppIoMessage;
@@ -109,7 +110,8 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate = new AppIoTemplate();
         this.appIoTemplate.markdownUpgradeAppIoITMessage = fetchMessage("markdown_upgrade_app_io_message_IT.md");
         this.appIoTemplate.markdownUpgradeAppIoENMessage = fetchMessage("markdown_upgrade_app_io_message_EN.md");
-        this.appIoTemplate.markdownActivationAppIoMessage = fetchMessage("markdown_activation_app_io_message.md");
+        this.appIoTemplate.markdownActivationAppIoAnalogMessage = fetchMessage("markdown_activation_app_io_analog_message.md");
+        this.appIoTemplate.markdownActivationAppIoDigitalMessage = fetchMessage("markdown_activation_app_io_digital_message.md");
         this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");
         this.appIoTemplate.subjectCourtesyAppIoMessage = fetchMessage("subject_courtesy_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerAfterDateAppIoMessage = fetchMessage("markdown_disclaimer_after_date_app_io_message.md");
