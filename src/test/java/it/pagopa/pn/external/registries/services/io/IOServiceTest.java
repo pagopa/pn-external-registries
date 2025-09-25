@@ -355,7 +355,7 @@ class IOServiceTest {
     }
 
     @Test
-    void sendIOActivationMessageSuccess() {
+    void sendIOActivationAnalogMessageSuccess() {
         //Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( false )
@@ -364,10 +364,11 @@ class IOServiceTest {
                 .id( "createdMessageId" );
 
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
-                .recipientTaxID( "recipientTaxId" );
+                .recipientTaxID( "recipientTaxId" )
+                .deliveryMode(SendMessageRequestDto.DeliveryModeEnum.ANALOG);
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.EPOCH);
@@ -388,13 +389,85 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_OPTIN, responseDto.getResult());
+    }
 
+    @Test
+    void sendIOActivationAnalogMessageSuccess_withNullDeliveryModeValue() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
 
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" )
+                .deliveryMode(null);
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
+        ioMessagesEntity.setLastModified(Instant.EPOCH);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlCittadini() ).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioMessagesDao.get(Mockito.anyString())).thenReturn( Mono.just(ioMessagesEntity) );
+        Mockito.when( ioMessagesDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_OPTIN, responseDto.getResult());
+    }
+
+    @Test
+    void sendIOActivationDigitalMessageSuccess() {
+        //Given
+        LimitedProfile limitedProfile = new LimitedProfile()
+                .senderAllowed( false )
+                .preferredLanguages(Collections.singletonList( "IT-It" ));
+        CreatedMessage createdMessage = new CreatedMessage()
+                .id( "createdMessageId" );
+
+        SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
+                .recipientTaxID( "recipientTaxId" )
+                .deliveryMode(SendMessageRequestDto.DeliveryModeEnum.DIGITAL);
+
+        PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoDigitalMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+
+        IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
+        ioMessagesEntity.setLastModified(Instant.EPOCH);
+
+        //When
+        Mockito.when( cfg.isEnableIoActivationMessage() ).thenReturn( true );
+        Mockito.when( cfg.getAppIoTemplate() ).thenReturn( appIoTemplate );
+        Mockito.when( cfg.getPiattaformanotificheurlCittadini() ).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when( cfg.getPiattaformanotificheurlTos() ).thenReturn( "https://fakeurl.it/tos" );
+        Mockito.when( cfg.getPiattaformanotificheurlPrivacy() ).thenReturn( "https://fakeurl.it/privacy" );
+        Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
+        Mockito.when( ioOptinClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
+        Mockito.when( ioMessagesDao.get(Mockito.anyString())).thenReturn( Mono.just(ioMessagesEntity) );
+        Mockito.when( ioMessagesDao.save(Mockito.any())).thenReturn( Mono.empty() );
+
+        SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_OPTIN, responseDto.getResult());
     }
 
 
     @Test
-    void sendIOActivationMessageNotSent() {
+    void sendIOActivationAnalogMessageNotSent() {
         //Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( false )
@@ -406,7 +479,7 @@ class IOServiceTest {
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
@@ -427,17 +500,12 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_ALREADY_SENT, responseDto.getResult());
-
-
     }
 
 
     @Test
-    void sendIOActivationMessageAppioNotActive() {
+    void sendIOActivationAnalogMessageAppioNotActive() {
         //Given
-        LimitedProfile limitedProfile = new LimitedProfile()
-                .senderAllowed( false )
-                .preferredLanguages(Collections.singletonList( "IT-It" ));
         CreatedMessage createdMessage = new CreatedMessage()
                 .id( "createdMessageId" );
 
@@ -445,7 +513,7 @@ class IOServiceTest {
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
@@ -466,17 +534,12 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_APPIO_UNAVAILABLE, responseDto.getResult());
-
-
     }
 
 
     @Test
-    void sendIOActivationMessageAppioError() {
+    void sendIOActivationAnalogMessageAppioError() {
         //Given
-        LimitedProfile limitedProfile = new LimitedProfile()
-                .senderAllowed( false )
-                .preferredLanguages(Collections.singletonList( "IT-It" ));
         CreatedMessage createdMessage = new CreatedMessage()
                 .id( "createdMessageId" );
 
@@ -484,7 +547,7 @@ class IOServiceTest {
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
@@ -505,19 +568,15 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.ERROR_USER_STATUS, responseDto.getResult());
-
-
     }
 
 
     @Test
-    void sendIOActivationMessageMessageError() {
+    void sendIOActivationAnalogMessageMessageError() {
         //Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( true )
                 .preferredLanguages(Collections.singletonList( "IT-It" ));
-        CreatedMessage createdMessage = new CreatedMessage()
-                .id( "createdMessageId" );
 
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
                 .subject("subject 123 123 123 123 123")
@@ -525,7 +584,7 @@ class IOServiceTest {
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.EPOCH);
@@ -547,25 +606,21 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.ERROR_COURTESY, responseDto.getResult());
-
-
     }
 
     @Test
-    void sendIOActivationMessageMessageDisabled() {
+    void sendIOActivationAnalogMessageMessageDisabled() {
         //Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( true )
                 .preferredLanguages(Collections.singletonList( "IT-It" ));
-        CreatedMessage createdMessage = new CreatedMessage()
-                .id( "createdMessageId" );
 
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
                 .subject("subject 123 123 123 123 123")
                 .recipientTaxID( "recipientTaxId" );
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.EPOCH);
@@ -586,25 +641,22 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_COURTESY_DISABLED_BY_CONF, responseDto.getResult());
-
-
     }
 
 
     @Test
-    void sendIOActivationMessageMessageActivationError() {
+    void sendIOActivationAnalogMessageMessageActivationError() {
         //Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( false )
                 .preferredLanguages(Collections.singletonList( "IT-It" ));
-        CreatedMessage createdMessage = new CreatedMessage()
-                .id( "createdMessageId" );
 
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
-                .recipientTaxID( "recipientTaxId" );
+                .recipientTaxID( "recipientTaxId" )
+                .deliveryMode(SendMessageRequestDto.DeliveryModeEnum.ANALOG);
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.EPOCH);
@@ -626,25 +678,22 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.ERROR_OPTIN, responseDto.getResult());
-
-
     }
 
 
     @Test
-    void sendIOActivationMessageMessageActivationDisabled() {
+    void sendIOActivationAnalogMessageMessageActivationDisabled() {
         //Given
         LimitedProfile limitedProfile = new LimitedProfile()
                 .senderAllowed( false )
                 .preferredLanguages(Collections.singletonList( "IT-It" ));
-        CreatedMessage createdMessage = new CreatedMessage()
-                .id( "createdMessageId" );
 
         SendMessageRequestDto messageRequestDto = new SendMessageRequestDto()
-                .recipientTaxID( "recipientTaxId" );
+                .recipientTaxID( "recipientTaxId" )
+                .deliveryMode(SendMessageRequestDto.DeliveryModeEnum.ANALOG);
 
         PnExternalRegistriesConfig.AppIoTemplate appIoTemplate = Mockito.mock(PnExternalRegistriesConfig.AppIoTemplate.class);
-        Mockito.when(appIoTemplate.getMarkdownActivationAppIoMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
+        Mockito.when(appIoTemplate.getMarkdownActivationAppIoAnalogMessage()).thenReturn("ciao, attiva piattaforma notifiche ${piattaformaNotificheURLTOS} ${piattaformaNotificheURLPrivacy}");
 
         IOMessagesEntity ioMessagesEntity = new IOMessagesEntity("123");
         ioMessagesEntity.setLastModified(Instant.EPOCH);
@@ -665,8 +714,6 @@ class IOServiceTest {
         //Then
         Assertions.assertNotNull( responseDto );
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_DISABLED_BY_CONF, responseDto.getResult());
-
-
     }
 
     @Test
