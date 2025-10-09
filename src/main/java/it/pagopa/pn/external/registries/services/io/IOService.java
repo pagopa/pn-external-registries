@@ -40,6 +40,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_SCHEDULING_ANALOG_DATE_NOT_FOUND;
 import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
@@ -214,7 +215,7 @@ public class IOService {
             log.info( "Proceeding with send activation message taxId={}", LogUtils.maskTaxId(sendMessageRequestDto.getRecipientTaxID()));
 
             MessageContent content = new MessageContent();
-            content.setMarkdown( composeFinalMarkdown(cfg.getAppIoTemplate().getMarkdownActivationAppIoMessage() ));
+            setContentFromDeliveryMode(sendMessageRequestDto, content);
             content.setSubject(cfg.getAppIoTemplate().getSubjectActivationAppIoMessage());
 
             NewMessage m = new NewMessage();
@@ -240,6 +241,17 @@ public class IOService {
             SendMessageResponseDto res = new SendMessageResponseDto();
             res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_DISABLED_BY_CONF);
             return Mono.just(res);
+        }
+    }
+
+    private void setContentFromDeliveryMode(SendMessageRequestDto sendMessageRequestDto, MessageContent content) {
+        //Per garantire la retrocompatibilità, se il valore di deliveryMode è null, il template da generare dovrà essere quello ANALOGICO.
+        if (Objects.isNull(sendMessageRequestDto.getDeliveryMode()) || sendMessageRequestDto.getDeliveryMode().equals(SendMessageRequestDto.DeliveryModeEnum.ANALOG)) {
+            log.info("Setting content for IO optIn message using ANALOG template");
+            content.setMarkdown(composeFinalMarkdown(cfg.getAppIoTemplate().getMarkdownActivationAppIoAnalogMessage()));
+        } else {
+            log.info("Setting content for IO optIn message using DIGITAL template");
+            content.setMarkdown(composeFinalMarkdown(cfg.getAppIoTemplate().getMarkdownActivationAppIoDigitalMessage()));
         }
     }
 

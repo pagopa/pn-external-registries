@@ -228,6 +228,12 @@ components:
           type: string
           format: date-time
           example: '2022-06-16T00:00:00.000Z'
+        deliveryMode:
+          type: string
+          description: Modalità di consegna della notifica
+          enum:
+            - DIGITAL
+            - ANALOG
     SendMessageResponse:
       title: Send message response
       description: Send message response information
