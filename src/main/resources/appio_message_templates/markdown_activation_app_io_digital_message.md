@@ -12,8 +12,8 @@ Ciao,
 
 hai ricevuto una **notifica SEND**, cioè una comunicazione a valore legale emessa da un’amministrazione.
 
-Per leggere la notifica in app, **attiva il servizio SEND entro 5 giorni**: eviterai una raccomandata e i relativi costi.
+Hai il domicilio digitale attivo: non riceverai avvisi cartacei e questa notifica risulterà legalmente consegnata a te dopo 7 giorni dalla ricezione su SEND.
 
-Se attivi il servizio dopo, dovrai consultare questa comunicazione tramite altri canali, ma riceverai in app le notifiche SEND future.
+Per leggere e gestire direttamente in app le notifiche SEND, **attiva SEND su IO**. 
 
 Premendo “Attiva per leggere la notifica” accetti i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})** e confermi di avere letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})**.
