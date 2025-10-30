@@ -19,7 +19,9 @@ import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.ONE_TRUST;
 @CustomLog
 public class OneTrustClient extends CommonBaseClient {
 
-    protected static final String PRIVACY_NOTICES_URL = "/api/privacynotice/v2/privacynotices/{privacyNoticeId}";
+    //protected static final String PRIVACY_NOTICES_URL = "/api/privacynotice/v2/privacynotices/{privacyNoticeId}";
+
+    protected static final String PRIVACY_NOTICES_URL = "/api/enterprise-policy/v1/privacynotices/{privacyNoticeId}/published-version";
 
     private WebClient webClient;
 
@@ -48,7 +50,7 @@ public class OneTrustClient extends CommonBaseClient {
      * @param privacyNoticeId identificativo del PrivacyNotice attivo da ricercare
      * @return il Privacy Notice se trovato, altrimenti One Trust restituisce 500
      */
-    public Mono<PrivacyNoticeOneTrustResponse> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {
+    public Mono<PrivacyNoticeOneTrustResult> getPrivacyNoticeVersionByPrivacyNoticeId(String privacyNoticeId) {
         log.logInvokingExternalDownstreamService(ONE_TRUST, "getPrivacyNoticeVersionByPrivacyNoticeId");
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -56,8 +58,9 @@ public class OneTrustClient extends CommonBaseClient {
                         .queryParam("date", LocalDate.now().plusDays(1)) //yyyy.MM.dd
                         .build(privacyNoticeId))
                 .retrieve()
-                .bodyToMono(PrivacyNoticeOneTrustResponse.class)
+                .bodyToMono(PrivacyNoticeOneTrustResponseInt.class)
                 .doOnSuccess(response -> log.info("Response from OneTrust: {}", response))
+                .map(this::mapToPrivacyNoticeResult)
                 .doOnError(throwable -> {
                     log.logInvokationResultDownstreamFailed(ONE_TRUST, elabExceptionMessage(throwable));
                     log.error(String.format("Error from OnTrust with privacyNoticeId: %s", privacyNoticeId), throwable);
@@ -74,6 +77,28 @@ public class OneTrustClient extends CommonBaseClient {
     @Override
     public void setReadTimeoutMillis(@Value("${pn.external-registry.onetrust-read-timeout-millis}") int readTimeoutMillis) {
         super.setReadTimeoutMillis(readTimeoutMillis);
+    }
+
+    private PrivacyNoticeOneTrustResult mapToPrivacyNoticeResult(PrivacyNoticeOneTrustResponseInt response){
+        //Null Check
+        // response.versions().get(0);
+        //response.orgGroup()
+        //response.approvers().get(0)
+
+        return new PrivacyNoticeOneTrustResult(
+                response.versions().get(0).createdDate(),
+                response.guid(),
+                response.versions().get(0).publishedDate(),
+                response.orgGroup().id(),
+                response.approvers().get(0).id(),
+                new PrivacyNoticeOneTrustResult.Version(
+                        response.versions().get(0).id(),
+                        response.name(),
+                        response.versions().get(0).publishedDate(),
+                        response.versions().get(0).versionStatus(),
+                        response.versions().get(0).majorVersion()
+                )
+        );
     }
 
 }

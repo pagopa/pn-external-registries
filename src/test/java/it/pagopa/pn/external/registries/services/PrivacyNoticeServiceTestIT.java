@@ -6,7 +6,7 @@ import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.exceptions.PnPrivacyNoticeNotFound;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PrivacyNoticeVersionResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.onetrust.OneTrustClient;
-import it.pagopa.pn.external.registries.middleware.msclient.onetrust.PrivacyNoticeOneTrustResponse;
+import it.pagopa.pn.external.registries.middleware.msclient.onetrust.PrivacyNoticeOneTrustResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ class PrivacyNoticeServiceTestIT {
         assertThat(privacyNoticeService.getPrivacyNoticeCache()).isEmpty();
 
         Mockito.when(oneTrustClient.getPrivacyNoticeVersionByPrivacyNoticeId("z0da531e-8370-4373-8bd2-61ddc89e7fa6"))
-                .thenReturn(Mono.just(objectMapper.readValue(oneTrustResponse(), PrivacyNoticeOneTrustResponse.class)));
+                .thenReturn(Mono.just(objectMapper.readValue(oneTrustResponse(), PrivacyNoticeOneTrustResult.class)));
 
         var expectedResponse = new PrivacyNoticeVersionResponseDto().version(1); //recuperato da one trust
 

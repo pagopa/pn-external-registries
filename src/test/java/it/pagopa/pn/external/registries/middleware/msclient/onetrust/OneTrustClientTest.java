@@ -57,16 +57,16 @@ class OneTrustClientTest extends MockAWSObjectsTestConfig {
         new MockServerClient("localhost", 9999)
                 .when(request()
                         .withMethod("GET")
-                        .withPath(PRIVACY_NOTICES_URL.replace("{privacyNoticeId}", "q0da531e-8370-4373-8bd2-61ddc89e7fa6"))
+                        .withPath(PRIVACY_NOTICES_URL.replace("{privacyNoticeId}", "374715bb-ce74-4e4e-bf85-4595bc485870"))
                         .withQueryStringParameter("date", LocalDate.now().plusDays(1).toString())
                         .withHeader(HttpHeaders.AUTHORIZATION, "Bearer " + "token-12345"))
                 .respond(response()
-                        .withBody(oneTrustResponse())
+                        .withBody(oneTrustResponseInt())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
 
-        var expectedResponse = new ObjectMapper().readValue(oneTrustResponse(), PrivacyNoticeOneTrustResponse.class);
-        Mono<PrivacyNoticeOneTrustResponse> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("q0da531e-8370-4373-8bd2-61ddc89e7fa6");
+        var expectedResponse = new ObjectMapper().readValue(oneTrustResult(), PrivacyNoticeOneTrustResult.class);
+        Mono<PrivacyNoticeOneTrustResult> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("374715bb-ce74-4e4e-bf85-4595bc485870");
 
         StepVerifier.create(actualResponse)
                 .expectNext(expectedResponse)
@@ -88,7 +88,7 @@ class OneTrustClientTest extends MockAWSObjectsTestConfig {
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withStatusCode(500));
 
-        Mono<PrivacyNoticeOneTrustResponse> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("z0da531e-8370-4373-8bd2-61ddc89e7fa6");
+        Mono<PrivacyNoticeOneTrustResult> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("z0da531e-8370-4373-8bd2-61ddc89e7fa6");
         StepVerifier.create(actualResponse)
                 .expectError(WebClientResponseException.InternalServerError.class)
                 .verify();
@@ -109,11 +109,11 @@ class OneTrustClientTest extends MockAWSObjectsTestConfig {
                         .withHeader(HttpHeaders.AUTHORIZATION, "Bearer " + "token-12345"))
                 .respond(response()
                         .withDelay(Delay.delay(TimeUnit.SECONDS, 5))
-                        .withBody(oneTrustResponse())
+                        .withBody(oneTrustResponseInt())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withStatusCode(200));
 
-        Mono<PrivacyNoticeOneTrustResponse> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("read-timeout");
+        Mono<PrivacyNoticeOneTrustResult> actualResponse = client.getPrivacyNoticeVersionByPrivacyNoticeId("read-timeout");
         StepVerifier.create(actualResponse)
                 .expectErrorMatches(throwable ->
                     throwable instanceof WebClientRequestException wex
@@ -124,22 +124,97 @@ class OneTrustClientTest extends MockAWSObjectsTestConfig {
     }
 
 
-    private String oneTrustResponse() {
+    private String oneTrustResult() {
         return """
                 {
-                     "id": "z0da531e-8370-4373-8bd2-61ddc89e7fa6",
-                     "createdDate": "2022-11-09T00:11:30.77",
+                     "id": "P0da531e-8370-4373-8bd2-61ddc89e7fa8",
+                     "createdDate": "2022-11-09T00:11:30.77Z",
                      "lastPublishedDate": "2022-11-15T07:23:18.347",
-                     "organizationId": "018cc1ca-2130-4edf-a1d6-f745a2e4fe19",
-                     "responsibleUserId": null,
+                     "organizationId": "d18cc1ca-2130-4edf-a1d6-f745a2e4fe12",
+                     "responsibleUserId": "018cc1ca-2130-4edf-a1d6-f745a2e4fe19",
                      "version": {
-                         "id": "374715bb-ce74-4e4e-bf85-4595bc485870",
-                         "name": "Prova - ToS",
+                         "id": "z0da531e-8370-4373-8bd2-61ddc89e7fa6",
+                         "name": "PN - Cittadini - ToS",
                          "publishedDate": "2022-11-15T07:23:18.347",
-                         "status": "ACTIVE",
-                         "version": 1
+                         "status": "PUBLISHED",
+                         "version": 9
                      }
-                 }
+                }
+                """;
+    }
+
+    private String oneTrustResponseInt() {
+        return """
+                {
+                  "versions": [
+                    {
+                      "id": "z0da531e-8370-4373-8bd2-61ddc89e7fa6",
+                      "attachmentId": null,
+                      "descriptionOfChanges": "update",
+                      "publishedDate": "2022-11-15T07:23:18.347",
+                      "createdDate": "2022-11-09T00:11:30.77Z",
+                      "versionStatus": "PUBLISHED",
+                      "policyContentType": "ONETRUST",
+                      "sections": [
+                        {
+                          "name": "Introduzione",
+                          "description": "",
+                          "content": "Test",
+                          "sectionType": "PLAIN",
+                          "order": 1
+                        },
+                        {
+                          "name": "1. Descrizione del servizio",
+                          "description": "",
+                          "content": "Test",
+                          "sectionType": "PLAIN",
+                          "order": 2
+                        },
+                        {
+                          "name": "2. Identificazione e accesso alla Piattaforma",
+                          "description": "",
+                          "content": "Test",
+                          "sectionType": "PLAIN",
+                          "order": 3
+                        },
+                        {
+                          "name": "3. Delega per l’accesso",
+                          "description": "",
+                          "content": "Test",
+                          "sectionType": "PLAIN",
+                          "order": 4
+                        }
+                      ],
+                      "majorVersion": 9,
+                      "minorVersion": 0
+                    }
+                  ],
+                  "guid": "P0da531e-8370-4373-8bd2-61ddc89e7fa8",
+                  "name": "PN - Cittadini - ToS",
+                  "description": "Termini di utilizzo del Portale Cittadini di Piattaforma Notifiche",
+                  "orgGroup": {
+                    "id": "d18cc1ca-2130-4edf-a1d6-f745a2e4fe12",
+                    "name": "PagoPA S.p.A."
+                  },
+                  "owners": [
+                    {
+                      "id": "019cc1ca-2130-5edf-a1d6-f745a2e4fe19",
+                      "name": "Mario Rossi",
+                      "email": "mario.rossi@email.it"
+                    }
+                  ],
+                  "approvers": [
+                    {
+                      "id": "018cc1ca-2130-4edf-a1d6-f745a2e4fe19",
+                      "name": "Mario Rossi",
+                      "email": "mario.rossi@email.it"
+                    }
+                  ],
+                  "effectiveDate": null,
+                  "expirationDate": null,
+                  "id": 24,
+                  "defaultLanguageCode": "it"
+                }
                 """;
     }
 
