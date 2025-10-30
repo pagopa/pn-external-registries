@@ -1,5 +1,6 @@
 package it.pagopa.pn.external.registries.middleware.msclient.onetrust;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import lombok.CustomLog;
@@ -12,8 +13,10 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.ONE_TRUST;
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PRIVACYNOTICE_MAPPING_ERROR;
 
 @Component
 @CustomLog
@@ -80,10 +83,15 @@ public class OneTrustClient extends CommonBaseClient {
     }
 
     private PrivacyNoticeOneTrustResult mapToPrivacyNoticeResult(PrivacyNoticeOneTrustResponseInt response){
-        //Null Check
-        // response.versions().get(0);
-        //response.orgGroup()
-        //response.approvers().get(0)
+        log.debug("Start mapToPrivacyNoticeResult");
+
+        if(Objects.isNull(response.versions()) ||Objects.isNull(response.versions().get(0)) ||
+                Objects.isNull(response.orgGroup()) || Objects.isNull(response.approvers()) || Objects.isNull(response.approvers().get(0))){
+
+            String message = String.format("Error mapping privacyNoticeResponse whit body %s", response);
+            log.error(message);
+            throw new PnInternalException(message, ERROR_CODE_EXTERNALREGISTRIES_PRIVACYNOTICE_MAPPING_ERROR);
+        }
 
         return new PrivacyNoticeOneTrustResult(
                 response.versions().get(0).createdDate(),
