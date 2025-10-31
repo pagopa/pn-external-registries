@@ -327,7 +327,7 @@ Parameters:
     Description: memory amount reserved to the task pod.
     AllowedValues: [ 2GB, 4GB, 6GB, 8GB ]
 
-  # Autoscaling parameters
+  # Autoscaling parameters for external-reg ms
   AutoscalingCheckPeriod:
     Default: 60
     Type: Number
@@ -353,6 +353,22 @@ Parameters:
     Description: minimum autoscaling number of tasks
 
   MaxTasksNumber:
+    Default: 6
+    Type: Number
+    Description: maximum autoscaling number of tasks
+
+
+  # Autoscaling parameters for external-registries-checkout ms
+  AutoscalingThresholdCheckout:
+    Default: 70
+    Type: String
+
+  MinTasksNumberCheckout:
+    Default: 1
+    Type: Number
+    Description: minimum autoscaling number of tasks
+
+  MaxTasksNumberCheckout:
     Default: 6
     Type: Number
     Description: maximum autoscaling number of tasks
@@ -440,10 +456,10 @@ Resources:
         HealthyThresholdCount: !Ref HealthyThresholdCount
         UnhealthyThresholdCount: !Ref UnhealthyThresholdCount
         AutoscalingStrategy: REST-API
-        AutoscalingThreshold: !Ref AutoscalingThreshold
+        AutoscalingThreshold: !Ref AutoscalingThresholdCheckout
         AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
-        MinTasksNumber: !Ref MinTasksNumber
-        MaxTasksNumber: !Ref MaxTasksNumber
+        MinTasksNumber: !Ref MinTasksNumberCheckout
+        MaxTasksNumber: !Ref MaxTasksNumberCheckout
         EfsFilesystem: !Ref FargateEFSFileSystemID
         MountEfs: !Ref MountEfs
         WireTapLogActivation: !Ref WireTapLogActivation
