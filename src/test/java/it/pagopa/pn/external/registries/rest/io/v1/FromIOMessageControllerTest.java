@@ -38,7 +38,6 @@ class FromIOMessageControllerTest {
 
         //When
         PreconditionContentDto response = new PreconditionContentDto()
-                .messageCode(POST_ANALOG_MESSAGE_CODE)
                 .title(POST_ANALOG_TITLE)
                 .markdown("markdown");
 
@@ -62,7 +61,6 @@ class FromIOMessageControllerTest {
 
         //When
         PreconditionContentDto response = new PreconditionContentDto()
-                .messageCode(POST_ANALOG_MESSAGE_CODE)
                 .title(POST_ANALOG_TITLE)
                 .markdown("markdown");
 

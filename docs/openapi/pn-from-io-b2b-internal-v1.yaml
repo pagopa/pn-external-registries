@@ -64,31 +64,6 @@ components:
       type: object
       additionalProperties: false
       properties:
-        messageCode:
-          example: BOTTOM_PRE_ANALOG_WORKFLOW
-          description: |
-            Il codice di uno dei messaggi censiti dal servizio, per pn: 
-
-            - __BOTTOM_PRE_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
-              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
-              risulterà legalmente recapitata a te. Se apri il messaggio entro il {{data}} alle 
-              {{ora}}, eviterai di ricevere  la raccomandata, i cui eventuali costi saranno 
-              calcolati in fase di pagamento."
-
-            - __BOTTOM_POST_ANALOG_WORKFLOW__: mostrare come title "Questo messaggio contiene una 
-              comunicazione a valore legale" e come messaggio "Premendo “Continua”, la notifica 
-              risulterà legalmente recapitata a te, a meno che tu non abbia ricevuto la raccomandata 
-              cartacea da più di 10 giorni."
-          type: string
-        messageParams:
-          description: |
-            Coppie chiave valore degli elementi da sostituire nei template del messaggio. Per PN
-            sarà presente al più cinque campi: data, con formattazione DD-MM-YYYY (in UTC), ora con formattazione hh:mm,
-            iun, senderDenomination e subject (oggetto della notifica)
-          example: { "data": "28-04-2023", "ora": "08:41", "iun": "aIun", "senderDenomination": "Comune di Milano", "subject": "Oggetto notifica" }
-          type: object
-          additionalProperties:
-            type: string
         title:
           type: string
           description: The title to be rendered in App
@@ -103,8 +78,8 @@ components:
             la raccomandata, i cui eventuali costi saranno calcolati in fase di pagamento.
             minlength: 1
       required:
-        - messageCode
-        - messageParams
+        - title
+        - markdown
 
   parameters:
     cxIdAuthFleet:                                                  # NO EXTERNAL

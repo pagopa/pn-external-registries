@@ -37,6 +37,7 @@ public class PnExternalRegistriesConfig {
 
     private String deliveryBaseUrl;
     private String deliveryPushBaseUrl;
+    private String timelineServiceBaseUrl;
 
     private String ioApiKey;
     private String ioactApiKey;
@@ -97,6 +98,8 @@ public class PnExternalRegistriesConfig {
         private String subjectCourtesyAppIoMessage;
         private String markdownDisclaimerAfterDateAppIoMessage;
         private String markdownDisclaimerBeforeDateAppIoMessage;
+        private String markdownDisclaimerDigitalAppIoMessage;
+        private String markdownDisclaimerAfterRefinementAppIoMessage;
 
     }
 
@@ -116,6 +119,8 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate.subjectCourtesyAppIoMessage = fetchMessage("subject_courtesy_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerAfterDateAppIoMessage = fetchMessage("markdown_disclaimer_after_date_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerBeforeDateAppIoMessage = fetchMessage("markdown_disclaimer_before_date_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerDigitalAppIoMessage = fetchMessage("markdown_disclaimer_digital_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerAfterRefinementAppIoMessage = fetchMessage("markdown_disclaimer_after_refinement_app_io_message.md");
     }
 
     private String fetchMessage(String filename){
