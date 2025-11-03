@@ -25,7 +25,7 @@ public class DeliveryClient extends CommonBaseClient {
 
         return pnDeliveryApi.getSentNotificationPrivate(iun)
                 .doOnError(throwable -> {
-                    log.logInvokationResultDownstreamFailed(PN_DELIVERY, "Sent notification not found for iun: " + iun);
+                    log.logInvokationResultDownstreamFailed(PN_DELIVERY, String.format("Sent notification not found for iun: %s. Exception: %s - %s", iun, throwable.getClass().getSimpleName(), throwable.getMessage()));
                 })
                 .onErrorMap(WebClientResponseException.class, error -> {
                     if (error.getStatusCode().equals(HttpStatus.NOT_FOUND)) {

@@ -760,19 +760,16 @@ class IOServiceTest {
         pnConfig.init();
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenAnswer(invocation -> {
-                    PreconditionContentInt dto = PreconditionContentInt.builder()
-                            .messageParams(Map.of(
-                                    "iun", iun,
-                                    "senderDenomination", senderDenomination,
-                                    "subject", subject
-                            ))
-                            .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
-                            .title("Questo messaggio contiene una comunicazione a valore legale")
-                            .messageCode(PRE_ANALOG_MESSAGE_CODE)
-                            .build();
-                    return dto;
-                });
+                .thenAnswer(invocation -> PreconditionContentInt.builder()
+                                .messageParams(Map.of(
+                                        "iun", iun,
+                                        "senderDenomination", senderDenomination,
+                                        "subject", subject
+                                ))
+                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
+                                .title("Questo messaggio contiene una comunicazione a valore legale")
+                                .messageCode(PRE_ANALOG_MESSAGE_CODE)
+                                .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
                 .messageParams(Map.of(
@@ -810,19 +807,16 @@ class IOServiceTest {
         pnConfig.init();
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenAnswer(invocation -> {
-                    PreconditionContentInt dto = PreconditionContentInt.builder()
-                            .messageParams(Map.of(
-                                    "iun", iun,
-                                    "senderDenomination", senderDenomination,
-                                    "subject", subject
-                            ))
-                            .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
-                            .title("Questo messaggio contiene una comunicazione a valore legale")
-                            .messageCode(POST_ANALOG_MESSAGE_CODE)
-                            .build();
-                    return dto;
-                });
+                .thenAnswer(invocation -> PreconditionContentInt.builder()
+                                .messageParams(Map.of(
+                                        "iun", iun,
+                                        "senderDenomination", senderDenomination,
+                                        "subject", subject
+                                ))
+                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                                .title("Questo messaggio contiene una comunicazione a valore legale")
+                                .messageCode(POST_ANALOG_MESSAGE_CODE)
+                                .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
                 .messageParams(Map.of(
@@ -859,19 +853,16 @@ class IOServiceTest {
         pnConfig.init();
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenAnswer(invocation -> {
-                    PreconditionContentInt dto = PreconditionContentInt.builder()
-                            .messageParams(Map.of(
-                                    "iun", iun,
-                                    "senderDenomination", senderDenomination,
-                                    "subject", subject
-                            ))
-                            .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage())
-                            .title("Questo messaggio contiene una comunicazione a valore legale")
-                            .messageCode(DIGITAL_MESSAGE_CODE)
-                            .build();
-                    return dto;
-                });
+                .thenAnswer(invocation -> PreconditionContentInt.builder()
+                                .messageParams(Map.of(
+                                        "iun", iun,
+                                        "senderDenomination", senderDenomination,
+                                        "subject", subject
+                                ))
+                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage())
+                                .title("Questo messaggio contiene una comunicazione a valore legale")
+                                .messageCode(DIGITAL_MESSAGE_CODE)
+                                .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
                 .messageParams(Map.of(
@@ -909,19 +900,16 @@ class IOServiceTest {
         pnConfig.init();
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenAnswer(invocation -> {
-                    PreconditionContentInt dto = PreconditionContentInt.builder()
-                            .messageParams(Map.of(
-                                    "iun", iun,
-                                    "senderDenomination", senderDenomination,
-                                    "subject", subject
-                            ))
-                            .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterRefinementAppIoMessage())
-                            .title("Questo messaggio contiene una comunicazione a valore legale")
-                            .messageCode(REFINED_MESSAGE_CODE)
-                            .build();
-                    return dto;
-                });
+                .thenAnswer(invocation -> PreconditionContentInt.builder()
+                        .messageParams(Map.of(
+                                "iun", iun,
+                                "senderDenomination", senderDenomination,
+                                "subject", subject
+                        ))
+                        .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterRefinementAppIoMessage())
+                        .title("Questo messaggio contiene una comunicazione a valore legale")
+                        .messageCode(REFINED_MESSAGE_CODE)
+                        .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
                 .messageParams(Map.of(

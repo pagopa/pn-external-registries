@@ -13,7 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import static it.pagopa.pn.external.registries.util.AppIOUtils.POST_ANALOG_MESSAGE_CODE;
 import static it.pagopa.pn.external.registries.util.AppIOUtils.POST_ANALOG_TITLE;
 
 @WebFluxTest(controllers = {FromIOMessageController.class})

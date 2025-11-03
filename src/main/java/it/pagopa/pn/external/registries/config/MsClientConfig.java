@@ -137,7 +137,7 @@ public class MsClientConfig {
     }
 
     @Configuration
-    static class deliveryClient extends CommonBaseClient {
+    static class DeliveryClient extends CommonBaseClient {
         @Bean
         InternalOnlyApi deliveryApi(PnExternalRegistriesConfig config) {
             var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.delivery_reactive.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder()));
@@ -147,7 +147,7 @@ public class MsClientConfig {
     }
 
     @Configuration
-    static class timelineServiceClient extends CommonBaseClient {
+    static class TimelineServiceClient extends CommonBaseClient {
         @Bean
         TimelineControllerApi timelineServiceApi(PnExternalRegistriesConfig config) {
             var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder()));
