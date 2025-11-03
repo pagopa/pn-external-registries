@@ -18,13 +18,12 @@ public class AnalogPostSchedulingProcessor implements BottomSheetProcessor {
     @Override
     public PreconditionContentInt process(PreconditionContentInt preconditionContentInt, BottomSheetContext context, PnExternalRegistriesConfig cfg) {
         log.debug("AnalogPostSchedulingProcessor process start for iun: {}", context.getIun());
-        preconditionContentInt.setMessageCode(POST_ANALOG_MESSAGE_CODE);
         preconditionContentInt.setTitle(POST_ANALOG_TITLE);
 
         preconditionContentInt.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
-                .replace(IUN_PLACEHOLDER, preconditionContentInt.getMessageParams().get(IUN_PARAM))
-                .replace(SENDER_DENOMINATION_PLACEHOLDER, preconditionContentInt.getMessageParams().get(SENDER_DENOMINATION_PARAM))
-                .replace(SUBJECT_PLACEHOLDER, preconditionContentInt.getMessageParams().get(SUBJECT_PARAM)));
+                .replace(IUN_PLACEHOLDER, context.getIun())
+                .replace(SENDER_DENOMINATION_PLACEHOLDER, context.getSenderDenomination())
+                .replace(SUBJECT_PLACEHOLDER, context.getSubject()));
         return preconditionContentInt;
     }
 }

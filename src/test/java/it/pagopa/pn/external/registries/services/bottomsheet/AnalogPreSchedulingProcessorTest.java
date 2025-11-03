@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,27 +15,23 @@ import static org.mockito.Mockito.when;
 class AnalogPreSchedulingProcessorTest {
 
     private AnalogPreSchedulingProcessor processor;
-    private BottomSheetContext context;
 
     @BeforeEach
     void setUp() {
         processor = new AnalogPreSchedulingProcessor();
-        context = mock(BottomSheetContext.class);
     }
 
     @Test
     void process_shouldSetFieldsCorrectly() {
-        Map<String, String> params = new HashMap<>();
-        params.put(IUN_PARAM, "iunTest");
-        params.put(SENDER_DENOMINATION_PARAM, "senderTest");
-        params.put(SUBJECT_PARAM, "subjectTest");
-
-        PreconditionContentInt dto = PreconditionContentInt.builder()
-                .messageParams(params)
-                .build();
+        PreconditionContentInt dto = new PreconditionContentInt();
 
         Instant schedulingDate = Instant.parse("2024-06-01T10:15:30.00Z");
-        when(context.getSchedulingAnalogDate()).thenReturn(schedulingDate);
+        BottomSheetContext context = BottomSheetContext.builder()
+                .iun("iunTest")
+                .senderDenomination("senderTest")
+                .subject("subjectTest")
+                .schedulingAnalogDate(schedulingDate)
+                .build();
 
         PnExternalRegistriesConfig cfg = mock(PnExternalRegistriesConfig.class);
         PnExternalRegistriesConfig.AppIoTemplate template = mock(PnExternalRegistriesConfig.AppIoTemplate.class);
@@ -48,7 +42,6 @@ class AnalogPreSchedulingProcessorTest {
 
         PreconditionContentInt result = processor.process(dto, context, cfg);
 
-        assertEquals(PRE_ANALOG_MESSAGE_CODE, result.getMessageCode());
         assertEquals(PRE_ANALOG_TITLE, result.getTitle());
 
         // Check markdown contains replaced values

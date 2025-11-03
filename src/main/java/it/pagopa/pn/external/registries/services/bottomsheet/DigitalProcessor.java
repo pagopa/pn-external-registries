@@ -18,13 +18,12 @@ public class DigitalProcessor implements BottomSheetProcessor{
     @Override
     public PreconditionContentInt process(PreconditionContentInt preconditionContentInt, BottomSheetContext context, PnExternalRegistriesConfig cfg) {
         log.debug("DigitalProcessor process start for iun: {}", context.getIun());
-        preconditionContentInt.setMessageCode(DIGITAL_MESSAGE_CODE);
         preconditionContentInt.setTitle(DIGITAL_TITLE);
 
         preconditionContentInt.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage()
-                .replace(IUN_PLACEHOLDER, preconditionContentInt.getMessageParams().get(IUN_PARAM))
-                .replace(SENDER_DENOMINATION_PLACEHOLDER, preconditionContentInt.getMessageParams().get(SENDER_DENOMINATION_PARAM))
-                .replace(SUBJECT_PLACEHOLDER, preconditionContentInt.getMessageParams().get(SUBJECT_PARAM)));
+                .replace(IUN_PLACEHOLDER, context.getIun())
+                .replace(SENDER_DENOMINATION_PLACEHOLDER, context.getSenderDenomination())
+                .replace(SUBJECT_PLACEHOLDER, context.getSubject()));
         return preconditionContentInt;
     }
 }

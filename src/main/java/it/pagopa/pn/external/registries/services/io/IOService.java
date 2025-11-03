@@ -44,7 +44,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -360,7 +359,7 @@ public class IOService {
                                                             String subject) {
         log.debug("Mapping to PreconditionContentDto with schedulingAnalogDate={}, iun={}, refinementOrViewDate={}, deliveryMode={}, senderDenomination={}, subject={}",
                 schedulingAnalogDate, iun, refinementOrViewDate, deliveryMode, senderDenomination, subject);
-        var preconditionContentInt = createPreconditionContentInt(iun, senderDenomination, subject);
+        var preconditionContentInt = new PreconditionContentInt();
         BottomSheetContext bottomSheetContext = BottomSheetContext.builder()
                 .schedulingAnalogDate(schedulingAnalogDate)
                 .senderDenomination(senderDenomination)
@@ -381,18 +380,6 @@ public class IOService {
         dto.setTitle(internal.getTitle());
         dto.setMarkdown(internal.getMarkdown());
         return dto;
-    }
-
-    private PreconditionContentInt createPreconditionContentInt(String iun, String senderDenomination, String subject) {
-        var messageParams = new HashMap<String, String>();
-
-        messageParams.put(IUN_PARAM, iun);
-        messageParams.put(SENDER_DENOMINATION_PARAM, senderDenomination);
-        messageParams.put(SUBJECT_PARAM, subject);
-
-        return PreconditionContentInt.builder()
-                .messageParams(messageParams)
-                .build();
     }
 
     private String enrichWithSenderDenomination(String message, String senderDenomination) {

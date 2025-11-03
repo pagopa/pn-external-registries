@@ -47,9 +47,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -761,25 +759,13 @@ class IOServiceTest {
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> PreconditionContentInt.builder()
-                                .messageParams(Map.of(
-                                        "iun", iun,
-                                        "senderDenomination", senderDenomination,
-                                        "subject", subject
-                                ))
                                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
                                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                                .messageCode(PRE_ANALOG_MESSAGE_CODE)
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .messageParams(Map.of(
-                        "iun", iun,
-                        "senderDenomination", senderDenomination,
-                        "subject", subject
-                ))
                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                .messageCode("BOTTOM_PRE_ANALOG_WORKFLOW")
                 .build();
 
         Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
@@ -808,25 +794,13 @@ class IOServiceTest {
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> PreconditionContentInt.builder()
-                                .messageParams(Map.of(
-                                        "iun", iun,
-                                        "senderDenomination", senderDenomination,
-                                        "subject", subject
-                                ))
                                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
                                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                                .messageCode(POST_ANALOG_MESSAGE_CODE)
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .messageParams(Map.of(
-                        "iun", iun,
-                        "senderDenomination", senderDenomination,
-                        "subject", subject
-                ))
                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                .messageCode("BOTTOM_POST_ANALOG_WORKFLOW")
                 .build();
 
         Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
@@ -854,25 +828,13 @@ class IOServiceTest {
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> PreconditionContentInt.builder()
-                                .messageParams(Map.of(
-                                        "iun", iun,
-                                        "senderDenomination", senderDenomination,
-                                        "subject", subject
-                                ))
                                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage())
                                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                                .messageCode(DIGITAL_MESSAGE_CODE)
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .messageParams(Map.of(
-                        "iun", iun,
-                        "senderDenomination", senderDenomination,
-                        "subject", subject
-                ))
                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage())
                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                .messageCode("BOTTOM_DIGITAL_WORKFLOW")
                 .build();
 
         Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
@@ -901,25 +863,13 @@ class IOServiceTest {
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> PreconditionContentInt.builder()
-                        .messageParams(Map.of(
-                                "iun", iun,
-                                "senderDenomination", senderDenomination,
-                                "subject", subject
-                        ))
                         .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterRefinementAppIoMessage())
                         .title("Questo messaggio contiene una comunicazione a valore legale")
-                        .messageCode(REFINED_MESSAGE_CODE)
                         .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .messageParams(Map.of(
-                        "iun", iun,
-                        "senderDenomination", senderDenomination,
-                        "subject", subject
-                ))
                 .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterRefinementAppIoMessage())
                 .title("Questo messaggio contiene una comunicazione a valore legale")
-                .messageCode("BOTTOM_REFINED_WORKFLOW")
                 .build();
 
         Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
