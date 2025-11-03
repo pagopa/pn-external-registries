@@ -786,8 +786,6 @@ class IOServiceTest {
     void notificationDisclaimerAfterSchedulingAnalogDateAppIOTest() {
         String recipientInternalId = "internalId";
         String iun = "iun";
-        String senderDenomination = "Comune di Milano";
-        String subject = "Oggetto del Messaggio";
 
         PnExternalRegistriesConfig pnConfig = new PnExternalRegistriesConfig();
         pnConfig.init();
@@ -820,8 +818,6 @@ class IOServiceTest {
     void notificationDisclaimerDigitalAppIOTest() {
         String recipientInternalId = "internalId";
         String iun = "iun";
-        String senderDenomination = "Comune di Milano";
-        String subject = "Oggetto del Messaggio";
 
         PnExternalRegistriesConfig pnConfig = new PnExternalRegistriesConfig();
         pnConfig.init();
@@ -855,8 +851,6 @@ class IOServiceTest {
     void notificationDisclaimerAfterRefinementAppIOTest() {
         String recipientInternalId = "internalId";
         String iun = "iun";
-        String senderDenomination = "Comune di Milano";
-        String subject = "Oggetto del Messaggio";
 
         PnExternalRegistriesConfig pnConfig = new PnExternalRegistriesConfig();
         pnConfig.init();
