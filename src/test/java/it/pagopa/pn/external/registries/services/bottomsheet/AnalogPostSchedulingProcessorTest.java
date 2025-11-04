@@ -31,7 +31,7 @@ class AnalogPostSchedulingProcessorTest {
         PnExternalRegistriesConfig cfg = mock(PnExternalRegistriesConfig.class);
         PnExternalRegistriesConfig.AppIoTemplate template = mock(PnExternalRegistriesConfig.AppIoTemplate.class);
         when(cfg.getAppIoTemplate()).thenReturn(template);
-        when(template.getMarkdownDisclaimerAfterDateAppIoMessage())
+        when(template.getMarkdownDisclaimerAfterAnalogDateAppIoMessage())
                 .thenReturn(IUN_PLACEHOLDER + " " + SENDER_DENOMINATION_PLACEHOLDER + " " + SUBJECT_PLACEHOLDER);
 
         PreconditionContentInt result = processor.process(dto, context, cfg);

@@ -7,11 +7,10 @@ import it.pagopa.pn.commons.log.PnAuditLogEventType;
 import it.pagopa.pn.commons.utils.LogUtils;
 import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
-import it.pagopa.pn.external.registries.services.io.dto.PreconditionContentInt;
+import it.pagopa.pn.external.registries.dto.delivery.NotificationInt;
+import it.pagopa.pn.external.registries.dto.delivery.NotificationRecipientInt;
 import it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.NotificationRecipientV24;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.SentNotificationV25;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.MessageContent;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
@@ -19,21 +18,22 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Thi
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
-import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import it.pagopa.pn.external.registries.middleware.msclient.DeliveryPushClient;
-import it.pagopa.pn.external.registries.middleware.msclient.TimelineServiceClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
+import it.pagopa.pn.external.registries.services.NotificationService;
+import it.pagopa.pn.external.registries.services.TimelineService;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetContext;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetProcessorFactory;
 import it.pagopa.pn.external.registries.services.bottomsheet.DeliveryModeInt;
+import it.pagopa.pn.external.registries.services.io.dto.PreconditionContentInt;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -48,7 +48,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_NOTIFICATION_RECIPIENT_ID_NOT_FOUND;
-import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
+import static it.pagopa.pn.external.registries.util.AppIOUtils.SENDER_DENOMINATION_PLACEHOLDER;
+import static it.pagopa.pn.external.registries.util.AppIOUtils.buildPkProbableSchedulingAnalogDate;
 import static java.util.stream.IntStream.range;
 
 @Service
@@ -66,9 +67,9 @@ public class IOService {
     private final IOMessagesDao ioMessagesDao;
 
     private final DeliveryPushClient deliveryPushClient;
-    private final DeliveryClient deliveryClient;
-    private final TimelineServiceClient timelineServiceClient;
     private final BottomSheetProcessorFactory bottomSheetProcessorFactory;
+    private final NotificationService notificationService;
+    private final TimelineService timelineService;
 
 
     public Mono<SendMessageResponseDto> sendIOMessage( Mono<SendMessageRequestDto> sendMessageRequestDtoMono )
@@ -314,12 +315,12 @@ public class IOService {
                 .build();
         logEvent.log();
 
-        return deliveryClient.getSentNotificationPrivate(iun)
+        return notificationService.getSentNotificationPrivate(iun)
                 .flatMap(deliveryResponse -> {
                     Integer recIndex = retrieveRecipientIndexFromInternalId(recipientInternalId, deliveryResponse);
-                    return timelineServiceClient.getDeliveryInformation(iun, recIndex)
+                    return timelineService.getDeliveryInformation(iun, recIndex)
                             .doOnNext(timelineServiceResponse -> {
-                                DeliveryModeInt deliveryMode = DeliveryModeInt.valueOf(timelineServiceResponse.getDeliveryMode().name());
+                                DeliveryModeInt deliveryMode = timelineServiceResponse.getDeliveryMode();
                                 if (deliveryMode == DeliveryModeInt.UNKNOWN) {
                                     throw new PnNotFoundException("Delivery mode is UNKNOWN", "DeliveryModeInt.UNKNOWN for iun " + iun,
                                             PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_DELIVERY_MODE_UNKNOWN
@@ -330,7 +331,7 @@ public class IOService {
                                     timelineServiceResponse.getSchedulingAnalogDate(),
                                     iun,
                                     timelineServiceResponse.getRefinementOrViewedDate(),
-                                    DeliveryModeInt.valueOf(timelineServiceResponse.getDeliveryMode().name()),
+                                    timelineServiceResponse.getDeliveryMode(),
                                     deliveryResponse.getSenderDenomination(),
                                     deliveryResponse.getSubject()));
                 })
@@ -339,8 +340,8 @@ public class IOService {
                 .doOnError( throwable -> logEvent.generateFailure("FAILURE {}", throwable.getMessage()).log() );
     }
 
-    private static Integer retrieveRecipientIndexFromInternalId(String recipientInternalId, SentNotificationV25 sentNotification) {
-        List<NotificationRecipientV24> recipients = sentNotification.getRecipients();
+    private static Integer retrieveRecipientIndexFromInternalId(String recipientInternalId, NotificationInt sentNotification) {
+        List<NotificationRecipientInt> recipients = sentNotification.getRecipients();
         return range(0, recipients.size())
                 .filter(i -> recipientInternalId.equals(recipients.get(i).getInternalId()))
                 .findFirst()

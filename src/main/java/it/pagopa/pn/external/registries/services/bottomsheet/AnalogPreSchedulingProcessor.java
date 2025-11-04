@@ -27,7 +27,7 @@ public class AnalogPreSchedulingProcessor implements BottomSheetProcessor {
         String[] schedulingDateWithHourItaly = localDateTimeItaly.split(" ");
         preconditionContentInt.setTitle(PRE_ANALOG_TITLE);
 
-        preconditionContentInt.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage()
+        preconditionContentInt.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerBeforeAnalogDateAppIoMessage()
                 .replace(DATE_PLACEHOLDER, schedulingDateWithHourItaly[0])
                 .replace(TIME_PLACEHOLDER, schedulingDateWithHourItaly[1])
                 .replace(IUN_PLACEHOLDER, context.getIun())

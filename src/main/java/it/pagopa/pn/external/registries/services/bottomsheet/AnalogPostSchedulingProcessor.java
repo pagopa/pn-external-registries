@@ -20,7 +20,7 @@ public class AnalogPostSchedulingProcessor implements BottomSheetProcessor {
         log.debug("AnalogPostSchedulingProcessor process start for iun: {}", context.getIun());
         preconditionContentInt.setTitle(POST_ANALOG_TITLE);
 
-        preconditionContentInt.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage()
+        preconditionContentInt.setMarkdown(cfg.getAppIoTemplate().getMarkdownDisclaimerAfterAnalogDateAppIoMessage()
                 .replace(IUN_PLACEHOLDER, context.getIun())
                 .replace(SENDER_DENOMINATION_PLACEHOLDER, context.getSenderDenomination())
                 .replace(SUBJECT_PLACEHOLDER, context.getSubject()));

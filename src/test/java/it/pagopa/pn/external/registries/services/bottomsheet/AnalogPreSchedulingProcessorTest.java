@@ -36,7 +36,7 @@ class AnalogPreSchedulingProcessorTest {
         PnExternalRegistriesConfig cfg = mock(PnExternalRegistriesConfig.class);
         PnExternalRegistriesConfig.AppIoTemplate template = mock(PnExternalRegistriesConfig.AppIoTemplate.class);
         when(cfg.getAppIoTemplate()).thenReturn(template);
-        when(template.getMarkdownDisclaimerBeforeDateAppIoMessage())
+        when(template.getMarkdownDisclaimerBeforeAnalogDateAppIoMessage())
                 .thenReturn(DATE_PLACEHOLDER + " " + TIME_PLACEHOLDER + " " +
                         IUN_PLACEHOLDER + " " + SENDER_DENOMINATION_PLACEHOLDER + " " + SUBJECT_PLACEHOLDER);
 

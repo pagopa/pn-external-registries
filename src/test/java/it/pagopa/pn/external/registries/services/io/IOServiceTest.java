@@ -1,23 +1,22 @@
 package it.pagopa.pn.external.registries.services.io;
 
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.dto.delivery.NotificationInt;
+import it.pagopa.pn.external.registries.dto.delivery.NotificationRecipientInt;
+import it.pagopa.pn.external.registries.dto.timelineservice.DeliveryInformationResponseInt;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.NotificationRecipientV24;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto.SentNotificationV25;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.CreatedMessage;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.LimitedProfile;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.NewMessage;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.DeliveryInformationResponse;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.DeliveryMode;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
-import it.pagopa.pn.external.registries.middleware.msclient.DeliveryClient;
 import it.pagopa.pn.external.registries.middleware.msclient.DeliveryPushClient;
-import it.pagopa.pn.external.registries.middleware.msclient.TimelineServiceClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import it.pagopa.pn.external.registries.services.NotificationService;
+import it.pagopa.pn.external.registries.services.TimelineService;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetContext;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetProcessor;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetProcessorFactory;
@@ -76,10 +75,10 @@ class IOServiceTest {
     DeliveryPushClient deliveryPushClient;
 
     @Mock
-    DeliveryClient deliveryClient;
+    NotificationService notificationService;
 
     @Mock
-    TimelineServiceClient timelineServiceClient;
+    TimelineService timelineService;
 
     @Mock
     BottomSheetProcessorFactory bottomSheetProcessorFactory;
@@ -759,18 +758,18 @@ class IOServiceTest {
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> PreconditionContentInt.builder()
-                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
+                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeAnalogDateAppIoMessage())
                                 .title("Questo messaggio contiene una comunicazione a valore legale")
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeDateAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeAnalogDateAppIoMessage())
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
-        Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
 
-        Mockito.when(timelineServiceClient.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceClientResponse(DeliveryModeInt.ANALOG));
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.ANALOG));
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
 
@@ -792,17 +791,17 @@ class IOServiceTest {
 
         Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> PreconditionContentInt.builder()
-                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterAnalogDateAppIoMessage())
                                 .title("Questo messaggio contiene una comunicazione a valore legale")
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterDateAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterAnalogDateAppIoMessage())
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
-        Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
-        Mockito.when(timelineServiceClient.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceClientResponse(DeliveryModeInt.ANALOG));
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.ANALOG));
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
 
@@ -833,8 +832,8 @@ class IOServiceTest {
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
-        Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
-        Mockito.when(timelineServiceClient.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceClientResponse(DeliveryModeInt.DIGITAL));
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.DIGITAL));
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
@@ -866,8 +865,8 @@ class IOServiceTest {
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
-        Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
-        Mockito.when(timelineServiceClient.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceClientResponse(DeliveryModeInt.DIGITAL));
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.DIGITAL));
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
@@ -885,7 +884,7 @@ class IOServiceTest {
         String recipientInternalId = "notfound";
         String iun = "iun";
 
-        Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -899,8 +898,8 @@ class IOServiceTest {
         String recipientInternalId = "internalId";
         String iun = "iun";
 
-        Mockito.when(deliveryClient.getSentNotificationPrivate(iun)).thenReturn(getDeliveryClientResponse());
-        Mockito.when(timelineServiceClient.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceClientResponse(DeliveryModeInt.UNKNOWN));
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.UNKNOWN));
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -909,26 +908,27 @@ class IOServiceTest {
                 .verify();
     }
 
-    private Mono<DeliveryInformationResponse> getTimelineServiceClientResponse(DeliveryModeInt deliveryMode) {
-        DeliveryInformationResponse response = new DeliveryInformationResponse();
-        response.setDeliveryMode(DeliveryMode.valueOf(deliveryMode.name()));
-        response.setIsNotificationCancelled(false);
-        response.setRefinementOrViewedDate(Instant.now());
-        response.setSchedulingAnalogDate(Instant.now());
-        return Mono.just(response);
+    private Mono<DeliveryInformationResponseInt> getTimelineServiceResponse(DeliveryModeInt deliveryMode) {
+        return Mono.just(DeliveryInformationResponseInt.builder()
+                .isNotificationCancelled(false)
+                .refinementOrViewedDate(Instant.now())
+                .deliveryMode(deliveryMode)
+                .schedulingAnalogDate(Instant.now()
+                ).build());
     }
 
-    private Mono<SentNotificationV25> getDeliveryClientResponse() {
-        SentNotificationV25 notification = new SentNotificationV25();
-        notification.setSenderDenomination("Oggetto del Messaggio");
-        notification.setSubject("subject");
-        notification.setRecipients(getRecipientsList());
-        return Mono.just(notification);
+    private Mono<NotificationInt> getnotificationServiceResponse() {
+        return Mono.just(NotificationInt.builder()
+                        .iun("iun")
+                        .senderDenomination("Oggetto del Messaggio")
+                        .recipients(getRecipientsList())
+                        .subject("subject")
+                .build());
     }
 
-    private List<NotificationRecipientV24> getRecipientsList() {
-        NotificationRecipientV24 recipient = new NotificationRecipientV24();
-        recipient.setInternalId("internalId");
-        return List.of(recipient);
+    private List<NotificationRecipientInt> getRecipientsList() {
+        return List.of(NotificationRecipientInt.builder()
+                .internalId("internalId")
+                .build());
     }
 }
