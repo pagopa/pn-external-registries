@@ -5,7 +5,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.A
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.PaymentRequestsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery_reactive.v1.api.InternalOnlyApi;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.InstitutionsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserApi;
@@ -111,17 +110,6 @@ public class MsClientConfig {
             apiClient.setBasePath( config.getIoBaseUrl() );
 
             return new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi( apiClient );
-        }
-    }
-
-    @Configuration
-    static class CommonBaseClients extends CommonBaseClient {
-
-        @Bean
-        TimelineAndStatusApi pnDeliveryPushApi(PnExternalRegistriesConfig config) {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.ApiClient( initWebClient( it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.ApiClient.buildWebClientBuilder() ) );
-            apiClient.setBasePath( config.getDeliveryPushBaseUrl() );
-            return new TimelineAndStatusApi( apiClient );
         }
     }
 

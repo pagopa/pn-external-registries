@@ -582,37 +582,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pn-external-registries-pn-delivery-push-client</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery-push/0007dd145b23d6ac34c49dd090de1c96beeb1de6/docs/openapi/api-private.yaml</inputSpec>
-                            <generatorName>java</generatorName>
-                            <library>webclient</library>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
-                            <typeMappings>
-                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
-                            </typeMappings>
-                            <configOptions>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api</apiPackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.dto</modelPackage>
-                                <dateLibrary>java8</dateLibrary>
-                                <delegatePattern>true</delegatePattern>
-                                <interfaceOnly>true</interfaceOnly>
-                                <annotationLibrary>none</annotationLibrary>
-                                <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <reactive>true</reactive>
-                                <skipDefaultInterface>false</skipDefaultInterface>
-                                <useTags>true</useTags>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>pn-external-registries-gpd-client</id>
                         <phase>generate-resources</phase>
                         <goals>

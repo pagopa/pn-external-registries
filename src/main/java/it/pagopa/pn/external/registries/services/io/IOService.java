@@ -18,7 +18,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Thi
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
-import it.pagopa.pn.external.registries.middleware.msclient.DeliveryPushClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.services.NotificationService;
@@ -66,7 +65,6 @@ public class IOService {
 
     private final IOMessagesDao ioMessagesDao;
 
-    private final DeliveryPushClient deliveryPushClient;
     private final BottomSheetProcessorFactory bottomSheetProcessorFactory;
     private final NotificationService notificationService;
     private final TimelineService timelineService;
