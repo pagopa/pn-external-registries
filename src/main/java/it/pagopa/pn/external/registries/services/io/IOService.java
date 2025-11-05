@@ -25,7 +25,7 @@ import it.pagopa.pn.external.registries.services.NotificationService;
 import it.pagopa.pn.external.registries.services.TimelineService;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetContext;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetProcessorFactory;
-import it.pagopa.pn.external.registries.services.bottomsheet.DeliveryModeInt;
+import it.pagopa.pn.external.registries.services.bottomsheet.ExtendedDeliveryMode;
 import it.pagopa.pn.external.registries.services.io.dto.PreconditionContentInt;
 import it.pagopa.pn.external.registries.services.io.dto.UserStatusResponseInternal;
 import lombok.RequiredArgsConstructor;
@@ -320,8 +320,8 @@ public class IOService {
                     Integer recIndex = retrieveRecipientIndexFromInternalId(recipientInternalId, deliveryResponse);
                     return timelineService.getDeliveryInformation(iun, recIndex)
                             .doOnNext(timelineServiceResponse -> {
-                                DeliveryModeInt deliveryMode = timelineServiceResponse.getDeliveryMode();
-                                if (deliveryMode == DeliveryModeInt.UNKNOWN) {
+                                ExtendedDeliveryMode deliveryMode = timelineServiceResponse.getDeliveryMode();
+                                if (deliveryMode == ExtendedDeliveryMode.UNKNOWN) {
                                     throw new PnNotFoundException("Delivery mode is UNKNOWN", "DeliveryModeInt.UNKNOWN for iun " + iun,
                                             PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_DELIVERY_MODE_UNKNOWN
                                     );
@@ -355,7 +355,7 @@ public class IOService {
     private PreconditionContentDto mapToPreconditionContent(Instant schedulingAnalogDate,
                                                             String iun,
                                                             Instant refinementOrViewDate,
-                                                            DeliveryModeInt deliveryMode,
+                                                            ExtendedDeliveryMode deliveryMode,
                                                             String senderDenomination,
                                                             String subject) {
         log.debug("Mapping to PreconditionContentDto with schedulingAnalogDate={}, iun={}, refinementOrViewDate={}, deliveryMode={}, senderDenomination={}, subject={}",

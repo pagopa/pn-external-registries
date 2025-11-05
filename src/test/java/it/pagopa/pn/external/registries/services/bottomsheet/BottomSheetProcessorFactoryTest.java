@@ -36,7 +36,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsPostRefinedProcessorWhenRefinementOrViewDateIsAfterCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
-                .deliveryMode(DeliveryModeInt.ANALOG)
+                .deliveryMode(ExtendedDeliveryMode.ANALOG)
                 .schedulingAnalogDate(Instant.now())
                 .refinementOrViewDate(Instant.now().plusSeconds(3600))
                 .build();
@@ -47,7 +47,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsAnalogPostSchedulingProcessorWhenAnalogAndSchedulingDateIsAfterCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
-                .deliveryMode(DeliveryModeInt.ANALOG)
+                .deliveryMode(ExtendedDeliveryMode.ANALOG)
                 .schedulingAnalogDate(Instant.now().plusSeconds(3600))
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
@@ -57,7 +57,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsAnalogPreSchedulingProcessorWhenAnalogAndSchedulingDateIsBeforeCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
-                .deliveryMode(DeliveryModeInt.ANALOG)
+                .deliveryMode(ExtendedDeliveryMode.ANALOG)
                 .schedulingAnalogDate(Instant.now().minus(Duration.ofMillis(3600)))
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
@@ -67,7 +67,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsDigitalProcessorWhenDigital() {
         BottomSheetContext context = BottomSheetContext.builder()
-                .deliveryMode(DeliveryModeInt.DIGITAL)
+                .deliveryMode(ExtendedDeliveryMode.DIGITAL)
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
         assertSame(digitalProcessor, processor);

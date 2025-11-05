@@ -28,21 +28,21 @@ public class BottomSheetProcessorFactory {
         }
 
         if (context.getDeliveryMode() != null &&
-                context.getDeliveryMode() == DeliveryModeInt.ANALOG &&
+                context.getDeliveryMode() == ExtendedDeliveryMode.ANALOG &&
                 context.getSchedulingAnalogDate().isAfter(Instant.now())) {
             log.debug("AnalogPostSchedulingProcessor selected");
             return analogPostSchedulingProcessor;
         }
 
         if (context.getDeliveryMode() != null &&
-                context.getDeliveryMode() == DeliveryModeInt.ANALOG &&
+                context.getDeliveryMode() == ExtendedDeliveryMode.ANALOG &&
                 context.getSchedulingAnalogDate().isBefore(Instant.now())) {
             log.debug("AnalogPreSchedulingProcessor selected");
             return analogPreSchedulingProcessor;
         }
 
         if (context.getDeliveryMode() != null &&
-                context.getDeliveryMode() == DeliveryModeInt.DIGITAL) {
+                context.getDeliveryMode() == ExtendedDeliveryMode.DIGITAL) {
             log.debug("DigitalProcessor selected");
             return digitalProcessor;
         }

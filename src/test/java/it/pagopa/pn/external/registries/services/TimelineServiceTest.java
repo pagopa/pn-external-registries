@@ -2,9 +2,8 @@ package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.dto.timelineservice.DeliveryInformationResponseInt;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.DeliveryInformationResponse;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.ExtendedDeliveryMode;
 import it.pagopa.pn.external.registries.middleware.msclient.TimelineServiceClient;
-import it.pagopa.pn.external.registries.services.bottomsheet.DeliveryModeInt;
+import it.pagopa.pn.external.registries.services.bottomsheet.ExtendedDeliveryMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,12 +31,12 @@ class TimelineServiceTest {
         DeliveryInformationResponse extResponse = new DeliveryInformationResponse();
         extResponse.setSchedulingAnalogDate(dateTime);
         extResponse.setRefinementOrViewedDate(dateTime);
-        extResponse.setDeliveryMode(ExtendedDeliveryMode.DIGITAL);
+        extResponse.setDeliveryMode(it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.ExtendedDeliveryMode.DIGITAL);
 
         DeliveryInformationResponseInt intResponse = DeliveryInformationResponseInt.builder()
                 .schedulingAnalogDate(dateTime)
                 .refinementOrViewedDate(dateTime)
-                .deliveryMode(DeliveryModeInt.DIGITAL)
+                .deliveryMode(ExtendedDeliveryMode.DIGITAL)
                 .build();
 
         Mockito.when(timelineServiceClient.getDeliveryInformation(iun, recIndex))

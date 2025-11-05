@@ -20,7 +20,7 @@ import it.pagopa.pn.external.registries.services.TimelineService;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetContext;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetProcessor;
 import it.pagopa.pn.external.registries.services.bottomsheet.BottomSheetProcessorFactory;
-import it.pagopa.pn.external.registries.services.bottomsheet.DeliveryModeInt;
+import it.pagopa.pn.external.registries.services.bottomsheet.ExtendedDeliveryMode;
 import it.pagopa.pn.external.registries.services.io.dto.PreconditionContentInt;
 import it.pagopa.pn.external.registries.util.AppIOUtils;
 import org.junit.jupiter.api.Assertions;
@@ -769,7 +769,7 @@ class IOServiceTest {
 
         Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
 
-        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.ANALOG));
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.ANALOG));
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
 
@@ -801,7 +801,7 @@ class IOServiceTest {
                 .build();
 
         Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
-        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.ANALOG));
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.ANALOG));
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
 
@@ -833,7 +833,7 @@ class IOServiceTest {
                 .build();
 
         Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
-        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.DIGITAL));
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.DIGITAL));
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
@@ -866,7 +866,7 @@ class IOServiceTest {
                 .build();
 
         Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
-        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.DIGITAL));
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.DIGITAL));
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
@@ -899,7 +899,7 @@ class IOServiceTest {
         String iun = "iun";
 
         Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
-        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(DeliveryModeInt.UNKNOWN));
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.UNKNOWN));
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -908,7 +908,7 @@ class IOServiceTest {
                 .verify();
     }
 
-    private Mono<DeliveryInformationResponseInt> getTimelineServiceResponse(DeliveryModeInt deliveryMode) {
+    private Mono<DeliveryInformationResponseInt> getTimelineServiceResponse(ExtendedDeliveryMode deliveryMode) {
         return Mono.just(DeliveryInformationResponseInt.builder()
                 .isNotificationCancelled(false)
                 .refinementOrViewedDate(Instant.now())

@@ -10,7 +10,7 @@ import java.time.Instant;
 public class BottomSheetContext {
     private Instant schedulingAnalogDate;
     private Instant refinementOrViewDate;
-    private DeliveryModeInt deliveryMode;
+    private ExtendedDeliveryMode deliveryMode;
     private boolean isCancelled;
     private String iun;
     private String senderDenomination;

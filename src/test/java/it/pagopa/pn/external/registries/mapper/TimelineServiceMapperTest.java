@@ -2,8 +2,7 @@ package it.pagopa.pn.external.registries.mapper;
 
 import it.pagopa.pn.external.registries.dto.timelineservice.DeliveryInformationResponseInt;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.DeliveryInformationResponse;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.ExtendedDeliveryMode;
-import it.pagopa.pn.external.registries.services.bottomsheet.DeliveryModeInt;
+import it.pagopa.pn.external.registries.services.bottomsheet.ExtendedDeliveryMode;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -19,14 +18,14 @@ class TimelineServiceMapperTest {
         DeliveryInformationResponse ext = new DeliveryInformationResponse();
         ext.setRefinementOrViewedDate(now);
         ext.setSchedulingAnalogDate(now);
-        ext.setDeliveryMode(ExtendedDeliveryMode.DIGITAL);
+        ext.setDeliveryMode(it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto.ExtendedDeliveryMode.DIGITAL);
         ext.setIsNotificationCancelled(Boolean.FALSE);
 
         DeliveryInformationResponseInt result = TimelineServiceMapper.externalToInternal(ext);
 
         assertEquals(now, result.getRefinementOrViewedDate());
         assertEquals(now, result.getSchedulingAnalogDate());
-        assertEquals(DeliveryModeInt.DIGITAL, result.getDeliveryMode());
+        assertEquals(ExtendedDeliveryMode.DIGITAL, result.getDeliveryMode());
         assertFalse(result.getIsNotificationCancelled());
     }
 
