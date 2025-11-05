@@ -5,6 +5,10 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.d
 
 public class NotificationRecipientMapper {
 
+    private NotificationRecipientMapper() {
+
+    }
+
     public static NotificationRecipientInt externalToInternal(NotificationRecipientV24 recipient) {
         if (recipient == null) {
             return null;

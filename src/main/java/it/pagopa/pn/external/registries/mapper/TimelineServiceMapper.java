@@ -6,6 +6,10 @@ import it.pagopa.pn.external.registries.services.bottomsheet.ExtendedDeliveryMod
 
 public class TimelineServiceMapper {
 
+    private TimelineServiceMapper() {
+
+    }
+
     public static DeliveryInformationResponseInt externalToInternal (DeliveryInformationResponse deliveryInformationResponse) {
 
         return DeliveryInformationResponseInt.builder()

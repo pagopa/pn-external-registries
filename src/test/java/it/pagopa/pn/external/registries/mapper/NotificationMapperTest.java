@@ -6,6 +6,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.d
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,11 +36,11 @@ class NotificationMapperTest {
         SentNotificationV25 sentNotification = new SentNotificationV25();
         sentNotification.setSubject("subject");
         sentNotification.setSenderDenomination("denomination");
-        sentNotification.setRecipients(null);
+        sentNotification.setRecipients(List.of());
 
         NotificationInt result = NotificationMapper.externalToInternal(sentNotification);
 
-        assertNull(result.getRecipients());
+        assertEquals(List.of(), result.getRecipients());
         assertEquals("subject", result.getSubject());
         assertEquals("denomination", result.getSenderDenomination());
     }
