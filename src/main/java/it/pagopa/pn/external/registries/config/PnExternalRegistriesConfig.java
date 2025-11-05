@@ -36,7 +36,6 @@ public class PnExternalRegistriesConfig {
     private String checkoutCartApiBaseUrl;
 
     private String deliveryBaseUrl;
-    private String deliveryPushBaseUrl;
     private String timelineServiceBaseUrl;
 
     private String ioApiKey;

@@ -11,7 +11,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.New
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.IOMessagesDao;
 import it.pagopa.pn.external.registries.middleware.db.io.entities.IOMessagesEntity;
-import it.pagopa.pn.external.registries.middleware.msclient.DeliveryPushClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
@@ -72,9 +71,6 @@ class IOServiceTest {
     SendIOSentMessageService ioSentMessageService;
 
     @Mock
-    DeliveryPushClient deliveryPushClient;
-
-    @Mock
     NotificationService notificationService;
 
     @Mock
@@ -97,7 +93,6 @@ class IOServiceTest {
 
     @BeforeEach
     public void init(){
-        Mockito.when(cfg.getDeliveryPushBaseUrl()).thenReturn("http://localhost:8081");
         Mockito.when(bottomSheetProcessorFactory.getBottomSheetProcessor(Mockito.any(BottomSheetContext.class)))
                 .thenReturn(bottomSheetProcessor);
     }

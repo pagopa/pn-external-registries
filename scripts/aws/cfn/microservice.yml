@@ -467,7 +467,7 @@ Resources:
         ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_BASE_URL=${SelfcarePgUsergroupBaseUrl}'
-        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_PUSH_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TIMELINE_SERVICE_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
         ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
         ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
@@ -487,7 +487,6 @@ Resources:
         ContainerEnvEntry35: !Sub "LOLLIPOP_IDP_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopIdpRestConfigConnectionTimeout}"
         ContainerEnvEntry36: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_READ_TIMEOUT=${LollipopAssertionRestConfigReadTimeout}"
         ContainerEnvEntry37: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopAssertionRestConfigConnectionTimeout}"
-        ContainerEnvEntry38: !Sub 'PN_EXTERNAL_REGISTRY_TIMELINE_SERVICE_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -556,7 +555,7 @@ Resources:
         ContainerEnvEntry14: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry15: !Sub 'PN_EXTERNAL_REGISTRY_IOOPTINMINDAYS=${IoOptInMinDays}'
         ContainerEnvEntry16: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREPGUSERGROUP_BASE_URL=${SelfcarePgUsergroupBaseUrl}'
-        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_DELIVERY_PUSH_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry17: !Sub 'PN_EXTERNAL_REGISTRY_TIMELINE_SERVICE_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry18: !Sub 'LOLLIPOP_ACTIVE=${IsLollipopActive}'
         ContainerEnvEntry19: !Sub 'LOLLIPOP_EXPECTED_LC_ORIGINAL_URL=${LollipopExpectedLcOriginalUrl}'
         ContainerEnvEntry20: !Sub 'LOLLIPOP_ENABLE_CONSUMER_LOGGING=${LollipopEnableConsumerLogging}'
@@ -577,7 +576,6 @@ Resources:
         ContainerEnvEntry35: !Sub "LOLLIPOP_IDP_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopIdpRestConfigConnectionTimeout}"
         ContainerEnvEntry36: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_READ_TIMEOUT=${LollipopAssertionRestConfigReadTimeout}"
         ContainerEnvEntry37: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopAssertionRestConfigConnectionTimeout}"
-        ContainerEnvEntry38: !Sub 'PN_EXTERNAL_REGISTRY_TIMELINE_SERVICE_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
