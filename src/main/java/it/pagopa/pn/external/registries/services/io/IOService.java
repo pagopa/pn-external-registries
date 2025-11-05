@@ -39,8 +39,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -48,7 +46,6 @@ import java.util.Objects;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_NOTIFICATION_RECIPIENT_ID_NOT_FOUND;
 import static it.pagopa.pn.external.registries.util.AppIOUtils.SENDER_DENOMINATION_PLACEHOLDER;
-import static it.pagopa.pn.external.registries.util.AppIOUtils.buildPkProbableSchedulingAnalogDate;
 import static java.util.stream.IntStream.range;
 
 @Service
@@ -133,8 +130,7 @@ public class IOService {
                         res.setResult(SendMessageResponseDto.ResultEnum.NOT_SENT_OPTIN_ALREADY_SENT);
                         return Mono.just(res);
                     }
-                })
-                .flatMap(sendMessageResponseDto -> saveProbableSchedulingAnalogDateIfPresent(sendMessageRequestDto).thenReturn(sendMessageResponseDto));
+                });
     }
 
     private Mono<SendMessageResponseDto> sendIOCourtesyMessage( SendMessageRequestDto sendMessageRequestDto, boolean localeIsIT ) {
@@ -189,7 +185,6 @@ public class IOService {
                     return res;
                 })
                 .flatMap(sendMessageResponseDto -> sendIOMessageSentEventToDeliveyPush(sendMessageRequestDto, sendMessageResponseDto))
-                .flatMap(sendMessageResponseDto -> saveProbableSchedulingAnalogDateIfPresent(sendMessageRequestDto).thenReturn(sendMessageResponseDto))
                 .onErrorResume( exception ->{
                     log.error( "[DOWNSTREAM APPIO] Error in submitMessageforUserWithFiscalCodeInBody iun={}", content.getThirdPartyData().getId());
                     SendMessageResponseDto res = new SendMessageResponseDto();
@@ -397,22 +392,6 @@ public class IOService {
     private boolean isPreferredLanguageIT(List<String> preferredLanguages)
     {
         return CollectionUtils.isEmpty(preferredLanguages) || preferredLanguages.contains(IO_LOCALE_IT_IT);
-    }
-
-    private Mono<Void> saveProbableSchedulingAnalogDateIfPresent(SendMessageRequestDto sendMessageRequestDto) {
-        String recipientInternalID = sendMessageRequestDto.getRecipientInternalID();
-        String iun = sendMessageRequestDto.getIun();
-        IOMessagesEntity ioMessagesEntity = new IOMessagesEntity();
-        ioMessagesEntity.setPk(buildPkProbableSchedulingAnalogDate(iun, recipientInternalID));
-        ioMessagesEntity.setSenderDenomination(sendMessageRequestDto.getSenderDenomination());
-        ioMessagesEntity.setIun(sendMessageRequestDto.getIun());
-        ioMessagesEntity.setSubject(sendMessageRequestDto.getSubject());
-        if(sendMessageRequestDto.getSchedulingAnalogDate() != null) {
-            ioMessagesEntity.setSchedulingAnalogDate(sendMessageRequestDto.getSchedulingAnalogDate().toInstant());
-            ioMessagesEntity.setTtl(LocalDateTime.from(sendMessageRequestDto.getSchedulingAnalogDate()).plusDays(2).atZone(ZoneId.systemDefault()).toEpochSecond());
-        }
-        return ioMessagesDao.save(ioMessagesEntity);
-
     }
 
 }

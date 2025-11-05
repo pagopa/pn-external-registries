@@ -46,7 +46,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class IOServiceTest {
@@ -214,7 +213,6 @@ class IOServiceTest {
         Mockito.when( appIoTemplate.getSubjectCourtesyAppIoMessage() ).thenReturn( "Comunicazione a valore legale da {{senderDenomination}}" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
-        Mockito.when( ioMessagesDao.save(Mockito.any(IOMessagesEntity.class)) ).thenReturn(Mono.empty());
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
@@ -232,13 +230,6 @@ class IOServiceTest {
 
         Mockito.verify(ioSentMessageService, Mockito.never()).sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any());
 
-        ArgumentCaptor<IOMessagesEntity> ioMessagesEntityCaptor = ArgumentCaptor.forClass(IOMessagesEntity.class);
-        Mockito.verify(ioMessagesDao, Mockito.times(1)).save(ioMessagesEntityCaptor.capture());
-
-        // verifico che è stato inserito il record per il ioMessagesEntity (probableSchedulingAnalogDate)
-        assertThat(ioMessagesEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
-        assertThat(ioMessagesEntityCaptor.getValue().getSchedulingAnalogDate()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant());
-        assertThat(ioMessagesEntityCaptor.getValue().getTtl()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant().plus(2, ChronoUnit.DAYS).getEpochSecond());
     }
 
     @Test
@@ -276,7 +267,6 @@ class IOServiceTest {
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
         Mockito.when( ioSentMessageService.sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(Mono.empty());
-        Mockito.when(ioMessagesDao.save(Mockito.any(IOMessagesEntity.class))).thenReturn(Mono.empty());
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
@@ -286,7 +276,6 @@ class IOServiceTest {
         ArgumentCaptor<NewMessage> newMessageCaptor = ArgumentCaptor.forClass(NewMessage.class);
         Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
         NewMessage newMessage = newMessageCaptor.getValue();
-        String ioSubject = messageRequestDto.getSubject();
 
         Assertions.assertEquals("Comunicazione a valore legale da PaMilano", newMessage.getContent().getSubject());
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
@@ -294,14 +283,6 @@ class IOServiceTest {
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
 
         Mockito.verify(ioSentMessageService).sendIOSentMessageNotification(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any());
-
-        ArgumentCaptor<IOMessagesEntity> ioMessagesEntityCaptor = ArgumentCaptor.forClass(IOMessagesEntity.class);
-        Mockito.verify(ioMessagesDao, Mockito.times(1)).save(ioMessagesEntityCaptor.capture());
-
-        // verifico che è stato inserito il record per il ioMessagesEntity (probableSchedulingAnalogDate)
-        assertThat(ioMessagesEntityCaptor.getValue().getPk()).isEqualTo("SENT##" + messageRequestDto.getIun() + "##" + messageRequestDto.getRecipientInternalID());
-        assertThat(ioMessagesEntityCaptor.getValue().getSchedulingAnalogDate()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant());
-        assertThat(ioMessagesEntityCaptor.getValue().getTtl()).isEqualTo(messageRequestDto.getSchedulingAnalogDate().toInstant().plus(2, ChronoUnit.DAYS).getEpochSecond());
     }
 
     @Test
@@ -349,7 +330,6 @@ class IOServiceTest {
         Mockito.when( appIoTemplate.getSubjectCourtesyAppIoMessage() ).thenReturn( "Comunicazione a valore legale da {{senderDenomination}}" );
         Mockito.when( ioClient.getProfileByPOST( Mockito.any() ) ).thenReturn( Mono.just( limitedProfile ) );
         Mockito.when( ioClient.submitMessageforUserWithFiscalCodeInBody( Mockito.any() )).thenReturn( Mono.just( createdMessage ) );
-        Mockito.when(ioMessagesDao.save(Mockito.any(IOMessagesEntity.class))).thenReturn(Mono.empty());
 
         SendMessageResponseDto responseDto = service.sendIOMessage( Mono.just( messageRequestDto ) ).block();
 
@@ -359,16 +339,12 @@ class IOServiceTest {
         ArgumentCaptor<NewMessage> newMessageCaptor = ArgumentCaptor.forClass(NewMessage.class);
         Mockito.verify(ioClient).submitMessageforUserWithFiscalCodeInBody(newMessageCaptor.capture());
         NewMessage newMessage = newMessageCaptor.getValue();
-        String ioSubject = messageRequestDto.getSubject();
         String ioSubjectTruncated = ("Comunicazione a valore legale da " + messageRequestDto.getSenderDenomination()).substring(0, 120);
 
         Assertions.assertEquals(ioSubjectTruncated, newMessage.getContent().getSubject());
         Assertions.assertEquals( SendMessageResponseDto.ResultEnum.SENT_COURTESY, responseDto.getResult());
         Assertions.assertNotNull(newMessage.getContent().getThirdPartyData());
         Assertions.assertEquals(messageRequestDto.getSubject(), newMessage.getContent().getThirdPartyData().getSummary());
-
-        Mockito.verify(ioMessagesDao, Mockito.times(1)).save(Mockito.any());
-
     }
 
     @Test
@@ -743,10 +719,6 @@ class IOServiceTest {
 
         IOMessagesEntity entity = new IOMessagesEntity();
         entity.setPk(expectedPk);
-        entity.setSchedulingAnalogDate(Instant.parse("2050-05-03T13:51:00Z"));
-        entity.setIun(iun);
-        entity.setSenderDenomination(senderDenomination);
-        entity.setSubject(subject);
 
         PnExternalRegistriesConfig pnConfig = new PnExternalRegistriesConfig();
         pnConfig.init();
