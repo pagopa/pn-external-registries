@@ -1,0 +1,44 @@
+package it.pagopa.pn.external.registries.services.bottomsheet;
+
+
+import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.services.io.dto.PreconditionContentInt;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static it.pagopa.pn.external.registries.util.AppIOUtils.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class DigitalProcessorTest {
+
+    private DigitalProcessor processor;
+
+    @BeforeEach
+    void setUp() {
+        processor = new DigitalProcessor();
+    }
+
+    @Test
+    void process_shouldSetFieldsCorrectly() {
+        PreconditionContentInt dto = new PreconditionContentInt();
+        BottomSheetContext context = BottomSheetContext.builder()
+                .iun("iun123")
+                .senderDenomination("sender")
+                .subject("subject")
+                .build();
+
+        PnExternalRegistriesConfig cfg = mock(PnExternalRegistriesConfig.class);
+        PnExternalRegistriesConfig.AppIoTemplate template = mock(PnExternalRegistriesConfig.AppIoTemplate.class);
+        when(cfg.getAppIoTemplate()).thenReturn(template);
+        when(template.getMarkdownDisclaimerDigitalAppIoMessage())
+                .thenReturn(IUN_PLACEHOLDER + " " + SENDER_DENOMINATION_PLACEHOLDER + " " + SUBJECT_PLACEHOLDER);
+
+        PreconditionContentInt result = processor.process(dto, context, cfg);
+
+        assertEquals(DIGITAL_TITLE, result.getTitle());
+        assertEquals("iun123 sender subject", result.getMarkdown());
+    }
+
+}

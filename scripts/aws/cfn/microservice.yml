@@ -487,6 +487,7 @@ Resources:
         ContainerEnvEntry35: !Sub "LOLLIPOP_IDP_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopIdpRestConfigConnectionTimeout}"
         ContainerEnvEntry36: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_READ_TIMEOUT=${LollipopAssertionRestConfigReadTimeout}"
         ContainerEnvEntry37: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopAssertionRestConfigConnectionTimeout}"
+        ContainerEnvEntry38: !Sub 'PN_EXTERNAL_REGISTRY_TIMELINE_SERVICE_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -576,6 +577,7 @@ Resources:
         ContainerEnvEntry35: !Sub "LOLLIPOP_IDP_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopIdpRestConfigConnectionTimeout}"
         ContainerEnvEntry36: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_READ_TIMEOUT=${LollipopAssertionRestConfigReadTimeout}"
         ContainerEnvEntry37: !Sub "LOLLIPOP_ASSERTION_REST_CONFIG_CONNECTION_TIMEOUT=${LollipopAssertionRestConfigConnectionTimeout}"
+        ContainerEnvEntry38: !Sub 'PN_EXTERNAL_REGISTRY_TIMELINE_SERVICE_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
