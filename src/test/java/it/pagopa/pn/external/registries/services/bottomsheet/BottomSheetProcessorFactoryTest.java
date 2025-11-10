@@ -34,31 +34,30 @@ class BottomSheetProcessorFactoryTest {
     }
 
     @Test
-    void returnsPostRefinedProcessorWhenRefinementOrViewDateIsAfterCurrentDate() {
+    void returnsPostRefinedProcessorWhenRefinementOrViewDateIsBeforeCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
                 .deliveryMode(ExtendedDeliveryMode.ANALOG)
-                .schedulingAnalogDate(Instant.now())
-                .refinementOrViewDate(Instant.now().plusSeconds(3600))
+                .refinementOrViewDate(Instant.now().minusSeconds(3600))
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
         assertSame(postRefinedProcessor, processor);
     }
 
     @Test
-    void returnsAnalogPostSchedulingProcessorWhenAnalogAndSchedulingDateIsAfterCurrentDate() {
+    void returnsAnalogPostSchedulingProcessorWhenAnalogAndSchedulingDateIsBeforeCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
                 .deliveryMode(ExtendedDeliveryMode.ANALOG)
-                .schedulingAnalogDate(Instant.now().plusSeconds(3600))
+                .schedulingAnalogDate(Instant.now().minusSeconds(3600))
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
         assertSame(analogPostSchedulingProcessor, processor);
     }
 
     @Test
-    void returnsAnalogPreSchedulingProcessorWhenAnalogAndSchedulingDateIsBeforeCurrentDate() {
+    void returnsAnalogPreSchedulingProcessorWhenAnalogAndSchedulingDateIsAfterCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
                 .deliveryMode(ExtendedDeliveryMode.ANALOG)
-                .schedulingAnalogDate(Instant.now().minus(Duration.ofMillis(3600)))
+                .schedulingAnalogDate(Instant.now().plus(Duration.ofMillis(3600)))
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
         assertSame(analogPreSchedulingProcessor, processor);

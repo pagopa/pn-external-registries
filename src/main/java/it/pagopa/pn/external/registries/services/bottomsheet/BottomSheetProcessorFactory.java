@@ -20,23 +20,23 @@ public class BottomSheetProcessorFactory {
 
     public BottomSheetProcessor getBottomSheetProcessor(BottomSheetContext context) {
         log.info("Get BottomSheet processor with context: {}", context);
-
+        Instant now = Instant.now();
         if (context.getRefinementOrViewDate() != null &&
-                context.getRefinementOrViewDate().isAfter(Instant.now())) {
+                now.isAfter(context.getRefinementOrViewDate())) {
             log.debug("PostRefinedProcessor selected");
             return postRefinedProcessor;
         }
 
         if (context.getDeliveryMode() != null &&
                 context.getDeliveryMode() == ExtendedDeliveryMode.ANALOG &&
-                context.getSchedulingAnalogDate().isAfter(Instant.now())) {
+                now.isAfter(context.getSchedulingAnalogDate())) {
             log.debug("AnalogPostSchedulingProcessor selected");
             return analogPostSchedulingProcessor;
         }
 
         if (context.getDeliveryMode() != null &&
                 context.getDeliveryMode() == ExtendedDeliveryMode.ANALOG &&
-                context.getSchedulingAnalogDate().isBefore(Instant.now())) {
+                now.isBefore(context.getSchedulingAnalogDate())) {
             log.debug("AnalogPreSchedulingProcessor selected");
             return analogPreSchedulingProcessor;
         }
