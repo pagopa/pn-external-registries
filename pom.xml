@@ -655,7 +655,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-timeline-service/97d88c1b8f1515c875b458b64af14a9d53e53f49/docs/openapi/pn-timeline-service-private.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-timeline-service/1886b3b9e0326adeeb3d0fe11007adae0ee7215a/docs/openapi/pn-timeline-service-private.yaml</inputSpec>
                             <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <skipValidateSpec>true</skipValidateSpec>
                             <generatorName>java</generatorName>
