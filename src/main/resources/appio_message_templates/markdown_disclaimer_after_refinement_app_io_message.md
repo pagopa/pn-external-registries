@@ -1,4 +1,4 @@
-Questa notifica risulta legalmente consegnata a te. Se non l'hai ancora letta, premi continua per consultare i documenti allegati: contengono informazioni importanti che ti riguardano.
+Questa notifica risulta legalmente consegnata a te. Se non l'hai ancora letta, premi "Continua" per consultare i documenti allegati: contengono informazioni importanti che ti riguardano.
 
 
 **Mittente** 
