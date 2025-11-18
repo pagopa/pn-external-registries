@@ -14,6 +14,7 @@ public class AppIOUtils {
     public static final String SENDER_DENOMINATION_PLACEHOLDER = "{{senderDenomination}}";
     public static final String IUN_PLACEHOLDER = "{{iun}}";
     public static final String SUBJECT_PLACEHOLDER = "{{subject}}";
+    public static final String ANALOG_COST_PLACEHOLDER = "{{analogCost}}";
 
     public static final String PROBABLE_SCHEDULING_ANALOG_DATE_PK_PREFIX = "SENT";
     public static final String PROBABLE_SCHEDULING_ANALOG_DATE_DELIMITER_PK = "##";
