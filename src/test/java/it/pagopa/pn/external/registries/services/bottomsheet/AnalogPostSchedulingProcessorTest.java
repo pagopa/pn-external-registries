@@ -13,10 +13,12 @@ import static org.mockito.Mockito.when;
 class AnalogPostSchedulingProcessorTest {
 
     private AnalogPostSchedulingProcessor processor;
+    private PnExternalRegistriesConfig config;
 
     @BeforeEach
     void setUp() {
-        processor = new AnalogPostSchedulingProcessor();
+        config = mock(PnExternalRegistriesConfig.class);
+        processor = new AnalogPostSchedulingProcessor(config);
     }
 
     @Test
@@ -28,16 +30,19 @@ class AnalogPostSchedulingProcessorTest {
                 .subject("subject")
                 .build();
 
+        String analogCost = "5.00 EUR";
+        when(config.getBottomsheetAnalogCost()).thenReturn(analogCost);
+
         PnExternalRegistriesConfig cfg = mock(PnExternalRegistriesConfig.class);
         PnExternalRegistriesConfig.AppIoTemplate template = mock(PnExternalRegistriesConfig.AppIoTemplate.class);
         when(cfg.getAppIoTemplate()).thenReturn(template);
         when(template.getMarkdownDisclaimerAfterAnalogDateAppIoMessage())
-                .thenReturn(IUN_PLACEHOLDER + " " + SENDER_DENOMINATION_PLACEHOLDER + " " + SUBJECT_PLACEHOLDER);
+                .thenReturn(IUN_PLACEHOLDER + " " + SENDER_DENOMINATION_PLACEHOLDER + " " + SUBJECT_PLACEHOLDER + " " + ANALOG_COST_PLACEHOLDER);
 
         PreconditionContentInt result = processor.process(dto, context, cfg);
 
         assertEquals(POST_ANALOG_TITLE, result.getTitle());
-        assertEquals("iun123 sender subject", result.getMarkdown());
+        assertEquals("iun123 sender subject 5.00 EUR", result.getMarkdown());
     }
 
 }

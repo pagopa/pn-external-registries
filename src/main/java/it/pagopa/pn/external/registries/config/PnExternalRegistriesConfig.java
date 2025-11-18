@@ -87,6 +87,8 @@ public class PnExternalRegistriesConfig {
 
     private List<String> aoouosenderid;
 
+    private String bottomsheetAnalogCost;
+
     @Data
     public static class AppIoTemplate{
         private String markdownUpgradeAppIoENMessage;
