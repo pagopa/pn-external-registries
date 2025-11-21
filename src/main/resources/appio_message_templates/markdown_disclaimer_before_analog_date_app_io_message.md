@@ -1,5 +1,5 @@
-Premendo “Continua”, la notifica risulterà legalmente recapitata a te.
-**Se apri il messaggio entro il {{data}} alle {{ora}}**, eviterai di ricevere la raccomandata, i cui eventuali costi saranno calcolati in fase di pagamento.
+Premendo **Continua**, la notifica risulterà legalmente consegnata a te.
+Se apri il messaggio **entro il {{data}} alle {{ora}}**, eviti l'invio della raccomandata cartacea e i relativi costi.
 
 
 **Mittente** 
