@@ -1,4 +1,7 @@
-Premendo “Continua”, la notifica risulterà legalmente recapitata a te. Con il domicilio digitale attivo, la notifica risulterà comunque consegnata 7 giorni dopo la ricezione, anche se non la apri o non la leggi.
+Premendo **Continua**, la notifica risulterà legalmente consegnata a te. 
+
+
+Avendo un domicilio digitale attivo, la notifica sarà considerata consegnata dopo 7 giorni dalla ricezione nel tuo domicilio digitale, anche se non la apri o non la leggi.
 
 
 **Mittente** 
