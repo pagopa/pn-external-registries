@@ -4,11 +4,12 @@ import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.ApiClient;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.DefaultApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api.PaymentRequestsApi;
-import it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.api.TimelineAndStatusApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.delivery_reactive.v1.api.InternalOnlyApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.InstitutionsApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api.UserGroupApi;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.api.TimelineControllerApi;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -113,17 +114,6 @@ public class MsClientConfig {
     }
 
     @Configuration
-    static class CommonBaseClients extends CommonBaseClient {
-
-        @Bean
-        TimelineAndStatusApi pnDeliveryPushApi(PnExternalRegistriesConfig config) {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.ApiClient( initWebClient( it.pagopa.pn.external.registries.generated.openapi.msclient.deliverypush.v1.ApiClient.buildWebClientBuilder() ) );
-            apiClient.setBasePath( config.getDeliveryPushBaseUrl() );
-            return new TimelineAndStatusApi( apiClient );
-        }
-    }
-
-    @Configuration
     static class GpdApis extends OcpBaseClient {
         @Bean
         PaymentsApiApi paymentsApiApiClient(PnExternalRegistriesConfig config) {
@@ -131,6 +121,26 @@ public class MsClientConfig {
                     it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey()).build());
             apiClient.setBasePath( config.getGpdApiBaseUrl() );
             return new PaymentsApiApi( apiClient );
+        }
+    }
+
+    @Configuration
+    static class DeliveryClient extends CommonBaseClient {
+        @Bean
+        InternalOnlyApi deliveryApi(PnExternalRegistriesConfig config) {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.delivery_reactive.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder()));
+            apiClient.setBasePath( config.getDeliveryBaseUrl() );
+            return new InternalOnlyApi( apiClient );
+        }
+    }
+
+    @Configuration
+    static class TimelineServiceClient extends CommonBaseClient {
+        @Bean
+        TimelineControllerApi timelineServiceApi(PnExternalRegistriesConfig config) {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder()));
+            apiClient.setBasePath( config.getTimelineServiceBaseUrl() );
+            return new TimelineControllerApi ( apiClient );
         }
     }
 

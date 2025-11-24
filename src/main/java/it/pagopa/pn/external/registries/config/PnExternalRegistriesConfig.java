@@ -36,7 +36,7 @@ public class PnExternalRegistriesConfig {
     private String checkoutCartApiBaseUrl;
 
     private String deliveryBaseUrl;
-    private String deliveryPushBaseUrl;
+    private String timelineServiceBaseUrl;
 
     private String ioApiKey;
     private String ioactApiKey;
@@ -95,8 +95,10 @@ public class PnExternalRegistriesConfig {
         private String markdownActivationAppIoDigitalMessage;
         private String subjectActivationAppIoMessage;
         private String subjectCourtesyAppIoMessage;
-        private String markdownDisclaimerAfterDateAppIoMessage;
-        private String markdownDisclaimerBeforeDateAppIoMessage;
+        private String markdownDisclaimerAfterAnalogDateAppIoMessage;
+        private String markdownDisclaimerBeforeAnalogDateAppIoMessage;
+        private String markdownDisclaimerDigitalAppIoMessage;
+        private String markdownDisclaimerAfterRefinementAppIoMessage;
 
     }
 
@@ -114,8 +116,10 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate.markdownActivationAppIoDigitalMessage = fetchMessage("markdown_activation_app_io_digital_message.md");
         this.appIoTemplate.subjectActivationAppIoMessage = fetchMessage("subject_activation_app_io_message.md");
         this.appIoTemplate.subjectCourtesyAppIoMessage = fetchMessage("subject_courtesy_app_io_message.md");
-        this.appIoTemplate.markdownDisclaimerAfterDateAppIoMessage = fetchMessage("markdown_disclaimer_after_date_app_io_message.md");
-        this.appIoTemplate.markdownDisclaimerBeforeDateAppIoMessage = fetchMessage("markdown_disclaimer_before_date_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerAfterAnalogDateAppIoMessage = fetchMessage("markdown_disclaimer_after_analog_date_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerBeforeAnalogDateAppIoMessage = fetchMessage("markdown_disclaimer_before_analog_date_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerDigitalAppIoMessage = fetchMessage("markdown_disclaimer_digital_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerAfterRefinementAppIoMessage = fetchMessage("markdown_disclaimer_after_refinement_app_io_message.md");
     }
 
     private String fetchMessage(String filename){
