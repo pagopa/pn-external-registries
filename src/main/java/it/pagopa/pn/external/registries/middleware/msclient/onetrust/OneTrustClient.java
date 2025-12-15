@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.onetrust;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import jakarta.annotation.PostConstruct;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.Objects;
 

@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.middleware.db.io.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
@@ -8,12 +10,10 @@ import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotific
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
 import java.time.Duration;
@@ -23,8 +23,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
-class OnboardInstitutionDaoTestIT {
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
+class OnboardInstitutionDaoTestIT extends MockProducerTest {
 
     private final Duration d = Duration.ofMillis(3000);
 
@@ -39,7 +39,7 @@ class OnboardInstitutionDaoTestIT {
 
     TestDao<OnboardInstitutionEntity> testDao;
 
-    @MockBean
+    @MockitoBean
     private SqsNotificationPaidProducer producer;
 
 

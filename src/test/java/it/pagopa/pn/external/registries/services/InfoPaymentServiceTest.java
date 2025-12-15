@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.exceptions.PnCheckoutBadRequestException;
+import it.pagopa.pn.external.registries.exceptions.PnExternalRegistriesBadRequestException;
 import it.pagopa.pn.external.registries.exceptions.PnNotFoundException;
 import it.pagopa.pn.external.registries.exceptions.PnUnprocessableEntityException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto.*;
@@ -328,6 +329,15 @@ class InfoPaymentServiceTest {
 
         assertNotNull( result );
         assertEquals( PaymentStatusDto.FAILURE, result.get(0).getStatus() );
+    }
+    @Test
+    void getInfoPaymentEmptyList() {
+        Flux<PaymentInfoRequestDto> emptyFlux = Flux.empty();
+        StepVerifier.create(service.getPaymentInfo(emptyFlux))
+                .expectErrorSatisfies(throwable -> {
+                    assertInstanceOf(PnExternalRegistriesBadRequestException.class, throwable);
+                })
+                .verify();
     }
 
     private PaymentRequestDto buildPaymentRequestDto(String returnUrl) {

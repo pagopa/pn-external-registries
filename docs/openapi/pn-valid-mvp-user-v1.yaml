@@ -49,9 +49,6 @@ components:
   schemas:
     TaxId:
       type: string
-      minLength: 16
-      maxLength: 16
-      pattern: "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$"
       x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
     MvpUser:
       type: object

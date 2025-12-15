@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.dto.SenderConfigurationType;
 import it.pagopa.pn.external.registries.middleware.db.entities.LanguageDetailEntity;
 import org.junit.jupiter.api.Assertions;
@@ -13,8 +15,8 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import java.util.List;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
-class SenderConfigurationDaoTestIT {
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
+class SenderConfigurationDaoTestIT extends MockProducerTest {
 
     @Autowired
     private SenderConfigurationDao senderConfigurationDao;
