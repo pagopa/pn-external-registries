@@ -55,6 +55,29 @@ class MVPValidUserServiceTest {
     }
 
     @Test
+    void checkValidUserInvalidTaxId() {
+        String invalidTaxId = "ABC123";
+
+        // When & Then
+        Assertions.assertThrows(
+                it.pagopa.pn.external.registries.exceptions.PnExternalRegistriesBadRequestException.class,
+                () -> service.checkValidUser(Mono.just(invalidTaxId)).block()
+        );
+    }
+
+    @Test
+    void checkValidUserTaxIdNotMatchingRegex() {
+        String invalidFormatTaxId = "1234567890123456";
+
+        Assertions.assertThrows(
+                it.pagopa.pn.external.registries.exceptions.PnExternalRegistriesBadRequestException.class,
+                () -> service.checkValidUser(Mono.just(invalidFormatTaxId)).block()
+        );
+    }
+
+
+
+    @Test
     void checkValidUserPnNotActive() {
         // Given
         LimitedProfile limitedProfile = new LimitedProfile()

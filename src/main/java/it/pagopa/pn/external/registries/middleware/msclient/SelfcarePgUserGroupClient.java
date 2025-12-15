@@ -1,6 +1,5 @@
 package it.pagopa.pn.external.registries.middleware.msclient;
 
-import com.amazonaws.util.StringUtils;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.util.UUID;
 
@@ -30,7 +30,7 @@ public class SelfcarePgUserGroupClient {
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId, String userId) {
         log.logInvokingExternalDownstreamService(SELFCARE_PG, "getUserGroups");
-        UUID userIdUuid = StringUtils.isNullOrEmpty(userId) ? null: UUID.fromString(userId);
+        UUID userIdUuid = StringUtils.isBlank(userId) ? null : UUID.fromString(userId);
         return userGroupPgApi.getUserGroupsUsingGET(config.getSelfcarepgusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, userIdUuid, null)
                 .doOnNext(dto -> log.info("PG GetUserGroup result for institutionId {}: {}", institutionId, dto))
                 .onErrorResume(WebClientResponseException.class, e -> {
