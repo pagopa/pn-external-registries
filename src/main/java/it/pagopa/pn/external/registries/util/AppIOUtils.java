@@ -8,6 +8,7 @@ public class AppIOUtils {
     public static final String POST_ANALOG_TITLE = "Questo messaggio contiene una comunicazione a valore legale";
     public static final String DIGITAL_TITLE = "Questo messaggio contiene una comunicazione a valore legale";
     public static final String REFINED_TITLE = "Questo messaggio contiene una comunicazione a valore legale";
+    public static final String CANCELLED_TITLE = "Questa comunicazione è stata annullata dall'ente mittente.";
 
     public static final String DATE_PLACEHOLDER = "{{data}}";
     public static final String TIME_PLACEHOLDER = "{{ora}}";
