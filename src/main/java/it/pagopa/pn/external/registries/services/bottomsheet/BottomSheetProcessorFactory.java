@@ -16,11 +16,17 @@ public class BottomSheetProcessorFactory {
     private final AnalogPreSchedulingProcessor analogPreSchedulingProcessor;
     private final AnalogPostSchedulingProcessor analogPostSchedulingProcessor;
     private final DigitalProcessor digitalProcessor;
+    private final CancelledProcessor cancelledProcessor;
     private final PostRefinedProcessor postRefinedProcessor;
 
     public BottomSheetProcessor getBottomSheetProcessor(BottomSheetContext context) {
         log.info("Get BottomSheet processor with context: {}", context);
         Instant now = Instant.now();
+
+        if(context.isCancelled()){
+            log.debug("CancelledProcessor selected");
+            return cancelledProcessor;
+        }
         if (context.getRefinementOrViewDate() != null &&
                 now.isAfter(context.getRefinementOrViewDate())) {
             log.debug("PostRefinedProcessor selected");
