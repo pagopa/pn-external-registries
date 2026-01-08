@@ -99,6 +99,7 @@ public class PnExternalRegistriesConfig {
         private String markdownDisclaimerBeforeAnalogDateAppIoMessage;
         private String markdownDisclaimerDigitalAppIoMessage;
         private String markdownDisclaimerAfterRefinementAppIoMessage;
+        private String markdownDisclaimerCancelledAppIoMessage;
 
     }
 
@@ -120,6 +121,7 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate.markdownDisclaimerBeforeAnalogDateAppIoMessage = fetchMessage("markdown_disclaimer_before_analog_date_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerDigitalAppIoMessage = fetchMessage("markdown_disclaimer_digital_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerAfterRefinementAppIoMessage = fetchMessage("markdown_disclaimer_after_refinement_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerCancelledAppIoMessage = fetchMessage("markdown_disclaimer_cancelled_app_io_message.md");
     }
 
     private String fetchMessage(String filename){
