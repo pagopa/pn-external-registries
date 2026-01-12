@@ -74,6 +74,80 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
+  '/ext-registry/pa/v2/activated-on-pn':
+    get:
+      operationId: extendedListOnboardedPa
+      summary: List all PA and relative children that use PN
+      description: Use with API to implement PA choose in domicile and mandate creation pages.
+      tags:
+        - InfoPA
+      #      security:                                                                # ONLY EXTERNAL
+      #        - bearerAuth: [ ]                                                      # ONLY EXTERNAL
+      x-api-permissions:
+        - 'BASE'
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'               # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'             # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/cxGroupsAuthFleet'           # NO EXTERNAL
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'                # NO EXTERNAL
+        - $ref: '#/components/parameters/cxRoleAuthFleet'                             # NO EXTERNAL-
+        - name: paNameFilter
+          description: Se valorizzato indica il prefisso della denominazione della PA
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PaNameFilter'
+        - name: onlyChildren
+          description: >
+            Se valorizzato a `true`, restituisce solo i figli delle PA, 
+            altrimenti restituisce tutti i risultati. 
+            Default: false.
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: page
+          description: >
+            Numero della pagina da visualizzare. 
+            Default: 1
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          description: >
+            Numero massimo di risultati per pagina. 
+            Default: 1
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaSummaryExtendedResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
   '/ext-registry/pg/v1/user-groups':
     get:
       operationId: getPgUserGroupsPrivate
@@ -161,6 +235,134 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PaSummary'
+    PaSummaryExtended:
+      title: PA con informazioni estese
+      description: Informazioni dettagliate riguardo una entità della pubblica amministrazione
+      type: object
+      required:
+        - id
+        - name
+        - childrenList
+      properties:
+        id:
+          type: string
+          description: Identificatore unico dell'entità
+        name:
+          type: string
+          description: Nome dell'entità
+        childrenList:
+          type: array
+          description: Lista delle informazioni estese (figli)
+          items:
+            $ref: '#/components/schemas/PaSummaryExtendedInfo'
+    PaSummaryExtendedInfo:
+      title: PA informazioni estese
+      description: Informazioni minimali della singola entità
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Identificatore unico dell'entità
+        name:
+          type: string
+          description: Nome dell'entità
+    PaSummaryExtendedResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Page'
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaSummaryExtended'
+          maxItems: 999999999
+          minItems: 1
+      additionalProperties: false
+      required:
+        - content
+    Pageable:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+          maximum: 999999999
+          minimum: 1
+        pageNumber:
+          type: integer
+          format: int32
+          maximum: 999999999
+          minimum: 1
+        pageSize:
+          type: integer
+          format: int32
+          maximum: 999999999
+          minimum: 1
+        paged:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        unpaged:
+          type: boolean
+      additionalProperties: false
+    Sort:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+      additionalProperties: false
+    Page:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          type: integer
+          format: int32
+          maximum: 999999999
+          minimum: 1
+        numberOfElements:
+          type: integer
+          format: int32
+          maximum: 999999999
+          minimum: 1
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          type: integer
+          format: int32
+          maximum: 1024
+          minimum: 1
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          type: integer
+          format: int64
+          maximum: 1
+          minimum: 1
+        totalPages:
+          type: integer
+          format: int64
+          maximum: 999999999
+          minimum: 1
+      additionalProperties: false
+      required:
+        - number
+        - numberOfElements
+        - size
+        - totalElements
+        - totalPages
 
 #  securitySchemes:                                      # ONLY EXTERNAL
 #    bearerAuth:                                         # ONLY EXTERNAL
