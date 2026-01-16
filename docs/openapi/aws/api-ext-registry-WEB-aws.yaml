@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: 4+BqOD8AJMgxmsaEnE9uqqH2MgcT5xjGNyq2ix8THdc=
+  version: NSA8F86Xdht/KUwGaQH4Exn/ruxL19EaSDvvKiEMUtc=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -1273,11 +1273,9 @@ components:
         companyName:
           type: string
           description: Public Administration company name
-          maxLength: 140
         description:
           type: string
           description: Subject of payment
-          maxLength: 140
     PaymentResponse:
       title: Response containing the Checkout callback URL
       type: object
