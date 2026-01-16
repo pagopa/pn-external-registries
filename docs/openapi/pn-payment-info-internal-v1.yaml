@@ -349,11 +349,9 @@ components:
         companyName:
           type: string
           description: Public Administration company name
-          maxLength: 140
         description:
           type: string
           description: Subject of payment
-          maxLength: 140
     PaymentResponse:
       title: Response containing the Checkout callback URL
       type: object
