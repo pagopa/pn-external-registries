@@ -942,7 +942,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       FunctionName: !Ref PnExternalRegistriesTriggerLambdaName
       Description: 'It triggers the onboarding institutes written of sqs'
       MemorySize: 128
