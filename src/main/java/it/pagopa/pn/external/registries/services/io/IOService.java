@@ -326,7 +326,8 @@ public class IOService {
                                     timelineServiceResponse.getRefinementOrViewedDate(),
                                     timelineServiceResponse.getDeliveryMode(),
                                     deliveryResponse.getSenderDenomination(),
-                                    deliveryResponse.getSubject()));
+                                    deliveryResponse.getSubject(),
+                                    timelineServiceResponse.getIsNotificationCancelled()));
                 })
                 .doOnNext(preconditionContentDto -> log.info("[{}] [{}] PreconditionContentDto response: {}", iun, recipientInternalId, preconditionContentDto))
                 .doOnNext(preconditionContentDto -> logEvent.generateSuccess().log())
@@ -350,12 +351,14 @@ public class IOService {
                                                             Instant refinementOrViewDate,
                                                             ExtendedDeliveryMode deliveryMode,
                                                             String senderDenomination,
-                                                            String subject) {
-        log.debug("Mapping to PreconditionContentDto with schedulingAnalogDate={}, iun={}, refinementOrViewDate={}, deliveryMode={}, senderDenomination={}, subject={}",
-                schedulingAnalogDate, iun, refinementOrViewDate, deliveryMode, senderDenomination, subject);
+                                                            String subject,
+                                                            boolean isCancelled) {
+        log.debug("Mapping to PreconditionContentDto with schedulingAnalogDate={}, iun={}, refinementOrViewDate={}, deliveryMode={}, senderDenomination={}, subject={}, isCancelled={}",
+                schedulingAnalogDate, iun, refinementOrViewDate, deliveryMode, senderDenomination, subject,isCancelled);
         var preconditionContentInt = new PreconditionContentInt();
         BottomSheetContext bottomSheetContext = BottomSheetContext.builder()
                 .schedulingAnalogDate(schedulingAnalogDate)
+                .isCancelled(isCancelled)
                 .senderDenomination(senderDenomination)
                 .subject(subject)
                 .iun(iun)
