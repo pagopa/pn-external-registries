@@ -1643,6 +1643,7 @@ parameters:
       [A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]
     x-example: SPNDNL80R13C555X
     x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+    format: password # NO EXTERNAL
   DateUTC:
     name: date
     in: path

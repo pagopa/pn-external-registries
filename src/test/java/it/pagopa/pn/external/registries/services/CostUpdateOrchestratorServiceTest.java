@@ -542,7 +542,7 @@ class CostUpdateOrchestratorServiceTest {
                 .iuv(iun)
                 .organizationFiscalCode(creditorTaxId)
                 .amount((long)notificationStepCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
+                .status(PaymentsModelResponse.StatusEnum.PO_PAID)
                 .lastUpdatedDate(new Date());
     }
 }

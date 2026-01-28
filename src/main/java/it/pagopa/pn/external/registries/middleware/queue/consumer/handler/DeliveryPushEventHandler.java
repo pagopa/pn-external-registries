@@ -10,8 +10,8 @@ import it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils.
 import it.pagopa.pn.external.registries.services.CostUpdateOrchestratorService;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 import static it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils.HandleEventUtils.getEventId;
 import static it.pagopa.pn.external.registries.middleware.queue.utils.ConsumerUtils.setMdc;
 
-@Configuration
+@Component
 @AllArgsConstructor
 @CustomLog
 public class DeliveryPushEventHandler {
@@ -37,6 +37,7 @@ public class DeliveryPushEventHandler {
 
             UpdateNotificationCost updateNotificationCost = message.getPayload();
             HandleEventUtils.addIunAndRecIndexAndCorrIdToMdc(updateNotificationCost.getIun(), updateNotificationCost.getRecIndex(), eventId);
+            HandleEventUtils.addMessageHeadersToMDC(message.getHeaders());
 
             log.logStartingProcess(processName);
 

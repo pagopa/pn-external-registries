@@ -11,6 +11,9 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
 import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import static it.pagopa.pn.api.dto.events.StandardEventHeader.*;
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_HANDLE_EVENT_FAILED;
@@ -72,6 +75,22 @@ public class HandleEventUtils {
         if(recIndex != null){
             MDC.put(MDCUtils.MDC_PN_CTX_RECIPIENT_INDEX, String.valueOf(recIndex));
         }
+    }
+
+    public static void addMessageHeadersToMDC(Map<String, Object> messageHeaders) {
+        String traceId = null;
+        String messageId = null;
+
+        if (messageHeaders.containsKey("aws_messageId"))
+            messageId = messageHeaders.get("aws_messageId").toString();
+        if (messageHeaders.containsKey("X-Amzn-Trace-Id"))
+            traceId = messageHeaders.get("X-Amzn-Trace-Id").toString();
+
+        traceId = Objects.requireNonNullElseGet(traceId, () -> "traceId:" + UUID.randomUUID());
+
+        MDCUtils.clearMDCKeys();
+        MDC.put(MDCUtils.MDC_TRACE_ID_KEY, traceId);
+        MDC.put(MDCUtils.MDC_PN_CTX_MESSAGE_ID, messageId);
     }
 
     public static void addCorrelationIdToMdc(String correlationId) {

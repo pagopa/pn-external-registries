@@ -55,7 +55,7 @@ class InfoPaymentServiceTest {
     void getInfoPaymentConflict() {
 
         PaymentStatusConflictDto responseBody = new PaymentStatusConflictDto();
-        responseBody.setFaultCodeCategory(FaultStatusConflictCategoryDto.DUPLICATED);
+        responseBody.setFaultCodeCategory(FaultStatusConflictCategoryDto.PAYMENT_DUPLICATED);
         responseBody.setFaultCodeDetail( PaymentConflictStatusFaultDto.PPT_PAGAMENTO_IN_CORSO);
 
         byte[] responseBodyBytes = new byte[0];
@@ -86,7 +86,7 @@ class InfoPaymentServiceTest {
     void getInfoPaymentConflictOnGoing() {
 
         PaymentStatusConflictDto responseBody = new PaymentStatusConflictDto();
-        responseBody.setFaultCodeCategory(FaultStatusConflictCategoryDto.ONGOING);
+        responseBody.setFaultCodeCategory(FaultStatusConflictCategoryDto.PAYMENT_ONGOING);
         responseBody.setFaultCodeDetail( PaymentConflictStatusFaultDto.PAA_PAGAMENTO_IN_CORSO);
 
         byte[] responseBodyBites = new byte[0];

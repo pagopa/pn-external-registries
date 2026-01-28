@@ -17,17 +17,6 @@
         <pagopa.codegen.version>v01.06.01</pagopa.codegen.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.awspring.cloud</groupId>
-                <artifactId>spring-cloud-aws-dependencies</artifactId>
-                <version>${awspring.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <scm>
         <connection>${git.conn}</connection>
@@ -159,27 +148,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
-                <executions>
-                    <execution>
-                        <id>unpack-dependencies</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>pn-commons</includeArtifactIds>
-                            <outputDirectory>${project.build.directory}/dependency-resources</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.9.0</version>
+                <version> 7.15.0</version>
                 <executions>
                     <execution>
                         <id>pn-external-registries-ipa-server</id>
@@ -194,7 +165,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
@@ -242,7 +212,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
@@ -283,7 +252,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
@@ -324,7 +292,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java8</dateLibrary>
@@ -365,7 +332,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java8</dateLibrary>
@@ -406,7 +372,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java8</dateLibrary>
@@ -447,7 +412,6 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-<!--                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>-->
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
@@ -470,39 +434,6 @@
                         </configuration>
                     </execution>
 
-<!--                    <execution>-->
-<!--                        <id>pn-external-registries-pdnd-client</id>-->
-<!--                        <phase>generate-resources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/docs/wsclient/pdnd/pdnd-v1.yaml</inputSpec>-->
-<!--                            <generatorName>java</generatorName>-->
-<!--                            <library>native</library>-->
-<!--                            <generateApiDocumentation>false</generateApiDocumentation>-->
-<!--                            <generateApiTests>false</generateApiTests>-->
-<!--                            <generateModelTests>false</generateModelTests>-->
-<!--                            <typeMappings>-->
-<!--                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>-->
-<!--                            </typeMappings>-->
-<!--                            <generateSupportingFiles>true</generateSupportingFiles>-->
-<!--                           <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>-->
-<!--                            <configOptions>-->
-<!--                                <asyncNative>true</asyncNative>-->
-<!--                                <useJakartaEe>true</useJakartaEe>-->
-<!--                                <swaggerAnnotations>false</swaggerAnnotations>-->
-<!--                                <openApiNullable>false</openApiNullable>-->
-<!--                                <basePackage>${project.groupId}.generated.openapi.msclient.pdnd.v1</basePackage>-->
-<!--                                <modelPackage>${project.groupId}.generated.openapi.msclient.pdnd.v1.dto</modelPackage>-->
-<!--                                <apiPackage>${project.groupId}.generated.openapi.msclient.pdnd.v1.api</apiPackage>-->
-<!--                                <configPackage>${project.groupId}.generated.openapi.msclient.pdnd.v1.config</configPackage>-->
-<!--                                <dateLibrary>java11</dateLibrary>-->
-<!--                            </configOptions>-->
-<!--                            <modelNameSuffix>Dto</modelNameSuffix>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-
                     <execution>
                         <id>pn-external-registires-anpr-client</id>
                         <phase>generate-resources</phase>
@@ -520,7 +451,6 @@
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
@@ -553,7 +483,6 @@
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
@@ -583,7 +512,6 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
@@ -613,7 +541,6 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
@@ -644,7 +571,6 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
@@ -675,7 +601,6 @@
                             <typeMappings>
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
@@ -715,7 +640,6 @@
                             <typeMappings>
                                 <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
                             </typeMappings>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>

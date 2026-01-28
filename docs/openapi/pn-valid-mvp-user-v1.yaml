@@ -50,6 +50,7 @@ components:
     TaxId:
       type: string
       x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+      format: password # NO EXTERNAL
     MvpUser:
       type: object
       required:
