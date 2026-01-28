@@ -6,9 +6,11 @@ import com.github.fge.jackson.JsonLoader;
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaSummaryExtendedDto;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
+import it.pagopa.pn.external.registries.services.helpers.impl.OnboardInstitutionFulltextSearchHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +20,18 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 @SpringBootTest
 @Import(LocalStackTestConfig.class)
@@ -33,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OnboardInstitutionFulltextSearchHelperTestIT {
+    final String classPathTestData = "src/test/resources/testdata/ipas.json";
+    final String classPathTestAllData = "src/test/resources/testdata/ipas_all.json";
 
     Duration d = Duration.ofMillis(3000);
 
@@ -49,34 +57,30 @@ class OnboardInstitutionFulltextSearchHelperTestIT {
     @Autowired
     OnboardInstitutionFulltextSearchHelper onboardInstitutionFulltextSearchHelper;
 
+
     @AfterAll
     public void clean() {
+        cleanData(classPathTestData);
+//        cleanData(classPathTestAllData);
+    }
+
+    void cleanData(String classPath) {
         testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOnboardInstitutions(), OnboardInstitutionEntity.class);
 
         try {
-            ClassPathResource res = new ClassPathResource("src/test/resources/testdata/ipas.json");
+            ClassPathResource res = new ClassPathResource(classPath);
             File file = new File(res.getPath());
             JsonNode mySchema = JsonLoader.fromFile(file);
             ArrayNode records = (ArrayNode) mySchema.get("records");
 
-            OnboardInstitutionEntity prev = testDao.get(((ArrayNode)records.get(0)).get(0).asText(), null);
-            if (prev != null)
-            {
+            OnboardInstitutionEntity prev = testDao.get((records.get(0)).get(0).asText(), null);
+            if (prev != null) {
                 int i = 1;
-                for (JsonNode d:
-                        records) {
-                    OnboardInstitutionEntity entity = new OnboardInstitutionEntity();
-                    entity.setPk(((ArrayNode)d).get(0).asText());
-                    entity.setDescription(((ArrayNode)d).get(2).asText());
-                    entity.setCreated(Instant.now());
-                    entity.setLastUpdate(Instant.now());
-                    entity.setTaxCode(((ArrayNode)d).get(3).asText());
-                    entity.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
-                    entity.setOnlyRootStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
-
-                    testDao.delete(entity.getPk(),null);
+                for (JsonNode jsonNode: records) {
+                    testDao.delete(jsonNode.get(0).asText(),null);
                     if (i % 100 == 0)
                         log.info("deleted " + i + "pas");
+                    i++;
                 }
             }
         } catch (Exception e) {
@@ -85,50 +89,100 @@ class OnboardInstitutionFulltextSearchHelperTestIT {
     }
 
     @BeforeEach
-    public void beforeeach() throws IOException {
-        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOnboardInstitutions(), OnboardInstitutionEntity.class);
+    public void beforeEach() throws IOException, ExecutionException, InterruptedException {
+        loadIpas(classPathTestData, false, null);
 
+//        Map<String, String> taxCodeToRootPk = getTaxCodeFathers();
+//        loadIpas(classPathTestAllData, true, taxCodeToRootPk);
+        loadFatherChild();
+
+        onboardInstitutionFulltextSearchHelper.update();
+    }
+
+    private void loadIpas(String classPath, boolean fatherChildren, Map<String, String> taxCodeToRootPk) throws IOException {
+        testDao = new TestDao(dynamoDbEnhancedAsyncClient, pnExternalRegistriesConfig.getDynamodbTableNameOnboardInstitutions(), OnboardInstitutionEntity.class);
         try {
-            ClassPathResource res = new ClassPathResource("src/test/resources/testdata/ipas.json");
+            ClassPathResource res = new ClassPathResource(classPath);
             File file = new File(res.getPath());
             JsonNode mySchema = JsonLoader.fromFile(file);
             ArrayNode records = (ArrayNode) mySchema.get("records");
 
-            OnboardInstitutionEntity prev = testDao.get(((ArrayNode)records.get(0)).get(0).asText(), null);
-            if (prev == null)
-            {
-                int i = 1;
-                for (JsonNode d:
-                        records) {
-                    OnboardInstitutionEntity entity = new OnboardInstitutionEntity();
-                    entity.setPk(((ArrayNode)d).get(0).asText());
-                    entity.setDescription(((ArrayNode)d).get(2).asText());
-                    entity.setCreated(Instant.now());
-                    entity.setLastUpdate(Instant.now());
-                    entity.setTaxCode(((ArrayNode)d).get(3).asText());
-                    entity.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
-                    entity.setOnlyRootStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
-
-                    testDao.put(entity);
-                    if (i % 100 == 0)
-                        log.info("inserted " + i + "pas");
+            for (JsonNode jsonNode : records) {
+                String pk = jsonNode.get(0).asText();
+                OnboardInstitutionEntity existingEntity = testDao.get(pk, null);
+                if (existingEntity == null) {
+                    testDao.put(getEntity(jsonNode, taxCodeToRootPk, fatherChildren));
                 }
             }
         } catch (IOException e) {
-           log.error(e.getMessage(), e);
-           throw e;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private OnboardInstitutionEntity getEntity(JsonNode jsonNode, Map<String, String> taxCodeToRootPk, boolean fatherChildren) {
+        OnboardInstitutionEntity entity = new OnboardInstitutionEntity();
+        String pk = jsonNode.get(0).asText();
+        String taxCode = jsonNode.get(3).asText();
+
+        entity.setPk(pk);
+        entity.setDescription(jsonNode.get(2).asText());
+        entity.setCreated(Instant.now());
+        entity.setLastUpdate(Instant.now());
+        entity.setTaxCode(taxCode);
+        entity.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        entity.setOnlyRootStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+
+        if (fatherChildren && taxCodeToRootPk != null && taxCodeToRootPk.containsKey(taxCode)) {
+            entity.setRootId(taxCodeToRootPk.get(taxCode));  // Assegna la pk del padre
+        } else {
+            entity.setRootId(pk); // Se non è figlio, assegna rootId a se stesso
+        }
+
+        return entity;
+    }
+
+    private Map<String, String> getTaxCodeFathers() throws IOException {
+        Map<String, String> taxCodeToRootPk = new HashMap<>();
+
+        ClassPathResource res = new ClassPathResource(classPathTestAllData);
+        File file = new File(res.getPath());
+        JsonNode mySchema = JsonLoader.fromFile(file);
+        ArrayNode records = (ArrayNode) mySchema.get("records");
+
+        for (JsonNode jsonNode : records) {
+            String pk = jsonNode.get(0).asText();
+            String taxCode = jsonNode.get(3).asText();
+            taxCodeToRootPk.putIfAbsent(taxCode, pk);
+        }
+
+        return taxCodeToRootPk;
+    }
+
+    private void loadFatherChild() throws ExecutionException, InterruptedException {
+        // Entità padre
+        OnboardInstitutionEntity parentEntity = createFatherOrChild("PARENT_001", "PARENT_001", "Ministero della Salute", "TAXCODE_PARENT_001");
+        testDao.put(parentEntity);
+
+        // Entità figlio collegata al padre
+        OnboardInstitutionEntity childEntity = createFatherOrChild("CHILD_001", "PARENT_001", "Azienda Sanitaria Locale Roma 1", "TAXCODE_CHILD_001");
+        testDao.put(childEntity);
+
+        // Un altro set di padre-figlio
+        OnboardInstitutionEntity parentEntity2 = createFatherOrChild("PARENT_002", "PARENT_002", "Ministero delle Finanze", "TAXCODE_PARENT_002");
+        testDao.put(parentEntity2);
+
+        OnboardInstitutionEntity childEntity2 = createFatherOrChild("CHILD_002", "PARENT_002", "Agenzia delle Entrate", "TAXCODE_CHILD_002");
+        testDao.put(childEntity2);
     }
 
     @Test
     void update() {
 
         Assertions.assertDoesNotThrow(() ->
-            onboardInstitutionFulltextSearchHelper.update()
+                onboardInstitutionFulltextSearchHelper.update()
         );
 
     }
@@ -137,7 +191,7 @@ class OnboardInstitutionFulltextSearchHelperTestIT {
     void updateWithDelete() throws IOException, ExecutionException, InterruptedException {
 
         //GIVEN
-        ClassPathResource res = new ClassPathResource("src/test/resources/testdata/ipas.json");
+        ClassPathResource res = new ClassPathResource(classPathTestData);
         File file = new File(res.getPath());
         JsonNode mySchema = JsonLoader.fromFile(file);
         ArrayNode records = (ArrayNode) mySchema.get("records");
@@ -168,7 +222,7 @@ class OnboardInstitutionFulltextSearchHelperTestIT {
     void updateWithAdd() throws IOException, ExecutionException, InterruptedException {
 
         //GIVEN
-        ClassPathResource res = new ClassPathResource("src/test/resources/testdata/ipas.json");
+        ClassPathResource res = new ClassPathResource(classPathTestData);
         File file = new File(res.getPath());
         JsonNode mySchema = JsonLoader.fromFile(file);
         ArrayNode records = (ArrayNode) mySchema.get("records");
@@ -200,7 +254,7 @@ class OnboardInstitutionFulltextSearchHelperTestIT {
     @Test
     void fullTextSearch() throws IOException, ExecutionException, InterruptedException {
         //GIVEN
-        ClassPathResource res = new ClassPathResource("src/test/resources/testdata/ipas.json");
+        ClassPathResource res = new ClassPathResource(classPathTestData);
         File file = new File(res.getPath());
         JsonNode mySchema = JsonLoader.fromFile(file);
         ArrayNode records = (ArrayNode) mySchema.get("records");
@@ -226,5 +280,90 @@ class OnboardInstitutionFulltextSearchHelperTestIT {
 
         // THEN
         assertTrue(result2.size() > 0);
+    }
+
+
+    @Test
+    void extendedFullTextSearch() {
+        // WHEN
+        List<PaSummaryExtendedDto> result = onboardInstitutionFulltextSearchHelper
+                .extendedFullTextSearch("", false)
+                .collectList()
+                .block();
+
+        // THEN
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+
+        // Si contano padri e figli
+        long numParents = result.stream().filter(dto -> dto.getChildrenList() != null && !dto.getChildrenList().isEmpty()).count();
+        long numEntitiesWithoutChildren = result.stream().filter(dto -> dto.getChildrenList() == null || dto.getChildrenList().isEmpty()).count();
+
+        assertTrue(numParents > 0);
+        assertTrue(numEntitiesWithoutChildren > 0);
+    }
+
+    @Test
+    void extendedFullTextSearch_onlyChildren() {
+        // WHEN
+        PaSummaryExtendedDto result = onboardInstitutionFulltextSearchHelper
+                .extendedFullTextSearch("", true)
+                .blockFirst();
+
+        // THEN
+        assertNotNull(result);
+        assertNotNull(result.getChildrenList());
+        assertFalse(result.getChildrenList().isEmpty());
+
+        // Si verifica che la lista contenga figli
+        boolean containsEntitiesWithChildren = !result.getChildrenList().isEmpty();
+        assertTrue(containsEntitiesWithChildren);
+    }
+
+    @Test
+    void extendedFullTextSearch_partialMatch() {
+        // WHEN
+        List<PaSummaryExtendedDto> allResults = onboardInstitutionFulltextSearchHelper
+                .extendedFullTextSearch("", false)
+                .collectList()
+                .block();
+
+        assertNotNull(allResults);
+        assertFalse(allResults.isEmpty());
+
+        PaSummaryExtendedDto selectedEntity = allResults.get(0);
+        String entityName = selectedEntity.getName();
+
+        assertNotNull(entityName);
+        assertTrue(entityName.length() >= 3);
+
+        // WHEN: Si ricerca un substring del nome
+        String partialQuery = entityName.substring(0, 3);
+        List<PaSummaryExtendedDto> resultWithSubstring = onboardInstitutionFulltextSearchHelper
+                .extendedFullTextSearch(partialQuery, false)
+                .collectList()
+                .block();
+
+        // THEN
+        assertNotNull(resultWithSubstring);
+        assertFalse(resultWithSubstring.isEmpty());
+
+        boolean containsMatchingEntity = resultWithSubstring.stream()
+                .anyMatch(dto -> dto.getName().toLowerCase().contains(partialQuery.toLowerCase()));
+
+        assertTrue(containsMatchingEntity, "Almeno un risultato dovrebbe contenere la substring '" + partialQuery + "'");
+    }
+
+    private OnboardInstitutionEntity createFatherOrChild(String pk, String rootId, String name, String taxCode) {
+        OnboardInstitutionEntity entity = new OnboardInstitutionEntity();
+        entity.setPk(pk);
+        entity.setDescription(name);
+        entity.setCreated(Instant.now());
+        entity.setLastUpdate(Instant.now());
+        entity.setTaxCode(taxCode);
+        entity.setStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        entity.setOnlyRootStatus(OnboardInstitutionEntity.STATUS_ACTIVE);
+        entity.setRootId(rootId);
+        return entity;
     }
 }

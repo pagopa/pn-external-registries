@@ -74,6 +74,25 @@ public class InfoPaController implements InfoPaApi {
     }
 
     /**
+     * GET /ext-registry/pa/v2/activated-on-pn : List all PA and relative children that use PN
+     * Use with API to implement PA choose in domicile and mandate creation pages.
+     *
+     * @param paNameFilter If valued, indicates the name or part of it to search for (optional)
+     * @param onlyChildren Indicate whether to return only children
+     * @param page Indicates the page number (default: 1)
+     * @param size Indicates the quantity of items per page (default: 1)
+     * @return OK (status code 200)
+     *         or Invalid input (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
+    @Override
+    public Mono<ResponseEntity<PaSummaryExtendedResponseDto>> extendedListOnboardedPa(String paNameFilter, Boolean onlyChildren, Integer page, Integer size, ServerWebExchange exchange) {
+        log.debug("extendedListOnboardedPa - paNameFilter={} onlyChildren={} page={} size={}", paNameFilter, onlyChildren, page, size);
+        return infoSelfcareInstitutionsService.extendedListOnboardedPaByName(paNameFilter, onlyChildren, page, size)
+                .map(ResponseEntity::ok);
+    }
+
+    /**
      * GET /ext-registry/pa/v1/groups : Retrieve the groups defined in Self Care of the current user
      * Used by the new notification page
      *

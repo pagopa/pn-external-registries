@@ -3,26 +3,23 @@ package it.pagopa.pn.external.registries.middleware.db.dao;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.BaseDao;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.BatchGetResultPage;
-import software.amazon.awssdk.enhanced.dynamodb.model.Page;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
-
-import java.time.Instant;
-import software.amazon.awssdk.enhanced.dynamodb.model.ReadBatch;
+import software.amazon.awssdk.enhanced.dynamodb.model.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.ReadBatch.Builder;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity.GSI_INDEX_LASTUPDATE;
 
@@ -31,7 +28,7 @@ import static it.pagopa.pn.external.registries.middleware.db.entities.OnboardIns
 public class OnboardInstitutionsDao extends BaseDao {
 
     DynamoDbAsyncTable<OnboardInstitutionEntity> onboardInstitutionsTable;
-    private DynamoDbEnhancedAsyncClient dynamoDbAsyncClient;
+    private final DynamoDbEnhancedAsyncClient dynamoDbAsyncClient;
 
     public OnboardInstitutionsDao(DynamoDbEnhancedAsyncClient dynamoDbAsyncClient,
                                   PnExternalRegistriesConfig pnExternalRegistriesConfig) {
@@ -65,6 +62,94 @@ public class OnboardInstitutionsDao extends BaseDao {
          return Flux.merge(
             Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestACTIVE).flatMapIterable(Page::items)),
                  Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryEnhancedRequestDELETED).flatMapIterable(Page::items)));
+    }
+
+    /**
+     * Retrieves a stream of onboarded institution entities that have been updated after the specified timestamp.
+     * This method queries the DynamoDB table using a global secondary index (GSI) and retrieves all child entities
+     * that have been updated after the provided `mostRecent` timestamp.
+     *
+     * The query is executed for both `STATUS_ACTIVE` and `STATUS_CLOSED` institutions.
+     * Once the initial set of matching entities is retrieved, their corresponding children are also fetched.
+     *
+     * @param mostRecent The timestamp to filter institutions updated after this date. If null, defaults to {@link Instant#EPOCH}.
+     * @return A {@link Flux} emitting all matching {@link OnboardInstitutionEntity} instances.
+     */
+    public Flux<OnboardInstitutionEntity> getNewerChildren(Instant mostRecent) {
+        final Instant finalMostRecent = (mostRecent != null) ? mostRecent : Instant.EPOCH;
+
+        log.debug("getNewerChildren, mostRecent = {}", finalMostRecent);
+        QueryEnhancedRequest queryRequestACTIVE = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.sortGreaterThan(
+                        Key.builder().partitionValue(OnboardInstitutionEntity.STATUS_ACTIVE).sortValue(finalMostRecent.toString()).build()
+                ))
+                .build();
+
+        QueryEnhancedRequest queryRequestCLOSED = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.sortGreaterThan(
+                        Key.builder().partitionValue(OnboardInstitutionEntity.STATUS_CLOSED).sortValue(finalMostRecent.toString()).build()
+                ))
+                .build();
+
+        return Flux.merge(
+                        Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryRequestACTIVE))
+                                .flatMapIterable(Page::items)
+                                .filter(entity -> !entity.getRootId().equals(entity.getPk()))
+                                .map(entity -> Key.builder().partitionValue(entity.getPk()).build()),
+
+                        Flux.from(onboardInstitutionsTable.index(GSI_INDEX_LASTUPDATE).query(queryRequestCLOSED))
+                                .flatMapIterable(Page::items)
+                                .filter(entity -> !entity.getRootId().equals(entity.getPk()))
+                                .map(entity -> Key.builder().partitionValue(entity.getPk()).build())
+                )
+                .collectList()
+                .flatMapMany(initialKeys -> {
+                    if (initialKeys.isEmpty()) {
+                        return Flux.empty();
+                    } else {
+                        return retrieveChildren(finalMostRecent, initialKeys);
+                    }
+                });
+    }
+
+    /**
+     * Recursively retrieves child entities from the DynamoDB table based on a list of unprocessed keys.
+     * This method performs batch reads on DynamoDB using the provided `unprocessedKeys` and filters the results.
+     * If new unprocessed keys are found (due to limitations in batch operations), it recursively calls itself
+     * to retrieve additional entities.
+     *
+     * @param mostRecent The timestamp to filter institutions updated after this date. If null, defaults to {@link Instant#EPOCH}.
+     * @param unprocessedKeys A list of keys representing the child entities to be retrieved.
+     * @return A {@link Flux} emitting all matching {@link OnboardInstitutionEntity} instances.
+     */
+    private Flux<OnboardInstitutionEntity> retrieveChildren(Instant mostRecent, List<Key> unprocessedKeys) {
+        final Instant finalMostRecent = mostRecent != null ? mostRecent : Instant.EPOCH;
+        if (unprocessedKeys.isEmpty()) {
+            return Flux.empty();
+        }
+
+        log.info("Unprocessed keys, size = {}", unprocessedKeys.size());
+        ReadBatch.Builder<OnboardInstitutionEntity> batchBuilder = ReadBatch.builder(OnboardInstitutionEntity.class)
+                .mappedTableResource(onboardInstitutionsTable);
+
+        unprocessedKeys.forEach(batchBuilder::addGetItem);
+        return Mono.from(dynamoDbAsyncClient.batchGetItem(BatchGetItemEnhancedRequest.builder()
+                        .readBatches(batchBuilder.build())
+                        .build()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .flatMapMany(batchResult -> {
+                    List<OnboardInstitutionEntity> results = batchResult.resultsForTable(onboardInstitutionsTable);
+                    log.info("Retrieved children, size = {}", results.size());
+                    List<Key> newUnprocessedKeys = batchResult.unprocessedKeysForTable(onboardInstitutionsTable);
+
+                    List<OnboardInstitutionEntity> filteredResults = results.stream()
+                            .filter(entity -> !entity.getRootId().equals(entity.getPk()))
+                            .filter(entity -> entity.getLastUpdate().isAfter(finalMostRecent))
+                            .toList();
+
+                    return Flux.fromIterable(filteredResults)
+                            .concatWith(retrieveChildren(finalMostRecent, newUnprocessedKeys));
+                });
     }
 
     public Flux<OnboardInstitutionEntity> filterOutRootIds(List<String> ids){
