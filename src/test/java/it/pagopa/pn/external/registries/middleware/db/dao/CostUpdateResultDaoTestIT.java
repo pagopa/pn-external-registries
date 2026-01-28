@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultResponseInt;
 import it.pagopa.pn.external.registries.middleware.db.entities.CommunicationResultEntity;
@@ -20,8 +22,8 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
-class CostUpdateResultDaoTestIT {
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
+class CostUpdateResultDaoTestIT extends MockProducerTest {
     @Autowired
     private CostUpdateResultDao costUpdateResultDao;
 

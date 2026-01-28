@@ -847,6 +847,39 @@ class IOServiceTest {
     }
 
     @Test
+    void notificationDisclaimerNotificationCancelledAppIOTest() {
+        String recipientInternalId = "internalId";
+        String iun = "iun";
+
+        PnExternalRegistriesConfig pnConfig = new PnExternalRegistriesConfig();
+        pnConfig.init();
+
+        Mockito.when(bottomSheetProcessor.process(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenAnswer(invocation -> PreconditionContentInt.builder()
+                        .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerCancelledAppIoMessage())
+                        .title("Questa comunicazione è stata annullata dall'ente mittente.")
+                        .build());
+
+        PreconditionContentInt expected = PreconditionContentInt.builder()
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerCancelledAppIoMessage())
+                .title("Questa comunicazione è stata annullata dall'ente mittente.")
+                .build();
+
+        Mockito.when(notificationService.getSentNotificationPrivate(iun)).thenReturn(getnotificationServiceResponse());
+        Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponseForNotificationCancelled(ExtendedDeliveryMode.DIGITAL));
+
+
+        Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
+
+        Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
+
+        StepVerifier.create(result)
+                .expectNextMatches(actual -> actual.getTitle().equals(expected.getTitle())
+                        && actual.getMarkdown().equals(expected.getMarkdown()))
+                .verifyComplete();
+    }
+
+    @Test
     void notificationDisclaimerWithoutRecipientTest() {
         String recipientInternalId = "notfound";
         String iun = "iun";
@@ -878,6 +911,15 @@ class IOServiceTest {
     private Mono<DeliveryInformationResponseInt> getTimelineServiceResponse(ExtendedDeliveryMode deliveryMode) {
         return Mono.just(DeliveryInformationResponseInt.builder()
                 .isNotificationCancelled(false)
+                .refinementOrViewedDate(Instant.now())
+                .deliveryMode(deliveryMode)
+                .schedulingAnalogDate(Instant.now()
+                ).build());
+    }
+
+    private Mono<DeliveryInformationResponseInt> getTimelineServiceResponseForNotificationCancelled(ExtendedDeliveryMode deliveryMode) {
+        return Mono.just(DeliveryInformationResponseInt.builder()
+                .isNotificationCancelled(true)
                 .refinementOrViewedDate(Instant.now())
                 .deliveryMode(deliveryMode)
                 .schedulingAnalogDate(Instant.now()

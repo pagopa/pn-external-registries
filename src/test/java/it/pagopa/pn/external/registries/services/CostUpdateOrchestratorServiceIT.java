@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
@@ -33,8 +35,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
-class CostUpdateOrchestratorServiceIT {
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
+class CostUpdateOrchestratorServiceIT extends MockProducerTest {
 
     @Autowired
     private CostComponentsDao costComponentsDao;
@@ -621,7 +623,7 @@ class CostUpdateOrchestratorServiceIT {
                 .iuv(iun)
                 .organizationFiscalCode(creditorTaxId)
                 .amount((long)notificationStepCost)
-                .status(PaymentsModelResponse.StatusEnum.PAID)
+                .status(PaymentsModelResponse.StatusEnum.PO_PAID)
                 .lastUpdatedDate(new Date());
     }
 }

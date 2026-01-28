@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.config;
 
 import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ResourceUtils;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -99,6 +98,7 @@ public class PnExternalRegistriesConfig {
         private String markdownDisclaimerBeforeAnalogDateAppIoMessage;
         private String markdownDisclaimerDigitalAppIoMessage;
         private String markdownDisclaimerAfterRefinementAppIoMessage;
+        private String markdownDisclaimerCancelledAppIoMessage;
 
     }
 
@@ -120,6 +120,7 @@ public class PnExternalRegistriesConfig {
         this.appIoTemplate.markdownDisclaimerBeforeAnalogDateAppIoMessage = fetchMessage("markdown_disclaimer_before_analog_date_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerDigitalAppIoMessage = fetchMessage("markdown_disclaimer_digital_app_io_message.md");
         this.appIoTemplate.markdownDisclaimerAfterRefinementAppIoMessage = fetchMessage("markdown_disclaimer_after_refinement_app_io_message.md");
+        this.appIoTemplate.markdownDisclaimerCancelledAppIoMessage = fetchMessage("markdown_disclaimer_cancelled_app_io_message.md");
     }
 
     private String fetchMessage(String filename){

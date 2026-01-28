@@ -3,6 +3,8 @@ package it.pagopa.pn.external.registries.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.exceptions.PnPrivacyNoticeNotFound;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PrivacyNoticeVersionResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.onetrust.OneTrustClient;
@@ -13,9 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -23,10 +25,10 @@ import reactor.test.StepVerifier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
-class PrivacyNoticeServiceTestIT {
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
+class PrivacyNoticeServiceTestIT extends MockProducerTest {
 
-    @MockBean
+    @MockitoBean
     private OneTrustClient oneTrustClient;
 
     @Autowired

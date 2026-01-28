@@ -125,6 +125,7 @@ components:
         address:
           type: string
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
     AnalogDomicile:
       title: dettagli di un domicilio analogico; ovvero un indirizzo fisico
       type: object
@@ -138,31 +139,38 @@ components:
           type: string
           example: 'presso famiglia Rossi'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         address: 
           type: string
           example: 'Via senza Nome 15'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         addressDetails:
           type: string
           example: 'scala A'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         cap:
           type: string
           example: '40129'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         municipality:
           type: string
           example: 'Bologna'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         province:
           type: string
           minLength: 2
           maxLength: 2
           example: 'BO'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         state:
           type: string
           minLength: 2
           maxLength: 2
           example: 'it'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL

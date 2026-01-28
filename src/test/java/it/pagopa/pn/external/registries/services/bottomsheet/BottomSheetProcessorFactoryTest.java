@@ -16,6 +16,7 @@ class BottomSheetProcessorFactoryTest {
     private AnalogPostSchedulingProcessor analogPostSchedulingProcessor;
     private DigitalProcessor digitalProcessor;
     private PostRefinedProcessor postRefinedProcessor;
+    private CancelledProcessor cancelledProcessor;
     private BottomSheetProcessorFactory factory;
 
     @BeforeEach
@@ -24,11 +25,13 @@ class BottomSheetProcessorFactoryTest {
         analogPostSchedulingProcessor = mock(AnalogPostSchedulingProcessor.class);
         digitalProcessor = mock(DigitalProcessor.class);
         postRefinedProcessor = mock(PostRefinedProcessor.class);
+        cancelledProcessor = mock(CancelledProcessor.class);
 
         factory = new BottomSheetProcessorFactory(
                 analogPreSchedulingProcessor,
                 analogPostSchedulingProcessor,
                 digitalProcessor,
+                cancelledProcessor,
                 postRefinedProcessor
         );
     }
@@ -36,6 +39,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsPostRefinedProcessorWhenRefinementOrViewDateIsBeforeCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
+                .isCancelled(false)
                 .deliveryMode(ExtendedDeliveryMode.ANALOG)
                 .refinementOrViewDate(Instant.now().minusSeconds(3600))
                 .build();
@@ -46,6 +50,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsAnalogPostSchedulingProcessorWhenAnalogAndSchedulingDateIsBeforeCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
+                .isCancelled(false)
                 .deliveryMode(ExtendedDeliveryMode.ANALOG)
                 .schedulingAnalogDate(Instant.now().minusSeconds(3600))
                 .build();
@@ -56,6 +61,7 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsAnalogPreSchedulingProcessorWhenAnalogAndSchedulingDateIsAfterCurrentDate() {
         BottomSheetContext context = BottomSheetContext.builder()
+                .isCancelled(false)
                 .deliveryMode(ExtendedDeliveryMode.ANALOG)
                 .schedulingAnalogDate(Instant.now().plus(Duration.ofMillis(3600)))
                 .build();
@@ -66,10 +72,20 @@ class BottomSheetProcessorFactoryTest {
     @Test
     void returnsDigitalProcessorWhenDigital() {
         BottomSheetContext context = BottomSheetContext.builder()
+                .isCancelled(false)
                 .deliveryMode(ExtendedDeliveryMode.DIGITAL)
                 .build();
         BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
         assertSame(digitalProcessor, processor);
+    }
+
+    @Test
+    void returnsCancelledProcessor() {
+        BottomSheetContext context = BottomSheetContext.builder()
+                .isCancelled(true)
+                .build();
+        BottomSheetProcessor processor = factory.getBottomSheetProcessor(context);
+        assertSame(cancelledProcessor, processor);
     }
 
     @Test
