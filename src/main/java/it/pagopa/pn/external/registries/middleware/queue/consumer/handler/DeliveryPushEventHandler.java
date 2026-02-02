@@ -37,7 +37,6 @@ public class DeliveryPushEventHandler {
 
             UpdateNotificationCost updateNotificationCost = message.getPayload();
             HandleEventUtils.addIunAndRecIndexAndCorrIdToMdc(updateNotificationCost.getIun(), updateNotificationCost.getRecIndex(), eventId);
-            HandleEventUtils.addMessageHeadersToMDC(message.getHeaders());
 
             log.logStartingProcess(processName);
 

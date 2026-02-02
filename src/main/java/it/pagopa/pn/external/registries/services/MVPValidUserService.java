@@ -18,6 +18,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @Slf4j
 public class MVPValidUserService {
     private final IOOptInClient client;
+    private final static String TAX_CODE_PATTERN = "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$";
 
     public MVPValidUserService(IOOptInClient client) {
         this.client = client;
@@ -27,7 +28,7 @@ public class MVPValidUserService {
         return body
                 .flatMap(taxId -> {
                     log.info("Start to check taxId={}", LogUtils.maskTaxId(taxId));
-                    if (StringUtils.isBlank(taxId) || taxId.length() != 16 || !taxId.matches("^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$")) {
+                    if (StringUtils.isBlank(taxId) || taxId.length() != 16 || !taxId.matches(TAX_CODE_PATTERN)) {
                         return Mono.error(new PnExternalRegistriesBadRequestException("Check taxId error","TaxId must contain a minimum of 16 and a maximum of 16 characters",
                                 ERROR_CODE_EXTERNALREGISTRIES_VALID_USER_BAD_REQUEST));
                     }

@@ -72,12 +72,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.8</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
@@ -182,12 +176,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.ipa.v1.config</configPackage>
                                 <documentationProvider>source</documentationProvider>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
-                                <openApiNullable>false</openApiNullable>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder(toBuilder = true);
-                                    @lombok.NoArgsConstructor;
-                                    @lombok.AllArgsConstructor;
-                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -199,13 +187,6 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <typeMappings>
-                                <typeMapping>Date=Instant</typeMapping>
-                            </typeMappings>
-                            <importMappings>
-                                <importMapping>java.util.Date=java.time.Instant</importMapping>
-                                <importMapping>Date=java.time.Instant</importMapping>
-                            </importMappings>
                             <inputSpec>${project.basedir}/docs/openapi/pn-recipient-domicile-v1.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <library>spring-boot</library>
@@ -229,12 +210,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.recipient.domicile.v1.config</configPackage>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder(toBuilder = true);
-                                    @lombok.NoArgsConstructor;
-                                    @lombok.AllArgsConstructor;
-                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -269,12 +244,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.payment.v1.config</configPackage>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder(toBuilder = true);
-                                    @lombok.NoArgsConstructor;
-                                    @lombok.AllArgsConstructor;
-                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -309,12 +278,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.io.v1.config</configPackage>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder(toBuilder = true);
-                                    @lombok.NoArgsConstructor;
-                                    @lombok.AllArgsConstructor;
-                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -349,12 +312,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.io.v1.config</configPackage>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder(toBuilder = true);
-                                    @lombok.NoArgsConstructor;
-                                    @lombok.AllArgsConstructor;
-                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -389,12 +346,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.valid.mvp.user.v1.config</configPackage>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder(toBuilder = true);
-                                    @lombok.NoArgsConstructor;
-                                    @lombok.AllArgsConstructor;
-                                </additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -429,7 +380,6 @@
                                 <configPackage>${project.groupId}.generated.openapi.server.ipa.v1.config</configPackage>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -447,9 +397,6 @@
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <typeMappings>
-                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
-                            </typeMappings>
                             <generateSupportingFiles>true</generateSupportingFiles>
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
@@ -580,6 +527,7 @@
                                 <configPackage>${project.groupId}.generated.openapi.msclient.gpd.v1.config</configPackage>
                                 <dateLibrary>java11</dateLibrary>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)</additionalModelTypeAnnotations>
+                                <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -608,13 +556,10 @@
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
-                                <basePackage>${project.groupId}.generated.openapi.msclient.delivery-reactive.v1</basePackage>
                                 <modelPackage>${project.groupId}.generated.openapi.msclient.delivery.v1.dto</modelPackage>
                                 <apiPackage>${project.groupId}.generated.openapi.msclient.delivery-reactive.v1.api</apiPackage>
-                                <configPackage>${project.groupId}.generated.openapi.msclient.delivery-reactive.v1.config</configPackage>
                                 <annotationLibrary>none</annotationLibrary>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
@@ -647,13 +592,10 @@
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
-                                <basePackage>${project.groupId}.generated.openapi.msclient.timelineservice.v1</basePackage>
                                 <modelPackage>${project.groupId}.generated.openapi.msclient.timelineservice.v1.dto</modelPackage>
                                 <apiPackage>${project.groupId}.generated.openapi.msclient.timelineservice.v1.api</apiPackage>
-                                <configPackage>${project.groupId}.generated.openapi.msclient.timelineservice.v1.config</configPackage>
                                 <annotationLibrary>none</annotationLibrary>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>

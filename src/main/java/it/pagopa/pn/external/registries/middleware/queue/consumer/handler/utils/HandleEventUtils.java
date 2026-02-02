@@ -77,22 +77,6 @@ public class HandleEventUtils {
         }
     }
 
-    public static void addMessageHeadersToMDC(Map<String, Object> messageHeaders) {
-        String traceId = null;
-        String messageId = null;
-
-        if (messageHeaders.containsKey("aws_messageId"))
-            messageId = messageHeaders.get("aws_messageId").toString();
-        if (messageHeaders.containsKey("X-Amzn-Trace-Id"))
-            traceId = messageHeaders.get("X-Amzn-Trace-Id").toString();
-
-        traceId = Objects.requireNonNullElseGet(traceId, () -> "traceId:" + UUID.randomUUID());
-
-        MDCUtils.clearMDCKeys();
-        MDC.put(MDCUtils.MDC_TRACE_ID_KEY, traceId);
-        MDC.put(MDCUtils.MDC_PN_CTX_MESSAGE_ID, messageId);
-    }
-
     public static void addCorrelationIdToMdc(String correlationId) {
         MDC.put(MDCUtils.MDC_PN_CTX_REQUEST_ID, correlationId);
     }

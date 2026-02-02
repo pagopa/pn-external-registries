@@ -265,7 +265,7 @@ components:
         codFiscale:
           type: string
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
-          format: FiscalCode # NO EXTERNAL
+          format: password # NO EXTERNAL
         validitaCF:
           type: string
         dataAttribuzioneValidita:
@@ -654,7 +654,7 @@ components:
         codiceFiscale:
           $ref: '#/components/schemas/TipoCodiceFiscale'
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
-          format: FiscalCode # NO EXTERNAL
+          format: password # NO EXTERNAL
         cognome:
           type: string
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
