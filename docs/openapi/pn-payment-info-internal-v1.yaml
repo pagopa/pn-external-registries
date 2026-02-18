@@ -173,6 +173,7 @@ components:
       title: Requests for payment info
       description: List of request payment info containing sender and payment id
       type: array
+      minItems: 1 # NO EXTERNAL
       items:
         $ref: '#/components/schemas/PaymentInfoRequest'
     PaymentInfoRequest:
@@ -191,6 +192,7 @@ components:
       title: Response for payment info requests
       description: List of payment info
       type: array
+      minItems: 1 # NO EXTERNAL
       items:
         $ref: '#/components/schemas/PaymentInfoV21'
     PaymentInfoV21:
