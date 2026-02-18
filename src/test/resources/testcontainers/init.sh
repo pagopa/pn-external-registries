@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "### CREATE QUEUES ###"
 
 queues="local-delivery-push-to-ext-registries"

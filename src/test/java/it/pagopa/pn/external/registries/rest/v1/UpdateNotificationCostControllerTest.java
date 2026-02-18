@@ -4,27 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.UpdateCostResponseInt;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PgGroupDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.PaymentsInfoForRecipientDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.UpdateNotificationCostRequestDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.UpdateNotificationCostResponseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.UpdateNotificationCostResultDto;
 import it.pagopa.pn.external.registries.services.CostUpdateOrchestratorService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = {UpdateNotificationCostController.class})
@@ -35,7 +34,7 @@ class UpdateNotificationCostControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private CostUpdateOrchestratorService service;
 
     @Test

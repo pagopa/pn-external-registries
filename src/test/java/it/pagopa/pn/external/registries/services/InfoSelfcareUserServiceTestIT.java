@@ -1,37 +1,40 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserInstitutionResourceDto;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto.UserProductResourceDto;
-import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.InstitutionResourcePNDto;
 import it.pagopa.pn.external.registries.middleware.msclient.SelfcarePaInstitutionClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
 @Slf4j
 @ActiveProfiles("test")
-class InfoSelfcareUserServiceTestIT {
+class InfoSelfcareUserServiceTestIT extends MockProducerTest {
 
 
     @Autowired
     private InfoSelfcareUserService service;
 
-    @MockBean
+    @MockitoBean
     private SelfcarePaInstitutionClient selfcarePaInstitutionClient;
 
     @Test

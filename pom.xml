@@ -4,19 +4,20 @@
     <parent>
         <groupId>it.pagopa.pn</groupId>
         <artifactId>pn-parent</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.3-SPRINGBOOT3</version>
         <relativePath />
     </parent>
 
     <groupId>it.pagopa.pn.external.registries</groupId>
     <artifactId>pn-external-registries</artifactId>
-    <version>2.15.0-SNAPSHOT</version>
+    <version>2.15.0-SPRINGBOOT3</version>
     <name>pn-external-registries</name>
     <description>TODO</description>
     <properties>
         <pagopa.codegen.version>v01.06.01</pagopa.codegen.version>
     </properties>
-    
+
+
     <scm>
         <connection>${git.conn}</connection>
         <developerConnection>${git.devConn}</developerConnection>
@@ -28,7 +29,7 @@
         <dependency>
             <groupId>it.pagopa.pn</groupId>
             <artifactId>pn-commons</artifactId>
-            <version>2.15.0</version>
+            <version>2.16.0-SPRINGBOOT3</version>
         </dependency>
         <dependency>
             <groupId>it.pagopa.pn</groupId>
@@ -38,7 +39,7 @@
         <dependency>
             <groupId>it.pagopa.pn</groupId>
             <artifactId>pn-model</artifactId>
-            <version>2.2.0</version>
+            <version>2.11.0-SPRINGBOOT3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.swagger/swagger-annotations -->
@@ -55,7 +56,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-sqs</artifactId>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/kms -->
@@ -63,7 +70,6 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>kms</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
@@ -106,21 +112,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-starter-aws-messaging</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.idealo.spring</groupId>
-            <artifactId>spring-cloud-stream-binder-sqs</artifactId>
-            <version>1.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-starter-aws-messaging</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -129,6 +120,14 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -143,27 +142,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
-                <executions>
-                    <execution>
-                        <id>unpack-dependencies</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>pn-commons</includeArtifactIds>
-                            <outputDirectory>${project.build.directory}/dependency-resources</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>6.0.0</version>
+                <version> 7.15.0</version>
                 <executions>
                     <execution>
                         <id>pn-external-registries-ipa-server</id>
@@ -178,16 +159,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1
-                                </basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -197,9 +170,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.ipa.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.ipa.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.ipa.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.ipa.v1.config</configPackage>
+                                <documentationProvider>source</documentationProvider>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-recipients-server</id>
                         <phase>generate-resources</phase>
@@ -213,20 +193,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1
-                                </basePackage>
-                                <modelPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.dto
-                                </modelPackage>
-                                <apiPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.api
-                                </apiPackage>
-                                <configPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.recipient.domicile.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -236,9 +204,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.recipient.domicile.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.recipient.domicile.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.recipient.domicile.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.recipient.domicile.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                                <documentationProvider>source</documentationProvider>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-payment-server</id>
                         <phase>generate-resources</phase>
@@ -252,20 +227,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.payment.v1
-                                </basePackage>
-                                <modelPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto
-                                </modelPackage>
-                                <apiPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.api
-                                </apiPackage>
-                                <configPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -275,9 +238,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.payment.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.payment.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.payment.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.payment.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                                <documentationProvider>source</documentationProvider>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-io-message-server</id>
                         <phase>generate-resources</phase>
@@ -291,20 +261,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1
-                                </basePackage>
-                                <modelPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto
-                                </modelPackage>
-                                <apiPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api
-                                </apiPackage>
-                                <configPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -314,9 +272,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.io.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.io.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.io.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.io.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                                <documentationProvider>source</documentationProvider>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-from-io-b2b</id>
                         <phase>generate-resources</phase>
@@ -330,20 +295,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1
-                                </basePackage>
-                                <modelPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto
-                                </modelPackage>
-                                <apiPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.api
-                                </apiPackage>
-                                <configPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.io.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -353,9 +306,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.io.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.io.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.io.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.io.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                                <documentationProvider>source</documentationProvider>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-valid-mvp-user-server</id>
                         <phase>generate-resources</phase>
@@ -369,20 +329,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1
-                                </basePackage>
-                                <modelPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto
-                                </modelPackage>
-                                <apiPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.api
-                                </apiPackage>
-                                <configPackage>
-                                    it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -392,9 +340,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.valid.mvp.user.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.valid.mvp.user.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.valid.mvp.user.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.valid.mvp.user.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                                <documentationProvider>source</documentationProvider>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-private</id>
                         <phase>generate-resources</phase>
@@ -408,16 +363,8 @@
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/server</templateDirectory>
                             <configOptions>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1
-                                </basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.config
-                                </configPackage>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <dateLibrary>java11</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -427,40 +374,16 @@
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.ipa.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.ipa.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.ipa.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.ipa.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                                <documentationProvider>source</documentationProvider>
                             </configOptions>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>pn-external-registries-pdnd-client</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/docs/wsclient/pdnd/pdnd-v1.yaml</inputSpec>
-                            <generatorName>java</generatorName>
-                            <library>native</library>
-                            <generateApiDocumentation>false</generateApiDocumentation>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                            <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
-                            <configOptions>
-                                <asyncNative>true</asyncNative>
-                                <swaggerAnnotations>false</swaggerAnnotations>
-                                <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.pdnd.v1.config
-                                </configPackage>
-                                <dateLibrary>java11</dateLibrary>
-                            </configOptions>
-                            <modelNameSuffix>Dto</modelNameSuffix>
-                        </configuration>
-                    </execution>
+
                     <execution>
                         <id>pn-external-registires-anpr-client</id>
                         <phase>generate-resources</phase>
@@ -475,22 +398,21 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.anpr.v1.config
+                                <basePackage>${project.groupId}.generated.openapi.msclient.anpr.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.anpr.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.anpr.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.msclient.anpr.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
                             <modelNameSuffix>Dto</modelNameSuffix>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-checkout-client</id>
                         <phase>generate-resources</phase>
@@ -504,23 +426,25 @@
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
+                            <typeMappings>
+                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
+                            </typeMappings>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.checkout.v1.config
+                                <basePackage>${project.groupId}.generated.openapi.msclient.checkout.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.checkout.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.checkout.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.msclient.checkout.v1.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
                             <modelNameSuffix>Dto</modelNameSuffix>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-selfcare-external-client-v2</id>
                         <phase>generate-resources</phase>
@@ -535,22 +459,21 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.config
+                                <basePackage>${project.groupId}.generated.openapi.msclient.selfcare.v2</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.selfcare.v2.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.selfcare.v2.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.msclient.selfcare.v2.config
                                 </configPackage>
                                 <dateLibrary>java11</dateLibrary>
                             </configOptions>
                             <modelNameSuffix>Dto</modelNameSuffix>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-io-client</id>
                         <phase>generate-resources</phase>
@@ -565,22 +488,22 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
-                                <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api
-                                </apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.config
-                                </configPackage>
+                                <basePackage>${project.groupId}.generated.openapi.msclient.io.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.io.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.io.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.msclient.io.v1.config</configPackage>
                                 <dateLibrary>java11</dateLibrary>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)</additionalModelTypeAnnotations>
                             </configOptions>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>pn-external-registries-gpd-client</id>
                         <phase>generate-resources</phase>
@@ -595,18 +518,16 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>true</generateSupportingFiles>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <swaggerAnnotations>false</swaggerAnnotations>
-                                <openApiNullable>false</openApiNullable>
-                                <basePackage>it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1</basePackage>
-                                <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto
-                                </modelPackage>
-                                <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api</apiPackage>
-                                <configPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.config
-                                </configPackage>
+                                <basePackage>${project.groupId}.generated.openapi.msclient.gpd.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.gpd.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.gpd.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.msclient.gpd.v1.config</configPackage>
                                 <dateLibrary>java11</dateLibrary>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)</additionalModelTypeAnnotations>
+                                <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -619,7 +540,6 @@
                         </goals>
                         <configuration>
                             <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/8cfb0308f31c00ef8a0900d2fb5d016be22133ee/docs/openapi/api-private.yaml</inputSpec>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <skipValidateSpec>true</skipValidateSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
@@ -636,15 +556,14 @@
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.delivery.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.delivery-reactive.v1.api</apiPackage>
                                 <annotationLibrary>none</annotationLibrary>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
                             </configOptions>
-                            <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery-reactive.v1.api</apiPackage>
-                            <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.delivery.v1.dto</modelPackage>
                         </configuration>
                     </execution>
                     <!-- OPEN API CLIENT PN-TIMELINE-SERVICE-->
@@ -656,10 +575,10 @@
                         </goals>
                         <configuration>
                             <inputSpec>https://raw.githubusercontent.com/pagopa/pn-timeline-service/5f27eeff5ebf8ca8087aeb5fa8c8c39abce2f885/docs/openapi/pn-timeline-service-private.yaml</inputSpec>
-                            <templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/6.0.0/client</templateDirectory>
                             <skipValidateSpec>true</skipValidateSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
+                            <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <additionalProperties>removeEnumValuePrefix=false</additionalProperties>
@@ -673,15 +592,14 @@
                                 <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
+                                <modelPackage>${project.groupId}.generated.openapi.msclient.timelineservice.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.msclient.timelineservice.v1.api</apiPackage>
                                 <annotationLibrary>none</annotationLibrary>
                                 <documentationProvider>source</documentationProvider>
-                                <openApiNullable>false</openApiNullable>
                                 <reactive>true</reactive>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
                             </configOptions>
-                            <apiPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.api</apiPackage>
-                            <modelPackage>it.pagopa.pn.external.registries.generated.openapi.msclient.timelineservice.v1.dto</modelPackage>
                         </configuration>
                     </execution>
                 </executions>

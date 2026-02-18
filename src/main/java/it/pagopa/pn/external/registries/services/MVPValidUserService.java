@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.services;
 
+import io.micrometer.common.util.StringUtils;
 import it.pagopa.pn.commons.utils.LogUtils;
+import it.pagopa.pn.external.registries.exceptions.PnExternalRegistriesBadRequestException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.FiscalCodePayload;
 import it.pagopa.pn.external.registries.generated.openapi.server.valid.mvp.user.v1.dto.MvpUserDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOOptInClient;
@@ -10,10 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_VALID_USER_BAD_REQUEST;
+
 @Service
 @Slf4j
 public class MVPValidUserService {
     private final IOOptInClient client;
+    private final static String TAX_CODE_PATTERN = "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$";
 
     public MVPValidUserService(IOOptInClient client) {
         this.client = client;
@@ -21,21 +26,26 @@ public class MVPValidUserService {
 
     public Mono<MvpUserDto> checkValidUser(Mono<String> body) {
         return body
-                .flatMap( taxId -> {
+                .flatMap(taxId -> {
+                    log.info("Start to check taxId={}", LogUtils.maskTaxId(taxId));
+                    if (StringUtils.isBlank(taxId) || taxId.length() != 16 || !taxId.matches(TAX_CODE_PATTERN)) {
+                        return Mono.error(new PnExternalRegistriesBadRequestException("Check taxId error","TaxId must contain a minimum of 16 and a maximum of 16 characters",
+                                ERROR_CODE_EXTERNALREGISTRIES_VALID_USER_BAD_REQUEST));
+                    }
                     log.info("Get mvp user profile by post taxId={}", LogUtils.maskTaxId(taxId));
                     FiscalCodePayload fiscalCodePayload = new FiscalCodePayload();
-                    fiscalCodePayload.setFiscalCode( taxId );
+                    fiscalCodePayload.setFiscalCode(taxId);
 
-                    return client.getProfileByPOST( fiscalCodePayload ).map( res ->{
+                    return client.getProfileByPOST(fiscalCodePayload).map(res -> {
                         log.info("Response getProfileByPOST, user with taxId={} have AppIo activated and isUserAllowed={}", LogUtils.maskTaxId(taxId), res.getSenderAllowed());
-                        
+
                         return new MvpUserDto()
                                 .taxId(taxId)
                                 .valid(true);
-                    }).onErrorResume( WebClientResponseException.class, exception ->{
-                        if(HttpStatus.NOT_FOUND.equals(exception.getStatusCode())){
+                    }).onErrorResume(WebClientResponseException.class, exception -> {
+                        if (HttpStatus.NOT_FOUND.equals(exception.getStatusCode())) {
                             log.info("Response status is 'NOT_FOUND' user with taxId={} haven't AppIo activated ", LogUtils.maskTaxId(taxId));
-                            return Mono.just( new MvpUserDto()
+                            return Mono.just(new MvpUserDto()
                                     .taxId(taxId)
                                     .valid(false)
                             );

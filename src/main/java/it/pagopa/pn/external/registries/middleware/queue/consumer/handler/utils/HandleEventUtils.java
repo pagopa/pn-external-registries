@@ -11,6 +11,9 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
 import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import static it.pagopa.pn.api.dto.events.StandardEventHeader.*;
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_HANDLE_EVENT_FAILED;

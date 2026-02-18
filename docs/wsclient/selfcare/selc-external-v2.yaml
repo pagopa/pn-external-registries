@@ -632,7 +632,7 @@ components:
           type: string
           description: 'Available values: MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA'
         status:
-          type: object
+          type: string
           enum:
             - ACTIVE
             - PENDING

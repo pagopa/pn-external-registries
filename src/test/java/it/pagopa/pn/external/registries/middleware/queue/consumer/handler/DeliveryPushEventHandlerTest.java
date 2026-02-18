@@ -18,15 +18,10 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
-
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 class DeliveryPushEventHandlerTest {
@@ -58,10 +53,7 @@ class DeliveryPushEventHandlerTest {
                 updateNotificationCost.getEventStorageTimestamp(),
                 CostUpdateCostPhaseInt.valueOf(updateNotificationCost.getUpdateCostPhase().getValue())
         )).thenReturn(Flux.fromIterable(updateCostResponseList));
-        
-        //WHEN
-        Consumer<Message<UpdateNotificationCost>> consumer = actionHandler.pnDeliveryPushUpdateCostEventConsumer();
-        Assertions.assertDoesNotThrow(() -> consumer.accept(message));
+        Assertions.assertDoesNotThrow(() -> actionHandler.pnDeliveryPushUpdateCostEventConsumer(message));
     }
 
     @Test
@@ -89,8 +81,7 @@ class DeliveryPushEventHandlerTest {
         )).thenReturn(Flux.fromIterable(updateCostResponseList));
 
         //WHEN
-        Consumer<Message<UpdateNotificationCost>> consumer = actionHandler.pnDeliveryPushUpdateCostEventConsumer();
-        Assertions.assertDoesNotThrow(() -> consumer.accept(message));
+        Assertions.assertDoesNotThrow(() -> actionHandler.pnDeliveryPushUpdateCostEventConsumer(message));
     }
 
     @Test
@@ -118,8 +109,7 @@ class DeliveryPushEventHandlerTest {
         )).thenReturn(Flux.fromIterable(updateCostResponseList));
 
         //WHEN
-        Consumer<Message<UpdateNotificationCost>> consumer = actionHandler.pnDeliveryPushUpdateCostEventConsumer();
-        Assertions.assertThrows(PnInternalException.class, ()-> consumer.accept(message));
+        Assertions.assertThrows(PnInternalException.class, () -> actionHandler.pnDeliveryPushUpdateCostEventConsumer(message));
     }
     
     @NotNull

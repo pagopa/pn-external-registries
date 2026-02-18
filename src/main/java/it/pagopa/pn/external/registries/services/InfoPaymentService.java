@@ -36,7 +36,15 @@ public class InfoPaymentService {
     public Mono<List<PaymentInfoV21Dto>> getPaymentInfo(Flux<PaymentInfoRequestDto> paymentInfoRequestDtoFlux) {
         return paymentInfoRequestDtoFlux
                 .flatMap(this::callCheckoutPaymentInfo)
-                .collectList();
+                .collectList()
+                .flatMap(list -> list.isEmpty() ?
+                        Mono.error(new PnExternalRegistriesBadRequestException(
+                                "PaymentInfo Bad Request",
+                                "The payment list must contain at least 1 item",
+                                ERROR_CODE_EXTERNALREGISTRIES_PAYMENT_BAD_REQUEST
+                        ))
+                        : Mono.just(list)
+                );
     }
 
     private Mono<PaymentInfoV21Dto> callCheckoutPaymentInfo(PaymentInfoRequestDto request) {
@@ -48,7 +56,7 @@ public class InfoPaymentService {
         return checkoutClient.getPaymentInfo(paymentId)
                 .map(paymentRequestsGetResponseDto -> apiResponseToPaymentInfoV21InnerDtoV2(paymentRequestsGetResponseDto, request))
                 .onErrorResume( WebClientResponseException.class, ex -> {
-                    HttpStatus httpStatus = ex.getStatusCode();
+                    HttpStatus httpStatus = HttpStatus.valueOf(ex.getStatusCode().value());
                     log.info( "Get checkout payment info status code={} paymentId={}", httpStatus, paymentId );
                     return fromCheckoutToPn( paTaxId, noticeNumber, httpStatus, ex.getResponseBodyAsString() );
                 });
