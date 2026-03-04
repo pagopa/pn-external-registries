@@ -65,7 +65,7 @@ public class OneTrustClient extends CommonBaseClient {
                 .doOnSuccess(response -> log.info("Response from OneTrust: {}", response))
                 .map(this::mapToPrivacyNoticeResult)
                 .doOnError(throwable -> {
-                    log.logInvokationResultDownstreamFailed(ONE_TRUST, elabExceptionMessage(throwable));
+                    log.logInvokationResultDownstreamFailed(ONE_TRUST, elabExceptionMessage(throwable),throwable);
                     log.error(String.format("Error from OnTrust with privacyNoticeId: %s", privacyNoticeId), throwable);
                 });
     }
