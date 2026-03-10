@@ -27,7 +27,7 @@ public class DeliveryPushEventHandler {
 
     private CostUpdateOrchestratorService costUpdateOrchestratorService;
 
-    @SqsListener(value = "${pn.external-registry.topics.delivery-push-input}")
+    @SqsListener(value = "${pn.external-registry.topics.delivery-push-to-external-registries}")
     public void pnDeliveryPushUpdateCostEventConsumer(Message<UpdateNotificationCost> message) {
         final String processName = "UPDATE NOTIFICATION COST";
         setMdc(message);
