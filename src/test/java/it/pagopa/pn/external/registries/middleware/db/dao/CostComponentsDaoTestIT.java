@@ -1,6 +1,8 @@
 package it.pagopa.pn.external.registries.middleware.db.dao;
 
 import it.pagopa.pn.external.registries.LocalStackTestConfig;
+import it.pagopa.pn.external.registries.MockAWSObjectsTestConfig;
+import it.pagopa.pn.external.registries.MockProducerTest;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.middleware.db.entities.CostComponentsEntity;
 import it.pagopa.pn.external.registries.middleware.db.io.dao.TestDao;
@@ -17,8 +19,8 @@ import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedExce
 import java.util.List;
 
 @SpringBootTest
-@Import(LocalStackTestConfig.class)
-class CostComponentsDaoTestIT {
+@Import({LocalStackTestConfig.class, MockAWSObjectsTestConfig.class})
+class CostComponentsDaoTestIT extends MockProducerTest {
 
     @Autowired
     private CostComponentsDao costComponentsDao;

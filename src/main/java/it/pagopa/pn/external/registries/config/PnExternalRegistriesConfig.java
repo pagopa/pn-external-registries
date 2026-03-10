@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.config;
 
 import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ResourceUtils;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;

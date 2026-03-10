@@ -54,7 +54,7 @@ public class UpdateCostService {
 
                     CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
                             updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
-                            response.getStatusCodeValue(), jsonResponse);
+                            response.getStatusCode().value(), jsonResponse);
 
                     return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
                 })
@@ -64,7 +64,7 @@ public class UpdateCostService {
 
                     CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
                             updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
-                            error.getRawStatusCode(), error.getResponseBodyAsString());
+                            error.getStatusCode().value(), error.getResponseBodyAsString());
 
                     return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
                 });

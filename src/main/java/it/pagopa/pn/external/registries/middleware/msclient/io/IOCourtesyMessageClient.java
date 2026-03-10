@@ -57,7 +57,7 @@ public class IOCourtesyMessageClient extends IOClient {
 
         return ioApi.upsertServiceActivation(dto)
                 .onErrorResume(throwable -> {
-                    log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable));
+                    log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable),throwable);
                     log.error("error upserting service activation message={}", elabExceptionMessage(throwable) , throwable);
                     return getServiceActivation(taxId);
                 })
@@ -93,7 +93,7 @@ public class IOCourtesyMessageClient extends IOClient {
         dto.setFiscalCode(taxId);
 
         return ioApi.getServiceActivationByPOST(dto)
-                .doOnError( throwable -> log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable)))
+                .doOnError( throwable -> log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable),throwable))
                 .map(x -> {
                     log.info("getServiceActivation response taxid={} status={} serviceId={} version={}", LogUtils.maskTaxId(x.getFiscalCode()), x.getStatus(), x.getServiceId(), x.getVersion());
                     return x;

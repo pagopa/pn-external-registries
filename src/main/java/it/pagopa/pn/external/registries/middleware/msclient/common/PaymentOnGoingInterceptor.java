@@ -20,7 +20,7 @@ public class PaymentOnGoingInterceptor implements ExchangeFilterFunction {
         return next.exchange(request)
                 .flatMap(response -> {
                     //in caso di 209 si vuole lanciare un exception che dovrà essere gestita dal chiamante
-                    if (response.rawStatusCode() == PAYMENT_ONGOING_STATUS_CODE) {
+                    if (response.statusCode().value() == PAYMENT_ONGOING_STATUS_CODE) {
                         Mono<PaymentsModelResponse> bodyMono = response.bodyToMono(PaymentsModelResponse.class);
                         Mono<HttpHeaders> headersMono = Mono.just(response.headers().asHttpHeaders());
                         
@@ -29,7 +29,7 @@ public class PaymentOnGoingInterceptor implements ExchangeFilterFunction {
                                 .flatMap(tuple -> {
                                     PaymentsModelResponse errorBody = tuple.getT1();
                                     HttpHeaders headers = tuple.getT2();
-                                    return Mono.error(new PnPaymentOngoingException(errorBody, headers, response.rawStatusCode()));
+                                    return Mono.error(new PnPaymentOngoingException(errorBody, headers, response.statusCode().value()));
                                 });
                     }
                     
