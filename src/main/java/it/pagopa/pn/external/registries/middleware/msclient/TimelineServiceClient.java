@@ -28,7 +28,7 @@ public class TimelineServiceClient extends CommonBaseClient {
                         iun,
                         recIndex,
                         throwable.getClass().getSimpleName(),
-                        throwable.getMessage())))
+                        throwable.getMessage()),throwable))
                 .onErrorMap(WebClientResponseException.class, error -> {
                     if (error.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
                         return new PnNotFoundException("Delivery Information not found", "Delivery information with iun " + iun + " and recIndex: " + recIndex + "not found", ERROR_CODE_EXTERNALREGISTRIES_TIMELINE_SERVICE_CLIENT_NOT_FOUND);

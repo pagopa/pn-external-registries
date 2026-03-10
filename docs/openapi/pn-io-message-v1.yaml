@@ -207,6 +207,7 @@ components:
           type: string
           description: Codice Fiscale del destinatario
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         requestAcceptedDate:
           description: data perfezionamento notifica per il mittente
           type: string
@@ -310,6 +311,7 @@ components:
           maxLength: 16
           pattern: "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$"
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
     UserStatusResponse:
       type: object
       required:
@@ -319,6 +321,7 @@ components:
         taxId:
           type: string
           x-field-extra-annotation: "@lombok.ToString.Exclude" # NO EXTERNAL
+          format: password # NO EXTERNAL
         status:
           type: string
           description: >
