@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
