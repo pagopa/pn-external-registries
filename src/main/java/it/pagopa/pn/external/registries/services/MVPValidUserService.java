@@ -18,7 +18,7 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @Slf4j
 public class MVPValidUserService {
     private final IOOptInClient client;
-    private final static String TAX_CODE_PATTERN = "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}$";
+    private static final String TAX_CODE_PATTERN = "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$";
 
     public MVPValidUserService(IOOptInClient client) {
         this.client = client;
