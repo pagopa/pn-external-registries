@@ -55,7 +55,7 @@ class IOClient extends OcpBaseClient {
                     return response;
                 })
                 .onErrorResume(throwable -> {
-                    log.logInvokingExternalService(IO, elabExceptionMessage(throwable));
+                    log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable),throwable);
                     log.error("error submitMessageforUserWithFiscalCodeInBody ioMode={} message={}", ioMode, elabExceptionMessage(throwable), throwable);
                     this.meterRegistry.get(SpringAnalyzerActivation.IO_SENT_FAILURE).counter().increment();
 
@@ -79,7 +79,7 @@ class IOClient extends OcpBaseClient {
             if (throwable instanceof NotFound){
                 log.logInvokationResultDownstreamNotFound(IO, elabExceptionMessage(throwable));
             }else {
-                log.logInvokingExternalService(IO, elabExceptionMessage(throwable));
+                log.logInvokationResultDownstreamFailed(IO, elabExceptionMessage(throwable),throwable);
             }
         });
     }

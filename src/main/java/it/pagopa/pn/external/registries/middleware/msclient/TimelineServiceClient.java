@@ -24,7 +24,7 @@ public class TimelineServiceClient extends CommonBaseClient {
         log.logInvokingExternalService(PN_TIMELINE_SERVICE, "TimelineServiceClient");
 
         return timelineServiceApi.getDeliveryInformation(iun, recIndex)
-                .doOnError(throwable -> log.logInvokingExternalService(PN_TIMELINE_SERVICE, String.format("Delivery Information not found for iun:%s and recIndex:%d. Exception: %s - %s",
+                .doOnError(throwable -> log.error(String.format("Delivery Information not found for iun:%s and recIndex:%d. Exception: %s - %s",
                         iun,
                         recIndex,
                         throwable.getClass().getSimpleName(),

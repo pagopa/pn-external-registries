@@ -34,7 +34,7 @@ public class SelfcarePgUserGroupClient {
         return userGroupPgApi.getUserGroupsUsingGET(config.getSelfcarepgusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, userIdUuid, null)
                 .doOnNext(dto -> log.info("PG GetUserGroup result for institutionId {}: {}", institutionId, dto))
                 .onErrorResume(WebClientResponseException.class, e -> {
-                    log.logInvokingExternalService(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(e));
+                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(e),e);
                     log.error("PG getUserGroups response error {}", e.getResponseBodyAsString(), e);
                     return Mono.error(new PnInternalException("Errore lettura PG usergroups", ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR, e));
                 });
