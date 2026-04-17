@@ -761,6 +761,7 @@ Resources:
         IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicB2BAPI.Outputs.APIGatewayARN
         Limit: !Ref B2bWafLimit
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
 
   # Expose PN-external-registries microservice public API with API-GW for B2B usage
   ExternalRegistryMicroserviceB2BPGAPI:
@@ -789,6 +790,7 @@ Resources:
         IntendedUsage: B2B
         APIGatewayARNs: !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.APIGatewayARN
         Limit: !Ref B2bWafLimit
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
 
   # Expose PN-Delivery microservice public API with API-GW for IO Backend usage
   ExternalRegistryMicroservicePublicIoAPI:
@@ -817,6 +819,7 @@ Resources:
         IntendedUsage: IO
         APIGatewayARNs: !GetAtt ExternalRegistryMicroservicePublicIoAPI.Outputs.APIGatewayARN
         AllowedCidrs: !Ref IOBackendCidrs
+        AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
 
   ## Dashboard
   ExternalRegistriesMicroserviceCloudWatchDashboard:
