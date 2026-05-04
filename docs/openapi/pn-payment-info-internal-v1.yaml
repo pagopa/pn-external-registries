@@ -12,6 +12,7 @@ servers:
 tags:
   - name: PaymentInfo
     description: Informazioni sullo stato del pagamento
+  - name: PaperCost
 paths:
   /ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
     get:
@@ -167,6 +168,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
 components:
   schemas:
     PaymentInfoRequests:

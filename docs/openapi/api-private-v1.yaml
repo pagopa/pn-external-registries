@@ -296,6 +296,54 @@ paths:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
+  /ext-registry-private/cost-update/{iun}/invalidate:
+    put:
+      operationId: invalidatePaperCost
+      description: Invalidate paper cost when notification rework occurs
+      tags:
+        - PaperCost
+      parameters:
+        - name: iun
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaperCostToInvalidate'
+      responses:
+        '204':
+          description: NO_CONTENT
+        '209':
+          description: In Payment
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '404':
+          description: Not Found
+        '422':
+          description: Cannot Update
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
 components:
   schemas:
     PgUserDetail:
@@ -379,4 +427,69 @@ components:
         - paId
         - additionalLanguages
 
+    PaperCostToInvalidate:
+      description: Contains info for cost invalidation
+      type: object
+      properties:
+        recIndex:
+          type: string
+          pattern: '^RECINDEX_([1-9][0-9]?|0)$'
+          example: 'RECINDEX_0'
+        costPhases:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalogUpdateCostPhase'
+        vat:
+          type: integer
+        PaymentsInfo:
+          type: array
+          description: Payment information
+          items:
+            $ref: '#/components/schemas/PaymentsInfo'
+      required:
+        - recIndex
+        - costPhases
+        - vat
 
+    AnalogUpdateCostPhase:
+      type: string
+      enum:
+        - SEND_ANALOG_DOMICILE_ATTEMPT_0
+        - SEND_ANALOG_DOMICILE_ATTEMPT_1
+
+    PaymentsInfo:
+      title: Payment information for recipient
+      allOf:
+        - $ref: '#/components/schemas/PaymentsInfoForRecipient'
+        - type: object
+          required:
+            - applyCost
+          properties:
+            applyCost:
+              type: boolean
+              description: indicates if cost applies to recipient
+
+    PaymentsInfoForRecipient:
+      title: Payment information for recipient
+      type: object
+      required:
+        - recIndex
+        - creditorTaxId
+        - noticeCode
+      properties:
+        recIndex:
+          type: integer
+          description: recipient index
+          format: int32
+        creditorTaxId:
+          description: Payment PA fiscal code
+          example: '77777777777'
+          type: string
+          maxLength: 11
+          minLength: 11
+        noticeCode:
+          description: Payment notice number  numero avviso
+          example: '302000100000019421'
+          type: string
+          maxLength: 18
+          minLength: 18
