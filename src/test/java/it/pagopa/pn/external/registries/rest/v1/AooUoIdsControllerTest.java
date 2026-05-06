@@ -16,6 +16,7 @@ class AooUoIdsControllerTest {
     private static final String URL = "/ext-registry-private/pa/v1/actions/filter-out-root-pa-ids?id={id}"
         .replace("{id}", "A123456789");
 
+    private static final String BASE_URL = "/ext-registry-private/pa/v1/actions/filter-out-root-pa-ids";
 
     @MockBean
     InfoSelfcareInstitutionsService infoSelfcareInstitutionsService;
@@ -36,4 +37,29 @@ class AooUoIdsControllerTest {
             .exchange()
             .expectStatus().isOk().expectBodyList(String.class).hasSize(1);
     }
+
+    @Test
+    void getFilteredIdsEmptyResult() {
+        List<String> values = Arrays.asList("A123456789");
+        Mockito.when(infoSelfcareInstitutionsService.filterOutRootIds(values))
+            .thenReturn(Flux.empty());
+
+        webTestClient.get()
+            .uri(URL)
+            .exchange()
+            .expectStatus().isOk().expectBodyList(String.class).hasSize(0);
+    }
+
+    @Test
+    void serviceError() {
+        List<String> values = Arrays.asList("A123456789");
+        Mockito.when(infoSelfcareInstitutionsService.filterOutRootIds(values))
+            .thenReturn(Flux.error(new RuntimeException("DynamoDB error")));
+
+        webTestClient.get()
+            .uri(URL)
+            .exchange()
+            .expectStatus().is5xxServerError();
+    }
+
 }

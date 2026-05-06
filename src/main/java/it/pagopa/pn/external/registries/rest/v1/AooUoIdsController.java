@@ -24,6 +24,6 @@ public class AooUoIdsController implements AooUoIdsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<String>>> getFilteredAooUoIdPrivate(List<String> id, final ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(infoSelfcareInstitutionsService.filterOutRootIds(id)));
+        return infoSelfcareInstitutionsService.filterOutRootIds(id).collectList().map(AooUoIdsController::apply);
     }
 }
