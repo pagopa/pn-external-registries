@@ -472,7 +472,7 @@ paths:
         '200':                                                                              # NO EXTERNAL
           description: OK                                                                   # NO EXTERNAL
           content:                                                                          # NO EXTERNAL
-            application/json:                                                               # NO EXTERNAL
+            text/plain:                                                                     # NO EXTERNAL
               schema:                                                                       # NO EXTERNAL
                 type: array                                                                 # NO EXTERNAL
                 items:                                                                      # NO EXTERNAL
