@@ -32,6 +32,14 @@ public class UpdateCostService {
     public Mono<UpdateCostResponseInt> updateCost(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
+        return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
+                eventTimestamp, eventStorageTimestamp, false);
+    }
+
+    private Mono<UpdateCostResponseInt> updateCost(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
+                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp,
+                                                   boolean checkResponseStatuses) {
+
         String iuv = creditorTaxId + noticeCode;
         String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
         Instant communicationTimestamp = Instant.now();
@@ -40,86 +48,60 @@ public class UpdateCostService {
         log.info("Updating the cost on GPD: iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
                 iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
-        return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long)notificationCost)
-                .flatMap(response -> {
+        Mono<ResponseEntity<PaymentsModelResponse>> setNotificationCostResponse = gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long) notificationCost);
+        if (checkResponseStatuses) {
+            setNotificationCostResponse = setNotificationCostResponse.flatMap(UpdateCostService::checkForResponseStatuses);
+        }
 
-                    PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
-                    // convert to JSON
-                    ObjectMapper mapper = new ObjectMapper();
-                    String jsonResponse = null;
-                    try {
-                        jsonResponse = mapper.writeValueAsString(paymentsModelResponse);
-                    } catch (Exception e) {
-                        log.error("Error converting paymentsModelResponse to JSON: {}", e.getMessage());
-                    }
+        return setNotificationCostResponse
+                .flatMap(response -> processNotificationCostResponse(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase, eventTimestamp, eventStorageTimestamp, response, communicationTimestamp, requestId))
+                .onErrorResume(WebClientResponseException.class, error -> processNotificationCostResponseError(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase, eventTimestamp, eventStorageTimestamp, error, iuv, requestId, communicationTimestamp));
+    }
 
-                    CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
-                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
-                            response.getStatusCode().value(), jsonResponse);
+    private Mono<UpdateCostResponseInt> processNotificationCostResponseError(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost, CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp, WebClientResponseException error, String iuv, String requestId, Instant communicationTimestamp) {
+        log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
+                error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
-                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
-                })
-                .onErrorResume(WebClientResponseException.class, error -> {
-                    log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
-                            error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
+        CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
+                updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
+                error.getStatusCode().value(), error.getResponseBodyAsString());
 
-                    CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
-                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
-                            error.getStatusCode().value(), error.getResponseBodyAsString());
+        return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
+    }
 
-                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
-                });
+    private Mono<UpdateCostResponseInt> processNotificationCostResponse(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost, CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp, ResponseEntity<PaymentsModelResponse> response, Instant communicationTimestamp, String requestId) {
+        PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
+        // convert to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonResponse = null;
+        try {
+            jsonResponse = mapper.writeValueAsString(paymentsModelResponse);
+        } catch (Exception e) {
+            log.error("Error converting paymentsModelResponse to JSON: {}", e.getMessage());
+        }
+
+        CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
+                updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
+                response.getStatusCode().value(), jsonResponse);
+
+        return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
+    }
+
+    private static Mono<ResponseEntity<PaymentsModelResponse>> checkForResponseStatuses(ResponseEntity<PaymentsModelResponse> response) {
+        return switch (response.getStatusCode().value()) {
+            case 200 -> Mono.just(response);
+            case 209, 422 ->
+                    Mono.error(new PnInternalException("Posizione debitoria considerata chiusa.", response.getStatusCode().value(), ""));
+            default ->
+                    Mono.error(new PnInternalException("Updating the cost for invalidated elements returned error.", response.getStatusCode().value(), ""));
+        };
     }
 
     public Mono<UpdateCostResponseInt> updateCostForInvalidated(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
-        String iuv = creditorTaxId + noticeCode;
-        String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
-        Instant communicationTimestamp = Instant.now();
-
-        // log, including passed information and requestId
-        log.info("Updating the cost on GPD: iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
-                iuv, creditorTaxId, noticeCode, requestId, notificationCost);
-
-        return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long)notificationCost)
-                .flatMap(response -> {
-
-                    switch (response.getStatusCode().value()) {
-                        case 200:
-                            break;
-                        case 209, 422:
-                            return Mono.error(new PnInternalException("Posizione debitoria considerata chiusa.", response.getStatusCode().value(), ""));
-                        default:
-                            return Mono.error(new PnInternalException("Updating the cost for invalidated elements returned error.", response.getStatusCode().value(), ""));
-                    };
-
-                    PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
-                    // convert to JSON
-                    ObjectMapper mapper = new ObjectMapper();
-                    String jsonResponse = null;
-                    try {
-                        jsonResponse = mapper.writeValueAsString(paymentsModelResponse);
-                    } catch (Exception e) {
-                        log.error("Error converting paymentsModelResponse to JSON: {}", e.getMessage());
-                    }
-
-                    CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
-                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
-                            response.getStatusCode().value(), jsonResponse);
-
-                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
-                })
-                .onErrorResume(WebClientResponseException.class, error -> {
-                    log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
-                            error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
-
-                    CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
-                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
-                            error.getStatusCode().value(), error.getResponseBodyAsString());
-
-                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
-                });
+        return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
+                eventTimestamp, eventStorageTimestamp, true);
     }
 
     private CostUpdateResultRequestInt getCostUpdateResultRequest(String creditorTaxId, String noticeCode, int notificationCost,

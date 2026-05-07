@@ -31,7 +31,7 @@ public class CostComponentService {
     }
 
     public Mono<CostComponentsInt> insertStepCost(CostUpdateCostPhaseInt updateCostPhase, String iun, int recIndex,
-                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost, Integer vat) {
+                                                  String creditorTaxId, String noticeCode, Integer notificationStepCost, Integer vat, boolean applyCost) {
         final String insertString = "inserting cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
         final String updatingString = "updating cost components: pk={}, sk={}, iun={}, recIndex={}, creditorTaxId={}, noticeCode={}, notificationStepCost={}, updateCostPhase={}";
 
@@ -57,10 +57,13 @@ public class CostComponentService {
         
         switch (updateCostPhase) {
             case VALIDATION:
-                entity.setBaseCost(notificationStepCost);
-                entity.setSimpleRegisteredLetterCost(0);
-                entity.setFirstAnalogCost(0);
-                entity.setSecondAnalogCost(0);
+                if (applyCost) {
+                    entity.setBaseCost(notificationStepCost);
+                    entity.setSimpleRegisteredLetterCost(0);
+                    entity.setFirstAnalogCost(0);
+                    entity.setSecondAnalogCost(0);
+                }
+
                 entity.setIsRefusedCancelled(false);
 
                 log.info(insertString,
@@ -70,10 +73,13 @@ public class CostComponentService {
                         .map(costComponentsMapper::dbToInternal);
 
             case REQUEST_REFUSED, NOTIFICATION_CANCELLED:
-                entity.setBaseCost(0);
-                entity.setSimpleRegisteredLetterCost(0);
-                entity.setFirstAnalogCost(0);
-                entity.setSecondAnalogCost(0);
+                if (applyCost) {
+                    entity.setBaseCost(0);
+                    entity.setSimpleRegisteredLetterCost(0);
+                    entity.setFirstAnalogCost(0);
+                    entity.setSecondAnalogCost(0);
+                }
+
                 entity.setIsRefusedCancelled(true);
             
                 log.info(insertString,
@@ -83,17 +89,24 @@ public class CostComponentService {
                         .map(costComponentsMapper::dbToInternal);
 
             case SEND_SIMPLE_REGISTERED_LETTER:
-                entity.setSimpleRegisteredLetterCost(notificationStepCost);
+                if (applyCost) {
+                    entity.setSimpleRegisteredLetterCost(notificationStepCost);
+                }
                 entity.setVat(vat);
                 break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_0:
+                if (applyCost) {
+                    entity.setFirstAnalogCost(notificationStepCost);
+                }
                 entity.setFirstAnalogCost(notificationStepCost);
                 entity.setVat(vat);
                 break;
 
             case SEND_ANALOG_DOMICILE_ATTEMPT_1:
-                entity.setSecondAnalogCost(notificationStepCost);
+                if (applyCost) {
+                    entity.setSecondAnalogCost(notificationStepCost);
+                }
                 entity.setVat(vat);
                 break;
 

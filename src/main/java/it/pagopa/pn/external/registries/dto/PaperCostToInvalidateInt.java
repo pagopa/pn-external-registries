@@ -13,8 +13,7 @@ import java.util.List;
 @ToString
 public class PaperCostToInvalidateInt {
     private String recIndex;
-    private List<AnalogUpdateCostPhaseInt> costPhases = new ArrayList<>();
+    private List<CostUpdateCostPhaseInt> costPhases = new ArrayList<>();
     private Integer vat;
-    private String creditorTaxId;
-    private String noticeCode;
+    private List<PaymentInfoInt> paymentInfoList = new ArrayList<>();
 }

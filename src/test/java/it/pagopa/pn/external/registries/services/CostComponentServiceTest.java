@@ -56,7 +56,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.VALIDATION, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, null)
+                .insertStepCost(CostUpdateCostPhaseInt.VALIDATION, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, null, true)
                 .block();
 
         // Then
@@ -96,7 +96,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.REQUEST_REFUSED, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, null)
+                .insertStepCost(CostUpdateCostPhaseInt.REQUEST_REFUSED, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, null, true)
                 .block(); // replace REQUEST_REFUSED with NOTIFICATION_CANCELLED to test the other case: the behavior is the same
 
         // Then
@@ -136,7 +136,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, vat)
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_SIMPLE_REGISTERED_LETTER, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, vat, true)
                 .block();
 
         // Then
@@ -177,7 +177,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, 22)
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, 22, true)
                 .block();
 
         // Then
@@ -218,7 +218,7 @@ class CostComponentServiceTest {
 
         // When
         CostComponentsInt costComponentsInt = costComponentService
-                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_1, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, 22)
+                .insertStepCost(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_1, iun, recIndex, creditorTaxId, noticeCode, notificationStepCost, 22, true)
                 .block();
 
         // Then

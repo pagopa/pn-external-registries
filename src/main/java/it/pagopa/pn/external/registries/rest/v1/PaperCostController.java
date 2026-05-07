@@ -1,20 +1,21 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
-import it.pagopa.pn.external.registries.dto.*;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.api.PaperCostApi;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.api.UpdateNotificationCostApi;
-import it.pagopa.pn.external.registries.generated.openapi.server.payment.v1.dto.*;
-import it.pagopa.pn.external.registries.services.CostUpdateOrchestratorService;
+import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
+import it.pagopa.pn.external.registries.dto.PaperCostToInvalidateInt;
+import it.pagopa.pn.external.registries.dto.PaymentInfoInt;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.api.PaperCostApi;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.AnalogUpdateCostPhaseDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaperCostToInvalidateDto;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaymentsInfoDto;
 import it.pagopa.pn.external.registries.services.PaperCostService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,14 +36,23 @@ public class PaperCostController implements PaperCostApi {
         return Mono.just(PaperCostToInvalidateInt
                 .builder()
                 .vat(dto.getVat())
-                .creditorTaxId(dto.getCreditorTaxId())
-                .noticeCode(dto.getNoticeCode())
                 .recIndex(dto.getRecIndex())
-                        .costPhases(getPaperCostToInvalidateInt(dto.getCostPhases()))
+                .costPhases(getPaperCostToInvalidateInt(dto.getCostPhases()))
+                .paymentInfoList(getPaymentInfoInt(dto.getPaymentsInfo()))
                 .build());
     }
 
-    private List<AnalogUpdateCostPhaseInt> getPaperCostToInvalidateInt(List<AnalogUpdateCostPhaseDto> dtoList) {
-        return dtoList.stream().map(entity -> AnalogUpdateCostPhaseInt.valueOf(entity.getValue())).toList();
+    private List<PaymentInfoInt> getPaymentInfoInt(List<PaymentsInfoDto> paymentsInfo) {
+        return paymentsInfo.stream().map(paymentInfoDto -> PaymentInfoInt
+                .builder()
+                .creditorTaxId(paymentInfoDto.getCreditorTaxId())
+                .noticeCode(paymentInfoDto.getNoticeCode())
+                .recIndex(paymentInfoDto.getRecIndex())
+                .applyCost(paymentInfoDto.getApplyCost())
+                .build()).toList();
+    }
+
+    private List<CostUpdateCostPhaseInt> getPaperCostToInvalidateInt(List<AnalogUpdateCostPhaseDto> dtoList) {
+        return dtoList.stream().map(entity -> CostUpdateCostPhaseInt.valueOf(entity.getValue())).toList();
     }
 }
