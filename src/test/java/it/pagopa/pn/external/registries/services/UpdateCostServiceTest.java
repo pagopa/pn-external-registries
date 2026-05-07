@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.Instant;
 import java.util.Date;
@@ -233,6 +234,47 @@ class UpdateCostServiceTest {
         Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
         Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
         Assertions.assertEquals(CommunicationResultGroupInt.RETRY, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
+    }
+
+    @Test
+    void testUpdateCostForInvalidated_200_OK() {
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.ok(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setEventTimestamp(Instant.now());
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(entity));
+
+        UpdateCostResponseInt updateCostResponse = updateCostService.updateCostForInvalidated(
+                recIndex, iun, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0,
+                Instant.now(), Instant.now()
+        ).block();
+
+        Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
+        Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
+        Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
+    }
+
+    @Test
+    void testUpdateCostForInvalidated_209_ShouldReturnError() {
+        PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
+        ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(209).body(paymentsModelResponse);
+        when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
+
+        StepVerifier.create(updateCostService.updateCostForInvalidated(
+                        recIndex, iun, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0,
+                        Instant.now(), Instant.now()))
+                .expectErrorSatisfies(throwable -> {
+                    Assertions.assertInstanceOf(it.pagopa.pn.commons.exceptions.PnInternalException.class, throwable);
+                    Assertions.assertEquals("Posizione debitoria considerata chiusa.", throwable.getMessage());
+                })
+                .verify();
     }
 
     private PaymentsModelResponse newPaymentModelResponse() {

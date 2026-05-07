@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
+import it.pagopa.pn.external.registries.dto.UpdateCostOptionEnum;
 import it.pagopa.pn.external.registries.dto.UpdateCostResponseInt;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.PaymentsModelResponse;
 import it.pagopa.pn.external.registries.middleware.msclient.gpd.GpdClient;
@@ -33,12 +34,12 @@ public class UpdateCostService {
                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
         return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
-                eventTimestamp, eventStorageTimestamp, false);
+                eventTimestamp, eventStorageTimestamp, UpdateCostOptionEnum.NO_CHECK_RESPONSE_STATUSES);
     }
 
     private Mono<UpdateCostResponseInt> updateCost(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
                                                    CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp,
-                                                   boolean checkResponseStatuses) {
+                                                   UpdateCostOptionEnum updateCostOption) {
 
         String iuv = creditorTaxId + noticeCode;
         String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
@@ -49,7 +50,7 @@ public class UpdateCostService {
                 iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
         Mono<ResponseEntity<PaymentsModelResponse>> setNotificationCostResponse = gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long) notificationCost);
-        if (checkResponseStatuses) {
+        if (updateCostOption.isCheckResponseStatuses()) {
             setNotificationCostResponse = setNotificationCostResponse.flatMap(UpdateCostService::checkForResponseStatuses);
         }
 
@@ -101,7 +102,7 @@ public class UpdateCostService {
                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
         return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
-                eventTimestamp, eventStorageTimestamp, true);
+                eventTimestamp, eventStorageTimestamp, UpdateCostOptionEnum.CHECK_RESPONSE_STATUSES);
     }
 
     private CostUpdateResultRequestInt getCostUpdateResultRequest(String creditorTaxId, String noticeCode, int notificationCost,

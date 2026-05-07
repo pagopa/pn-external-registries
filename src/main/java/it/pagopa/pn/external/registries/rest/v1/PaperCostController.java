@@ -8,7 +8,6 @@ import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.Anal
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaperCostToInvalidateDto;
 import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PaymentsInfoDto;
 import it.pagopa.pn.external.registries.services.PaperCostService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

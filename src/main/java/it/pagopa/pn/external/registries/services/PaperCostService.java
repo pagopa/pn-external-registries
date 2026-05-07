@@ -43,8 +43,9 @@ public class PaperCostService {
                 .flatMap(totalCost -> updateCostService.updateCostForInvalidated(recIndex, iun,
                                 paymentInfo.getCreditorTaxId(), paymentInfo.getNoticeCode(),
                                 totalCost, costPhase, now, now)
+                .filter(updateCostResponse -> paymentInfo.isApplyCost())
                 .flatMap(updateCostResponse -> costComponentService.insertStepCost(costPhase, iun, recIndex,
-                                paymentInfo.getCreditorTaxId(), paymentInfo.getNoticeCode(), INVALIDATED_COST, vat, paymentInfo.isApplyCost())
+                                paymentInfo.getCreditorTaxId(), paymentInfo.getNoticeCode(), INVALIDATED_COST, vat)
                 .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
                         recIndex, e.getMessage()))));
     }
@@ -66,7 +67,7 @@ public class PaperCostService {
         if(Objects.isNull(response.getStatus())) return Mono.error(new IllegalStateException("The cost cannot be invalidated because the payment status information is not available"));
         return switch (response.getStatus()) {
             case PO_PAID, PO_PARTIALLY_REPORTED, PO_REPORTED ->
-                    Mono.error(new PnInternalException("Posizione debitoria considerata chiusa.", 422, ""));
+                    Mono.error(new PnInternalException("Pagato.", 422, ""));
             case PO_UNPAID -> Mono.just(response);
         };
     }
