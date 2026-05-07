@@ -12,6 +12,7 @@ servers:
 tags:
   - name: PaymentInfo
     description: Informazioni sullo stato del pagamento
+  - name: PaperCost
 paths:
   /ext-registry/pagopa/v1/paymentinfo/{paTaxId}/{noticeNumber}:
     get:
@@ -161,6 +162,40 @@ paths:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '404':
           description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+
+  /ext-registry-private/cost-update/{iun}/invalidate:
+    put:
+      operationId: invalidatePaperCost
+      description: Invalidate paper cost when notification rework occurs
+      tags:
+        - PaperCost
+      parameters:
+        - name: iun
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaperCostToInvalidate'
+      responses:
+        '204':
+          description: NO_CONTENT
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
         '500':
           description: Internal Server Error
           content:
@@ -466,6 +501,35 @@ components:
             - OK
             - KO
             - RETRY
+
+    PaperCostToInvalidate:
+      description: Contains info for cost invalidation
+      type: object
+      properties:
+        recIndex:
+          type: string
+          pattern: '^RECINDEX_([1-9][0-9]?|0)$'
+          example: 'RECINDEX_0'
+        costPhases:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalogUpdateCostPhase'
+        vat:
+          type: integer
+        creditorTaxId:
+          type: string
+        noticeCode:
+          type: string
+      required:
+        - recIndex
+        - costPhases
+        - vat
+
+    AnalogUpdateCostPhase:
+      type: string
+      enum:
+        - SEND_ANALOG_DOMICILE_ATTEMPT_0
+        - SEND_ANALOG_DOMICILE_ATTEMPT_1
 
 #  securitySchemes:                                      # ONLY EXTERNAL
 #    bearerAuth:                                         # ONLY EXTERNAL

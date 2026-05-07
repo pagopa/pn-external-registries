@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.dto.UpdateCostResponseInt;
@@ -41,6 +42,57 @@ public class UpdateCostService {
 
         return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long)notificationCost)
                 .flatMap(response -> {
+
+                    PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
+                    // convert to JSON
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonResponse = null;
+                    try {
+                        jsonResponse = mapper.writeValueAsString(paymentsModelResponse);
+                    } catch (Exception e) {
+                        log.error("Error converting paymentsModelResponse to JSON: {}", e.getMessage());
+                    }
+
+                    CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
+                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
+                            response.getStatusCode().value(), jsonResponse);
+
+                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
+                })
+                .onErrorResume(WebClientResponseException.class, error -> {
+                    log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
+                            error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
+
+                    CostUpdateResultRequestInt costUpdateResultRequestInt = getCostUpdateResultRequest(creditorTaxId, noticeCode, notificationCost,
+                            updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
+                            error.getStatusCode().value(), error.getResponseBodyAsString());
+
+                    return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
+                });
+    }
+
+    public Mono<UpdateCostResponseInt> updateCostForInvalidated(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
+                                                  CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
+
+        String iuv = creditorTaxId + noticeCode;
+        String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
+        Instant communicationTimestamp = Instant.now();
+
+        // log, including passed information and requestId
+        log.info("Updating the cost on GPD: iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
+                iuv, creditorTaxId, noticeCode, requestId, notificationCost);
+
+        return gpdClient.setNotificationCost(creditorTaxId, noticeCode, requestId, (long)notificationCost)
+                .flatMap(response -> {
+
+                    switch (response.getStatusCode().value()) {
+                        case 200:
+                            break;
+                        case 209, 422:
+                            return Mono.error(new PnInternalException("Posizione debitoria considerata chiusa.", response.getStatusCode().value(), ""));
+                        default:
+                            return Mono.error(new PnInternalException("Updating the cost for invalidated elements returned error.", response.getStatusCode().value(), ""));
+                    };
 
                     PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
                     // convert to JSON
