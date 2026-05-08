@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.PaperCostToInvalidateInt;
@@ -16,6 +17,9 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_INVALIDATE_ALREADY_PAID;
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_INVALIDATE_COST_FAILED;
 
 @Service
 @Slf4j
@@ -67,7 +71,14 @@ public class PaperCostService {
         if(Objects.isNull(response.getStatus())) return Mono.error(new IllegalStateException("The cost cannot be invalidated because the payment status information is not available"));
         return switch (response.getStatus()) {
             case PO_PAID, PO_PARTIALLY_REPORTED, PO_REPORTED ->
-                    Mono.error(new PnInternalException("Pagato.", 422, ""));
+                    Mono.error(new PnRuntimeException(
+                            "Pagato.",
+                            "Pagato.",
+                            422,
+                            ERROR_CODE_EXTERNALREGISTRIES_INVALIDATE_ALREADY_PAID,
+                            null,
+                            null
+                    ));
             case PO_UNPAID -> Mono.just(response);
         };
     }

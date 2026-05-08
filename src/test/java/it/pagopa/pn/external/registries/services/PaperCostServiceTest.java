@@ -1,6 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.dto.CommunicationResultGroupInt;
 import it.pagopa.pn.external.registries.dto.CostComponentsInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
@@ -115,7 +116,7 @@ class PaperCostServiceTest {
         when(gpdClient.getOrganizationPaymentOptionByNAV("77777777777", "302000100000019421")).thenReturn(Mono.just(gpdResponse));
 
         StepVerifier.create(paperCostService.invalidateCosts(request, "testIun"))
-                .expectErrorMatches(throwable -> throwable instanceof PnInternalException
+                .expectErrorMatches(throwable -> throwable instanceof PnRuntimeException
                         && throwable.getMessage().contains("Pagato"))
                 .verify();
 

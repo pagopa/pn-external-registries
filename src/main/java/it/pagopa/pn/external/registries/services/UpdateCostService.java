@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import it.pagopa.pn.external.registries.dto.CostUpdateCostPhaseInt;
 import it.pagopa.pn.external.registries.dto.CostUpdateResultRequestInt;
 import it.pagopa.pn.external.registries.dto.UpdateCostOptionEnum;
@@ -17,6 +17,9 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.UUID;
+
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_INVALIDATE_COST_FAILED;
+import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PAYMENT_ONGOING;
 
 @Service
 @Slf4j
@@ -92,9 +95,23 @@ public class UpdateCostService {
         return switch (response.getStatusCode().value()) {
             case 200 -> Mono.just(response);
             case 209, 422 ->
-                    Mono.error(new PnInternalException("Posizione debitoria considerata chiusa.", response.getStatusCode().value(), ""));
+                    Mono.error(new PnRuntimeException(
+                            "Posizione debitoria considerata chiusa.",
+                            "Posizione debitoria considerata chiusa.",
+                            response.getStatusCode().value(),
+                            ERROR_CODE_EXTERNALREGISTRIES_PAYMENT_ONGOING,
+                            null,
+                            null
+                    ));
             default ->
-                    Mono.error(new PnInternalException("Updating the cost for invalidated elements returned error.", response.getStatusCode().value(), ""));
+                    Mono.error(new PnRuntimeException(
+                            "Updating the cost for invalidated elements returned error.",
+                            "Updating the cost for invalidated elements returned error.",
+                            response.getStatusCode().value(),
+                            ERROR_CODE_EXTERNALREGISTRIES_INVALIDATE_COST_FAILED,
+                            null,
+                            null
+                    ));
         };
     }
 

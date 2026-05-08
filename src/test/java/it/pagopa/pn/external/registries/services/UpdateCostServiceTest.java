@@ -271,7 +271,7 @@ class UpdateCostServiceTest {
                         recIndex, iun, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0,
                         Instant.now(), Instant.now()))
                 .expectErrorSatisfies(throwable -> {
-                    Assertions.assertInstanceOf(it.pagopa.pn.commons.exceptions.PnInternalException.class, throwable);
+                    Assertions.assertInstanceOf(it.pagopa.pn.commons.exceptions.PnRuntimeException.class, throwable);
                     Assertions.assertEquals("Posizione debitoria considerata chiusa.", throwable.getMessage());
                 })
                 .verify();

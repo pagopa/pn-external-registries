@@ -40,7 +40,7 @@ class PaperCostControllerTest {
                   "recIndex": "RECINDEX_0",
                   "costPhases": ["SEND_ANALOG_DOMICILE_ATTEMPT_0", "SEND_ANALOG_DOMICILE_ATTEMPT_1"],
                   "vat": 22,
-                  "paymentsInfo": [
+                  "PaymentsInfo": [
                     {
                       "recIndex": 0,
                       "creditorTaxId": "77777777777",
