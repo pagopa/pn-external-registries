@@ -267,14 +267,23 @@ class UpdateCostServiceTest {
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(209).body(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
 
-        StepVerifier.create(updateCostService.updateCostForInvalidated(
-                        recIndex, iun, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0,
-                        Instant.now(), Instant.now()))
-                .expectErrorSatisfies(throwable -> {
-                    Assertions.assertInstanceOf(it.pagopa.pn.commons.exceptions.PnRuntimeException.class, throwable);
-                    Assertions.assertEquals("Posizione debitoria considerata chiusa.", throwable.getMessage());
-                })
-                .verify();
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(pk);
+        entity.setSk(sk);
+        entity.setEventTimestamp(Instant.now());
+        when(costUpdateResultDao.insertOrUpdate(any(CostUpdateResultEntity.class)))
+                .thenReturn(Mono.just(entity));
+
+        UpdateCostResponseInt updateCostResponse = updateCostService.updateCostForInvalidated(
+                recIndex, iun, creditorTaxId, noticeCode, notificationCost, CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0,
+                Instant.now(), Instant.now()
+        ).block();
+
+        Assertions.assertNotNull(updateCostResponse, "UpdateCostResponse should not be null");
+        Assertions.assertEquals(recIndex, updateCostResponse.getRecIndex(), "RecIndex should match");
+        Assertions.assertEquals(creditorTaxId, updateCostResponse.getCreditorTaxId(), "CreditorTaxId should match");
+        Assertions.assertEquals(noticeCode, updateCostResponse.getNoticeCode(), "NoticeCode should match");
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, updateCostResponse.getResult(), "CommunicationResultGroupInt should match");
     }
 
     private PaymentsModelResponse newPaymentModelResponse() {

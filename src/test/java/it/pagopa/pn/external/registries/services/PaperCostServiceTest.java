@@ -53,23 +53,6 @@ class PaperCostServiceTest {
     }
 
     @Test
-    void invalidateCostsShouldSkipInsertStepCostWhenApplyCostIsFalse() {
-        PaperCostToInvalidateInt request = buildRequest(false);
-        UpdateCostResponseInt updateCostResponse = new UpdateCostResponseInt(0, "77777777777", "302000100000019421", CommunicationResultGroupInt.OK);
-
-        when(costComponentService.getTotalCost(22, "testIun", 0, "77777777777", "302000100000019421")).thenReturn(Mono.just(150));
-        when(updateCostService.updateCostForInvalidated(anyInt(), anyString(), anyString(), anyString(), anyInt(), any(), any(Instant.class), any(Instant.class)))
-                .thenReturn(Mono.just(updateCostResponse));
-
-        StepVerifier.create(paperCostService.invalidateCosts(request, "testIun"))
-                .verifyComplete();
-
-        verify(costComponentService, times(1)).getTotalCost(22, "testIun", 0, "77777777777", "302000100000019421");
-        verify(updateCostService, times(1)).updateCostForInvalidated(anyInt(), anyString(), anyString(), anyString(), anyInt(), any(), any(Instant.class), any(Instant.class));
-        verify(costComponentService, never()).insertStepCost(any(), anyString(), anyInt(), anyString(), anyString(), anyInt(), any());
-    }
-
-    @Test
     void invalidateCostsShouldFailWhenPaymentInfoListIsEmpty() {
         PaperCostToInvalidateInt request = PaperCostToInvalidateInt.builder()
                 .vat(22)

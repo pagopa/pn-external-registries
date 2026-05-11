@@ -37,12 +37,19 @@ public class UpdateCostService {
                                                   CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
 
         return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
-                eventTimestamp, eventStorageTimestamp, UpdateCostOptionEnum.NO_CHECK_RESPONSE_STATUSES);
+                eventTimestamp, eventStorageTimestamp, UpdateCostOptionEnum.NO_CHECK_RESPONSE_STATUSES, false);
+    }
+
+    public Mono<UpdateCostResponseInt> updateCostForInvalidated(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
+                                                                CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
+
+        return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
+                eventTimestamp, eventStorageTimestamp, UpdateCostOptionEnum.CHECK_RESPONSE_STATUSES, true);
     }
 
     private Mono<UpdateCostResponseInt> updateCost(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
                                                    CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp,
-                                                   UpdateCostOptionEnum updateCostOption) {
+                                                   UpdateCostOptionEnum updateCostOption, boolean reworked) {
 
         String iuv = creditorTaxId + noticeCode;
         String requestId = creditorTaxId + "_" + noticeCode + "_" + updateCostPhase + "_" + UUID.randomUUID();
@@ -58,11 +65,11 @@ public class UpdateCostService {
         }
 
         return setNotificationCostResponse
-                .flatMap(response -> processNotificationCostResponse(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase, eventTimestamp, eventStorageTimestamp, response, communicationTimestamp, requestId))
-                .onErrorResume(WebClientResponseException.class, error -> processNotificationCostResponseError(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase, eventTimestamp, eventStorageTimestamp, error, iuv, requestId, communicationTimestamp));
+                .flatMap(response -> processNotificationCostResponse(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase, eventTimestamp, eventStorageTimestamp, response, communicationTimestamp, requestId, reworked))
+                .onErrorResume(WebClientResponseException.class, error -> processNotificationCostResponseError(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase, eventTimestamp, eventStorageTimestamp, error, iuv, requestId, communicationTimestamp, reworked));
     }
 
-    private Mono<UpdateCostResponseInt> processNotificationCostResponseError(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost, CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp, WebClientResponseException error, String iuv, String requestId, Instant communicationTimestamp) {
+    private Mono<UpdateCostResponseInt> processNotificationCostResponseError(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost, CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp, WebClientResponseException error, String iuv, String requestId, Instant communicationTimestamp, boolean reworked) {
         log.info("Error calling GPD: {}, iuv: {}, creditorTaxId: {}, noticeCode: {}, requestId: {}, notificationCost: {}",
                 error.getResponseBodyAsString(), iuv, creditorTaxId, noticeCode, requestId, notificationCost);
 
@@ -70,10 +77,10 @@ public class UpdateCostService {
                 updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
                 error.getStatusCode().value(), error.getResponseBodyAsString());
 
-        return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
+        return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode, reworked);
     }
 
-    private Mono<UpdateCostResponseInt> processNotificationCostResponse(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost, CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp, ResponseEntity<PaymentsModelResponse> response, Instant communicationTimestamp, String requestId) {
+    private Mono<UpdateCostResponseInt> processNotificationCostResponse(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost, CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp, ResponseEntity<PaymentsModelResponse> response, Instant communicationTimestamp, String requestId, boolean reworked) {
         PaymentsModelResponse paymentsModelResponse = getPaymentsModelResponseAndCleanUp(response);
         // convert to JSON
         ObjectMapper mapper = new ObjectMapper();
@@ -88,13 +95,13 @@ public class UpdateCostService {
                 updateCostPhase, eventTimestamp, eventStorageTimestamp, communicationTimestamp, requestId, iun,
                 response.getStatusCode().value(), jsonResponse);
 
-        return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode);
+        return createUpdateCostResponse(costUpdateResultRequestInt, recIndex, creditorTaxId, noticeCode,reworked);
     }
 
     private static Mono<ResponseEntity<PaymentsModelResponse>> checkForResponseStatuses(ResponseEntity<PaymentsModelResponse> response) {
         return switch (response.getStatusCode().value()) {
-            case 200 -> Mono.just(response);
-            case 209, 422 ->
+            case 200, 209 -> Mono.just(response);
+            case 422 ->
                     Mono.error(new PnRuntimeException(
                             "Posizione debitoria considerata chiusa.",
                             "Posizione debitoria considerata chiusa.",
@@ -113,13 +120,6 @@ public class UpdateCostService {
                             null
                     ));
         };
-    }
-
-    public Mono<UpdateCostResponseInt> updateCostForInvalidated(int recIndex, String iun, String creditorTaxId, String noticeCode, int notificationCost,
-                                                  CostUpdateCostPhaseInt updateCostPhase, Instant eventTimestamp, Instant eventStorageTimestamp) {
-
-        return updateCost(recIndex, iun, creditorTaxId, noticeCode, notificationCost, updateCostPhase,
-                eventTimestamp, eventStorageTimestamp, UpdateCostOptionEnum.CHECK_RESPONSE_STATUSES);
     }
 
     private CostUpdateResultRequestInt getCostUpdateResultRequest(String creditorTaxId, String noticeCode, int notificationCost,
@@ -158,8 +158,8 @@ public class UpdateCostService {
         return paymentsModelResponse;
     }
 
-    private Mono<UpdateCostResponseInt> createUpdateCostResponse(CostUpdateResultRequestInt request, int recIndex, String creditorTaxId, String noticeCode) {
-        return costUpdateResultService.createUpdateResult(request)
+    private Mono<UpdateCostResponseInt> createUpdateCostResponse(CostUpdateResultRequestInt request, int recIndex, String creditorTaxId, String noticeCode, boolean reworked) {
+        return costUpdateResultService.createUpdateResult(request, reworked)
                 .map(result -> new UpdateCostResponseInt(
                         recIndex,
                         creditorTaxId,

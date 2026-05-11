@@ -38,7 +38,6 @@ public class PaperCostService {
                 .flatMap(totalCost -> updateCostService.updateCostForInvalidated(recIndex, iun,
                                 paymentInfo.getCreditorTaxId(), paymentInfo.getNoticeCode(),
                                 totalCost, costPhase, now, now)
-                .filter(updateCostResponse -> paymentInfo.isApplyCost())
                 .flatMap(updateCostResponse -> costComponentService.insertStepCost(costPhase, iun, recIndex,
                                 paymentInfo.getCreditorTaxId(), paymentInfo.getNoticeCode(), INVALIDATED_COST, vat)
                 .doOnError(e -> log.error("An error occurred while inserting step cost for recIndex: {}. Error: {}",
