@@ -58,7 +58,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        String result = Objects.requireNonNull(service.createUpdateResult(request).block()).getValue();
+        String result = Objects.requireNonNull(service.createUpdateResult(request, false).block()).getValue();
         Assertions.assertEquals("OK", result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -120,7 +120,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        CommunicationResultGroupInt result = service.createUpdateResult(request, false).block();
         Assertions.assertEquals(CommunicationResultGroupInt.OK, result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -163,7 +163,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        CommunicationResultGroupInt result = service.createUpdateResult(request, false).block();
         Assertions.assertEquals(CommunicationResultGroupInt.KO, result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -206,7 +206,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        CommunicationResultGroupInt result = service.createUpdateResult(request, false).block();
         Assertions.assertEquals(CommunicationResultGroupInt.KO, result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -249,7 +249,7 @@ class CostUpdateResultServiceTest {
         when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
 
         // Execute & Verify
-        CommunicationResultGroupInt result = service.createUpdateResult(request).block();
+        CommunicationResultGroupInt result = service.createUpdateResult(request, false).block();
         Assertions.assertEquals(CommunicationResultGroupInt.RETRY, result);
 
         verify(dao).insertOrUpdate(captor.capture());
@@ -277,8 +277,35 @@ class CostUpdateResultServiceTest {
     }
 
     @Test
+    void testCreateUpdateResult_Reworked_SkHasNotificationReworkedPrefix() {
+        int statusCode = 200;
+
+        CostUpdateResultRequestInt request = newCostUpdateResultRequestInt(statusCode, sourceJsonString);
+
+        CostUpdateResultEntity entity = new CostUpdateResultEntity();
+        entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
+        entity.setSk("NOTIFICATION_REWORKED##" + request.getUpdateCostPhase().getValue() + "##" +
+                "OK" + "##" +
+                UUID.randomUUID());
+
+        when(dao.insertOrUpdate(any())).thenReturn(Mono.just(entity));
+
+        CommunicationResultGroupInt result = service.createUpdateResult(request, true).block();
+        Assertions.assertEquals(CommunicationResultGroupInt.OK, result);
+
+        verify(dao).insertOrUpdate(captor.capture());
+        CostUpdateResultEntity capturedEntity = captor.getValue();
+
+        String[] skParts = capturedEntity.getSk().split("##");
+        Assertions.assertEquals(4, skParts.length);
+        Assertions.assertEquals("NOTIFICATION_REWORKED", skParts[0]);
+        Assertions.assertEquals(request.getUpdateCostPhase().getValue(), skParts[1]);
+        Assertions.assertEquals("OK", skParts[2]);
+    }
+
+    @Test
     void testNullRequest() {
-        final Mono<CommunicationResultGroupInt> updateResult = service.createUpdateResult(null);
+        final Mono<CommunicationResultGroupInt> updateResult = service.createUpdateResult(null, false);
 
         // Execute & Verify
         Assertions.assertThrows(IllegalArgumentException.class, () -> {

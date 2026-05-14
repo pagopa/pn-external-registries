@@ -4,6 +4,7 @@ import it.pagopa.pn.external.registries.exceptions.PnPaymentOngoingException;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.api.PaymentsApiApi;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.NotificationFeeUpdateModel;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.PaymentsModelResponse;
+import it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.dto.PaymentsWithDebtorInfoModelResponse;
 import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -42,6 +43,11 @@ public class GpdClient extends OcpBaseClient {
                                                 .body(ex.getResponse())
                                 )
                 );
+    }
+
+    public Mono<PaymentsWithDebtorInfoModelResponse> getOrganizationPaymentOptionByNAV(String organizationFiscalCode, String nav) {
+        log.logInvokingExternalService(GPD, "getOrganizationPaymentOptionByNAV");
+        return paymentsApiApi.getOrganizationPaymentOptionByNAV(organizationFiscalCode, nav, null);
     }
 
 }

@@ -26,7 +26,7 @@ public class CostUpdateResultService {
         this.communicationResultGroupMapper = communicationResultGroupMapper;
     }
 
-    public Mono<CommunicationResultGroupInt> createUpdateResult(CostUpdateResultRequestInt request) {
+    public Mono<CommunicationResultGroupInt> createUpdateResult(CostUpdateResultRequestInt request, boolean reworked) {
         if (request == null) {
             return Mono.error(new IllegalArgumentException("Request cannot be null"));
         }
@@ -37,9 +37,13 @@ public class CostUpdateResultService {
         entity.setCommunicationResultGroup(communicationResultGroup.getValue());
 
         entity.setPk(request.getCreditorTaxId() + "##" + request.getNoticeCode());
-        entity.setSk(request.getUpdateCostPhase().getValue() + "##" +
+        String sk = request.getUpdateCostPhase().getValue() + "##" +
                 communicationResultGroup + "##" +
-                UUID.randomUUID());
+                UUID.randomUUID();
+        if (reworked) {
+            sk = "NOTIFICATION_REWORKED##" + sk;
+        }
+        entity.setSk(sk);
 
         entity.setRequestId(request.getRequestId());
 
