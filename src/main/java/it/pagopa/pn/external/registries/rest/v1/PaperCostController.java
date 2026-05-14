@@ -16,6 +16,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Slf4j
@@ -26,16 +27,24 @@ public class PaperCostController implements PaperCostApi {
     @Override
     public Mono<ResponseEntity<Void>> invalidatePaperCost(String iun, Mono<PaperCostToInvalidateDto> paperCostToInvalidateDto, final ServerWebExchange exchange) {
         return paperCostToInvalidateDto
+                .flatMap(this::validateData)
                 .flatMap(this::getInternalPaperCostToInvalidate)
                 .flatMap(internalReq -> service.invalidateCosts(internalReq, iun))
-                .map(responseList -> ResponseEntity.ok().build());
+                .thenReturn(ResponseEntity.ok().build());
+    }
+
+    private Mono<PaperCostToInvalidateDto> validateData(PaperCostToInvalidateDto paperCostToInvalidateDto) {
+        if (Objects.isNull(paperCostToInvalidateDto.getPaymentsInfo())) {
+            return Mono.error(new IllegalArgumentException("Payments info list cannot be null"));
+        }
+
+        return Mono.just(paperCostToInvalidateDto);
     }
 
     private Mono<PaperCostToInvalidateInt> getInternalPaperCostToInvalidate(PaperCostToInvalidateDto dto) {
         return Mono.just(PaperCostToInvalidateInt
                 .builder()
                 .vat(dto.getVat())
-                .recIndex(dto.getRecIndex())
                 .costPhases(getPaperCostToInvalidateInt(dto.getCostPhases()))
                 .paymentInfoList(getPaymentInfoInt(dto.getPaymentsInfo()))
                 .build());
@@ -47,7 +56,6 @@ public class PaperCostController implements PaperCostApi {
                 .creditorTaxId(paymentInfoDto.getCreditorTaxId())
                 .noticeCode(paymentInfoDto.getNoticeCode())
                 .recIndex(paymentInfoDto.getRecIndex())
-                .applyCost(paymentInfoDto.getApplyCost())
                 .build()).toList();
     }
 

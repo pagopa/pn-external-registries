@@ -12,5 +12,4 @@ public class PaymentInfoInt {
     private int recIndex;
     private String creditorTaxId;
     private String noticeCode;
-    private boolean applyCost;
 }

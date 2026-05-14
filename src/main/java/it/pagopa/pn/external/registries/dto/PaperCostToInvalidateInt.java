@@ -12,8 +12,9 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 public class PaperCostToInvalidateInt {
-    private String recIndex;
+    @Builder.Default
     private List<CostUpdateCostPhaseInt> costPhases = new ArrayList<>();
     private Integer vat;
+    @Builder.Default
     private List<PaymentInfoInt> paymentInfoList = new ArrayList<>();
 }

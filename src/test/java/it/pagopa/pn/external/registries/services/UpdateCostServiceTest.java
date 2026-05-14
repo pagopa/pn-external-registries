@@ -9,14 +9,13 @@ import it.pagopa.pn.external.registries.middleware.db.entities.CostUpdateResultE
 import it.pagopa.pn.external.registries.middleware.db.mapper.CommunicationResultGroupMapper;
 import it.pagopa.pn.external.registries.middleware.msclient.gpd.GpdClient;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.Instant;
 import java.util.Date;

@@ -69,7 +69,6 @@ class PaperCostControllerTest {
 
         PaperCostToInvalidateInt capturedRequest = captor.getValue();
         assertNotNull(capturedRequest);
-        assertEquals("RECINDEX_0", capturedRequest.getRecIndex());
         assertEquals(22, capturedRequest.getVat());
         assertEquals(2, capturedRequest.getCostPhases().size());
         assertEquals(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0, capturedRequest.getCostPhases().get(0));
@@ -80,13 +79,11 @@ class PaperCostControllerTest {
         assertEquals(0, firstPayment.getRecIndex());
         assertEquals("77777777777", firstPayment.getCreditorTaxId());
         assertEquals("302000100000019421", firstPayment.getNoticeCode());
-        assertTrue(firstPayment.isApplyCost());
 
         PaymentInfoInt secondPayment = capturedRequest.getPaymentInfoList().get(1);
         assertEquals(1, secondPayment.getRecIndex());
         assertEquals("88888888888", secondPayment.getCreditorTaxId());
         assertEquals("302000100000019422", secondPayment.getNoticeCode());
-        assertFalse(secondPayment.isApplyCost());
     }
 }
 
