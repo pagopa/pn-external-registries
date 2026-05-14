@@ -19,6 +19,8 @@ tags:
     description: Tag for Privacy Notices operations
   - name: additional-lang
     description: Tag for pa additional languages operation
+  - name: update-notification-cost
+    description: Tag for update notification cost operation
 paths:
   '/ext-registry-private/pa/v1/groups-all':
     get:
@@ -295,6 +297,39 @@ paths:
             application/problem+json:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
+  /ext-registry-private/cost-update:
+    post:
+      operationId: updateNotificationCost
+      description: This API allows updating the notification fee
+      tags:
+        - update-notification-cost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotificationCostRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateNotificationCostResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
 
   /ext-registry-private/cost-update/{iun}/invalidate:
     put:
@@ -490,3 +525,82 @@ components:
           type: string
           maxLength: 18
           minLength: 18
+    UpdateNotificationCostRequest:
+      title: Update notification cost information
+      type: object
+      required:
+        - notificationStepCost
+        - iun
+        - paymentsInfoForRecipients
+        - updateCostPhase
+      properties:
+        notificationStepCost:
+          type: integer
+          description: Single notification step cost (euro-cent)
+          format: int32
+        iun:
+          description: Notification Unique identifier
+          type: string
+        paymentsInfoForRecipients:
+          type: array
+          description: Payment information for recipient
+          items:
+            $ref: '#/components/schemas/PaymentsInfoForRecipient'
+        eventTimestamp:
+          type: string
+          description: event timestamp
+          format: date-time
+        eventStorageTimestamp:
+          type: string
+          description: event storage timestamp
+          format: date-time
+        updateCostPhase:
+          type: string
+          enum:
+            - VALIDATION
+            - REQUEST_REFUSED
+            - NOTIFICATION_CANCELLED
+
+    UpdateNotificationCostResponse:
+      title: Update notification cost response
+      type: object
+      required:
+        - updateResults
+      properties:
+        updateResults:
+          type: array
+          description: Update notification cost results
+          items:
+            $ref: '#/components/schemas/UpdateNotificationCostResult'
+
+    UpdateNotificationCostResult:
+      title: Update notification cost results
+      type: object
+      required:
+        - recIndex
+        - creditorTaxId
+        - noticeCode
+        - result
+      properties:
+        recIndex:
+          type: integer
+          description: recipient index
+          format: int32
+        creditorTaxId:
+          description: Payment PA fiscal code
+          example: '77777777777'
+          type: string
+          maxLength: 11
+          minLength: 11
+        noticeCode:
+          description: Payment notice number  numero avviso
+          example: '302000100000019421'
+          type: string
+          maxLength: 18
+          minLength: 18
+        result:
+          type: string
+          enum:
+            - OK
+            - KO
+            - RETRY
