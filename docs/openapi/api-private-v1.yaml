@@ -19,6 +19,8 @@ tags:
     description: Tag for Privacy Notices operations
   - name: additional-lang
     description: Tag for pa additional languages operation
+  - name: update-notification-cost
+    description: Tag for update notification cost operation
 paths:
   '/ext-registry-private/pa/v1/groups-all':
     get:
@@ -297,10 +299,10 @@ paths:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
   /ext-registry-private/cost-update:
     post:
-      operationId: UpdateNotificationCost
-      description: This api allow updating notification fee
+      operationId: updateNotificationCost
+      description: This API allows updating the notification fee
       tags:
-        - UpdateNotificationCost
+        - update-notification-cost
       requestBody:
         content:
           application/json:
