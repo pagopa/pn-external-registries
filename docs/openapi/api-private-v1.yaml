@@ -561,31 +561,6 @@ components:
             - REQUEST_REFUSED
             - NOTIFICATION_CANCELLED
 
-    PaymentsInfoForRecipient:
-      title: Payment information for recipient
-      type: object
-      required:
-        - recIndex
-        - creditorTaxId
-        - noticeCode
-      properties:
-        recIndex:
-          type: integer
-          description: recipient index
-          format: int32
-        creditorTaxId:
-          description: Payment PA fiscal code
-          example: '77777777777'
-          type: string
-          maxLength: 11
-          minLength: 11
-        noticeCode:
-          description: Payment notice number  numero avviso
-          example: '302000100000019421'
-          type: string
-          maxLength: 18
-          minLength: 18
-
     UpdateNotificationCostResponse:
       title: Update notification cost response
       type: object
