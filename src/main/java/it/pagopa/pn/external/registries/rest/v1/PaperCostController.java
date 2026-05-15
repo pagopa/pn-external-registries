@@ -30,7 +30,7 @@ public class PaperCostController implements PaperCostApi {
                 .flatMap(this::validateData)
                 .flatMap(this::getInternalPaperCostToInvalidate)
                 .flatMap(internalReq -> service.invalidateCosts(internalReq, iun))
-                .thenReturn(ResponseEntity.ok().build());
+                .thenReturn(ResponseEntity.noContent().build());
     }
 
     private Mono<PaperCostToInvalidateDto> validateData(PaperCostToInvalidateDto paperCostToInvalidateDto) {

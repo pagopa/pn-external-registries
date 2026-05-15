@@ -35,7 +35,7 @@ class PaperCostServiceTest {
 
     @Test
     void invalidateCostsShouldExecuteWholeFlowWhenPaymentIsUnpaidAndApplyCostTrue() {
-        PaperCostToInvalidateInt request = buildRequest(true);
+        PaperCostToInvalidateInt request = buildRequest();
         UpdateCostResponseInt updateCostResponse = new UpdateCostResponseInt(0, "77777777777", "302000100000019421", CommunicationResultGroupInt.OK);
 
         when(costComponentService.getTotalCost(22, "testIun", 0, "77777777777", "302000100000019421")).thenReturn(Mono.just(150));
@@ -56,7 +56,6 @@ class PaperCostServiceTest {
     void invalidateCostsShouldFailWhenPaymentInfoListIsEmpty() {
         PaperCostToInvalidateInt request = PaperCostToInvalidateInt.builder()
                 .vat(22)
-                .recIndex("RECINDEX_0")
                 .costPhases(List.of(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0))
                 .paymentInfoList(List.of())
                 .build();
@@ -71,16 +70,14 @@ class PaperCostServiceTest {
         verify(updateCostService, never()).updateCostForInvalidated(anyInt(), anyString(), anyString(), anyString(), anyInt(), any(), any(Instant.class), any(Instant.class));
     }
 
-    private PaperCostToInvalidateInt buildRequest(boolean applyCost) {
+    private PaperCostToInvalidateInt buildRequest() {
         PaymentInfoInt paymentInfo = PaymentInfoInt.builder()
                 .recIndex(0)
                 .creditorTaxId("77777777777")
                 .noticeCode("302000100000019421")
-                .applyCost(applyCost)
                 .build();
 
         return PaperCostToInvalidateInt.builder()
-                .recIndex("RECINDEX_0")
                 .vat(22)
                 .costPhases(List.of(CostUpdateCostPhaseInt.SEND_ANALOG_DOMICILE_ATTEMPT_0))
                 .paymentInfoList(List.of(paymentInfo))

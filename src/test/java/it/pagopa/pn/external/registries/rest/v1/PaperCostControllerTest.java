@@ -37,7 +37,7 @@ class PaperCostControllerTest {
                   "recIndex": "RECINDEX_0",
                   "costPhases": ["SEND_ANALOG_DOMICILE_ATTEMPT_0", "SEND_ANALOG_DOMICILE_ATTEMPT_1"],
                   "vat": 22,
-                  "PaymentsInfo": [
+                  "paymentsInfo": [
                     {
                       "recIndex": 0,
                       "creditorTaxId": "77777777777",
@@ -61,7 +61,7 @@ class PaperCostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isNoContent()
                 .expectBody().isEmpty();
 
         ArgumentCaptor<PaperCostToInvalidateInt> captor = ArgumentCaptor.forClass(PaperCostToInvalidateInt.class);
