@@ -21,6 +21,8 @@ tags:
     description: Tag for pa additional languages operation
   - name: update-notification-cost
     description: Tag for update notification cost operation
+  - name: paper-cost
+    description: Tag for invalidate notification cost operation
 paths:
   '/ext-registry-private/pa/v1/groups-all':
     get:
@@ -336,7 +338,7 @@ paths:
       operationId: invalidatePaperCost
       description: Invalidate paper cost when notification rework occurs
       tags:
-        - PaperCost
+        - paper-cost
       parameters:
         - name: iun
           in: path
@@ -481,7 +483,6 @@ components:
         - recIndex
         - costPhases
         - vat
-        - paymentsInfo
 
     AnalogUpdateCostPhase:
       type: string
@@ -494,12 +495,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/PaymentsInfoForRecipient'
         - type: object
-          required:
-            - applyCost
-          properties:
-            applyCost:
-              type: boolean
-              description: indicates if cost applies to recipient
 
     PaymentsInfoForRecipient:
       title: Payment information for recipient

@@ -46,7 +46,7 @@ public class PaperCostService {
 
     private Mono<List<PaymentInfoInt>> validatePaymentInfoList(List<PaymentInfoInt> paymentInfoList) {
         if (paymentInfoList == null || paymentInfoList.isEmpty()) {
-            return Mono.error(new IllegalStateException("The cost cannot be invalidated because the payment information is not available"));
+            return Mono.error(new IllegalArgumentException("The cost cannot be invalidated because the payment information is not available"));
         }
 
         return Mono.just(paymentInfoList);

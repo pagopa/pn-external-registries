@@ -61,7 +61,7 @@ class PaperCostServiceTest {
                 .build();
 
         StepVerifier.create(paperCostService.invalidateCosts(request, "testIun"))
-                .expectErrorMatches(throwable -> throwable instanceof IllegalStateException
+                .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException
                         && throwable.getMessage().contains("payment information is not available"))
                 .verify();
 

@@ -261,7 +261,7 @@ class UpdateCostServiceTest {
     }
 
     @Test
-    void testUpdateCostForInvalidated_209_ShouldReturnError() {
+    void testUpdateCostForInvalidated_209_ShouldComplete() {
         PaymentsModelResponse paymentsModelResponse = newPaymentModelResponse();
         ResponseEntity<PaymentsModelResponse> responseEntity = ResponseEntity.status(209).body(paymentsModelResponse);
         when(gpdClient.setNotificationCost(any(), any(), any(), any())).thenReturn(Mono.just(responseEntity));
