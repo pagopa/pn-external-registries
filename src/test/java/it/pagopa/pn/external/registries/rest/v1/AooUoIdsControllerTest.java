@@ -50,6 +50,10 @@ class AooUoIdsControllerTest {
         webTestClient.get()
                 .uri(URL_V2)
                 .exchange()
-                .expectStatus().isOk().expectBodyList(String.class).hasSize(1);
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.ids").isArray()
+                .jsonPath("$.ids.length()").isEqualTo(1)
+                .jsonPath("$.ids[0]").isEqualTo("A123456789");
     }
 }
