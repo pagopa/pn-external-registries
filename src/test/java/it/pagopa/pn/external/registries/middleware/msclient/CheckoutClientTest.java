@@ -17,8 +17,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.test.StepVerifier;
+
+import io.netty.handler.timeout.ReadTimeoutException;
+import org.mockserver.model.Delay;
+import java.util.concurrent.TimeUnit;
 
 import java.net.URI;
 import java.util.List;
@@ -32,7 +37,9 @@ import static org.mockserver.model.HttpResponse.response;
 @TestPropertySource(properties = {
         "pn.external-registry.checkout-api-base-url=http://localhost:9999",
         "pn.external-registry.checkout-api-key=fake_api_key",
-        "pn.external-registry.checkout-cart-api-base-url=http://localhost:9999"
+        "pn.external-registry.checkout-cart-api-base-url=http://localhost:9999",
+        "pn.external-registry.checkout-read-timeout-millis=1000",
+        "pn.external-registry.checkout-retry-max-attempts=0"
 })
 class CheckoutClientTest extends MockAWSObjectsTestConfig {
 
@@ -180,5 +187,25 @@ class CheckoutClientTest extends MockAWSObjectsTestConfig {
         StepVerifier.create(client.checkoutCart(cartRequestDto))
             .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException.NotFound)
             .verify();
+    }
+
+    @Test
+    void getPaymentInfoReadTimeout() {
+        new MockServerClient("localhost", 9999)
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/payment-requests/77777777777302000100000019421"))
+                .respond(response()
+                        .withDelay(Delay.delay(TimeUnit.SECONDS, 5))
+                        .withBody("{}")
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200));
+
+        StepVerifier.create(client.getPaymentInfo("77777777777302000100000019421"))
+                .expectErrorMatches(throwable ->
+                        throwable instanceof WebClientRequestException wex
+                                && wex.getMostSpecificCause() instanceof ReadTimeoutException
+                )
+                .verify();
     }
 }

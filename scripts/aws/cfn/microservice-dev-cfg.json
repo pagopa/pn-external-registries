@@ -28,6 +28,8 @@
     "IoRemoteContentCfgId": "01HMVMHCZZ8D0VTFWMRHBM5D6F",
     "SendPortalUrl": "https://notifichedigitali.pagopa.it",
     "OneTrustReadTimeoutMillis": "3000",
-    "OneTrustRetryMaxAttempts": "1"
+    "OneTrustRetryMaxAttempts": "1",
+    "CheckoutRetryMaxAttempts": "0",
+    "CheckoutReadTimeoutMillis": "8000"
   }
 }

@@ -2,8 +2,8 @@ package it.pagopa.pn.external.registries.middleware.queue.utils;
 
 import it.pagopa.pn.commons.utils.MDCUtils;
 import org.slf4j.MDC;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.Message;
 
 import java.util.UUID;
 

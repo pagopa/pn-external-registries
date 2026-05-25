@@ -14,6 +14,8 @@ import it.pagopa.pn.external.registries.middleware.msclient.common.OcpBaseClient
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,6 +25,20 @@ public class MsClientConfig {
 
     @Configuration
     static class CheckoutApis extends OcpBaseClient {
+
+        @Autowired
+        @Override
+        public void setRetryMaxAttempts(
+                @Value("${pn.external-registry.checkout-retry-max-attempts}") int retryMaxAttempts) {
+            super.setRetryMaxAttempts(retryMaxAttempts);
+        }
+
+        @Autowired
+        @Override
+        public void setReadTimeoutMillis(
+                @Value("${pn.external-registry.checkout-read-timeout-millis}") int readTimeoutMillis) {
+            super.setReadTimeoutMillis(readTimeoutMillis);
+        }
 
         @Bean
         PaymentRequestsApi defaultApiClient(PnExternalRegistriesConfig config) {
