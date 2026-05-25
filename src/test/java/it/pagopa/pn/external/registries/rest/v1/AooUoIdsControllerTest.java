@@ -1,13 +1,12 @@
 package it.pagopa.pn.external.registries.rest.v1;
 
 import it.pagopa.pn.external.registries.services.InfoSelfcareInstitutionsService;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
@@ -16,8 +15,11 @@ class AooUoIdsControllerTest {
     private static final String URL = "/ext-registry-private/pa/v1/actions/filter-out-root-pa-ids?id={id}"
         .replace("{id}", "A123456789");
 
+    private static final String URL_V2 = "/ext-registry-private/pa/v2/actions/filter-out-root-pa-ids?id={id}"
+            .replace("{id}", "A123456789");
 
-    @MockBean
+
+    @MockitoBean
     InfoSelfcareInstitutionsService infoSelfcareInstitutionsService;
 
     @Autowired
@@ -26,7 +28,7 @@ class AooUoIdsControllerTest {
     @Test
     void getFilteredIdsOK()  {
 
-        List<String> values = Arrays.asList("A123456789");
+        List<String> values = List.of("A123456789");
         Mockito.when(infoSelfcareInstitutionsService.filterOutRootIds(values))
             .thenReturn(Flux.fromIterable(values));
 
@@ -35,5 +37,23 @@ class AooUoIdsControllerTest {
             .uri(URL)
             .exchange()
             .expectStatus().isOk().expectBodyList(String.class).hasSize(1);
+    }
+
+    @Test
+    void getFilteredIdsV2OK()  {
+
+        List<String> values = List.of("A123456789");
+        Mockito.when(infoSelfcareInstitutionsService.filterOutRootIds(values))
+                .thenReturn(Flux.fromIterable(values));
+
+        // Then
+        webTestClient.get()
+                .uri(URL_V2)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.ids").isArray()
+                .jsonPath("$.ids.length()").isEqualTo(1)
+                .jsonPath("$.ids[0]").isEqualTo("A123456789");
     }
 }
