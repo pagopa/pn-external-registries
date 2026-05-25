@@ -100,7 +100,11 @@ public class UpdateCostService {
 
     private static Mono<ResponseEntity<PaymentsModelResponse>> checkForResponseStatuses(ResponseEntity<PaymentsModelResponse> response) {
         return switch (response.getStatusCode().value()) {
-            case 200, 209 -> Mono.just(response);
+            case 200 -> Mono.just(response);
+            case 209 -> {
+                log.warn("GPD returned status 209 for cost update, so status is OK_IN_PAYMENT");
+                yield Mono.just(response);
+            }
             case 422 ->
                     Mono.error(new PnRuntimeException(
                             "Posizione debitoria considerata chiusa.",
