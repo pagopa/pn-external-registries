@@ -23,6 +23,13 @@ public class PaperCostService {
     public static final int INVALIDATED_COST = 0;
 
     public Mono<Void> invalidateCosts(PaperCostToInvalidateInt req, String iun) {
+        log.debug("Starting invalidateCosts for iun={} with vat={}, costPhases={}, paymentInfoListSize={}, paymentInfoList={}",
+                iun,
+                req.getVat(),
+                req.getCostPhases(),
+                req.getPaymentInfoList() == null ? null : req.getPaymentInfoList().size(),
+                req.getPaymentInfoList());
+
         return validatePaymentInfoList(req.getPaymentInfoList())
                 .flatMapMany(paymentInfoList -> Flux.fromIterable(paymentInfoList)
                         .concatMap(paymentInfo -> Flux.fromIterable(req.getCostPhases())

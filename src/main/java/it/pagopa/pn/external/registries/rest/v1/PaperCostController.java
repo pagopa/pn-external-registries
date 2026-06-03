@@ -27,8 +27,16 @@ public class PaperCostController implements PaperCostApi {
     @Override
     public Mono<ResponseEntity<Void>> invalidatePaperCost(String iun, Mono<PaperCostToInvalidateDto> paperCostToInvalidateDto, final ServerWebExchange exchange) {
         return paperCostToInvalidateDto
+                .doOnNext(dto -> log.debug("Received invalidatePaperCost request for iun={} with costPhases={}, vat={}, paymentsInfo={} ",
+                        iun, dto.getCostPhases(), dto.getVat(), dto.getPaymentsInfo()))
                 .flatMap(this::validateData)
                 .flatMap(this::getInternalPaperCostToInvalidate)
+                .doOnNext(internalReq -> log.debug("Mapped invalidatePaperCost request for iun={} to internal DTO with costPhases={}, vat={}, paymentInfoListSize={}, paymentInfoList={}",
+                        iun,
+                        internalReq.getCostPhases(),
+                        internalReq.getVat(),
+                        internalReq.getPaymentInfoList() == null ? null : internalReq.getPaymentInfoList().size(),
+                        internalReq.getPaymentInfoList()))
                 .flatMap(internalReq -> service.invalidateCosts(internalReq, iun))
                 .thenReturn(ResponseEntity.noContent().build());
     }
