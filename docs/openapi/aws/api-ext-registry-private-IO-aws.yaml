@@ -61,7 +61,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
       security:
-        - pn-auth-fleet_IoAuthorizer_openapi: []
+        - pn-auth-fleet_LollipopAuthorizer_openapi: []
         - api_key_openapi: []
       x-amazon-apigateway-integration:
         uri: >-
@@ -270,17 +270,17 @@ components:
       type: apiKey
       name: x-api-key
       in: header
-    pn-auth-fleet_IoAuthorizer_openapi:
+    pn-auth-fleet_LollipopAuthorizer_openapi:
       type: apiKey
-      name: Unused
+      name: x-pagopa-lollipop-auth-jwt
       in: header
       x-amazon-apigateway-authtype: custom
       x-amazon-apigateway-authorizer:
         authorizerUri: >-
-          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:pn-ioAuthorizerLambda/invocations
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:pn-lollipopAuthorizerLambda/invocations
         authorizerResultTtlInSeconds: 300
         identitySource: >-
-          method.request.header.x-api-key,
+          method.request.header.x-pagopa-lollipop-auth-jwt,
           method.request.header.x-pagopa-cx-taxid
         type: request
 tags:
