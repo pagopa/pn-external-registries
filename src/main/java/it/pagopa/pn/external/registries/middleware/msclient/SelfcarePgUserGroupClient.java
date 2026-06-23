@@ -8,6 +8,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.d
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.utils.StringUtils;
@@ -33,9 +34,10 @@ public class SelfcarePgUserGroupClient {
         UUID userIdUuid = StringUtils.isBlank(userId) ? null : UUID.fromString(userId);
         return userGroupPgApi.getUserGroupsUsingGET(config.getSelfcarepgusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, userIdUuid, null)
                 .doOnNext(dto -> log.info("PG GetUserGroup result for institutionId {}: {}", institutionId, dto))
-                .onErrorResume(WebClientResponseException.class, e -> {
-                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(e),e);
-                    log.error("PG getUserGroups response error {}", e.getResponseBodyAsString(), e);
+                .onErrorResume(WebClientException.class, e -> {
+                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(e), e);
+                    String body = (e instanceof WebClientResponseException wcre) ? wcre.getResponseBodyAsString() : e.getMessage();
+                    log.error("PG getUserGroups response error {}", body, e);
                     return Mono.error(new PnInternalException("Errore lettura PG usergroups", ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR, e));
                 });
     }

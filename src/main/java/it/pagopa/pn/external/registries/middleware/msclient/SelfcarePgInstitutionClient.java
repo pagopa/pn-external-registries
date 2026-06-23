@@ -10,6 +10,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.d
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
@@ -33,9 +34,10 @@ public class SelfcarePgInstitutionClient {
                 .filter(userInstitutionResourceDtos -> !userInstitutionResourceDtos.isEmpty())
                 .switchIfEmpty(Mono.error(new PnInternalException("Error getting institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR)))
                 .map(userInstitutionResourceDtos -> userInstitutionResourceDtos.get(0))
-                .onErrorResume(WebClientResponseException.class, x -> {
-                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(x),x);
-                    log.error("getInstitutions for userId " + userIdForAuth + " response error {}", x.getResponseBodyAsString(), x);
+                .onErrorResume(WebClientException.class, x -> {
+                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(x), x);
+                    String body = (x instanceof WebClientResponseException wcre) ? wcre.getResponseBodyAsString() : x.getMessage();
+                    log.error("retrieveUserInstitution for userId {} institutionId {} downstream error {}", userIdForAuth, institutionId, body, x);
                     return Mono.error(new PnInternalException("Error getting institutions", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
                 });
     }
@@ -44,9 +46,10 @@ public class SelfcarePgInstitutionClient {
     public Mono<UserResponseDto> retrieveUserDetail(String xPagopaPnUid, String xPagopaPnCxId) {
         return userPgApi.getUserInfoUsingGET(xPagopaPnUid, xPagopaPnCxId, null)
                 .doOnNext(userResponseDto -> log.info("getUserInfoUsingGET result: {}", userResponseDto))
-                .onErrorResume(WebClientResponseException.class, x -> {
-                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(x),x);
-                    log.error("getUserInfoUsingGET for userId " + xPagopaPnUid + " response error {}", x.getResponseBodyAsString(), x);
+                .onErrorResume(WebClientException.class, x -> {
+                    log.logInvokationResultDownstreamFailed(SELFCARE_PG, CommonBaseClient.elabExceptionMessage(x), x);
+                    String body = (x instanceof WebClientResponseException wcre) ? wcre.getResponseBodyAsString() : x.getMessage();
+                    log.error("getUserInfoUsingGET for userId " + xPagopaPnUid + " response error {}", body, x);
                     return Mono.error(new PnInternalException("Error getting user info", ERROR_CODE_EXTERNALREGISTRIES_INSTITUTIONSERROR, x));
                 });
     }

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.mockserver.model.HttpError;
+
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -30,7 +32,8 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.external-registry.selfcareusergroup-base-url=http://localhost:9999"
+        "pn.external-registry.selfcareusergroup-base-url=http://localhost:9999",
+        "pn.commons.retry-max-attempts=0"
 })
 class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
 
@@ -190,7 +193,7 @@ class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
 
         //When
         try {
-            client.getInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
+            client.getUserInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0633").collectList().block();
         }
         catch (Exception e) {
             status = ((PnInternalException) e).getStatus();
@@ -233,5 +236,88 @@ class SelfcarePaInstitutionClientTest extends MockAWSObjectsTestConfig {
         StepVerifier.create(client.getUserInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0622"))
                 .expectNextCount(1)
                         .verifyComplete();
+    }
+
+    @Test
+    void getInstitutions_connectionError_shouldThrowPnInternalException() {
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request().withMethod("GET").withPath("/institutions"))
+                .error(HttpError.error().withDropConnection(true));
+
+        StepVerifier.create(client.getInstitutions("user-id"))
+                .expectError(PnInternalException.class)
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getInstitutionProducts_connectionError_shouldThrowPnInternalException() {
+        String institutionId = UUID.randomUUID().toString();
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request().withMethod("GET").withPath("/institutions/" + institutionId + "/products"))
+                .error(HttpError.error().withDropConnection(true));
+
+        StepVerifier.create(client.getInstitutionProducts(institutionId, "user-id"))
+                .expectError(PnInternalException.class)
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void retrievePaginatedUserInstitutions_ok() throws Exception {
+        UserInstitutionResourceDto resourceDto = new UserInstitutionResourceDto();
+        resourceDto.setInstitutionId("id");
+        resourceDto.setUserId("1a2qp213-f1cb-4021-b3d0-5241216a0622");
+        byte[] responseBodyBytes = new ObjectMapper().writeValueAsBytes(List.of(resourceDto));
+
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request().withMethod("GET").withPath("/users"))
+                .respond(response()
+                        .withBody(responseBodyBytes)
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200));
+
+        List<UserInstitutionResourceDto> result =
+                client.retrievePaginatedUserInstitutions("1a2qp213-f1cb-4021-b3d0-5241216a0622", 0, 100).block();
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+    }
+
+    @Test
+    void retrievePaginatedUserInstitutions_httpError_shouldThrowPnInternalException() {
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request().withMethod("GET").withPath("/users"))
+                .respond(response().withStatusCode(500));
+
+        StepVerifier.create(client.retrievePaginatedUserInstitutions("user-id", 0, 100))
+                .expectError(PnInternalException.class)
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void retrievePaginatedUserInstitutions_connectionError_shouldThrowPnInternalException() {
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request().withMethod("GET").withPath("/users"))
+                .error(HttpError.error().withDropConnection(true));
+
+        StepVerifier.create(client.retrievePaginatedUserInstitutions("user-id", 0, 100))
+                .expectError(PnInternalException.class)
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getUserInstitutions_connectionError_shouldThrowPnInternalException() {
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request().withMethod("GET").withPath("/users"))
+                .error(HttpError.error().withDropConnection(true));
+
+        StepVerifier.create(client.getUserInstitutions("user-id"))
+                .expectError(PnInternalException.class)
+                .verify(Duration.ofSeconds(5));
     }
 }

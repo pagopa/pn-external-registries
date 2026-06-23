@@ -11,13 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpError;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import reactor.test.StepVerifier;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,16 +30,15 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.external-registry.selfcarepgusergroup-base-url=http://localhost:9999"
+        "pn.external-registry.selfcarepgusergroup-base-url=http://localhost:9999",
+        "pn.commons.retry-max-attempts=0"
 })
 class SelfcarePgInstitutionClientTest extends MockAWSObjectsTestConfig {
-
 
     private static ClientAndServer mockServer;
 
     @Autowired
     private SelfcarePgInstitutionClient client;
-
 
     @BeforeEach
     public void startMockServer() {
@@ -130,11 +132,9 @@ class SelfcarePgInstitutionClientTest extends MockAWSObjectsTestConfig {
         try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
             mockServerClient.when(request()
                             .withMethod("GET")
-                            .withPath("/user-info"))
+                            .withPath("/users/uid"))
                     .respond(response()
-                            .withBody("[]".getBytes(StandardCharsets.UTF_8))
-                            .withContentType(MediaType.APPLICATION_JSON)
-                            .withStatusCode(200));
+                            .withStatusCode(404));
 
             assertThrows(PnInternalException.class, () -> client.retrieveUserDetail("uid", "cxId").block());
         }
@@ -145,11 +145,47 @@ class SelfcarePgInstitutionClientTest extends MockAWSObjectsTestConfig {
         try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
             mockServerClient.when(request()
                             .withMethod("GET")
-                            .withPath("/user-info"))
+                            .withPath("/users/uid"))
                     .respond(response()
                             .withStatusCode(500));
 
             assertThrows(PnInternalException.class, () -> client.retrieveUserDetail("uid", "cxId").block());
+        }
+    }
+
+    @Test
+    void retrieveUserInstitution_httpError_shouldThrowPnInternalException() {
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request().withMethod("GET").withPath("/users"))
+                    .respond(response().withStatusCode(500));
+
+            StepVerifier.create(client.retrieveUserInstitution("uid", "cxId"))
+                    .expectError(PnInternalException.class)
+                    .verify(Duration.ofSeconds(5));
+        }
+    }
+
+    @Test
+    void retrieveUserInstitution_connectionError_shouldThrowPnInternalException() {
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request().withMethod("GET").withPath("/users"))
+                    .error(HttpError.error().withDropConnection(true));
+
+            StepVerifier.create(client.retrieveUserInstitution("uid", "cxId"))
+                    .expectError(PnInternalException.class)
+                    .verify(Duration.ofSeconds(5));
+        }
+    }
+
+    @Test
+    void retrieveUserDetail_connectionError_shouldThrowPnInternalException() {
+        try (MockServerClient mockServerClient = new MockServerClient("localhost", 9999)) {
+            mockServerClient.when(request().withMethod("GET").withPath("/users/uid"))
+                    .error(HttpError.error().withDropConnection(true));
+
+            StepVerifier.create(client.retrieveUserDetail("uid", "cxId"))
+                    .expectError(PnInternalException.class)
+                    .verify(Duration.ofSeconds(5));
         }
     }
 }
