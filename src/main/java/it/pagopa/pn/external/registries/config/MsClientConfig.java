@@ -134,7 +134,7 @@ public class MsClientConfig {
         @Bean
         PaymentsApiApi paymentsApiApiClient(PnExternalRegistriesConfig config) {
             it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient apiClient = new
-                    it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey()).build());
+                    it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey(), "GPD").build());
             apiClient.setBasePath( config.getGpdApiBaseUrl() );
             return new PaymentsApiApi( apiClient );
         }
