@@ -66,8 +66,8 @@ public class MsClientConfig {
         private final PnExternalRegistriesConfig config;
 
         @Override
-        protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey) {
-            return super.initWebClient(builder, apiKey)
+        protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey, String downstreamName) {
+            return super.initWebClient(builder, apiKey, downstreamName)
                     .defaultHeader(HEADER_SELFCARE_UID, config.getSelfcareusergroupUid());
         }
 
@@ -122,7 +122,7 @@ public class MsClientConfig {
 
         @Bean
         it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi ioActApi(PnExternalRegistriesConfig config) {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoactApiKey(), "IO").build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoactApiKey(), "IO-").build());
             apiClient.setBasePath( config.getIoBaseUrl() );
 
             return new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi( apiClient );
