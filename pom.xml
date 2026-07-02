@@ -34,7 +34,7 @@
         <dependency>
             <groupId>it.pagopa.pn</groupId>
             <artifactId>pn-lollipop-client</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>it.pagopa.pn</groupId>
@@ -539,7 +539,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/8cfb0308f31c00ef8a0900d2fb5d016be22133ee/docs/openapi/api-private.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/pagopa/pn-delivery/dc615aec04c88e33f6024df8203ed2dcc3c44770/docs/openapi/api-private.yaml</inputSpec>
                             <skipValidateSpec>true</skipValidateSpec>
                             <generatorName>java</generatorName>
                             <library>webclient</library>
