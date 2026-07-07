@@ -36,6 +36,7 @@ public class PnExternalRegistriesConfig {
 
     private String deliveryBaseUrl;
     private String timelineServiceBaseUrl;
+    private String userAttributesBaseUrl;
 
     private String ioApiKey;
     private String ioactApiKey;
