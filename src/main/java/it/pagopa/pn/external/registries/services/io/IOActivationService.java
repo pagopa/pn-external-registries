@@ -42,11 +42,16 @@ public class IOActivationService {
     public Mono<ActivationDto> upsertServiceActivation(Mono<ActivationPayloadDto> activationPayloadDto,
                                                         String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId) {
         CxTypeAuthFleet cxType = CxTypeAuthFleet.fromValue(xPagopaPnCxType.getValue());
-        return acceptConsent(xPagopaPnUid, xPagopaPnCxId, cxType, CONSENT_TYPE_TOS)
-                .then(acceptConsent(xPagopaPnUid, xPagopaPnCxId, cxType, CONSENT_TYPE_DATAPRIVACY))
-                .then(activationPayloadDto)
-                .flatMap(x -> client.upsertServiceActivation(x.getFiscalCode(), x.getStatus().equals(ActivationStatusDto.ACTIVE))
-                        .map(ActivationToActivationDtoMapper::toDto));
+        return activationPayloadDto
+                .flatMap(x -> {
+                    boolean isActive = x.getStatus().equals(ActivationStatusDto.ACTIVE);
+                    Mono<Void> consents = isActive
+                            ? acceptConsent(xPagopaPnUid, xPagopaPnCxId, cxType, CONSENT_TYPE_TOS)
+                                    .then(acceptConsent(xPagopaPnUid, xPagopaPnCxId, cxType, CONSENT_TYPE_DATAPRIVACY))
+                            : Mono.empty();
+                    return consents.then(client.upsertServiceActivation(x.getFiscalCode(), isActive));
+                })
+                .map(ActivationToActivationDtoMapper::toDto);
     }
 
     private Mono<Void> acceptConsent(String uid, String cxId, CxTypeAuthFleet cxType, String consentsType) {

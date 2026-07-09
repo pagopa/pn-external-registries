@@ -38,7 +38,7 @@ class IOActivationControllerTest {
         //Then
         webTestClient.post()
                 .uri( url )
-                .body(Mono.just(requestDto), SendMessageResponseDto.class)
+                .body(Mono.just(requestDto), FiscalCodePayloadDto.class)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -66,7 +66,7 @@ class IOActivationControllerTest {
                 .header( "x-pagopa-pn-uid", "uid" )
                 .header( "x-pagopa-pn-cx-type", "PF" )
                 .header( "x-pagopa-pn-cx-id", "cxId" )
-                .body(Mono.just(requestDto), SendMessageResponseDto.class)
+                .body(Mono.just(requestDto), ActivationPayloadDto.class)
                 .exchange()
                 .expectStatus().isOk();
     }

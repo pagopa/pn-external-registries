@@ -126,5 +126,33 @@ class IOActivationServiceTest {
         assertEquals(activation.getStatus(), responseDto.getStatus().getValue());
     }
 
+    @Test
+    void upsertServiceActivationDeactivateDoesNotAcceptConsents() {
+        //Given
+        ActivationPayloadDto req = new ActivationPayloadDto();
+        req.setFiscalCode("EEEEEE00E00E000A");
+        req.setStatus(ActivationStatusDto.INACTIVE);
+
+        Activation activation = new Activation();
+        activation.setServiceId("PN");
+        activation.setFiscalCode("EEEEEE00E00E000A");
+        activation.setStatus("INACTIVE");
+        activation.setVersion(1);
+
+        //When
+        Mockito.when( ioClient.upsertServiceActivation( Mockito.any(), Mockito.anyBoolean() )).thenReturn( Mono.just( activation ) );
+
+        ActivationDto responseDto = service.upsertServiceActivation( Mono.just( req ), "uid", CxTypeAuthFleetDto.PF, "cxId" ).block();
+
+        //Then
+        Assertions.assertNotNull( responseDto );
+        assertEquals(activation.getFiscalCode(), responseDto.getFiscalCode());
+        assertEquals(activation.getVersion(), responseDto.getVersion());
+        assertEquals(activation.getStatus(), responseDto.getStatus().getValue());
+
+        Mockito.verify( privacyNoticeService, Mockito.never() ).findPrivacyNoticeVersion( Mockito.any(), Mockito.any() );
+        Mockito.verify( userAttributesConsentClient, Mockito.never() ).acceptConsent( Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any() );
+        Mockito.verify( ioClient ).upsertServiceActivation( "EEEEEE00E00E000A", false );
+    }
 
 }

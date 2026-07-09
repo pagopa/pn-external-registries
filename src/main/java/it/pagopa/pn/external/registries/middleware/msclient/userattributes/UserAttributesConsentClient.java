@@ -8,7 +8,6 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.userattribute
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import static it.pagopa.pn.commons.log.PnLogger.EXTERNAL_SERVICES.PN_USER_ATTRIBUTES;
@@ -28,7 +27,7 @@ public class UserAttributesConsentClient {
                 .channel(ConsentAction.ChannelEnum.IO);
 
         return consentsApi.consentAction(uid, cxId, cxType, consentType, String.valueOf(version), consentAction)
-                .doOnError(WebClientResponseException.class, throwable ->
+                .doOnError(throwable ->
                         log.logInvokationResultDownstreamFailed(PN_USER_ATTRIBUTES, CommonBaseClient.elabExceptionMessage(throwable), throwable));
     }
 }
