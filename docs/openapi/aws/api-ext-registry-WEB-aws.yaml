@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: NSA8F86Xdht/KUwGaQH4Exn/ruxL19EaSDvvKiEMUtc=
+  version: XDlxobYcOAcB9LxU98hSF9N4tzVLtoa6coOM27DvBn8=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -71,7 +71,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -139,7 +139,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -207,7 +207,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -267,7 +267,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -328,7 +328,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -396,7 +396,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
           integration.request.path.id: method.request.path.id
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
@@ -474,7 +474,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
           integration.request.path.paTaxId: method.request.path.paTaxId
           integration.request.path.noticeNumber: method.request.path.noticeNumber
         passthroughBehavior: when_no_match
@@ -543,7 +543,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -620,7 +620,7 @@ paths:
           integration.request.header.x-pagopa-pn-cx-type: context.authorizer.cx_type
           integration.request.header.x-pagopa-pn-cx-groups: context.authorizer.cx_groups
           integration.request.header.x-pagopa-pn-src-ch-details: context.authorizer.sourceChannelDetails
-          integration.request.header.x-pagopa-pn-src-ch: '''WEB'''
+          integration.request.header.x-pagopa-pn-src-ch: context.authorizer.sourceChannel
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
         timeoutInMillis: 29000
@@ -939,6 +939,13 @@ components:
       minLength: 1
       maxLength: 50
       pattern: ^[ -~ ]*$
+    FilteredPaIdsResponse:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelfCarePaId'
     ProductResourceList:
       title: ProductResourceList
       description: Contains the list of products related institution and current user
@@ -1285,104 +1292,6 @@ components:
         checkoutUrl:
           type: string
           description: The Checkout callback URL
-    UpdateNotificationCostRequest:
-      title: Update notification cost information
-      type: object
-      required:
-        - notificationStepCost
-        - iun
-        - paymentsInfoForRecipients
-        - updateCostPhase
-      properties:
-        notificationStepCost:
-          type: number
-          description: Single notification step cost (euro-cent)
-        iun:
-          description: Notification Unique identifier
-          type: string
-        paymentsInfoForRecipients:
-          type: array
-          description: Payment information for recipient
-          items:
-            $ref: '#/components/schemas/PaymentsInfoForRecipient'
-        eventTimestamp:
-          type: string
-          description: event timestamp
-          format: date-time
-        eventStorageTimestamp:
-          type: string
-          description: event storage timestamp
-          format: date-time
-        updateCostPhase:
-          type: string
-          enum:
-            - VALIDATION
-            - REQUEST_REFUSED
-            - NOTIFICATION_CANCELLED
-    PaymentsInfoForRecipient:
-      title: Payment information for recipient
-      type: object
-      required:
-        - recIndex
-        - creditorTaxId
-        - noticeCode
-      properties:
-        recIndex:
-          type: number
-          description: recipient index
-        creditorTaxId:
-          description: Payment PA fiscal code
-          example: '77777777777'
-          type: string
-          maxLength: 11
-          minLength: 11
-        noticeCode:
-          description: Payment notice number  numero avviso
-          example: '302000100000019421'
-          type: string
-          maxLength: 18
-          minLength: 18
-    UpdateNotificationCostResponse:
-      title: Update notification cost response
-      type: object
-      required:
-        - updateResults
-      properties:
-        updateResults:
-          type: array
-          description: Update notification cost results
-          items:
-            $ref: '#/components/schemas/UpdateNotificationCostResult'
-    UpdateNotificationCostResult:
-      title: Update notification cost results
-      type: object
-      required:
-        - recIndex
-        - creditorTaxId
-        - noticeCode
-        - result
-      properties:
-        recIndex:
-          type: number
-          description: recipient index
-        creditorTaxId:
-          description: Payment PA fiscal code
-          example: '77777777777'
-          type: string
-          maxLength: 11
-          minLength: 11
-        noticeCode:
-          description: Payment notice number  numero avviso
-          example: '302000100000019421'
-          type: string
-          maxLength: 18
-          minLength: 18
-        result:
-          type: string
-          enum:
-            - OK
-            - KO
-            - RETRY
     paTaxId:
       description: Payment PA fiscal code
       example: '77777777777'
@@ -1408,7 +1317,7 @@ components:
         authorizerUri: >-
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:pn-jwtAuthorizerLambda/invocations
         authorizerResultTtlInSeconds: 300
-        identityValidationExpression: ^Bearer\s([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)\.([a-zA-Z0-9_\-]+)$
+        identityValidationExpression: ^Bearer\s([a-zA-Z0-9_]+)\.([a-zA-Z0-9\-_]+)\.([a-zA-Z0-9_\-]+)$
         type: token
 tags:
   - name: SelfCare
@@ -1419,12 +1328,16 @@ x-amazon-apigateway-gateway-responses:
   DEFAULT_5XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Strict-Transport-Security: '''max-age=31536000; includeSubDomains; preload'''
   DEFAULT_4XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Strict-Transport-Security: '''max-age=31536000; includeSubDomains; preload'''
   BAD_REQUEST_PARAMETERS:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Expose-Headers: '''x-amzn-trace-id'''
+      gatewayresponse.header.Strict-Transport-Security: '''max-age=31536000; includeSubDomains; preload'''
     responseTemplates:
       application/json: >-
         {"status": 400, "title": "VALIDATION ERROR", "traceId":
@@ -1433,6 +1346,8 @@ x-amazon-apigateway-gateway-responses:
   BAD_REQUEST_BODY:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Expose-Headers: '''x-amzn-trace-id'''
+      gatewayresponse.header.Strict-Transport-Security: '''max-age=31536000; includeSubDomains; preload'''
     responseTemplates:
       application/json: >-
         {"status": 400, "title": "VALIDATION ERROR", "traceId":
