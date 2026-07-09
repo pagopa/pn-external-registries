@@ -17,7 +17,6 @@
         <pagopa.codegen.version>v01.06.01</pagopa.codegen.version>
     </properties>
 
-
     <scm>
         <connection>${git.conn}</connection>
         <developerConnection>${git.devConn}</developerConnection>
