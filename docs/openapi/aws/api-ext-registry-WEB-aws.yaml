@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: >-
     ${stageVariables.ProjectName}-${stageVariables.MicroServiceUniqueName}-${stageVariables.IntendedUsage}
-  version: XDlxobYcOAcB9LxU98hSF9N4tzVLtoa6coOM27DvBn8=
+  version: EXzpL2VgiEO2GlgIYr6ZkCcf8Zd+Fdv5Neap3Ic5hAI=
 servers:
   - url: https://${stageVariables.DnsName}/{basePath}
     variables:
@@ -939,13 +939,6 @@ components:
       minLength: 1
       maxLength: 50
       pattern: ^[ -~ ]*$
-    FilteredPaIdsResponse:
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            $ref: '#/components/schemas/SelfCarePaId'
     ProductResourceList:
       title: ProductResourceList
       description: Contains the list of products related institution and current user

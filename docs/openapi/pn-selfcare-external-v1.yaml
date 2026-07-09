@@ -578,13 +578,6 @@ components:
       maxLength: 50
       # ASCII printable characters
       pattern: ^[ -~ ]*$
-    FilteredPaIdsResponse:
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            $ref: '#/components/schemas/SelfCarePaId'
     ProductResourceList:
       title: ProductResourceList
       description: Contains the list of products related institution and current user
