@@ -160,4 +160,14 @@ public class MsClientConfig {
         }
     }
 
+    @Configuration
+    static class UserAttributesClient extends CommonBaseClient {
+        @Bean
+        it.pagopa.pn.external.registries.generated.openapi.msclient.userattributes.v1.api.ConsentsApi userAttributesConsentsApi(PnExternalRegistriesConfig config) {
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.userattributes.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder()));
+            apiClient.setBasePath( config.getUserAttributesBaseUrl() );
+            return new it.pagopa.pn.external.registries.generated.openapi.msclient.userattributes.v1.api.ConsentsApi( apiClient );
+        }
+    }
+
 }
