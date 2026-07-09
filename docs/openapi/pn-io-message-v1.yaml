@@ -95,6 +95,10 @@ paths:
       description: Create or update an Activation for a couple Service/User
       tags:
         - IOActivation
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
       requestBody:
         content:
           application/json:

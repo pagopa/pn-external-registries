@@ -58,11 +58,14 @@ class IOActivationControllerTest {
         String url = "/ext-registry-private/io/v1/activations";
 
         //When
-        Mockito.when( service.upsertServiceActivation( Mockito.any() ) ).thenReturn( Mono.just( responseDto ) );
+        Mockito.when( service.upsertServiceActivation( Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any() ) ).thenReturn( Mono.just( responseDto ) );
 
         //Then
         webTestClient.put()
                 .uri( url )
+                .header( "x-pagopa-pn-uid", "uid" )
+                .header( "x-pagopa-pn-cx-type", "PF" )
+                .header( "x-pagopa-pn-cx-id", "cxId" )
                 .body(Mono.just(requestDto), SendMessageResponseDto.class)
                 .exchange()
                 .expectStatus().isOk();

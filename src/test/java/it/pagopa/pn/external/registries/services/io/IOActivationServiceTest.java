@@ -3,8 +3,11 @@ package it.pagopa.pn.external.registries.services.io;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
 import it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.dto.Activation;
 import it.pagopa.pn.external.registries.generated.openapi.server.io.v1.dto.*;
+import it.pagopa.pn.external.registries.generated.openapi.server.ipa.v1.dto.PrivacyNoticeVersionResponseDto;
 import it.pagopa.pn.external.registries.middleware.msclient.io.IOCourtesyMessageClient;
+import it.pagopa.pn.external.registries.middleware.msclient.userattributes.UserAttributesConsentClient;
 import it.pagopa.pn.external.registries.middleware.queue.producer.sqs.SqsNotificationPaidProducer;
+import it.pagopa.pn.external.registries.services.PrivacyNoticeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,6 +33,12 @@ class IOActivationServiceTest {
 
     @Mock
     IOCourtesyMessageClient ioClient;
+
+    @Mock
+    PrivacyNoticeService privacyNoticeService;
+
+    @Mock
+    UserAttributesConsentClient userAttributesConsentClient;
 
     @Mock
     PnExternalRegistriesConfig cfg;
@@ -101,10 +110,14 @@ class IOActivationServiceTest {
                 .creditorTaxId( "creditorTaxId" )
                 .subject( "subject" );
 
+        PrivacyNoticeVersionResponseDto privacyNoticeVersion = new PrivacyNoticeVersionResponseDto().version(1);
+
         //When
+        Mockito.when( privacyNoticeService.findPrivacyNoticeVersion( Mockito.anyString(), Mockito.anyString() )).thenReturn( Mono.just( privacyNoticeVersion ) );
+        Mockito.when( userAttributesConsentClient.acceptConsent( Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any() )).thenReturn( Mono.empty() );
         Mockito.when( ioClient.upsertServiceActivation( Mockito.any(), Mockito.anyBoolean() )).thenReturn( Mono.just( activation ) );
 
-        ActivationDto responseDto = service.upsertServiceActivation( Mono.just( req ) ).block();
+        ActivationDto responseDto = service.upsertServiceActivation( Mono.just( req ), "uid", CxTypeAuthFleetDto.PF, "cxId" ).block();
 
         //Then
         Assertions.assertNotNull( responseDto );
