@@ -8,6 +8,7 @@ import it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.d
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
@@ -27,9 +28,10 @@ public class SelfcarePaUserGroupClient {
         log.logInvokingExternalDownstreamService(SELFCARE_PA, "getUserGroups");
         return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, null, null)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
-                .onErrorResume(WebClientResponseException.class, x -> {
-                    log.logInvokationResultDownstreamFailed(SELFCARE_PA, CommonBaseClient.elabExceptionMessage(x),x);
-                    log.error("getUserGroups response error {}", x.getResponseBodyAsString(), x);
+                .onErrorResume(WebClientException.class, x -> {
+                    log.logInvokationResultDownstreamFailed(SELFCARE_PA, CommonBaseClient.elabExceptionMessage(x), x);
+                    String body = (x instanceof WebClientResponseException wcre) ? wcre.getResponseBodyAsString() : x.getMessage();
+                    log.error("getUserGroups response error {}", body, x);
                     return Mono.error(new PnInternalException("Errore lettura usergroups", ERROR_CODE_EXTERNALREGISTRIES_USERGROUPSREADERROR, x));
                 });
     }
