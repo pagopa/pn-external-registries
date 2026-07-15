@@ -122,7 +122,7 @@ public class MsClientConfig {
 
         @Bean
         it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi ioActApi(PnExternalRegistriesConfig config) {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoactApiKey(), "IO-").build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoactApiKey(), "IO").build());
             apiClient.setBasePath( config.getIoBaseUrl() );
 
             return new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi( apiClient );
