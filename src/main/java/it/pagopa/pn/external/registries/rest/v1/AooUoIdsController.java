@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -25,14 +24,5 @@ public class AooUoIdsController implements AooUoIdsApi {
         return infoSelfcareInstitutionsService.filterOutRootIds(id)
                 .collectList()
                 .map(ids -> ResponseEntity.ok(new FilteredPaIdsResponseDto().ids(ids)));
-    }
-
-    private static ResponseEntity<Flux<String>> apply(List<String> dto) {
-        return ResponseEntity.ok(Flux.fromIterable(dto));
-    }
-
-    @Override
-    public Mono<ResponseEntity<Flux<String>>> getFilteredAooUoIdPrivate(List<String> id, final ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(infoSelfcareInstitutionsService.filterOutRootIds(id)));
     }
 }

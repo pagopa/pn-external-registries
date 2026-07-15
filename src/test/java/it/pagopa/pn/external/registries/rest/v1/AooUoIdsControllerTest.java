@@ -12,32 +12,15 @@ import reactor.core.publisher.Flux;
 
 @WebFluxTest(AooUoIdsController.class)
 class AooUoIdsControllerTest {
-    private static final String URL = "/ext-registry-private/pa/v1/actions/filter-out-root-pa-ids?id={id}"
-        .replace("{id}", "A123456789");
 
     private static final String URL_V2 = "/ext-registry-private/pa/v2/actions/filter-out-root-pa-ids?id={id}"
             .replace("{id}", "A123456789");
-
 
     @MockitoBean
     InfoSelfcareInstitutionsService infoSelfcareInstitutionsService;
 
     @Autowired
     WebTestClient webTestClient;
-
-    @Test
-    void getFilteredIdsOK()  {
-
-        List<String> values = List.of("A123456789");
-        Mockito.when(infoSelfcareInstitutionsService.filterOutRootIds(values))
-            .thenReturn(Flux.fromIterable(values));
-
-        // Then
-        webTestClient.get()
-            .uri(URL)
-            .exchange()
-            .expectStatus().isOk().expectBodyList(String.class).hasSize(1);
-    }
 
     @Test
     void getFilteredIdsV2OK()  {
