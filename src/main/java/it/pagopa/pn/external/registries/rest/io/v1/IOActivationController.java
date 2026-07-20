@@ -33,9 +33,10 @@ public class IOActivationController implements IoActivationApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ActivationDto>> upsertServiceActivation(Mono<ActivationPayloadDto> activationPayloadDto, final ServerWebExchange exchange) {
+    public Mono<ResponseEntity<ActivationDto>> upsertServiceActivation(String xPagopaPnUid, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnCxId,
+                                                                        Mono<ActivationPayloadDto> activationPayloadDto, final ServerWebExchange exchange) {
         log.debug( "[enter] upsertServiceActivation");
-        return service.upsertServiceActivation( activationPayloadDto )
+        return service.upsertServiceActivation( activationPayloadDto, xPagopaPnUid, xPagopaPnCxType, xPagopaPnCxId )
                 .map( body -> {
                     log.debug( "[exit] upsertServiceActivation");
                     return ResponseEntity.ok( body );

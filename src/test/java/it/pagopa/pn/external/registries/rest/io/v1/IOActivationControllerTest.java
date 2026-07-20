@@ -38,7 +38,7 @@ class IOActivationControllerTest {
         //Then
         webTestClient.post()
                 .uri( url )
-                .body(Mono.just(requestDto), SendMessageResponseDto.class)
+                .body(Mono.just(requestDto), FiscalCodePayloadDto.class)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -58,12 +58,15 @@ class IOActivationControllerTest {
         String url = "/ext-registry-private/io/v1/activations";
 
         //When
-        Mockito.when( service.upsertServiceActivation( Mockito.any() ) ).thenReturn( Mono.just( responseDto ) );
+        Mockito.when( service.upsertServiceActivation( Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any() ) ).thenReturn( Mono.just( responseDto ) );
 
         //Then
         webTestClient.put()
                 .uri( url )
-                .body(Mono.just(requestDto), SendMessageResponseDto.class)
+                .header( "x-pagopa-pn-uid", "uid" )
+                .header( "x-pagopa-pn-cx-type", "PF" )
+                .header( "x-pagopa-pn-cx-id", "cxId" )
+                .body(Mono.just(requestDto), ActivationPayloadDto.class)
                 .exchange()
                 .expectStatus().isOk();
     }
