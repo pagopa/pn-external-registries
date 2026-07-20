@@ -32,6 +32,14 @@ Parameters:
     Type: String
     Description: "Where to send CDC"
 
+  EnableDownstreamSubscriptionFilter:
+    Type: String
+    Default: false
+    Description: Enable downstream subscription filter
+    AllowedValues:
+      - true
+      - false
+
 Conditions:
   Never: !Equals [ 'true', 'false' ]
 
@@ -169,6 +177,7 @@ Resources:
         LogGroupName: !Sub '${ProjectName}-external-registries'
         LogGroupRetention: !Ref LogRetention
         LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
+        LogEnableDownstreamSubscriptionFilter: !Ref EnableDownstreamSubscriptionFilter
 
   PnExternalRegistriesCheckoutLogGroup:
     Type: AWS::CloudFormation::Stack
@@ -180,6 +189,7 @@ Resources:
         LogGroupName: !Sub '${ProjectName}-external-registries-checkout'
         LogGroupRetention: !Ref LogRetention
         LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
+        LogEnableDownstreamSubscriptionFilter: !Ref EnableDownstreamSubscriptionFilter
 
   PnExternalRegistriesInsertTriggerLogGroup:
     Type: AWS::CloudFormation::Stack
