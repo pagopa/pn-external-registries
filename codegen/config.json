@@ -18,7 +18,7 @@
             "servicePath": "ext-registry"
         },
         {
-            "intendedUsage": "IO",
+            "intendedUsage": "IOL",
             "openapiFiles": [
                 "pn-from-io-b2b-internal-v1.yaml"
             ],
