@@ -42,7 +42,7 @@ public class MsClientConfig {
 
         @Bean
         PaymentRequestsApi defaultApiClient(PnExternalRegistriesConfig config) {
-            ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getCheckoutApiKey()).build());
+            ApiClient apiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getCheckoutApiKey(), "CHECKOUT").build());
             apiClient.setBasePath( config.getCheckoutApiBaseUrl() );
             return new PaymentRequestsApi( apiClient );
         }
@@ -50,7 +50,7 @@ public class MsClientConfig {
         //checkout ha una base-url diversa per il carrello
         @Bean
         DefaultApi defaultApiClientCartCheckout(PnExternalRegistriesConfig config) {
-            ApiClient apiClientCartCheckout = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder()) );
+            ApiClient apiClientCartCheckout = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), "CHECKOUT"));
             apiClientCartCheckout.setBasePath(config.getCheckoutCartApiBaseUrl());
             return new DefaultApi(apiClientCartCheckout);
         }
@@ -66,42 +66,42 @@ public class MsClientConfig {
         private final PnExternalRegistriesConfig config;
 
         @Override
-        protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey) {
-            return super.initWebClient(builder, apiKey)
+        protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey, String downstreamName) {
+            return super.initWebClient(builder, apiKey, downstreamName)
                     .defaultHeader(HEADER_SELFCARE_UID, config.getSelfcareusergroupUid());
         }
 
         @Bean
         UserGroupApi userGroupPaApi() {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey(), "SELFCARE").build());
             apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
             return new UserGroupApi(apiClient);
         }
 
         @Bean
         UserGroupApi userGroupPgApi() {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey(), "SELFCARE-PG").build());
             apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
             return new UserGroupApi(apiClient);
         }
 
         @Bean
         InstitutionsApi institutionsApi() {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcareusergroupApiKey(), "SELFCARE").build());
             apiClient.setBasePath(config.getSelfcareusergroupBaseUrl());
             return new InstitutionsApi(apiClient);
         }
 
         @Bean
         InstitutionsApi institutionsPgApi() {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey(), "SELFCARE-PG").build());
             apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
             return new InstitutionsApi(apiClient);
         }
 
         @Bean
         UserApi userPgApi() {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient(initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.selfcare.v2.ApiClient.buildWebClientBuilder(), config.getSelfcarepgusergroupApiKey(), "SELFCARE-PG").build());
             apiClient.setBasePath(config.getSelfcarepgusergroupBaseUrl());
             return new UserApi(apiClient);
         }
@@ -114,7 +114,7 @@ public class MsClientConfig {
 
         @Bean
         it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi ioApi(PnExternalRegistriesConfig config) {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoApiKey(), "IO").build());
             apiClient.setBasePath( config.getIoBaseUrl() );
 
             return new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi( apiClient );
@@ -122,7 +122,7 @@ public class MsClientConfig {
 
         @Bean
         it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi ioActApi(PnExternalRegistriesConfig config) {
-            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoactApiKey()).build());
+            var apiClient = new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient( initWebClient(it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.ApiClient.buildWebClientBuilder(), config.getIoactApiKey(), "IO").build());
             apiClient.setBasePath( config.getIoBaseUrl() );
 
             return new it.pagopa.pn.external.registries.generated.openapi.msclient.io.v1.api.DefaultApi( apiClient );
@@ -134,7 +134,7 @@ public class MsClientConfig {
         @Bean
         PaymentsApiApi paymentsApiApiClient(PnExternalRegistriesConfig config) {
             it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient apiClient = new
-                    it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey()).build());
+                    it.pagopa.pn.external.registries.generated.openapi.msclient.gpd.v1.ApiClient( initWebClient(ApiClient.buildWebClientBuilder(), config.getGpdApiKey(), "GPD").build());
             apiClient.setBasePath( config.getGpdApiBaseUrl() );
             return new PaymentsApiApi( apiClient );
         }

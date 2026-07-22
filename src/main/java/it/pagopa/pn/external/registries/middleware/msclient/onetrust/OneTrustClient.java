@@ -3,6 +3,7 @@ package it.pagopa.pn.external.registries.middleware.msclient.onetrust;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.external.registries.config.PnExternalRegistriesConfig;
+import it.pagopa.pn.external.registries.middleware.msclient.common.PaymentOnGoingInterceptor;
 import jakarta.annotation.PostConstruct;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,8 @@ public class OneTrustClient extends CommonBaseClient {
 
     @PostConstruct
     public void init() {
-        this.webClient = super.enrichBuilder(WebClient.builder().baseUrl(oneTrustBaseUrl))
+        this.webClient = initWebClient(WebClient.builder().baseUrl(oneTrustBaseUrl), "ONETRUST")
+                .mutate()
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + oneTrustToken)
                 .build();
     }

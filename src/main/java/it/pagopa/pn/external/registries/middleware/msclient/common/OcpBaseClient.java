@@ -8,9 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public abstract class OcpBaseClient extends CommonBaseClient {
     private static final String HEADER_API_KEY = "Ocp-Apim-Subscription-Key";
     
-    protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey){
-
-        return super.enrichBuilder(builder)
+    protected WebClient.Builder initWebClient(WebClient.Builder builder, String apiKey, String downstreamName){     
+        return super.initWebClient(builder, downstreamName)
+                .mutate()
                 .filter(new PaymentOnGoingInterceptor())
                 .defaultHeader(HEADER_API_KEY, apiKey);
     }
