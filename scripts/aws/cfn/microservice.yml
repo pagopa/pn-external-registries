@@ -447,6 +447,16 @@ Parameters:
       - true
       - false
 
+  CpuArchitecture:
+    Type: String
+    Default: 'ARM'
+    Description: CPU architecture for the Fargate tasks
+
+  JavaToolOptions:
+    Type: String
+    Default: ''
+    Description: Java tool options for the Fargate tasks
+
 Conditions:
   SendLogToKinesis: !Not [ !Equals [ !Ref LogsKinesisSourceStreamArn, '' ] ]
 
@@ -543,6 +553,8 @@ Resources:
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsCheckoutLogGroup
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
+        CpuArchitecture: !Ref CpuArchitecture
+        JavaToolOptions: !Ref JavaToolOptions
 
   # PN-External-Registry microservice
   ExternalRegistryMicroservice:
