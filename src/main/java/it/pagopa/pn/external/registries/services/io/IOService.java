@@ -368,6 +368,7 @@ public class IOService {
 
         PreconditionContentInt processedInt = bottomSheetProcessorFactory.getBottomSheetProcessor(bottomSheetContext)
                 .process(preconditionContentInt, bottomSheetContext, cfg);
+        processedInt.setMarkdown(composeFinalMarkdown(processedInt.getMarkdown()));
 
         return mapFromPreconditionContentIntToDto(processedInt);
     }
