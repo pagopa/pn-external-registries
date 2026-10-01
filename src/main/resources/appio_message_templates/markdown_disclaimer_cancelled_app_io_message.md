@@ -1,7 +1,7 @@
 Puoi ignorare il contenuto della notifica premendo su **Annulla**. Se invece vuoi consultarne i dettagli, premi su **Continua**.
 
 
-Premendo **Continua** accetti i **[Termini e condizioni d'uso](${piattaformaNotificheURLTOS})** e confermi di avere letto l'**[Informativa privacy](${piattaformaNotificheURLPrivacy})**.
+Premendo **Apri la notifica** dichiari di aver letto l’[Informativa Privacy](${piattaformaNotificheURLPrivacy}) e di accettare i [Termini e Condizioni d’uso](${piattaformaNotificheURLTOS}).
 
 
 **Mittente**
