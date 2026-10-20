@@ -6,3 +6,5 @@ Puoi ignorare il contenuto della notifica premendo su **Annulla**. Se invece vuo
 
 **Codice IUN**
 {{iun}}
+
+Premendo *Apri la notifica* dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.

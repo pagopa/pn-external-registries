@@ -9,3 +9,5 @@ Premi **Continua** per consultare i documenti allegati: contengono informazioni 
 
 **Codice IUN** 
 {{iun}}
+
+Premendo *Apri la notifica* dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.
