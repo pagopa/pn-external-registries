@@ -1,5 +1,4 @@
-Puoi ignorare il contenuto della notifica premendo su **Annulla**. Se invece vuoi consultarne i dettagli, premi su **Continua**.
-
+Puoi ignorarne il contenuto o consultarla comunque.
 
 **Mittente**
 {{senderDenomination}}
@@ -7,4 +6,4 @@ Puoi ignorare il contenuto della notifica premendo su **Annulla**. Se invece vuo
 **Codice IUN**
 {{iun}}
 
-Premendo *Apri la notifica* dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.

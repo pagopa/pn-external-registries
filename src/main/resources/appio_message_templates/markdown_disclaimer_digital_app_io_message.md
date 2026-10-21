@@ -1,13 +1,9 @@
-Premendo **Continua**, la notifica risulterà legalmente consegnata a te. 
+La notifica SEND risulterà legalmente consegnata alla sua apertura o, in ogni caso, dopo 7 giorni dalla consegna sul tuo domicilio digitale.
 
-
-Avendo un domicilio digitale attivo, la notifica sarà considerata consegnata dopo 7 giorni dalla ricezione nel tuo domicilio digitale, anche se non la apri o non la leggi.
-
-
-**Mittente** 
+**Mittente**
 {{senderDenomination}}
 
-**Codice IUN** 
+**Codice IUN**
 {{iun}}
 
-Premendo *Apri la notifica* dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.
