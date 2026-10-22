@@ -1,14 +1,9 @@
-Premendo **Continua**, la notifica risulterà legalmente consegnata a te.
+La notifica SEND **ti è stata inviata anche tramite raccomandata**, perché non l’hai consultata in digitale entro 120 ore. Aprila subito qui su IO per leggere gli allegati: la notifica risulterà legalmente consegnata.
 
-
-Poiché sono trascorsi 5 giorni (120 ore) da quando l’hai ricevuta, è stata inviata anche la raccomandata cartacea con i relativi costi di spedizione.
-
-
-Premendo **Apri la notifica** dichiari di aver letto l’[Informativa Privacy](${piattaformaNotificheURLPrivacy}) e di accettare i [Termini e Condizioni d’uso](${piattaformaNotificheURLTOS}).
-
-
-__Mittente__ 
+**Mittente**
 {{senderDenomination}}
 
-__Codice IUN__ 
+**Codice IUN**
 {{iun}}
+
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.

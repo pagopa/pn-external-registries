@@ -1,14 +1,9 @@
-Premendo **Continua**, la notifica risulterà legalmente consegnata a te. 
+Se la apri **entro le ore {{ora}} del giorno {{data}}** la notifica SEND risulterà legalmente consegnata ed eviterai l'invio della raccomandata con i relativi costi.
 
-
-Se apri il messaggio **entro il {{data}} alle {{ora}}**, eviti l'invio della raccomandata cartacea e i relativi costi.
-
-
-Premendo **Apri la notifica** dichiari di aver letto l’[Informativa Privacy](${piattaformaNotificheURLPrivacy}) e di accettare i [Termini e Condizioni d’uso](${piattaformaNotificheURLTOS}).
-
-
-**Mittente** 
+**Mittente**
 {{senderDenomination}}
 
-**Codice IUN** 
+**Codice IUN**
 {{iun}}
+
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.
