@@ -14,6 +14,8 @@ components:
       $ref: 'https://raw.githubusercontent.com/pagopa/pn-auth-fleet/a1f457ddc112983ec79be0be93256476dd11102c/docs/openapi/authenticationParameters-v1.yaml#/components/parameters/uidAuthFleet'
     cxTaxIdAuthFleet:
       $ref: 'https://raw.githubusercontent.com/pagopa/pn-auth-fleet/a1f457ddc112983ec79be0be93256476dd11102c/docs/openapi/authenticationParameters-v1.yaml#/components/parameters/cxTaxIdAuthFleet'
+    headerSourceChannel:
+      $ref: 'https://raw.githubusercontent.com/pagopa/pn-auth-fleet/98f60386116afff5a4db8cf9590c314335a6b92d/docs/openapi/authenticationParameters-v1.yaml#/components/parameters/headerSourceChannel'
 
     ############################################################################################
     ###                     PARAMETRI DI AUTENTICAZIONE LOLLIPOP                             ###
