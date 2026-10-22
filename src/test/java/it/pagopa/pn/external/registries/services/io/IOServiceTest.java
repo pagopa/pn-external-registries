@@ -730,7 +730,9 @@ class IOServiceTest {
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeAnalogDateAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerBeforeAnalogDateAppIoMessage()
+                        .replace("${piattaformaNotificheURLTOS}", "https://fakeurl.it/tos")
+                        .replace("${piattaformaNotificheURLPrivacy}", "https://fakeurl.it/privacy"))
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
@@ -739,6 +741,9 @@ class IOServiceTest {
         Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.ANALOG));
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
+        Mockito.when(cfg.getPiattaformanotificheurlCittadini()).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when(cfg.getPiattaformanotificheurlTos()).thenReturn("https://fakeurl.it/tos");
+        Mockito.when(cfg.getPiattaformanotificheurlPrivacy()).thenReturn("https://fakeurl.it/privacy");
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -763,7 +768,9 @@ class IOServiceTest {
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterAnalogDateAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterAnalogDateAppIoMessage()
+                        .replace("${piattaformaNotificheURLTOS}", "https://fakeurl.it/tos")
+                        .replace("${piattaformaNotificheURLPrivacy}", "https://fakeurl.it/privacy"))
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
@@ -771,6 +778,9 @@ class IOServiceTest {
         Mockito.when(timelineService.getDeliveryInformation(iun, 0)).thenReturn(getTimelineServiceResponse(ExtendedDeliveryMode.ANALOG));
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
+        Mockito.when(cfg.getPiattaformanotificheurlCittadini()).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when(cfg.getPiattaformanotificheurlTos()).thenReturn("https://fakeurl.it/tos");
+        Mockito.when(cfg.getPiattaformanotificheurlPrivacy()).thenReturn("https://fakeurl.it/privacy");
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -795,7 +805,9 @@ class IOServiceTest {
                                 .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerDigitalAppIoMessage()
+                        .replace("${piattaformaNotificheURLTOS}", "https://fakeurl.it/tos")
+                        .replace("${piattaformaNotificheURLPrivacy}", "https://fakeurl.it/privacy"))
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
@@ -804,6 +816,9 @@ class IOServiceTest {
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
+        Mockito.when(cfg.getPiattaformanotificheurlCittadini()).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when(cfg.getPiattaformanotificheurlTos()).thenReturn("https://fakeurl.it/tos");
+        Mockito.when(cfg.getPiattaformanotificheurlPrivacy()).thenReturn("https://fakeurl.it/privacy");
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -828,7 +843,9 @@ class IOServiceTest {
                         .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterRefinementAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerAfterRefinementAppIoMessage()
+                        .replace("${piattaformaNotificheURLTOS}", "https://fakeurl.it/tos")
+                        .replace("${piattaformaNotificheURLPrivacy}", "https://fakeurl.it/privacy"))
                 .title("Questo messaggio contiene una comunicazione a valore legale")
                 .build();
 
@@ -837,6 +854,9 @@ class IOServiceTest {
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
+        Mockito.when(cfg.getPiattaformanotificheurlCittadini()).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when(cfg.getPiattaformanotificheurlTos()).thenReturn("https://fakeurl.it/tos");
+        Mockito.when(cfg.getPiattaformanotificheurlPrivacy()).thenReturn("https://fakeurl.it/privacy");
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
@@ -861,7 +881,9 @@ class IOServiceTest {
                         .build());
 
         PreconditionContentInt expected = PreconditionContentInt.builder()
-                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerCancelledAppIoMessage())
+                .markdown(pnConfig.getAppIoTemplate().getMarkdownDisclaimerCancelledAppIoMessage()
+                        .replace("${piattaformaNotificheURLTOS}", "https://fakeurl.it/tos")
+                        .replace("${piattaformaNotificheURLPrivacy}", "https://fakeurl.it/privacy"))
                 .title("Questa comunicazione è stata annullata dall'ente mittente.")
                 .build();
 
@@ -870,6 +892,9 @@ class IOServiceTest {
 
 
         Mockito.when(cfg.getAppIoTemplate()).thenReturn(pnConfig.getAppIoTemplate());
+        Mockito.when(cfg.getPiattaformanotificheurlCittadini()).thenReturn("https://notifichedigitali.pagopa.it/cittadini");
+        Mockito.when(cfg.getPiattaformanotificheurlTos()).thenReturn("https://fakeurl.it/tos");
+        Mockito.when(cfg.getPiattaformanotificheurlPrivacy()).thenReturn("https://fakeurl.it/privacy");
 
         Mono<PreconditionContentDto> result = service.notificationDisclaimer(recipientInternalId, iun);
 
