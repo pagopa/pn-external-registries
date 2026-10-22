@@ -1,11 +1,9 @@
-La notifica risulta già legalmente consegnata a te. 
+La notifica SEND **risulta già legalmente consegnata**. Aprila comunque per leggere i documenti allegati: contengono informazioni importanti.
 
-
-Premi **Continua** per consultare i documenti allegati: contengono informazioni importanti che ti riguardano.
-
-
-**Mittente** 
+**Mittente**
 {{senderDenomination}}
 
-**Codice IUN** 
+**Codice IUN**
 {{iun}}
+
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.
