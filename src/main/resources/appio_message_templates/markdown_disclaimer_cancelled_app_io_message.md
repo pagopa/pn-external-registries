@@ -6,4 +6,4 @@ Puoi ignorarne il contenuto o consultarla comunque.
 **Codice IUN**
 {{iun}}
 
-Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.

@@ -6,4 +6,4 @@ La notifica SEND risulterà legalmente consegnata alla sua apertura o, in ogni c
 **Codice IUN**
 {{iun}}
 
-Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})**.
+Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.
