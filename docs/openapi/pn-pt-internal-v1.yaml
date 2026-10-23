@@ -18,8 +18,8 @@ paths:
       operationId: getPtInstitutions
       summary: List institutions that delegated the PT
       description: >
-        Restituisce l'elenco paginato degli Enti con una delega attiva verso il Partner Tecnologico
-        indicato da x-pagopa-pn-cx-id
+        Restituisce l'elenco paginato degli Enti da cui il Partner Tecnologico indicato da x-pagopa-pn-cx-id
+        è o è stato delegato, con lo stato della delega
       tags:
         - InfoPT
       parameters:
@@ -43,6 +43,12 @@ paths:
             type: string
             minLength: 1
             maxLength: 32
+        - name: status
+          description: Se valorizzato restituisce solo gli Enti la cui delega è nello stato indicato, altrimenti restituisce le deleghe in qualsiasi stato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PtDelegationStatus'
         - name: limit
           description: Numero massimo di elementi restituiti
           in: query
@@ -51,7 +57,7 @@ paths:
             type: integer
             format: int32
             minimum: 1
-            maximum: 100
+            maximum: 50
             default: 10
         - name: lastKey
           description: Chiave restituita dalla pagina precedente, da usare per leggere la pagina successiva
@@ -80,20 +86,10 @@ paths:
               schema:
                 $ref: 'remote-refs.yaml#/components/schemas/Problem'
 components:
-  parameters:
-    headerCxType:
-      name: x-pagopa-pn-cx-type
-      in: header
-      description: Customer Type
-      required: true
-      schema:
-        type: string
-        pattern: ^[ -~]*$
-        maxLength: 64
   schemas:
     PtInstitutionsResponse:
       title: Elenco degli Enti deleganti
-      description: Pagina dell'elenco degli Enti che hanno una delega attiva verso il Partner Tecnologico
+      description: Pagina dell'elenco degli Enti che hanno delegato il Partner Tecnologico
       type: object
       required:
         - items
@@ -112,8 +108,8 @@ components:
         - institutionId
         - institutionName
         - institutionTaxCode
-        - productId
         - delegationId
+        - status
         - delegatedAt
       properties:
         institutionId:
@@ -125,13 +121,26 @@ components:
         institutionTaxCode:
           type: string
           description: Codice fiscale dell'Ente
-        productId:
-          type: string
-          description: Prodotto oggetto della delega
         delegationId:
           type: string
           description: Id SelfCare della delega
+        status:
+          $ref: '#/components/schemas/PtDelegationStatus'
         delegatedAt:
           type: string
           format: date-time
-          description: Data di inizio del periodo attivo corrente della delega
+          description: Data di inizio della delega
+        revokedAt:
+          type: string
+          format: date-time
+          description: Data di revoca della delega, presente solo se lo stato è REVOKED
+    PtDelegationStatus:
+      title: Stato della delega
+      description: >
+        Stato della delega:
+        * `ACTIVE` - delega attiva
+        * `REVOKED` - delega revocata
+      type: string
+      enum:
+        - ACTIVE
+        - REVOKED
