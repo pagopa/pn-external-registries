@@ -1,0 +1,142 @@
+openapi: 3.0.1
+info:
+  title: API dei Partner Tecnologici
+  version: v1
+  description: Api di consultazione delle deleghe ricevute dai Partner Tecnologici
+  license:
+    name: PagoPA PN license
+    url: http://pn.pagopa.it
+servers:
+  - url: https://api.externalregistries.pagopa.local
+    description: Server url interno, raggiungibile solo tramite ALB
+tags:
+  - name: InfoPT
+    description: Deleghe ricevute dal Partner Tecnologico
+paths:
+  '/ext-registry-private/pt/v1/institutions':
+    get:
+      operationId: getPtInstitutions
+      summary: List institutions that delegated the PT
+      description: >
+        Restituisce l'elenco paginato degli Enti da cui il Partner Tecnologico indicato da x-pagopa-pn-cx-id
+        è stato delegato, con lo stato della delega
+      tags:
+        - InfoPT
+      parameters:
+        - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
+        - $ref: 'remote-refs.yaml#/components/parameters/headerSourceChannel'
+        - name: institutionName
+          description: Se valorizzato restituisce gli Enti la cui ragione sociale contiene il valore, senza distinzione tra maiuscole e minuscole
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 250
+        - name: institutionTaxCode
+          description: Se valorizzato restituisce l'Ente con il codice fiscale indicato
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 32
+        - name: status
+          description: Se valorizzato restituisce solo gli Enti la cui delega è nello stato indicato, altrimenti restituisce le deleghe in qualsiasi stato
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/PtDelegationStatus'
+        - name: limit
+          description: Numero massimo di elementi restituiti
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: lastKey
+          description: Chiave restituita dalla pagina precedente, da usare per leggere la pagina successiva
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 1024
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PtInstitutionsResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: 'remote-refs.yaml#/components/schemas/Problem'
+components:
+  schemas:
+    PtInstitutionsResponse:
+      title: Elenco degli Enti deleganti
+      description: Pagina dell'elenco degli Enti che hanno delegato il Partner Tecnologico
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PtInstitution'
+        lastKey:
+          type: string
+          description: Chiave per leggere la pagina successiva, assente se non ci sono altri elementi
+    PtInstitution:
+      title: Ente delegante
+      type: object
+      required:
+        - institutionId
+        - institutionName
+        - institutionTaxCode
+        - delegationId
+        - status
+        - statusChangedAt
+      properties:
+        institutionId:
+          type: string
+          description: Id SelfCare dell'Ente
+        institutionName:
+          type: string
+          description: Ragione sociale dell'Ente
+        institutionTaxCode:
+          type: string
+          description: Codice fiscale dell'Ente
+        delegationId:
+          type: string
+          description: Id SelfCare della delega
+        status:
+          $ref: '#/components/schemas/PtDelegationStatus'
+        statusChangedAt:
+          type: string
+          format: date-time
+          description: Data da cui la delega è nello stato indicato
+    PtDelegationStatus:
+      title: Stato della delega
+      description: >
+        Stato della delega:
+        * `ACTIVE` - delega attiva
+        * `REVOKED` - delega revocata
+      type: string
+      enum:
+        - ACTIVE
+        - REVOKED
