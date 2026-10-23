@@ -24,7 +24,7 @@ paths:
         - InfoPT
       parameters:
         - $ref: 'remote-refs.yaml#/components/parameters/cxIdAuthFleet'
-        - $ref: '#/components/parameters/headerCxType'
+        - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
         - $ref: 'remote-refs.yaml#/components/parameters/headerSourceChannel'
         - name: institutionName
