@@ -110,7 +110,7 @@ components:
         - institutionTaxCode
         - delegationId
         - status
-        - delegatedAt
+        - statusChangedAt
       properties:
         institutionId:
           type: string
@@ -126,14 +126,10 @@ components:
           description: Id SelfCare della delega
         status:
           $ref: '#/components/schemas/PtDelegationStatus'
-        delegatedAt:
+        statusChangedAt:
           type: string
           format: date-time
-          description: Data di inizio della delega
-        revokedAt:
-          type: string
-          format: date-time
-          description: Data di revoca della delega, presente solo se lo stato è REVOKED
+          description: Data da cui la delega è nello stato indicato
     PtDelegationStatus:
       title: Stato della delega
       description: >
