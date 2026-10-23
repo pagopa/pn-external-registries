@@ -19,7 +19,7 @@ paths:
       summary: List institutions that delegated the PT
       description: >
         Restituisce l'elenco paginato degli Enti da cui il Partner Tecnologico indicato da x-pagopa-pn-cx-id
-        è o è stato delegato, con lo stato della delega
+        è stato delegato, con lo stato della delega
       tags:
         - InfoPT
       parameters:
