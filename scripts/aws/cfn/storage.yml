@@ -32,6 +32,10 @@ Parameters:
     Type: String
     Description: "Where to send CDC"
 
+  AlarmSNSTopicName:
+    Type: String
+    Description: 'Topic alarm'
+
   EnableDownstreamSubscriptionFilter:
     Type: String
     Default: false
@@ -167,6 +171,17 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
+  KafkaBridgeDelegationsQueue:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/sqs-queue.yaml"
+      Parameters:
+        QueueName: !Sub '${ProjectName}-kafka_bridge_delegations'
+        DelaySeconds: 1
+        AlarmSNSTopicName: !Ref AlarmSNSTopicName
+
   PnExternalRegistriesLogGroup:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Retain
@@ -240,6 +255,20 @@ Outputs:
   SenderConfigurationTableArn:
     Description: ARM Dynamo Name used by application to access the key-value store
     Value: !Sub '${SenderConfigurationTable.Arn}'
+
+  # Kafka bridge delegations queue
+  KafkaBridgeDelegationsQueueName:
+    Value: !GetAtt KafkaBridgeDelegationsQueue.Outputs.QueueName
+    Description: pn-kafka_bridge_delegations queue name
+  KafkaBridgeDelegationsQueueARN:
+    Value: !GetAtt KafkaBridgeDelegationsQueue.Outputs.QueueARN
+    Description: pn-kafka_bridge_delegations queue ARN
+  KafkaBridgeDelegationsQueueAlarmARN:
+    Value: !GetAtt KafkaBridgeDelegationsQueue.Outputs.SqsDLQAlarmArn
+    Description: pn-kafka_bridge_delegations-DLQ alarm ARN
+  KafkaBridgeDelegationsQueueAgeAlarmARN:
+    Value: !GetAtt KafkaBridgeDelegationsQueue.Outputs.SqsAgeAlarmArn
+    Description: pn-kafka_bridge_delegations age alarm ARN
 
   # Log group exports
   EcsLogGroup:
