@@ -350,6 +350,39 @@
                     </execution>
 
                     <execution>
+                        <id>pn-external-registries-pt-server</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/pn-pt-internal-v1.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <dateLibrary>java11</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <reactive>true</reactive>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                                <basePackage>${project.groupId}.generated.openapi.server.pt.v1</basePackage>
+                                <modelPackage>${project.groupId}.generated.openapi.server.pt.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.generated.openapi.server.pt.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.generated.openapi.server.pt.v1.config</configPackage>
+                                <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>pn-external-registries-private</id>
                         <phase>generate-resources</phase>
                         <goals>
