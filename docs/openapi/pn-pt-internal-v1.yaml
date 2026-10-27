@@ -27,22 +27,14 @@ paths:
         - $ref: 'remote-refs.yaml#/components/parameters/cxTypeAuthFleet'
         - $ref: 'remote-refs.yaml#/components/parameters/uidAuthFleet'
         - $ref: 'remote-refs.yaml#/components/parameters/headerSourceChannel'
-        - name: institutionName
-          description: Se valorizzato restituisce gli Enti la cui ragione sociale contiene il valore, senza distinzione tra maiuscole e minuscole
+        - name: search
+          description: Se valorizzato restituisce gli Enti la cui ragione sociale o il cui codice fiscale contengono il valore, senza distinzione tra maiuscole e minuscole
           in: query
           required: false
           schema:
             type: string
-            minLength: 1
+            minLength: 3
             maxLength: 250
-        - name: institutionTaxCode
-          description: Se valorizzato restituisce l'Ente con il codice fiscale indicato
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 32
         - name: status
           description: Se valorizzato restituisce solo gli Enti la cui delega è nello stato indicato, altrimenti restituisce le deleghe in qualsiasi stato
           in: query
