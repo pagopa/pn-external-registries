@@ -426,6 +426,23 @@ Parameters:
     Type: String
     Description: Queue max age alarm
 
+  # Kafka Bridge Delegations Queue
+  KafkaBridgeDelegationsQueueName:
+    Type: String
+    Description: Queue name
+
+  KafkaBridgeDelegationsQueueARN:
+    Type: String
+    Description: Queue ARN
+
+  KafkaBridgeDelegationsQueueAlarmARN:
+    Type: String
+    Description: Queue DLQ alarm
+
+  KafkaBridgeDelegationsQueueAgeAlarmARN:
+    Type: String
+    Description: Queue max age alarm
+
   PnCronAnalyzer:
     Type: String
     Default: '-'
@@ -621,6 +638,7 @@ Resources:
         ContainerEnvEntry39: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_RETRY_MAX_ATTEMPTS=${CheckoutRetryMaxAttempts}'
         ContainerEnvEntry40: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_READ_TIMEOUT_MILLIS=${CheckoutReadTimeoutMillis}'
         ContainerEnvEntry41: !Sub 'PN_EXTERNAL_REGISTRY_USER_ATTRIBUTES_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry42: !Sub "PN_EXTERNAL_REGISTRY_TOPICS_KAFKA_BRIDGE_DELEGATIONS=${KafkaBridgeDelegationsQueueName}"
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -693,6 +711,17 @@ Resources:
             Resource:
               - !Ref DeliveryPushInputsQueueARN
               - !Ref DeliveryPushToExternalRegistriesQueueARN
+          - Effect: Allow
+            Action:
+              - sqs:ChangeMessageVisibility
+              - sqs:ChangeMessageVisibilityBatch
+              - sqs:DeleteMessage
+              - sqs:DeleteMessageBatch
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - sqs:ReceiveMessage
+            Resource:
+              - !Ref KafkaBridgeDelegationsQueueARN
           - Effect: Allow
             Action:
               - ssm:GetParameter
@@ -880,6 +909,7 @@ Resources:
           - ','
           - - !Ref DeliveryPushToExternalRegistriesQueueARN
             - !Ref KafkaBridgeOnboardingQueueARN
+            - !Ref KafkaBridgeDelegationsQueueARN
         AlarmArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroservice.Outputs.FatalLogsMetricAlarmArn
@@ -889,6 +919,8 @@ Resources:
             - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiLatencyAlarmArn
             - !Ref DeliveryPushToExternalRegistriesQueueAlarmARN
             - !Ref DeliveryPushToExternalRegistriesQueueAgeAlarmARN
+            - !Ref KafkaBridgeDelegationsQueueAlarmARN
+            - !Ref KafkaBridgeDelegationsQueueAgeAlarmARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-external-registries'
