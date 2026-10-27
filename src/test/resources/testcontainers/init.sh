@@ -128,6 +128,19 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
         AttributeName=sortKey,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
 
+echo "### CREATE PN PT DELEGATIONS TABLE ###"
+
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+    dynamodb create-table \
+    --table-name pn-PtDelegations \
+    --attribute-definitions \
+        AttributeName=ptId,AttributeType=S \
+        AttributeName=eventKey,AttributeType=S \
+    --key-schema \
+        AttributeName=ptId,KeyType=HASH \
+        AttributeName=eventKey,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
+
 
 echo "Initialization terminated"
 
