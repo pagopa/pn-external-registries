@@ -217,6 +217,14 @@ Parameters:
     Type: String
     Description: 'ARN of dynamodb table containing SenderConfiguration information'
 
+  PtDelegationsTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing PtDelegations information'
+
+  PtDelegationsTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing PtDelegations information'
+
   PortalUrl:
     Type: String
     Description: 'Url del portale cittadini da inserire negli avvisi a IO'
@@ -639,6 +647,7 @@ Resources:
         ContainerEnvEntry40: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_READ_TIMEOUT_MILLIS=${CheckoutReadTimeoutMillis}'
         ContainerEnvEntry41: !Sub 'PN_EXTERNAL_REGISTRY_USER_ATTRIBUTES_BASE_URL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry42: !Sub "PN_EXTERNAL_REGISTRY_TOPICS_KAFKA_BRIDGE_DELEGATIONS=${KafkaBridgeDelegationsQueueName}"
+        ContainerEnvEntry43: !Sub 'PN_EXTERNAL_REGISTRY_DYNAMODB_TABLE_NAME_PT_DELEGATIONS=${PtDelegationsTableName}'
         ContainerSecret1: !Sub 'PN_EXTERNAL_REGISTRY_CHECKOUT_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:CheckoutApiKey:AWSCURRENT:'
         ContainerSecret2: !Sub 'PN_EXTERNAL_REGISTRY_IO_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:IoApiKey:AWSCURRENT:'
         ContainerSecret3: !Sub 'PN_EXTERNAL_REGISTRY_SELFCAREUSERGROUP_API_KEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-ExternalRegistries-Secrets:SelfCareApiKey:AWSCURRENT:'
@@ -697,6 +706,8 @@ Resources:
               - !Sub "${CostUpdateResultTableArn}/*"
               - !Sub "${SenderConfigurationTableArn}"
               - !Sub "${SenderConfigurationTableArn}/*"
+              - !Sub "${PtDelegationsTableArn}"
+              - !Sub "${PtDelegationsTableArn}/*"
           - Effect: Allow
             Action:
               - sqs:ChangeMessageVisibility
@@ -894,6 +905,7 @@ Resources:
             - !Ref CostComponentsTableName
             - !Ref CostUpdateResultTableName
             - !Ref SenderConfigurationTableName
+            - !Ref PtDelegationsTableName
         RestApiStageArns: !Join
           - ','
           - - !GetAtt ExternalRegistryMicroserviceB2BPGAPI.Outputs.RestApiStageArn

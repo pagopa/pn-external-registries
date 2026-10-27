@@ -7,6 +7,8 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 @DynamoDbBean
 @Data
@@ -40,11 +42,11 @@ public class PtDelegationEntity {
     public static final String COL_PT_TYPE = "ptType";
 
     public static String buildEventKey(String institutionId, Instant lastChangeAt) {
-        throw new UnsupportedOperationException();
+        return institutionId + "#" + DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'").withZone(ZoneOffset.UTC).format(lastChangeAt);
     }
 
     public static String buildEventKeyPrefix(String institutionId) {
-        throw new UnsupportedOperationException();
+        return institutionId + "#";
     }
 
     @Setter @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PT_ID)}))  private String ptId;
