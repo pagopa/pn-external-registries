@@ -19,6 +19,12 @@ public class PtDelegationEntity {
     public static final String STATUS_ACTIVE = "ACTIVE";
     public static final String STATUS_DELETED = "DELETED";
 
+    private static final String EVENT_KEY_SEPARATOR = "#";
+
+    private static final DateTimeFormatter EVENT_KEY_DATE_FORMATTER = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+            .withZone(ZoneOffset.UTC);
+
     public static final String COL_PT_ID = "ptId";
     public static final String COL_EVENT_KEY = "eventKey";
     public static final String COL_DELEGATION_ID = "delegationId";
@@ -42,11 +48,11 @@ public class PtDelegationEntity {
     public static final String COL_PT_TYPE = "ptType";
 
     public static String buildEventKey(String institutionId, Instant lastChangeAt) {
-        return institutionId + "#" + DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'").withZone(ZoneOffset.UTC).format(lastChangeAt);
+        return buildEventKeyPrefix(institutionId) + EVENT_KEY_DATE_FORMATTER.format(lastChangeAt);
     }
 
     public static String buildEventKeyPrefix(String institutionId) {
-        return institutionId + "#";
+        return institutionId + EVENT_KEY_SEPARATOR;
     }
 
     @Setter @Getter(onMethod=@__({@DynamoDbPartitionKey, @DynamoDbAttribute(COL_PT_ID)}))  private String ptId;

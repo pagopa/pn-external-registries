@@ -17,6 +17,9 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
+import static it.pagopa.pn.external.registries.middleware.db.entities.PtDelegationEntity.COL_EVENT_KEY;
+import static it.pagopa.pn.external.registries.middleware.db.entities.PtDelegationEntity.COL_PT_ID;
+
 @Repository
 @Slf4j
 public class PtDelegationsDao extends BaseDao {
@@ -34,7 +37,7 @@ public class PtDelegationsDao extends BaseDao {
         PutItemEnhancedRequest<PtDelegationEntity> putItemEnhancedRequest = PutItemEnhancedRequest.builder(PtDelegationEntity.class)
                 .item(entity)
                 .conditionExpression(Expression.builder()
-                        .expression("attribute_not_exists(ptId) and attribute_not_exists(eventKey)")
+                        .expression("attribute_not_exists(" + COL_PT_ID + ") and attribute_not_exists(" + COL_EVENT_KEY + ")")
                         .build())
                 .build();
 
@@ -59,7 +62,6 @@ public class PtDelegationsDao extends BaseDao {
                 .build();
 
         return Flux.from(ptDelegationsTable.query(queryEnhancedRequest).flatMapIterable(Page::items))
-                .bufferUntilChanged(PtDelegationEntity::getInstitutionId)
-                .map(events -> events.get(0));
+                .distinctUntilChanged(PtDelegationEntity::getInstitutionId);
     }
 }
