@@ -65,6 +65,7 @@ public class PnExternalRegistriesConfig {
     private String dynamodbTableNameCostComponents;
     private String dynamodbTableNameCostUpdateResult;
     private String dynamodbTableNameSenderConfiguration;
+    private String dynamodbTableNamePtDelegations;
 
     private int dynamodbTableNameCostUpdateResultTtlDays;
 
