@@ -17,4 +17,4 @@ Per leggela in app, **attiva il servizio SEND entro 5 giorni**: eviterai una rac
 
 Se attivi il servizio dopo, dovrai consultarla tramite altri canali, ma riceverai in app le notifiche SEND future.
 
-Premendo “Attiva per leggere la notifica” accetti i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})** e confermi di avere letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})**.
+Premendo **Attiva per leggere la notifica** accetti i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})** e confermi di avere letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})**.

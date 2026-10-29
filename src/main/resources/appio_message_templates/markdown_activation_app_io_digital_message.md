@@ -17,4 +17,4 @@ Hai il domicilio digitale attivo: non riceverai avvisi cartacei e questa notific
 
 Per leggere e gestire direttamente in app le notifiche SEND, **attiva SEND su IO**.
 
-Premendo “Attiva per leggere la notifica” accetti i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})** e confermi di avere letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})**.
+Premendo **Attiva per leggere la notifica** accetti i **[Termini e condizioni d’uso](${piattaformaNotificheURLTOS})** e confermi di avere letto l’**[Informativa privacy](${piattaformaNotificheURLPrivacy})**.
