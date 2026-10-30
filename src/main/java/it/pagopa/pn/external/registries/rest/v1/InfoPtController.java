@@ -19,6 +19,7 @@ public class InfoPtController implements InfoPtApi {
 
     @Override
     public Mono<ResponseEntity<PtInstitutionsResponseDto>> getPtInstitutions(String xPagopaPnCxId, CxTypeAuthFleetDto xPagopaPnCxType, String xPagopaPnUid, String xPagopaPnSrcCh, String search, PtDelegationStatusDto status, Integer limit, String lastKey, ServerWebExchange exchange) {
-        return Mono.error(new UnsupportedOperationException());
+        return infoPtService.getPtInstitutions(xPagopaPnCxId, search, status, limit, lastKey)
+                .map(ResponseEntity::ok);
     }
 }
