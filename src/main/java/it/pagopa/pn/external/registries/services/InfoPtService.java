@@ -22,21 +22,28 @@ public class InfoPtService {
 
     public Mono<PtInstitutionsResponseDto> getPtInstitutions(String ptId, String search, PtDelegationStatusDto status, int limit, String lastKey) {
         log.info("start retrieving institutions for PT: [{}] search: [{}] status: [{}] limit: [{}] lastKey: [{}]", ptId, search, status, limit, lastKey);
+        String normalizedSearch = normalizeSearch(search);
         return ptDelegationsDao.getLatestEventPerInstitution(ptId, lastKey)
                 .map(PtDelegationEntityToPtInstitutionDtoMapper::toDto)
                 .filter(institution -> status == null || status == institution.getStatus())
-                .filter(institution -> matchesSearch(institution, search))
+                .filter(institution -> matchesSearch(institution, normalizedSearch))
                 .take(limit + 1L)
                 .collectList()
                 .map(institutions -> toResponse(institutions, limit));
     }
 
-    private boolean matchesSearch(PtInstitutionDto institution, String search) {
+    private String normalizeSearch(String search) {
         if (search == null || search.isBlank()) {
+            return null;
+        }
+        return search.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private boolean matchesSearch(PtInstitutionDto institution, String search) {
+        if (search == null) {
             return true;
         }
-        String value = search.trim().toLowerCase(Locale.ROOT);
-        return contains(institution.getInstitutionName(), value) || contains(institution.getInstitutionTaxCode(), value);
+        return contains(institution.getInstitutionName(), search) || contains(institution.getInstitutionTaxCode(), search);
     }
 
     private boolean contains(String field, String value) {
