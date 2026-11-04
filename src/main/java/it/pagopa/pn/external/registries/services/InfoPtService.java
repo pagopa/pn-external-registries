@@ -23,7 +23,7 @@ public class InfoPtService {
     public Mono<PtInstitutionsResponseDto> getPtInstitutions(String ptId, String search, PtDelegationStatusDto status, int limit, String lastKey) {
         log.info("start retrieving institutions for PT: [{}] search: [{}] status: [{}] limit: [{}] lastKey: [{}]", ptId, search, status, limit, lastKey);
         String normalizedSearch = normalizeSearch(search);
-        return ptDelegationsDao.getLatestEventPerInstitution(ptId, lastKey)
+        return ptDelegationsDao.getEventsPerInstitution(ptId, lastKey)
                 .map(PtDelegationEntityToPtInstitutionDtoMapper::toDto)
                 .filter(institution -> status == null || status == institution.getStatus())
                 .filter(institution -> matchesSearch(institution, normalizedSearch))

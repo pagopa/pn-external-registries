@@ -17,6 +17,8 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
+import java.util.List;
+
 import static it.pagopa.pn.external.registries.middleware.db.entities.PtDelegationEntity.COL_EVENT_KEY;
 import static it.pagopa.pn.external.registries.middleware.db.entities.PtDelegationEntity.COL_PT_ID;
 
@@ -49,8 +51,8 @@ public class PtDelegationsDao extends BaseDao {
                 });
     }
 
-    public Flux<PtDelegationEntity> getLatestEventPerInstitution(String ptId, String lastInstitutionId) {
-        log.debug("getLatestEventPerInstitution ptId={} lastInstitutionId={}", ptId, lastInstitutionId);
+    public Flux<List<PtDelegationEntity>> getEventsPerInstitution(String ptId, String lastInstitutionId) {
+        log.debug("getEventsPerInstitution ptId={} lastInstitutionId={}", ptId, lastInstitutionId);
 
         QueryConditional queryConditional = lastInstitutionId == null
                 ? QueryConditional.keyEqualTo(getKeyBuild(ptId))
@@ -62,6 +64,6 @@ public class PtDelegationsDao extends BaseDao {
                 .build();
 
         return Flux.from(ptDelegationsTable.query(queryEnhancedRequest).flatMapIterable(Page::items))
-                .distinctUntilChanged(PtDelegationEntity::getInstitutionId);
+                .bufferUntilChanged(PtDelegationEntity::getInstitutionId);
     }
 }

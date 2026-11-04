@@ -82,59 +82,59 @@ class PtDelegationsDaoTestIT extends MockProducerTest {
     }
 
     @Test
-    void getLatestEventPerInstitution() throws Exception {
+    void getEventsPerInstitution() throws Exception {
         String ptId = UUID.randomUUID().toString();
-        put(added(ptId, "ente-A", CREATED_AT));
-        put(updated(ptId, "ente-A", PtDelegationEntity.STATUS_DELETED, "2026-11-20T09:30:00.000000Z"));
+        PtDelegationEntity addedA = put(added(ptId, "ente-A", CREATED_AT));
+        PtDelegationEntity deletedA = put(updated(ptId, "ente-A", PtDelegationEntity.STATUS_DELETED, "2026-11-20T09:30:00.000000Z"));
         PtDelegationEntity latestA = put(updated(ptId, "ente-A", PtDelegationEntity.STATUS_ACTIVE, "2026-12-01T15:12:00.000000Z"));
         PtDelegationEntity latestB = put(added(ptId, "ente-B", "2026-11-05T08:00:00.000000Z"));
         put(added(UUID.randomUUID().toString(), "ente-C", "2026-11-05T08:00:00.000000Z"));
 
-        List<PtDelegationEntity> result = ptDelegationsDao.getLatestEventPerInstitution(ptId, null).collectList().block();
+        List<List<PtDelegationEntity>> result = ptDelegationsDao.getEventsPerInstitution(ptId, null).collectList().block();
 
-        assertThat(result).containsExactlyInAnyOrder(latestA, latestB);
+        assertThat(result).containsExactly(List.of(latestB), List.of(latestA, deletedA, addedA));
     }
 
     @Test
-    void getLatestEventPerInstitutionFromLastInstitution() throws Exception {
+    void getEventsPerInstitutionFromLastInstitution() throws Exception {
         String ptId = UUID.randomUUID().toString();
-        put(added(ptId, "ente-A", CREATED_AT));
+        PtDelegationEntity addedA = put(added(ptId, "ente-A", CREATED_AT));
         PtDelegationEntity latestA = put(updated(ptId, "ente-A", PtDelegationEntity.STATUS_DELETED, "2026-11-20T09:30:00.000000Z"));
         put(added(ptId, "ente-B", "2026-11-05T08:00:00.000000Z"));
         put(added(ptId, "ente-B1", "2026-11-06T08:00:00.000000Z"));
         put(added(ptId, "ente-C", "2026-11-07T08:00:00.000000Z"));
 
-        List<PtDelegationEntity> result = ptDelegationsDao.getLatestEventPerInstitution(ptId, "ente-B").collectList().block();
+        List<List<PtDelegationEntity>> result = ptDelegationsDao.getEventsPerInstitution(ptId, "ente-B").collectList().block();
 
-        assertThat(result).containsExactly(latestA);
+        assertThat(result).containsExactly(List.of(latestA, addedA));
     }
 
     @Test
-    void getLatestEventPerInstitutionFromLastInstitutionWithoutOthers() throws Exception {
+    void getEventsPerInstitutionFromLastInstitutionWithoutOthers() throws Exception {
         String ptId = UUID.randomUUID().toString();
         put(added(ptId, "ente-A", CREATED_AT));
 
-        List<PtDelegationEntity> result = ptDelegationsDao.getLatestEventPerInstitution(ptId, "ente-A").collectList().block();
+        List<List<PtDelegationEntity>> result = ptDelegationsDao.getEventsPerInstitution(ptId, "ente-A").collectList().block();
 
         Assertions.assertEquals(List.of(), result);
     }
 
     @Test
-    void getLatestEventPerInstitutionWithoutEvents() {
-        List<PtDelegationEntity> result = ptDelegationsDao.getLatestEventPerInstitution(UUID.randomUUID().toString(), null).collectList().block();
+    void getEventsPerInstitutionWithoutEvents() {
+        List<List<PtDelegationEntity>> result = ptDelegationsDao.getEventsPerInstitution(UUID.randomUUID().toString(), null).collectList().block();
 
         Assertions.assertEquals(List.of(), result);
     }
 
     @Test
-    void getLatestEventPerInstitutionIgnoresLateEvent() throws Exception {
+    void getEventsPerInstitutionOrdersLateEvent() throws Exception {
         String ptId = UUID.randomUUID().toString();
         PtDelegationEntity latest = put(updated(ptId, "ente-A", PtDelegationEntity.STATUS_DELETED, "2026-11-20T09:30:00.000000Z"));
-        put(added(ptId, "ente-A", CREATED_AT));
+        PtDelegationEntity late = put(added(ptId, "ente-A", CREATED_AT));
 
-        List<PtDelegationEntity> result = ptDelegationsDao.getLatestEventPerInstitution(ptId, null).collectList().block();
+        List<List<PtDelegationEntity>> result = ptDelegationsDao.getEventsPerInstitution(ptId, null).collectList().block();
 
-        Assertions.assertEquals(List.of(latest), result);
+        Assertions.assertEquals(List.of(List.of(latest, late)), result);
     }
 
     private PtDelegationEntity put(PtDelegationEntity entity) throws Exception {

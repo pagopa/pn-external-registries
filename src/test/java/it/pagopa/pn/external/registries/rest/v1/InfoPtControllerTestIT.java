@@ -103,7 +103,7 @@ class InfoPtControllerTestIT extends MockProducerTest {
         assertEquals("80015010723", reactivated.getInstitutionTaxCode());
         assertEquals("delegation-02", reactivated.getDelegationId());
         assertEquals(PtDelegationStatusDto.ACTIVE, reactivated.getStatus());
-        assertEquals(date("2026-09-02T09:00:00.200Z"), reactivated.getStatusChangedAt());
+        assertEquals(date("2026-09-20T11:00:00.400Z"), reactivated.getStatusChangedAt());
 
         PtInstitutionDto revoked = institution(response, "ente-03");
         assertEquals(PtDelegationStatusDto.REVOKED, revoked.getStatus());
@@ -112,6 +112,7 @@ class InfoPtControllerTestIT extends MockProducerTest {
         PtInstitutionDto renamed = institution(response, "ente-04");
         assertEquals("Comune di Genova", renamed.getInstitutionName());
         assertEquals(PtDelegationStatusDto.ACTIVE, renamed.getStatus());
+        assertEquals(date("2026-09-04T08:00:00.700Z"), renamed.getStatusChangedAt());
     }
 
     @Test

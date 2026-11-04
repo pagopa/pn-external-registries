@@ -36,10 +36,10 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutions() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_DELETED)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_DELETED)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, null, 10, null).block();
 
@@ -50,7 +50,7 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsWithoutDelegations() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null)).thenReturn(Flux.empty());
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null)).thenReturn(Flux.empty());
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, null, 10, null).block();
 
@@ -60,11 +60,11 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsReturnsLastKeyWhenOtherInstitutionsFollow() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, null, 2, null).block();
 
@@ -74,10 +74,10 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsWithoutLastKeyWhenPageIsExactlyFull() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, null, 2, null).block();
 
@@ -87,8 +87,8 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsFromLastKey() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, "ente-B"))
-                .thenReturn(Flux.just(newEntity("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE)));
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, "ente-B"))
+                .thenReturn(Flux.just(newEvents("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, null, 2, "ente-B").block();
 
@@ -99,13 +99,13 @@ class InfoPtServiceTest {
     @Test
     void getPtInstitutionsStopsReadingAfterNextPageStart() {
         AtomicInteger read = new AtomicInteger();
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-D", "Comune di Dolo", "44444444444", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE))
-                        .doOnNext(entity -> read.incrementAndGet()));
+                        newEvents("ente-D", "Comune di Dolo", "44444444444", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE))
+                        .doOnNext(events -> read.incrementAndGet()));
 
         infoPtService.getPtInstitutions(PT_ID, null, null, 2, null).block();
 
@@ -114,11 +114,11 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsFilteredByStatus() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_DELETED),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_DELETED)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_DELETED),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_DELETED)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, PtDelegationStatusDto.REVOKED, 10, null).block();
 
@@ -127,10 +127,10 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsSearchedByName() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, "BARI", null, 10, null).block();
 
@@ -139,10 +139,10 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsSearchedByTaxCode() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, "3333", null, 10, null).block();
 
@@ -151,10 +151,10 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsSearchedWithSurroundingSpaces() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, "  di bari  ", null, 10, null).block();
 
@@ -163,10 +163,10 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsSearchedWithBlankValue() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, "   ", null, 10, null).block();
 
@@ -175,12 +175,12 @@ class InfoPtServiceTest {
 
     @Test
     void getPtInstitutionsFilteredReturnsLastKeyOfLastMatchingInstitution() {
-        when(ptDelegationsDao.getLatestEventPerInstitution(PT_ID, null))
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
                 .thenReturn(Flux.just(
-                        newEntity("ente-D", "Comune di Dolo", "44444444444", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_DELETED),
-                        newEntity("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
-                        newEntity("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE)));
+                        newEvents("ente-D", "Comune di Dolo", "44444444444", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", PtDelegationEntity.STATUS_DELETED),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE),
+                        newEvents("ente-A", "Comune di Ancona", "11111111111", PtDelegationEntity.STATUS_ACTIVE)));
 
         PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, PtDelegationStatusDto.ACTIVE, 2, null).block();
 
@@ -192,7 +192,7 @@ class InfoPtServiceTest {
         return response.getItems().stream().map(PtInstitutionDto::getInstitutionId).toList();
     }
 
-    private PtDelegationEntity newEntity(String institutionId, String institutionName, String institutionTaxCode, String status) {
+    private List<PtDelegationEntity> newEvents(String institutionId, String institutionName, String institutionTaxCode, String status) {
         Instant createdAt = Instant.parse("2026-11-02T10:00:00.000000Z");
         PtDelegationEntity entity = new PtDelegationEntity();
         entity.setPtId(PT_ID);
@@ -207,6 +207,6 @@ class InfoPtServiceTest {
         if (PtDelegationEntity.STATUS_DELETED.equals(status)) {
             entity.setClosedAt(createdAt);
         }
-        return entity;
+        return List.of(entity);
     }
 }
