@@ -15,9 +15,10 @@ import reactor.core.publisher.Mono;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED;
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID;
@@ -28,6 +29,22 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 public class PtDelegationService {
 
     private static final Set<String> ALLOWED_STATUSES = Set.of(PtDelegationEntity.STATUS_ACTIVE, PtDelegationEntity.STATUS_DELETED);
+
+    private static final Map<String, Function<PnPtDelegationPayload, Object>> REQUIRED_FIELDS = Map.ofEntries(
+            Map.entry("delegationId", PnPtDelegationPayload::getDelegationId),
+            Map.entry("delegationType", PnPtDelegationPayload::getDelegationType),
+            Map.entry("productId", PnPtDelegationPayload::getProductId),
+            Map.entry("status", PnPtDelegationPayload::getStatus),
+            Map.entry("sourceEventId", PnPtDelegationPayload::getSourceEventId),
+            Map.entry("createdAt", PnPtDelegationPayload::getCreatedAt),
+            Map.entry("institutionId", PnPtDelegationPayload::getInstitutionId),
+            Map.entry("institutionName", PnPtDelegationPayload::getInstitutionName),
+            Map.entry("institutionTaxCode", PnPtDelegationPayload::getInstitutionTaxCode),
+            Map.entry("institutionType", PnPtDelegationPayload::getInstitutionType),
+            Map.entry("ptId", PnPtDelegationPayload::getPtId),
+            Map.entry("ptName", PnPtDelegationPayload::getPtName),
+            Map.entry("ptTaxCode", PnPtDelegationPayload::getPtTaxCode),
+            Map.entry("ptType", PnPtDelegationPayload::getPtType));
 
     private final PtDelegationsDao ptDelegationsDao;
     private final OnboardInstitutionsDao onboardInstitutionsDao;
@@ -66,23 +83,11 @@ public class PtDelegationService {
             throw new PnInternalException("Delegation payload is null", ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID);
         }
 
-        List<String> missingFields = new ArrayList<>();
-        requireText(missingFields, "delegationId", payload.getDelegationId());
-        requireText(missingFields, "delegationType", payload.getDelegationType());
-        requireText(missingFields, "productId", payload.getProductId());
-        requireText(missingFields, "status", payload.getStatus());
-        requireText(missingFields, "sourceEventId", payload.getSourceEventId());
-        requireText(missingFields, "institutionId", payload.getInstitutionId());
-        requireText(missingFields, "institutionName", payload.getInstitutionName());
-        requireText(missingFields, "institutionTaxCode", payload.getInstitutionTaxCode());
-        requireText(missingFields, "institutionType", payload.getInstitutionType());
-        requireText(missingFields, "ptId", payload.getPtId());
-        requireText(missingFields, "ptName", payload.getPtName());
-        requireText(missingFields, "ptTaxCode", payload.getPtTaxCode());
-        requireText(missingFields, "ptType", payload.getPtType());
-        if (payload.getCreatedAt() == null) {
-            missingFields.add("createdAt");
-        }
+        List<String> missingFields = REQUIRED_FIELDS.entrySet().stream()
+                .filter(field -> isMissing(field.getValue().apply(payload)))
+                .map(Map.Entry::getKey)
+                .sorted()
+                .toList();
 
         if (!missingFields.isEmpty()) {
             throw new PnInternalException("Invalid delegation payload delegationId=" + payload.getDelegationId() + " missingFields=" + missingFields, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID);
@@ -93,9 +98,7 @@ public class PtDelegationService {
         }
     }
 
-    private static void requireText(List<String> missingFields, String fieldName, String value) {
-        if (StringUtils.isBlank(value)) {
-            missingFields.add(fieldName);
-        }
+    private static boolean isMissing(Object value) {
+        return value == null || value instanceof String text && StringUtils.isBlank(text);
     }
 }
