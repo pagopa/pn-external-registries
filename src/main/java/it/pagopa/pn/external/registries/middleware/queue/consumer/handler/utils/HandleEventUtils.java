@@ -3,7 +3,6 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils
 import it.pagopa.pn.api.dto.events.StandardEventHeader;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.MDCUtils;
-import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
@@ -47,7 +46,7 @@ public class HandleEventUtils {
     }
 
     @Nullable
-    public static String getEventId(Message<UpdateNotificationCost> message) {
+    public static String getEventId(Message<?> message) {
         MessageHeaders messageHeaders = message.getHeaders();
         String eventId = null;
         if (messageHeaders.containsKey("eventId")){
