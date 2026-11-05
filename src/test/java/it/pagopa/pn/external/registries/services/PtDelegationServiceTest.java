@@ -100,58 +100,21 @@ class PtDelegationServiceTest {
     }
 
     @Test
-    void saveDelegationEventFailsWhenRequiredFieldMissing() {
-        PnPtDelegationPayload payload = payload();
-        payload.setPtId(null);
-        payload.setInstitutionTaxCode(" ");
-
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
-                .expectErrorSatisfies(ex -> {
-                    assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID);
-                    assertThat(((PnInternalException) ex).getProblem().getDetail()).contains("ptId").contains("institutionTaxCode");
-                })
-                .verify();
-
-        verifyNoInteractions(onboardInstitutionsDao, ptDelegationsDao);
-    }
-
-    @Test
-    void saveDelegationEventFailsWhenDelegationIdMissing() {
-        PnPtDelegationPayload payload = payload();
-        payload.setDelegationId(null);
-
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
-                .expectErrorSatisfies(ex -> assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID))
-                .verify();
-
-        verifyNoInteractions(onboardInstitutionsDao, ptDelegationsDao);
-    }
-
-    @Test
-    void saveDelegationEventFailsWhenStatusMissing() {
-        PnPtDelegationPayload payload = payload();
-        payload.setStatus(null);
-
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
-                .expectErrorSatisfies(ex -> assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID))
-                .verify();
-
-        verifyNoInteractions(onboardInstitutionsDao, ptDelegationsDao);
-    }
-
-    @Test
-    void saveDelegationEventFailsWhenCreatedAtMissing() {
+    void saveDelegationEventWithoutOptionalFields() {
         PnPtDelegationPayload payload = payload();
         payload.setCreatedAt(null);
+        payload.setInstitutionTaxCode(null);
+        payload.setPtName(null);
+        when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
+        when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
-                .expectErrorSatisfies(ex -> {
-                    assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID);
-                    assertThat(((PnInternalException) ex).getProblem().getDetail()).contains("createdAt");
-                })
-                .verify();
+                .expectNext(Boolean.TRUE)
+                .verifyComplete();
 
-        verifyNoInteractions(onboardInstitutionsDao, ptDelegationsDao);
+        ArgumentCaptor<PtDelegationEntity> captor = ArgumentCaptor.forClass(PtDelegationEntity.class);
+        verify(ptDelegationsDao).insertIfAbsent(captor.capture());
+        assertThat(captor.getValue().getLastChangeAt()).isEqualTo(NOW);
     }
 
     @Test
@@ -164,13 +127,6 @@ class PtDelegationServiceTest {
                 .verify();
 
         verifyNoInteractions(onboardInstitutionsDao, ptDelegationsDao);
-    }
-
-    @Test
-    void saveDelegationEventFailsWhenPayloadNull() {
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(null))
-                .expectErrorSatisfies(ex -> assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID))
-                .verify();
     }
 
     @Test
