@@ -14,25 +14,20 @@ import reactor.core.publisher.Mono;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Set;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED;
-import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID;
 
 @Service
 @CustomLog
 @RequiredArgsConstructor
 public class PtDelegationService {
 
-    private static final Set<String> ALLOWED_STATUSES = Set.of(PtDelegationEntity.STATUS_ACTIVE, PtDelegationEntity.STATUS_DELETED);
-
     private final PtDelegationsDao ptDelegationsDao;
     private final OnboardInstitutionsDao onboardInstitutionsDao;
     private final Clock clock;
 
     public Mono<Boolean> saveDelegationEvent(PnPtDelegationPayload payload) {
-        return Mono.fromRunnable(() -> validateStatus(payload))
-                .then(Mono.defer(() -> checkInstitutionOnboarded(payload.getInstitutionId())))
+        return Mono.defer(() -> checkInstitutionOnboarded(payload.getInstitutionId()))
                 .then(Mono.defer(() -> {
                     Instant lastChangeAt = computeLastChangeAt(payload);
                     PtDelegationEntity entity = PtDelegationPayloadToPtDelegationEntity.toEntity(payload, lastChangeAt);
@@ -58,9 +53,4 @@ public class PtDelegationService {
         return Instant.now(clock);
     }
 
-    private void validateStatus(PnPtDelegationPayload payload) {
-        if (payload.getStatus() == null || !ALLOWED_STATUSES.contains(payload.getStatus())) {
-            throw new PnInternalException("Invalid delegation payload delegationId=" + payload.getDelegationId() + " status=" + payload.getStatus(), ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID);
-        }
-    }
 }

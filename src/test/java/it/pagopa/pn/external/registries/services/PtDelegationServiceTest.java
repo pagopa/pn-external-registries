@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 
 import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED;
-import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -118,15 +117,15 @@ class PtDelegationServiceTest {
     }
 
     @Test
-    void saveDelegationEventFailsWhenStatusNotAllowed() {
+    void saveDelegationEventDoesNotValidateStatus() {
         PnPtDelegationPayload payload = payload();
         payload.setStatus("SUSPENDED");
+        when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
+        when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
-                .expectErrorSatisfies(ex -> assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INVALID))
-                .verify();
-
-        verifyNoInteractions(onboardInstitutionsDao, ptDelegationsDao);
+                .expectNext(Boolean.TRUE)
+                .verifyComplete();
     }
 
     @Test

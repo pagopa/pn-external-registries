@@ -34,7 +34,7 @@ class PtDelegationEventHandlerTest {
     void pnKafkaBridgePtDelegationEventConsumerError() {
         Message<PnPtDelegationPayload> message = getMessage();
         Mockito.when(ptDelegationService.saveDelegationEvent(message.getPayload()))
-                .thenReturn(Mono.error(new PnInternalException("error", "PN_EXTERNALREGISTRIES_PT_DELEGATION_INVALID")));
+                .thenReturn(Mono.error(new PnInternalException("error", "PN_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED")));
 
         Assertions.assertThrows(PnInternalException.class, () -> ptDelegationEventHandler.pnKafkaBridgePtDelegationEventConsumer(message));
     }
