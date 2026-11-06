@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "### CREATE QUEUES ###"
 
-queues="local-delivery-push-to-ext-registries"
+queues="local-delivery-push-to-ext-registries local-kafka-bridge-delegations"
 
 for qn in  $( echo $queues | tr " " "\n" ) ; do
     echo creating queue $qn ...
