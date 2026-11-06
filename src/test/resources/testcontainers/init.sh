@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "### CREATE QUEUES ###"
 
-queues="local-delivery-push-to-ext-registries"
+queues="local-delivery-push-to-ext-registries local-kafka-bridge-delegations"
 
 for qn in  $( echo $queues | tr " " "\n" ) ; do
     echo creating queue $qn ...
@@ -126,6 +126,19 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
     --key-schema \
         AttributeName=hashKey,KeyType=HASH \
         AttributeName=sortKey,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
+
+echo "### CREATE PN PT DELEGATIONS TABLE ###"
+
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+    dynamodb create-table \
+    --table-name pn-PtDelegations \
+    --attribute-definitions \
+        AttributeName=ptId,AttributeType=S \
+        AttributeName=eventKey,AttributeType=S \
+    --key-schema \
+        AttributeName=ptId,KeyType=HASH \
+        AttributeName=eventKey,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
 
 
