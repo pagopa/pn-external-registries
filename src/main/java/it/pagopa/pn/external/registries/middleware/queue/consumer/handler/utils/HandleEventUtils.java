@@ -2,6 +2,7 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils
 
 import it.pagopa.pn.api.dto.events.StandardEventHeader;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import io.awspring.cloud.sqs.listener.SqsHeaders;
 import it.pagopa.pn.commons.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +54,12 @@ public class HandleEventUtils {
             eventId = messageHeaders.get("eventId", String.class);
         }
         return eventId;
+    }
+
+    @Nullable
+    public static Instant getSentTimestamp(Message<?> message) {
+        Object sentTimestamp = message.getHeaders().get(SqsHeaders.MessageSystemAttributes.SQS_SENT_TIMESTAMP);
+        return sentTimestamp != null ? Instant.ofEpochMilli(Long.parseLong(sentTimestamp.toString())) : null;
     }
 
     public static void addIunAndRecIndexAndCorrIdToMdc(String iun, Integer recIndex, String correlationId) {

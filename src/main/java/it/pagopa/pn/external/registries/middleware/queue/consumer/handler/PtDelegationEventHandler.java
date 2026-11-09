@@ -10,6 +10,7 @@ import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import static it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils.HandleEventUtils.getEventId;
+import static it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils.HandleEventUtils.getSentTimestamp;
 import static it.pagopa.pn.external.registries.middleware.queue.utils.ConsumerUtils.setMdc;
 
 @Component
@@ -29,7 +30,7 @@ public class PtDelegationEventHandler {
             HandleEventUtils.addCorrelationIdToMdc(getEventId(message));
 
             log.logStartingProcess(processName);
-            ptDelegationService.saveDelegationEvent(message.getPayload()).block();
+            ptDelegationService.saveDelegationEvent(message.getPayload(), getSentTimestamp(message)).block();
             log.logEndingProcess(processName);
         } catch (Exception ex) {
             log.logEndingProcess(processName, false, ex.getMessage(), ex);

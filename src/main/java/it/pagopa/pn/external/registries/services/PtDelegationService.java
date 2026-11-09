@@ -26,10 +26,10 @@ public class PtDelegationService {
     private final OnboardInstitutionsDao onboardInstitutionsDao;
     private final Clock clock;
 
-    public Mono<Boolean> saveDelegationEvent(PnPtDelegationPayload payload) {
+    public Mono<Boolean> saveDelegationEvent(PnPtDelegationPayload payload, Instant sentAt) {
         return Mono.defer(() -> checkInstitutionOnboarded(payload.getInstitutionId()))
                 .then(Mono.defer(() -> {
-                    Instant lastChangeAt = computeLastChangeAt(payload);
+                    Instant lastChangeAt = computeLastChangeAt(payload, sentAt);
                     PtDelegationEntity entity = PtDelegationPayloadToPtDelegationEntity.toEntity(payload, lastChangeAt);
                     return ptDelegationsDao.insertIfAbsent(entity);
                 }))
@@ -43,12 +43,15 @@ public class PtDelegationService {
                 .switchIfEmpty(Mono.error(() -> new PnInternalException("Institution not onboarded institutionId=" + institutionId, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED)));
     }
 
-    Instant computeLastChangeAt(PnPtDelegationPayload payload) {
+    Instant computeLastChangeAt(PnPtDelegationPayload payload, Instant sentAt) {
         if (payload.getUpdatedAt() != null) {
             return payload.getUpdatedAt();
         }
         if (payload.getCreatedAt() != null) {
             return payload.getCreatedAt();
+        }
+        if (sentAt != null) {
+            return sentAt;
         }
         return Instant.now(clock);
     }

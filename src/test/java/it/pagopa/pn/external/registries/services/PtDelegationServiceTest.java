@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 class PtDelegationServiceTest {
 
     private static final Instant NOW = Instant.parse("2026-11-03T12:00:00Z");
+    private static final Instant SENT_AT = Instant.parse("2026-11-03T11:59:58.250Z");
     private static final Instant CREATED_AT = Instant.parse("2026-11-02T10:00:00Z");
     private static final Instant UPDATED_AT = Instant.parse("2026-11-20T09:30:00.123456Z");
 
@@ -51,7 +52,7 @@ class PtDelegationServiceTest {
         when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
         when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
+        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload, SENT_AT))
                 .expectNext(Boolean.TRUE)
                 .verifyComplete();
 
@@ -71,7 +72,7 @@ class PtDelegationServiceTest {
         when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
         when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.FALSE));
 
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload()))
+        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload(), SENT_AT))
                 .expectNext(Boolean.FALSE)
                 .verifyComplete();
     }
@@ -80,7 +81,7 @@ class PtDelegationServiceTest {
     void saveDelegationEventFailsWhenInstitutionNotFound() {
         when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.empty());
 
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload()))
+        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload(), SENT_AT))
                 .expectErrorSatisfies(ex -> assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED))
                 .verify();
 
@@ -91,7 +92,7 @@ class PtDelegationServiceTest {
     void saveDelegationEventFailsWhenInstitutionNotActive() {
         when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_CLOSED)));
 
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload()))
+        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload(), SENT_AT))
                 .expectErrorSatisfies(ex -> assertErrorCode(ex, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED))
                 .verify();
 
@@ -107,13 +108,13 @@ class PtDelegationServiceTest {
         when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
         when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
+        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload, SENT_AT))
                 .expectNext(Boolean.TRUE)
                 .verifyComplete();
 
         ArgumentCaptor<PtDelegationEntity> captor = ArgumentCaptor.forClass(PtDelegationEntity.class);
         verify(ptDelegationsDao).insertIfAbsent(captor.capture());
-        assertThat(captor.getValue().getLastChangeAt()).isEqualTo(NOW);
+        assertThat(captor.getValue().getLastChangeAt()).isEqualTo(SENT_AT);
     }
 
     @Test
@@ -123,7 +124,7 @@ class PtDelegationServiceTest {
         when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
         when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload))
+        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload, SENT_AT))
                 .expectNext(Boolean.TRUE)
                 .verifyComplete();
     }
@@ -133,12 +134,20 @@ class PtDelegationServiceTest {
         PnPtDelegationPayload payload = payload();
         payload.setUpdatedAt(UPDATED_AT);
 
-        assertThat(ptDelegationService.computeLastChangeAt(payload)).isEqualTo(UPDATED_AT);
+        assertThat(ptDelegationService.computeLastChangeAt(payload, SENT_AT)).isEqualTo(UPDATED_AT);
     }
 
     @Test
     void computeLastChangeAtFallsBackToCreatedAt() {
-        assertThat(ptDelegationService.computeLastChangeAt(payload())).isEqualTo(CREATED_AT);
+        assertThat(ptDelegationService.computeLastChangeAt(payload(), SENT_AT)).isEqualTo(CREATED_AT);
+    }
+
+    @Test
+    void computeLastChangeAtFallsBackToSentTimestamp() {
+        PnPtDelegationPayload payload = payload();
+        payload.setCreatedAt(null);
+
+        assertThat(ptDelegationService.computeLastChangeAt(payload, SENT_AT)).isEqualTo(SENT_AT);
     }
 
     @Test
@@ -146,7 +155,7 @@ class PtDelegationServiceTest {
         PnPtDelegationPayload payload = payload();
         payload.setCreatedAt(null);
 
-        assertThat(ptDelegationService.computeLastChangeAt(payload)).isEqualTo(NOW);
+        assertThat(ptDelegationService.computeLastChangeAt(payload, null)).isEqualTo(NOW);
     }
 
     private static void assertErrorCode(Throwable ex, String errorCode) {
