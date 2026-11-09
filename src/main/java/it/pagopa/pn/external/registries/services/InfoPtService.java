@@ -5,6 +5,7 @@ import it.pagopa.pn.external.registries.generated.openapi.server.pt.v1.dto.PtIns
 import it.pagopa.pn.external.registries.generated.openapi.server.pt.v1.dto.PtInstitutionsResponseDto;
 import it.pagopa.pn.external.registries.mapper.PtDelegationEntityToPtInstitutionDtoMapper;
 import it.pagopa.pn.external.registries.middleware.db.dao.PtDelegationsDao;
+import it.pagopa.pn.external.registries.middleware.db.entities.PtDelegationEntity;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,23 @@ public class InfoPtService {
         log.info("start retrieving institutions for PT: [{}] search: [{}] status: [{}] limit: [{}] lastKey: [{}]", ptId, search, status, limit, lastKey);
         String normalizedSearch = normalizeSearch(search);
         return ptDelegationsDao.getEventsPerInstitution(ptId, lastKey)
+                .filter(this::hasSupportedStatus)
                 .map(PtDelegationEntityToPtInstitutionDtoMapper::toDto)
                 .filter(institution -> status == null || status == institution.getStatus())
                 .filter(institution -> matchesSearch(institution, normalizedSearch))
                 .take(limit + 1L)
                 .collectList()
                 .map(institutions -> toResponse(institutions, limit));
+    }
+
+    private boolean hasSupportedStatus(List<PtDelegationEntity> events) {
+        PtDelegationEntity latest = events.getFirst();
+        if (PtDelegationEntityToPtInstitutionDtoMapper.isSupportedStatus(latest.getStatus())) {
+            return true;
+        }
+        log.warn("Skipping delegation with unsupported status ptId={} institutionId={} delegationId={} status={}",
+                latest.getPtId(), latest.getInstitutionId(), latest.getDelegationId(), latest.getStatus());
+        return false;
     }
 
     private String normalizeSearch(String search) {

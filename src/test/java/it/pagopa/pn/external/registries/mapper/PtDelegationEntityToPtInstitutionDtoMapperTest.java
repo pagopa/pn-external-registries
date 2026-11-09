@@ -10,6 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PtDelegationEntityToPtInstitutionDtoMapperTest {
 
@@ -90,6 +93,21 @@ class PtDelegationEntityToPtInstitutionDtoMapperTest {
 
         assertEquals(PtDelegationStatusDto.REVOKED, dto.getStatus());
         assertEquals(Date.from(UPDATED_AT), dto.getStatusChangedAt());
+    }
+
+    @Test
+    void toDtoUnsupportedStatus() {
+        List<PtDelegationEntity> events = List.of(newEntity("SUSPENDED", UPDATED_AT));
+
+        assertThrows(IllegalArgumentException.class, () -> PtDelegationEntityToPtInstitutionDtoMapper.toDto(events));
+    }
+
+    @Test
+    void isSupportedStatus() {
+        assertTrue(PtDelegationEntityToPtInstitutionDtoMapper.isSupportedStatus(PtDelegationEntity.STATUS_ACTIVE));
+        assertTrue(PtDelegationEntityToPtInstitutionDtoMapper.isSupportedStatus(PtDelegationEntity.STATUS_DELETED));
+        assertFalse(PtDelegationEntityToPtInstitutionDtoMapper.isSupportedStatus("SUSPENDED"));
+        assertFalse(PtDelegationEntityToPtInstitutionDtoMapper.isSupportedStatus(null));
     }
 
     private PtDelegationEntity newEntity(String status, Instant lastChangeAt) {

@@ -188,6 +188,18 @@ class InfoPtServiceTest {
         assertEquals("ente-B", response.getLastKey());
     }
 
+    @Test
+    void getPtInstitutionsSkipsUnsupportedStatus() {
+        when(ptDelegationsDao.getEventsPerInstitution(PT_ID, null))
+                .thenReturn(Flux.just(
+                        newEvents("ente-C", "Comune di Cagliari", "33333333333", "SUSPENDED"),
+                        newEvents("ente-B", "Comune di Bari", "22222222222", PtDelegationEntity.STATUS_ACTIVE)));
+
+        PtInstitutionsResponseDto response = infoPtService.getPtInstitutions(PT_ID, null, PtDelegationStatusDto.ACTIVE, 10, null).block();
+
+        assertEquals(List.of("ente-B"), institutionIds(response));
+    }
+
     private List<String> institutionIds(PtInstitutionsResponseDto response) {
         return response.getItems().stream().map(PtInstitutionDto::getInstitutionId).toList();
     }
