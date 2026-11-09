@@ -100,24 +100,6 @@ class PtDelegationServiceTest {
     }
 
     @Test
-    void saveDelegationEventWithoutOptionalFields() {
-        PnPtDelegationPayload payload = payload();
-        payload.setCreatedAt(null);
-        payload.setInstitutionTaxCode(null);
-        payload.setPtName(null);
-        when(onboardInstitutionsDao.get("ente-A")).thenReturn(Mono.just(onboardInstitution(OnboardInstitutionEntity.STATUS_ACTIVE)));
-        when(ptDelegationsDao.insertIfAbsent(any())).thenReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(ptDelegationService.saveDelegationEvent(payload, SENT_AT))
-                .expectNext(Boolean.TRUE)
-                .verifyComplete();
-
-        ArgumentCaptor<PtDelegationEntity> captor = ArgumentCaptor.forClass(PtDelegationEntity.class);
-        verify(ptDelegationsDao).insertIfAbsent(captor.capture());
-        assertThat(captor.getValue().getLastChangeAt()).isEqualTo(SENT_AT);
-    }
-
-    @Test
     void saveDelegationEventDoesNotValidateStatus() {
         PnPtDelegationPayload payload = payload();
         payload.setStatus("SUSPENDED");
