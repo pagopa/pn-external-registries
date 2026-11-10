@@ -2,8 +2,8 @@ package it.pagopa.pn.external.registries.middleware.queue.consumer.handler.utils
 
 import it.pagopa.pn.api.dto.events.StandardEventHeader;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import io.awspring.cloud.sqs.listener.SqsHeaders;
 import it.pagopa.pn.commons.utils.MDCUtils;
-import it.pagopa.pn.external.registries.dto.deliverypush.UpdateNotificationCost;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
@@ -47,13 +47,19 @@ public class HandleEventUtils {
     }
 
     @Nullable
-    public static String getEventId(Message<UpdateNotificationCost> message) {
+    public static String getEventId(Message<?> message) {
         MessageHeaders messageHeaders = message.getHeaders();
         String eventId = null;
         if (messageHeaders.containsKey("eventId")){
             eventId = messageHeaders.get("eventId", String.class);
         }
         return eventId;
+    }
+
+    @Nullable
+    public static Instant getSentTimestamp(Message<?> message) {
+        Object sentTimestamp = message.getHeaders().get(SqsHeaders.MessageSystemAttributes.SQS_SENT_TIMESTAMP);
+        return sentTimestamp != null ? Instant.ofEpochMilli(Long.parseLong(sentTimestamp.toString())) : null;
     }
 
     public static void addIunAndRecIndexAndCorrIdToMdc(String iun, Integer recIndex, String correlationId) {
