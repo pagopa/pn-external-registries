@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.api.dto.events.PnPtDelegationPayload;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.PnPtDelegationInstitutionNotOnboardedException;
 import it.pagopa.pn.external.registries.mapper.PtDelegationPayloadToPtDelegationEntity;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.dao.PtDelegationsDao;
@@ -15,8 +15,6 @@ import reactor.core.publisher.Mono;
 import java.time.Clock;
 import java.time.Instant;
 
-import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesExceptionCodes.ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED;
-
 @Service
 @CustomLog
 @RequiredArgsConstructor
@@ -27,7 +25,7 @@ public class PtDelegationService {
     private final Clock clock;
 
     public Mono<Boolean> saveDelegationEvent(PnPtDelegationPayload payload, Instant sentAt) {
-        return Mono.defer(() -> checkInstitutionOnboarded(payload))
+        return Mono.defer(() -> checkInstitutionOnboarded(payload.getInstitutionId()))
                 .then(Mono.defer(() -> {
                     Instant lastChangeAt = computeLastChangeAt(payload, sentAt);
                     PtDelegationEntity entity = PtDelegationPayloadToPtDelegationEntity.toEntity(payload, lastChangeAt);
@@ -37,14 +35,10 @@ public class PtDelegationService {
                         payload.getDelegationId(), payload.getPtId(), payload.getInstitutionId(), payload.getStatus(), inserted));
     }
 
-    private Mono<OnboardInstitutionEntity> checkInstitutionOnboarded(PnPtDelegationPayload payload) {
-        String institutionId = payload.getInstitutionId();
+    private Mono<OnboardInstitutionEntity> checkInstitutionOnboarded(String institutionId) {
         return onboardInstitutionsDao.get(institutionId)
                 .filter(OnboardInstitutionEntity::isActive)
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("Institution not onboarded or not active, delegation event not saved delegationId={} ptId={} institutionId={}", payload.getDelegationId(), payload.getPtId(), institutionId);
-                    return Mono.error(new PnInternalException("Institution not onboarded institutionId=" + institutionId, ERROR_CODE_EXTERNALREGISTRIES_PT_DELEGATION_INSTITUTION_NOT_ONBOARDED));
-                }));
+                .switchIfEmpty(Mono.error(() -> new PnPtDelegationInstitutionNotOnboardedException(institutionId)));
     }
 
     Instant computeLastChangeAt(PnPtDelegationPayload payload, Instant sentAt) {

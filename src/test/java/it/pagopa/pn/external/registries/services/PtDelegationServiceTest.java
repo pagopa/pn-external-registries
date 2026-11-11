@@ -1,7 +1,7 @@
 package it.pagopa.pn.external.registries.services;
 
 import it.pagopa.pn.api.dto.events.PnPtDelegationPayload;
-import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.external.registries.exceptions.PnPtDelegationInstitutionNotOnboardedException;
 import it.pagopa.pn.external.registries.middleware.db.dao.OnboardInstitutionsDao;
 import it.pagopa.pn.external.registries.middleware.db.dao.PtDelegationsDao;
 import it.pagopa.pn.external.registries.middleware.db.entities.OnboardInstitutionEntity;
@@ -141,8 +141,9 @@ class PtDelegationServiceTest {
     }
 
     private static void assertErrorCode(Throwable ex, String errorCode) {
-        assertThat(ex).isInstanceOf(PnInternalException.class);
-        assertThat(((PnInternalException) ex).getProblem().getErrors().get(0).getCode()).isEqualTo(errorCode);
+        assertThat(ex).isInstanceOf(PnPtDelegationInstitutionNotOnboardedException.class)
+                .hasMessage("Institution not onboarded institutionId=ente-A");
+        assertThat(((PnPtDelegationInstitutionNotOnboardedException) ex).getProblem().getErrors().get(0).getCode()).isEqualTo(errorCode);
     }
 
     private static OnboardInstitutionEntity onboardInstitution(String status) {
