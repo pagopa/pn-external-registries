@@ -15,6 +15,7 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpError;
 import org.mockserver.model.MediaType;
+import org.mockserver.verify.VerificationTimes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -82,12 +83,85 @@ class SelfcarePaUserGroupClientTest extends MockAWSObjectsTestConfig {
                         .withStatusCode(200));
 
         //When
-        PageOfUserGroupResourceDto response = client.getUserGroups("77777777777302000100000019421").block();
+        PageOfUserGroupResourceDto response = client.getUserGroups("77777777777302000100000019421", null).block();
 
         //Then
         Assertions.assertNotNull(response);
         Assertions.assertEquals(1, response.getContent().size());
         Assertions.assertEquals(responseDto.getContent().get(0).getName(), response.getContent().get(0).getName());
+    }
+
+    @Test
+    void getUserGroups_shouldRequestFirstPageWithSize300() throws JsonProcessingException {
+        UserGroupResourceDto userDto = new UserGroupResourceDto()
+                .name("companyname");
+
+        PageOfUserGroupResourceDto responseDto = new PageOfUserGroupResourceDto();
+        responseDto.setContent(List.of(userDto));
+
+        byte[] responseBody = new ObjectMapper().writeValueAsBytes(responseDto);
+
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request()
+                        .withMethod("GET")
+                        .withPath("/user-groups")
+                        .withQueryStringParameter("page", "0")
+                        .withQueryStringParameter("size", "300"))
+                .respond(response()
+                        .withBody(responseBody)
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200));
+
+        StepVerifier.create(client.getUserGroups("77777777777302000100000019421", null))
+                .assertNext(response -> {
+                    Assertions.assertEquals(1, response.getContent().size());
+                    Assertions.assertEquals(userDto.getName(), response.getContent().get(0).getName());
+                })
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+
+        mockServerClient.verify(request()
+                        .withMethod("GET")
+                        .withPath("/user-groups")
+                        .withQueryStringParameter("page", "0")
+                        .withQueryStringParameter("size", "300"),
+                VerificationTimes.once());
+    }
+
+    @Test
+    void getUserGroups_shouldForwardStatusToSelfcare() throws JsonProcessingException {
+        UserGroupResourceDto userDto = new UserGroupResourceDto()
+                .name("companyname");
+
+        PageOfUserGroupResourceDto responseDto = new PageOfUserGroupResourceDto();
+        responseDto.setContent(List.of(userDto));
+
+        byte[] responseBody = new ObjectMapper().writeValueAsBytes(responseDto);
+
+        MockServerClient mockServerClient = new MockServerClient("localhost", 9999);
+        mockServerClient.reset();
+        mockServerClient.when(request()
+                        .withMethod("GET")
+                        .withPath("/user-groups")
+                        .withQueryStringParameter("status", "ACTIVE"))
+                .respond(response()
+                        .withBody(responseBody)
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200));
+
+        StepVerifier.create(client.getUserGroups("77777777777302000100000019421", "ACTIVE"))
+                .assertNext(response -> Assertions.assertEquals(1, response.getContent().size()))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+
+        mockServerClient.verify(request()
+                        .withMethod("GET")
+                        .withPath("/user-groups")
+                        .withQueryStringParameter("page", "0")
+                        .withQueryStringParameter("size", "300")
+                        .withQueryStringParameter("status", "ACTIVE"),
+                VerificationTimes.once());
     }
 
     @Test
@@ -97,7 +171,7 @@ class SelfcarePaUserGroupClientTest extends MockAWSObjectsTestConfig {
         mockServerClient.when(request().withMethod("GET").withPath("/user-groups"))
                 .respond(response().withStatusCode(500));
 
-        StepVerifier.create(client.getUserGroups("institution-id"))
+        StepVerifier.create(client.getUserGroups("institution-id", null))
                 .expectError(PnInternalException.class)
                 .verify(Duration.ofSeconds(5));
     }
@@ -109,7 +183,7 @@ class SelfcarePaUserGroupClientTest extends MockAWSObjectsTestConfig {
         mockServerClient.when(request().withMethod("GET").withPath("/user-groups"))
                 .error(HttpError.error().withDropConnection(true));
 
-        StepVerifier.create(client.getUserGroups("institution-id"))
+        StepVerifier.create(client.getUserGroups("institution-id", null))
                 .expectError(PnInternalException.class)
                 .verify(Duration.ofSeconds(5));
     }
