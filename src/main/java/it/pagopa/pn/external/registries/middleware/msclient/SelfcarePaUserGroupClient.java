@@ -20,13 +20,15 @@ import static it.pagopa.pn.external.registries.exceptions.PnExternalregistriesEx
 @RequiredArgsConstructor
 public class SelfcarePaUserGroupClient {
 
+    private static final int MAX_PAGE_SIZE = 300;
+
     private final UserGroupApi userGroupPaApi; //inject by name
     private final PnExternalRegistriesConfig config;
 
 
     public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
         log.logInvokingExternalDownstreamService(SELFCARE_PA, "getUserGroups");
-        return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, 100, null, null, null)
+        return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, null, null)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientException.class, x -> {
                     log.logInvokationResultDownstreamFailed(SELFCARE_PA, CommonBaseClient.elabExceptionMessage(x), x);
