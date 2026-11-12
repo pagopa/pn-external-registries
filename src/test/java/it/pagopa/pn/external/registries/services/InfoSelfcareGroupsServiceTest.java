@@ -55,7 +55,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        when(selfcarePaUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePaUserGroupClient.getUserGroups(id, null)).thenReturn(Mono.just(response));
 
         // WHEN
         List<PaGroupDto> res = service.getPaGroups(id, id, null, null).collectList().block(d);
@@ -86,7 +86,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        when(selfcarePaUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePaUserGroupClient.getUserGroups(id, null)).thenReturn(Mono.just(response));
 
         // WHEN
         List<PaGroupDto> res = service.getPaGroups(id, id, List.of(id), null).collectList().block(d);
@@ -123,7 +123,7 @@ class InfoSelfcareGroupsServiceTest {
         PageOfUserGroupResourceDto response = new PageOfUserGroupResourceDto();
         response.setContent(list);
 
-        when(selfcarePaUserGroupClient.getUserGroups(id)).thenReturn(Mono.just(response));
+        when(selfcarePaUserGroupClient.getUserGroups(id, "ACTIVE")).thenReturn(Mono.just(response));
 
         // WHEN
         List<PaGroupDto> res = service.getPaGroups(id, id, List.of(id, id + "3"), PaGroupStatusDto.ACTIVE).collectList().block(d);

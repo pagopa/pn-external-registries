@@ -26,9 +26,9 @@ public class SelfcarePaUserGroupClient {
     private final PnExternalRegistriesConfig config;
 
 
-    public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId) {
+    public Mono<PageOfUserGroupResourceDto> getUserGroups(String institutionId, String status) {
         log.logInvokingExternalDownstreamService(SELFCARE_PA, "getUserGroups");
-        return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, null, null)
+        return userGroupPaApi.getUserGroupsUsingGET(config.getSelfcareusergroupUid(), institutionId, 0, MAX_PAGE_SIZE, null, null, status)
                 .doOnNext(pageOfUserGroupResourceDto -> log.info("GetUserGroup result for institutionId {}: {}", institutionId, pageOfUserGroupResourceDto))
                 .onErrorResume(WebClientException.class, x -> {
                     log.logInvokationResultDownstreamFailed(SELFCARE_PA, CommonBaseClient.elabExceptionMessage(x), x);
