@@ -6,4 +6,4 @@ Se la apri **entro le ore {{ora}} del giorno {{data}}** la notifica SEND risulte
 **Codice IUN**
 {{iun}}
 
-Premendo **Apri la notifica** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.
+Premendo **Leggi il messaggio** dichiari di aver letto l’**[Informativa Privacy](${piattaformaNotificheURLPrivacy})** e di accettare i **[Termini e Condizioni d’uso](${piattaformaNotificheURLTOS})**.
